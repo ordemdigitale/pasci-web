@@ -4,7 +4,7 @@
 Plateforme digitale des OSC membres du CRASC.
 
 ## Technologies utilisées
-- [text](https://nextjs.org/)
+- [Next.js](https://nextjs.org/)
 
 ## Lancer le projet
 - Cloner le projet
