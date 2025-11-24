@@ -16,11 +16,11 @@ import {
 
 const NavLinks = [
   { href: "/", key: 1, text: "Accueil" },
-  { href: "/a-propos", key: 2, text: "À propos" },
-  { href: "/annuaire-des-crasc", key: 3, text: "Annuaire des CRASC" },
-  { href: "/statistiques", key: 4, text: "Statistiques" },
-  { href: "/ressources", key: 5, text: "Ressources" },
-  { href: "/espace-collaboratif", key: 6, text: "Espace collaboratif" },
+  { href: "/services", key: 2, text: "Services" },
+  { href: "/formations", key: 3, text: "Formations" },
+  { href: "/ressources", key: 4, text: "Ressources" },
+  { href: "/espace-collaboratif", key: 5, text: "Espace collaboratif" },
+  { href: "/a-propos", key: 6, text: "À propos" },
   { href: "/contact", key: 7, text: "Contact" },
 ]
 
@@ -36,7 +36,7 @@ export default function Navbar() {
 
   return (
     <header>
-      <nav className="py-4 border-b border-gray-200">
+      <nav className="py-4 border-b border-gray-200 font-poppins">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -52,7 +52,7 @@ export default function Navbar() {
                 <a
                   key={link.text}
                   href={link.href}
-                  className="text-gray-700 hover:text-gray-900 text-sm tracking-wide transition-colors"
+                  className="text-gray-700 hover:text-[#E05017] text-sm tracking-wide transition-colors border-b-2 border-transparent hover:border-[#E05017] pb-1"
                 >
                   {link.text}
                 </a>

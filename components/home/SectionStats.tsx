@@ -2,6 +2,7 @@
 
 import { Globe, MapPin } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { Button } from "@/components/ui/button"
 
 export default function Stats() {
   // Data for "Répartition des OSC par zone CRASC" donut chart
@@ -36,10 +37,13 @@ export default function Stats() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-gray-900">Tableau de Bord des Statistiques</h2>
-          <button className="px-4 py-2 border-2 border-[#ff8c42] text-[#ff8c42] rounded-lg hover:bg-[#ff8c42] hover:text-white transition-colors">
+          <h2 className="text-gray-900 font-bold text-3xl">Tableau de Bord des Statistiques</h2>
+          <Button 
+            variant="outline" 
+            className="border border-[#E05017] text-[#E05017] hover:bg-[#E05017] hover:text-white rounded-lg px-6"
+          >
             Voir plus
-          </button>
+          </Button>
         </div>
 
         {/* Top Row - 3 Cards */}

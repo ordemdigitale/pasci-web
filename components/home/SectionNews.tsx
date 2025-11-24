@@ -39,14 +39,14 @@ export default function SectionNews() {
   ];
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-white font-poppins">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
-          <h2 className="text-gray-900">Actualités</h2>
+          <h2 className="text-gray-900 font-bold text-3xl">Actualités</h2>
           <Button 
             variant="outline" 
-            className="border border-[#ff8c42] text-[#ff8c42] hover:bg-[#ff8c42] hover:text-white rounded-full px-6"
+            className="border border-[#E05017] text-[#E05017] hover:bg-[#E05017] hover:text-white rounded-lg px-6"
           >
             Voir plus
           </Button>
@@ -77,7 +77,7 @@ export default function SectionNews() {
                 </p>
                 <a 
                   href={article.link}
-                  className="text-gray-700 text-sm hover:text-[#ff8c42] transition-colors inline-flex items-center group"
+                  className="text-gray-700 text-sm hover:text-[#E05017] transition-colors inline-flex items-center group"
                 >
                   Lire l'article
                   <svg 

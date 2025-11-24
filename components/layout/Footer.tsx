@@ -4,7 +4,7 @@ import { ImageWithFallback } from "@/lib/imageWithFallback"
 
 export default function Footer() {
   return (
-    <footer className="bg-[#052838] text-white">
+    <footer className="bg-[#052838] text-white font-poppins">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
@@ -148,7 +148,7 @@ export default function Footer() {
 
         {/* Bottom Footer */}
         <div className="flex flex-col md:flex-row justify-center items-center gap-4 text-sm text-gray-400">
-          <p>copyright © 2025 Projet PASCI. Tous droits réservés.</p>
+          <p>Copyright © 2025 Projet PASCI. Tous droits réservés.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-white transition-colors">
               Politique de Confidentialité
