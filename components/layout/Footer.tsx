@@ -22,12 +22,12 @@ export default function Footer() {
             <h3 className="text-white mb-4">Architecture</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a href="/" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Accueil
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a href="/a-propos" className="text-gray-300 hover:text-white text-sm transition-colors">
                   À propos
                 </a>
               </li>
@@ -42,12 +42,12 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a href="/espace-collaboratif" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Espace Collaboratif
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a href="/contact" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Contact
                 </a>
               </li>

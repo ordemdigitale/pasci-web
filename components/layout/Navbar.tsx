@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from "next/navigation";
+import { Url } from "next/dist/shared/lib/router/router";
 import { Search, Menu, X, User, UserCircle, LogOut } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import {
@@ -33,6 +35,8 @@ const user = {
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const isActive = (path: Url) => pathname === path;
 
   return (
     <header>
@@ -52,7 +56,7 @@ export default function Navbar() {
                 <a
                   key={link.text}
                   href={link.href}
-                  className="text-gray-700 hover:text-[#E05017] text-sm tracking-wide transition-colors border-b-2 border-transparent hover:border-[#E05017] pb-1"
+                  className={`${isActive(link.href) ? "text-[#E05017] border-[#E05017]" : "text-gray-700 hover:text-[#E05017] border-transparent hover:border-[#E05017]"} text-sm tracking-wide transition-colors border-b-2 pb-1`}
                 >
                   {link.text}
                 </a>
