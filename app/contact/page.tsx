@@ -203,7 +203,7 @@ export default function ContactPage() {
        {/* Map Section */}
       <section className="w-full h-[400px] lg:h-[500px]">
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.2967654076436!2d-3.9876543!3d5.3599517!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMjEnMzUuOCJOIDPCsDU5JzE1LjYiVw!5e0!3m2!1sen!2s!4v1234567890123!5m2!1sen!2s"
+          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15890.01803822938!2d-4.000601!3d5.339672!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfc1eb77cd9cd065%3A0x9ecf98221f1475c8!2sCERAP!5e0!3m2!1sfr!2sci!4v1764181760882!5m2!1sfr!2sci"
           width="100%"
           height="100%"
           style={{ border: 0 }}
