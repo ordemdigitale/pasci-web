@@ -11,43 +11,43 @@ interface PasciTeamMember {
 }
 
 const teamMembers: PasciTeamMember[] = [
-    {
-      id: 1,
-      name: 'Laborum nisi',
-      position: 'Chef de Projet',
-      image: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGNvbmZlcmVuY2UlMjBtZWV0aW5nfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    },
-    {
-      id: 2,
-      name: 'Laborum nisi',
-      position: 'Architecte Logiciel',
-      image: 'https://images.unsplash.com/photo-1758691736067-b309ee3ef7b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwcmVzZW50YXRpb258ZW58MXx8fHwxNzYzMTA2NjU3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    },
-    {
-      id: 3,
-      name: 'Laborum nisi',
-      position: 'Spécialiste Cybersécurité',
-      image: 'https://images.unsplash.com/photo-1623177578701-2727010a3f1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3RoZXIlMjB3b3JraW5nJTIwb2ZmaWNlfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    },
-    {
-      id: 4,
-      name: 'Laborum nisi',
-      position: 'Responsable Communication',
-      image: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGNvbmZlcmVuY2UlMjBtZWV0aW5nfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    },
-    {
-      id: 5,
-      name: 'Laborum nisi',
-      position: 'Développeur Principal',
-      image: 'https://images.unsplash.com/photo-1758691736067-b309ee3ef7b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwcmVzZW50YXRpb258ZW58MXx8fHwxNzYzMTA2NjU3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    },
-    {
-      id: 6,
-      name: 'Laborum nisi',
-      position: "Analyste Support",
-      image: 'https://images.unsplash.com/photo-1623177578701-2727010a3f1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3RoZXIlMjB3b3JraW5nJTIwb2ZmaWNlfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    },
-  ];
+  {
+    id: 1,
+    name: 'Laborum nisi',
+    position: 'Chef de Projet',
+    image: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGNvbmZlcmVuY2UlMjBtZWV0aW5nfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+  },
+  {
+    id: 2,
+    name: 'Laborum nisi',
+    position: 'Architecte Logiciel',
+    image: 'https://images.unsplash.com/photo-1758691736067-b309ee3ef7b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwcmVzZW50YXRpb258ZW58MXx8fHwxNzYzMTA2NjU3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+  },
+  {
+    id: 3,
+    name: 'Laborum nisi',
+    position: 'Spécialiste Cybersécurité',
+    image: 'https://images.unsplash.com/photo-1623177578701-2727010a3f1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3RoZXIlMjB3b3JraW5nJTIwb2ZmaWNlfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+  },
+  {
+    id: 4,
+    name: 'Laborum nisi',
+    position: 'Responsable Communication',
+    image: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGNvbmZlcmVuY2UlMjBtZWV0aW5nfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+  },
+  {
+    id: 5,
+    name: 'Laborum nisi',
+    position: 'Développeur Principal',
+    image: 'https://images.unsplash.com/photo-1758691736067-b309ee3ef7b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwcmVzZW50YXRpb258ZW58MXx8fHwxNzYzMTA2NjU3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+  },
+  {
+    id: 6,
+    name: 'Laborum nisi',
+    position: "Analyste Support",
+    image: 'https://images.unsplash.com/photo-1623177578701-2727010a3f1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3RoZXIlMjB3b3JraW5nJTIwb2ZmaWNlfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+  },
+];
 
 export default function AboutPage() {
   return (

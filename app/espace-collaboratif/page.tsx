@@ -21,7 +21,7 @@ export default function CollaborativeSpacePage() {
         <div className="space-y-12">
           <div className="">
             <ImageWithFallback
-              src="/images/contact-page-thumbnail.png"
+              src="/images/espace-collab-page-thumb.png"
               alt="image"
               className="w-full h-[300px] object-cover rounded-lg"
             />
