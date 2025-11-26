@@ -83,7 +83,7 @@ export default function ContactPage() {
                     id="name"
                     name="name"
                     type="text"
-                    placeholder="Votre nom"
+                    placeholder="Entrez votre nom"
                     value={formData.name}
                     onChange={handleChange}
                     required
@@ -100,7 +100,7 @@ export default function ContactPage() {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="Votre adresse e-mail"
+                    placeholder="Entrez votre adresse e-mail"
                     value={formData.email}
                     onChange={handleChange}
                     required
@@ -116,7 +116,7 @@ export default function ContactPage() {
                   <Textarea
                     id="message"
                     name="message"
-                    placeholder="Votre message..."
+                    placeholder="Écrivez votre message ici"
                     value={formData.message}
                     onChange={handleChange}
                     required
@@ -210,7 +210,7 @@ export default function ContactPage() {
           allowFullScreen
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          title="CRASC Location Map"
+          title="CERAP-Location"
         />
       </section>
       

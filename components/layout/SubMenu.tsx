@@ -49,6 +49,14 @@ export default function SubMenu() {
           >
             Processus de formalisation
           </a>
+
+          {/* Cri de coeur */}
+          <a
+            href="#"
+            className="text-white hover:text-white/90 transition-colors"
+          >
+            Cri de coeur
+          </a>
         </nav>
       </div>
     </div>
