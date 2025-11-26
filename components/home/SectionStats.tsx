@@ -142,7 +142,7 @@ export default function Stats() {
                     innerRadius={60}
                     outerRadius={90}
                     dataKey="value"
-                    label={({ label }) => label}
+                    label={({ name, value }) => `${name} ${value}%`}
                     labelLine={false}
                   >
                     {categoryData.map((entry, index) => (
