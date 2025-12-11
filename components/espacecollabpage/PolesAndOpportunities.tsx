@@ -11,29 +11,30 @@ interface CardItem {
   category: string;
   description: string;
   email: string;
+ // objectifs: [];
 }
 
 const consultationPoles: CardItem[] = [
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1762952805560-130ccc74c3fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaWdpdGFsJTIwc3RhZ2UlMjBzZXR1cHxlbnwxfHx8fDE3NjQxNjkwNzZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: '/images/espace-collabo/2d5632f9-ac11-4f20-8029-a58de61ba137.jpg',
     title: 'Offre de stage: Chargé(e) de communication digitale',
-    category: 'Stage',
+    category: 'Agriculture, Sylviculture et Pêche',
     description: 'Dynamiser notre présence en ligne et créer des contenus engageants. Excellente opportunité d\'apprentissage et de contribution à notre mission.',
     email: 'Contact:comm@ligueenvolee.org'
   },
   {
     id: 2,
-    image: 'https://images.unsplash.com/photo-1717414477663-a5f5384499b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb25mZXJlbmNlJTIwcm9vbSUyMGNoYWlyc3xlbnwxfHx8fDE3NjQxNjkwNzZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: '/images/espace-collabo/63ac2eed-9ce3-4108-bad4-c7cf536795da.jpg',
     title: 'Vente: Bureau et chaises de conférence (occasion)',
-    category: 'Vente',
+    category: 'Education',
     description: 'Un grand bureau de directions et 6 chaises de conférence en excellent état. Prix raisonnable. Disponibles immédiatement.',
     email: 'Contact:vente.web@lesoceanos.fr'
   },
   {
     id: 3,
-    image: 'https://images.unsplash.com/photo-1669286211114-9f17251fd0e3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2xvcmZ1bCUyMGZvbGRlcnMlMjBzdGFja3xlbnwxfHx8fDE3NjQxNjkwNzd8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Recherche: Bénévoles pour soutien scolaire',
+    image: '/images/espace-collabo/d24228b8-f1e2-4943-a058-124e90667f40.jpg',
+    title: 'Commerce et Tourisme',
     category: 'Recherche',
     description: 'Cherche bénévoles pour accompagner des enfants en difficulté scolaire une fois par semaine. Tous niveaux et matières sont concernés.',
     email: 'Contact:bene@ligueenvolee.org'
@@ -94,7 +95,7 @@ export default function PolesAndOpportunities() {
 
   return (
     <div className="py-16 px-4 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* PÔLES DE CONCERTATION Section */}
         <div className="mb-20">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
@@ -129,8 +130,8 @@ export default function PolesAndOpportunities() {
                   />
                 </div>
                 <div className="p-4">
-                  <h4 className="text-gray-800 mb-2">{item.title}</h4>
-                  <div className="inline-block px-3 py-1 rounded text-xs text-white mb-3 bg-[#E05017]">
+                  {/* <h4 className="text-gray-800 mb-2">{item.title}</h4> */}
+                  <div className="inline-block px-3 py-1 rounded-full text-sm text-white mb-3 bg-[#E05017]">
                     {item.category}
                   </div>
                   <p className="text-gray-600 text-sm mb-4">{item.description}</p>

@@ -49,7 +49,17 @@ const teamMembers: PasciTeamMember[] = [
   },
 ];
 
-export default function AboutPage() {
+interface IItems {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+}
+
+export default async function AboutPage() {
+  const response = await fetch("http://localhost:8000/api/v1/items");
+  const data: IItems[] = await response.json();
+  console.log("Items data fetched from fastapi :", data);
   return (
     <section className="mx-auto pt-12 pb-6 font-poppins">
       
@@ -128,6 +138,19 @@ export default function AboutPage() {
       {/* Actualités et Événements */}
       <div></div>
       <ActualitiesEvents />
+
+      <div>
+      <p>Hello World Page</p>
+      <ul className="events">
+        {data.map((d)=>(
+          <li key={d.id}>
+            <p>{d.name}</p>
+            <p>{d.description}</p>
+            <p>{d.price}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
 
     </section>
   )

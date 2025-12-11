@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button"
 export default function Stats() {
   // Data for "Répartition des OSC par zone CRASC" donut chart
   const zoneData = [
-    { name: 'Abidjan', value: 28, color: '#4A90E2' },
-    { name: 'Bouaké', value: 20, color: '#27AE60' },
-    { name: 'Yamoussoukro', value: 15, color: '#95A5A6' },
-    { name: 'Man', value: 8, color: '#3498DB' },
-    { name: 'Korhogo', value: 11, color: '#F39C12' },
-    { name: 'Gagnoa', value: 6, color: '#9B59B6' },
-    { name: 'San-Pédro', value: 7, color: '#1ABC9C' },
-    { name: 'Abengourou', value: 5, color: '#2ECC71' },
+    { name: 'CRASC NORD', value: 28, color: '#2F80F9' },
+    { name: 'CRASC EST', value: 20, color: '#4CAE4F' },
+    { name: 'CRASC CENTRE', value: 15, color: '#E57171' },
+    { name: 'CRASC SUD', value: 21, color: '#FFB200' },
+    { name: 'CRASC OUEST', value: 16, color: '#92BCFC' },
+ //   { name: 'Gagnoa', value: 6, color: '#9B59B6' },
+ //   { name: 'San-Pédro', value: 7, color: '#1ABC9C' },
+ //   { name: 'Abengourou', value: 5, color: '#2ECC71' },
   ];
 
   // Data for "Types de communautés" bar chart
@@ -27,9 +27,9 @@ export default function Stats() {
 
   // Data for "Catégories d'organisations" donut chart
   const categoryData = [
-    { name: 'Organisation de la Jeunesse', value: 43, color: '#4A90E2', label: 'ODJ 43%' },
-    { name: 'Organisation de la Femme', value: 36, color: '#27AE60', label: 'ODF 36%' },
-    { name: "Organisation de Promotion de la Santé et de l'Hygiène", value: 21, color: '#E74C3C', label: 'OPSH 21%' },
+    { name: 'Organisation Dirigée par les Jeunes', value: 43, color: '#4A90E2', shortName: 'ODJ' },
+    { name: 'Organisation Dirigée par les Femmes', value: 36, color: '#27AE60', shortName: 'ODF' },
+    { name: "Organisation Dirigée par Personnes en Situation de Handicap", value: 21, color: '#E74C3C', shortName: 'OPSH' },
   ];
 
   return (
@@ -75,7 +75,7 @@ export default function Stats() {
           {/* Zone Distribution Chart */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
             <p className="text-sm text-gray-600 mb-4">Répartition des OSC par zone CRASC</p>
-            <div className="flex justify-center items-center mb-4" style={{ height: '180px' }}>
+            <div className="flex justify-center items-center mb-4" style={{ height: '200px' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -85,8 +85,9 @@ export default function Stats() {
                     innerRadius={50}
                     outerRadius={80}
                     dataKey="value"
-                    label={({ name, value }) => `${name} ${value}%`}
+                    label={({ value }) => `${value}%`}
                     labelLine={false}
+                    fontSize={13}
                   >
                     {zoneData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -132,7 +133,7 @@ export default function Stats() {
           {/* Organization Categories Donut Chart */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
             <p className="text-sm text-gray-600 mb-4">Catégories d'organisations</p>
-            <div className="flex justify-center items-center mb-4" style={{ height: '200px' }}>
+            <div className="flex justify-center items-center mb-4" style={{ height: '250px' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -142,8 +143,9 @@ export default function Stats() {
                     innerRadius={60}
                     outerRadius={90}
                     dataKey="value"
-                    label={({ name, value }) => `${name} ${value}%`}
+                    label={({ shortName, value }) => `${shortName} ${value}%`}
                     labelLine={false}
+                    fontSize={10}
                   >
                     {categoryData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />

@@ -1,10 +1,17 @@
+import { ImageWithFallback } from "@/lib/imageWithFallback"
+
+interface IPartenaires {
+  id: number;
+  name: string;
+  imageUrl: string;
+}
+
 export default function Partners() {
-  const partners = [
-    { id: 1, name: 'CRIPEN', color: '#4A90E2' },
-    { id: 2, name: 'Save the Children', color: '#E74C3C' },
-    { id: 3, name: 'European Union', color: '#003399' },
-    { id: 4, name: 'Social Justice', color: '#3498DB' },
-    { id: 5, name: 'INADES Formation', color: '#F39C12' },
+  const partners: IPartenaires[] = [
+    { id: 1, name: 'Save The Children', imageUrl: "/images/partenaires/save-the-children.png" },
+    { id: 2, name: 'CERAP', imageUrl: '/images/partenaires/cerap.png' },
+    { id: 3, name: 'Social Justice', imageUrl: '/images/partenaires/social-justice.png' },
+    { id: 4, name: 'Union Européenne', imageUrl: '/images/partenaires/union-europeenne.png' },
   ];
 
   return (
@@ -14,23 +21,22 @@ export default function Partners() {
         <h2 className="text-gray-900 font-bold text-3xl">Nos partenaires</h2>
 
         {/* Partners Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 items-center">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8 items-center">
           {partners.map((partner) => (
             <div
               key={partner.id}
-              className="flex items-center justify-center p-6 bg-white rounded-lg hover:shadow-md transition-shadow"
+              className="flex items-center justify-center p-6"
             >
               <div className="text-center">
-                <div 
-                  className="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-2"
-                  style={{ backgroundColor: `${partner.color}20` }}
-                >
-                  <div 
-                    className="w-12 h-12 rounded-full"
-                    style={{ backgroundColor: partner.color }}
-                  ></div>
+                <div className="mx-auto rounded-full flex items-center justify-center mb-2">
+                  <ImageWithFallback
+                    src={partner.imageUrl}
+                    alt={partner.name}
+                    className="object-contain"
+                    width={170}
+                    height={200}
+                  />
                 </div>
-                <p className="text-xs text-gray-600 mt-2">{partner.name}</p>
               </div>
             </div>
           ))}

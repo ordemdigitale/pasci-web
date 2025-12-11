@@ -20,19 +20,27 @@ export default function SubMenu() {
               <ChevronDown className="size-4" />
             </button>
             {isAnnuaireOpen && (
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Option 1
+              <div className="absolute top-full left-0 mt-2 w-52 bg-white rounded-md shadow-lg py-1 z-50">
+                <a href="/annuaire/annuaire-des-crasc" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                  Annuaire des CRASC
                 </a>
-                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Option 2
+                <a href="/annuaire/annuaire-des-partenaires-techniques-et-financiers" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                  Annuaire des Partenaires Techniques et Financiers
                 </a>
-                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                {/* <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                   Option 3
-                </a>
+                </a> */}
               </div>
             )}
           </div>
+
+          {/* Offres d'emploi */}
+          <a
+            href="#"
+            className="text-white hover:text-white/90 transition-colors"
+          >
+            Offres d&apos;emploi
+          </a>
 
           {/* Offres de projets */}
           <a
@@ -44,19 +52,19 @@ export default function SubMenu() {
 
           {/* Processus de formalisation */}
           <a
-            href="#"
+            href="/processus-de-formalisation"
             className="text-white hover:text-white/90 transition-colors"
           >
             Processus de formalisation
           </a>
 
           {/* Cri de coeur */}
-          <a
+          {/* <a
             href="#"
             className="text-white hover:text-white/90 transition-colors"
           >
             Cri de coeur
-          </a>
+          </a> */}
         </nav>
       </div>
     </div>
