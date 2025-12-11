@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from "next/navigation";
 import { Url } from "next/dist/shared/lib/router/router";
-import { Search, Menu, X, User, UserCircle, LogOut } from 'lucide-react'
+import { Search, Menu, X, User, UserCircle, LogOut, ChevronDown } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import {
   DropdownMenu,
@@ -14,17 +14,43 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from '../ui/dropdown-menu'
 
 const NavLinks = [
   { href: "/", key: 1, text: "Accueil" },
   { href: "/services", key: 2, text: "Services" },
   { href: "/formations", key: 3, text: "Formations" },
-  { href: "/ressources", key: 4, text: "Ressources" },
+  { href: "#", key: 4, text: "Ressources", hasDropdown: true },
   { href: "/espace-collaboratif", key: 5, text: "Espace collaboratif" },
   { href: "/a-propos", key: 6, text: "À propos" },
   { href: "/contact", key: 7, text: "Contact" },
-]
+];
+
+const ressourcesSubmenu = {
+    submenu1: {
+      title: 'Documentation',
+      href: "/ressources/documentation",
+      items: [
+        { name: 'North Region', href: '#north' },
+        { name: 'South Region', href: '#south' },
+        { name: 'East Region', href: '#east' },
+        { name: 'West Region', href: '#west' },
+      ]
+    },
+    submenu2: {
+      title: 'Fiche Informative',
+      href: "/ressources/fiches-informatives",
+      items: [
+        { name: 'Community Centers', href: '#centers' },
+        { name: 'Training Facilities', href: '#training' },
+        { name: 'Support Services', href: '#support' },
+        { name: 'Resources', href: '#resources' },
+      ]
+    }
+  };
 
 // Mock user data - replace with actual user data
 const user = {
@@ -35,6 +61,8 @@ const user = {
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isPlacesOpen, setIsPlacesOpen] = useState(false);
+  const [isRessourcesSubmenuOpen, setIsRessourcesSubmenuOpen] = useState(false);
   const pathname = usePathname();
   const isActive = (path: Url) => pathname === path;
 
@@ -53,13 +81,36 @@ export default function Navbar() {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               {NavLinks.map((link) => (
-                <a
-                  key={link.text}
-                  href={link.href}
-                  className={`${isActive(link.href) ? "text-[#E05017] border-[#E05017]" : "text-gray-700 hover:text-[#E05017] border-transparent hover:border-[#E05017]"} text-sm tracking-wide transition-colors border-b-2 pb-1`}
-                >
-                  {link.text}
-                </a>
+                link.hasDropdown ? (
+                  <DropdownMenu key={link.text}>
+                    <DropdownMenuTrigger className="text-gray-700 hover:text-gray-900 text-sm tracking-wide transition-colors flex items-center gap-1 focus:outline-none">
+                      {link.text}
+                      <ChevronDown className='w-4 h-4'/>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-48">
+                      <DropdownMenuSub>
+                        <Link href={ressourcesSubmenu.submenu1.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
+                          <span>{ressourcesSubmenu.submenu1.title}</span>
+                        </Link>
+                      </DropdownMenuSub>
+                      
+                      <DropdownMenuSub>
+                        <Link href={ressourcesSubmenu.submenu2.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
+                          <span>{ressourcesSubmenu.submenu2.title}</span>
+                        </Link>
+                      </DropdownMenuSub>
+                    </DropdownMenuContent>
+
+                  </DropdownMenu>
+                ) : (
+                  <a
+                    key={link.text}
+                    href={link.href}
+                    className={`${isActive(link.href) ? "text-[#E05017] border-[#E05017]" : "text-gray-700 hover:text-[#E05017] border-transparent hover:border-[#E05017]"} text-sm tracking-wide transition-colors border-b-2 pb-1`}
+                  >
+                    {link.text}
+                  </a>
+                )
               ))}
             </div>
 
@@ -137,13 +188,42 @@ export default function Navbar() {
 
                 {/* Mobile Navigation Links */}
                 {NavLinks.map((link) => (
-                  <a
-                    key={link.text}
-                    href={link.href}
-                    className="text-gray-700 hover:text-gray-900 text-sm tracking-wide transition-colors"
-                  >
-                    {link.text}
-                  </a>
+                  link.hasDropdown ? (
+                    <div key={link.text}>
+                    <button
+                      onClick={() => setIsRessourcesSubmenuOpen(!isRessourcesSubmenuOpen)}
+                      className="text-gray-700 hover:text-gray-900 text-sm tracking-wide transition-colors flex items-center gap-1 w-full"
+                    >
+                      {link.text}
+                      <ChevronDown className={`w-4 h-4 transition-transform ${isRessourcesSubmenuOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isRessourcesSubmenuOpen && (
+                      <div className="ml-4">
+                        <div>
+                          <Link href={ressourcesSubmenu.submenu1.href}>
+                            <span className="text-sm text-gray-900">{ressourcesSubmenu.submenu1.title}</span>
+                          </Link>
+                          
+                        </div>
+                        <div className="pt-2">
+                          <Link href={ressourcesSubmenu.submenu2.href}>
+                            <span className="text-sm text-gray-900">{ressourcesSubmenu.submenu2.title}</span>
+                          </Link>
+                          
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  ) : (
+                    <a
+                      key={link.text}
+                      href={link.href}
+                      className="text-gray-700 hover:text-gray-900 text-sm tracking-wide transition-colors"
+                    >
+                      {link.text}
+                    </a>
+
+                  )
                 ))}
 
                 {/* Mobile Actions */}
