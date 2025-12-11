@@ -57,9 +57,9 @@ interface IItems {
 }
 
 export default async function AboutPage() {
-  const response = await fetch("http://localhost:8000/api/v1/items");
+  /* const response = await fetch("http://localhost:8000/api/v1/items");
   const data: IItems[] = await response.json();
-  console.log("Items data fetched from fastapi :", data);
+  console.log("Items data fetched from fastapi :", data); */
   return (
     <section className="mx-auto pt-12 pb-6 font-poppins">
       
@@ -139,7 +139,7 @@ export default async function AboutPage() {
       <div></div>
       <ActualitiesEvents />
 
-      <div>
+      {/* <div>
       <p>Hello World Page</p>
       <ul className="events">
         {data.map((d)=>(
@@ -150,7 +150,7 @@ export default async function AboutPage() {
           </li>
         ))}
       </ul>
-    </div>
+    </div> */}
 
     </section>
   )

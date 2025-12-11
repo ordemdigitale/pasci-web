@@ -3,7 +3,6 @@
 import { Globe, MapPin } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { Button } from "@/components/ui/button"
-
 export default function Stats() {
   // Data for "Répartition des OSC par zone CRASC" donut chart
   const zoneData = [
@@ -27,9 +26,9 @@ export default function Stats() {
 
   // Data for "Catégories d'organisations" donut chart
   const categoryData = [
-    { name: 'Organisation Dirigée par les Jeunes', value: 43, color: '#4A90E2', shortName: 'ODJ' },
-    { name: 'Organisation Dirigée par les Femmes', value: 36, color: '#27AE60', shortName: 'ODF' },
-    { name: "Organisation Dirigée par Personnes en Situation de Handicap", value: 21, color: '#E74C3C', shortName: 'OPSH' },
+    { name: 'Organisation Dirigée par les Jeunes', value: 43, color: '#4A90E2', u1: 'ODJ' },
+    { name: 'Organisation Dirigée par les Femmes', value: 36, color: '#27AE60', u1: 'ODF' },
+    { name: "Organisation Dirigée par Personnes en Situation de Handicap", value: 21, color: '#E74C3C', u1: 'OPSH' },
   ];
 
   return (
@@ -143,7 +142,7 @@ export default function Stats() {
                     innerRadius={60}
                     outerRadius={90}
                     dataKey="value"
-                    label={({ shortName, value }) => `${shortName} ${value}%`}
+                    label={({ value, u1 }) => `${u1} ${value}%`}
                     labelLine={false}
                     fontSize={10}
                   >
