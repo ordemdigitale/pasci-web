@@ -63,7 +63,7 @@ export default function SectionNews() {
       date: '4 juillet 2025',
       title: "Plan d'action",
       description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
-      image: '/images/page-annuaire-crasc/5.jpg',
+      image: '/images/page-annuaire-crasc/6.jpg',
       link: '#',
       crasc: "RI CRASC"
     },
