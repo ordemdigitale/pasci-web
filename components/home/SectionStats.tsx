@@ -21,7 +21,7 @@ export default function Stats() {
     { name: 'Association', value: 9000 },
     { name: 'ONG', value: 4500 },
     { name: 'Fondation', value: 1800 },
-    { name: 'Organisation religieuse', value: 1200 },
+    { name: 'Organisation cultuelle', value: 1200 },
   ];
 
   // Data for "Catégories d'organisations" donut chart
