@@ -11,6 +11,11 @@ import { CrascMapSvg } from "../ui/CrascMapSvg";
 
 export default function SectionHero() {
   const router = useRouter();
+
+  const handleClick = () => {
+    router.push("/a-propos")
+  }
+
   return (
     <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,6 +51,7 @@ export default function SectionHero() {
                 <Button 
                   variant="outline" 
                   className="border border-[#E05017] bg-[#E05017] text-white hover:text-[#e05017] hover:bg-white rounded-lg px-6 ml-auto"
+                  onClick={() => handleClick()}
                 >
                   Voir plus
                 </Button>
