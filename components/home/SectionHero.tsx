@@ -50,7 +50,7 @@ export default function SectionHero() {
                 </p>
                 <Button 
                   variant="outline" 
-                  className="border border-[#E05017] bg-[#E05017] text-white hover:text-[#e05017] hover:bg-white rounded-lg px-6 ml-auto"
+                  className="border border-[#E05017] bg-[#E05017] text-white hover:text-[#e05017] hover:bg-white rounded-lg px-6 ml-auto cursor-pointer"
                   onClick={() => handleClick()}
                 >
                   Voir plus

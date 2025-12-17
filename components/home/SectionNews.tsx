@@ -8,6 +8,7 @@ interface NewsArticle {
   description: string;
   image: string;
   link: string;
+  crasc: string;
 }
 
 export default function SectionNews() {
@@ -19,6 +20,7 @@ export default function SectionNews() {
       description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
       image: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGNvbmZlcmVuY2UlMjBtZWV0aW5nfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
       link: '#',
+      crasc: "CRASC NORD"
     },
     {
       id: 2,
@@ -27,6 +29,7 @@ export default function SectionNews() {
       description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
       image: 'https://images.unsplash.com/photo-1758691736067-b309ee3ef7b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwcmVzZW50YXRpb258ZW58MXx8fHwxNzYzMTA2NjU3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
       link: '#',
+      crasc: "CRASC OUEST"
     },
     {
       id: 3,
@@ -35,6 +38,34 @@ export default function SectionNews() {
       description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
       image: 'https://images.unsplash.com/photo-1623177578701-2727010a3f1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3RoZXIlMjB3b3JraW5nJTIwb2ZmaWNlfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
       link: '#',
+      crasc: "CRASC CENTRE"
+    },
+    {
+      id: 4,
+      date: '23 septembre 2025',
+      title: 'Laborum nisi',
+      description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
+      image: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGNvbmZlcmVuY2UlMjBtZWV0aW5nfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      link: '#',
+      crasc: "CRASC EST"
+    },
+    {
+      id: 5,
+      date: '3 septembre 2025',
+      title: "Point sur l'avancement des travaux",
+      description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
+      image: 'https://images.unsplash.com/photo-1758691736067-b309ee3ef7b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwcmVzZW50YXRpb258ZW58MXx8fHwxNzYzMTA2NjU3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      link: '#',
+      crasc: "CRASC SUD"
+    },
+    {
+      id: 6,
+      date: '4 juillet 2025',
+      title: "Plan d'action",
+      description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
+      image: 'https://images.unsplash.com/photo-1623177578701-2727010a3f1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3RoZXIlMjB3b3JraW5nJTIwb2ZmaWNlfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      link: '#',
+      crasc: "RI CRASC"
     },
   ];
 
@@ -70,8 +101,8 @@ export default function SectionNews() {
 
               {/* Content */}
               <div className="p-6">
-                <p className="text-sm text-gray-500 mb-2">{article.date}</p>
-                <h3 className="text-gray-900 mb-3">{article.title}</h3>
+                <p className="text-sm text-gray-800 mb-2">{article.crasc}</p>
+                <h3 className="text-gray-900 mb-3 font-bold">{article.title}</h3>
                 <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                   {article.description}
                 </p>
