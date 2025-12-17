@@ -16,7 +16,7 @@ export default function Partners() {
 
   return (
     <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <h2 className="text-gray-900 font-bold text-3xl">Nos partenaires</h2>
 
