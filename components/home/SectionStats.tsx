@@ -98,7 +98,7 @@ export default function Stats() {
           </div>
 
           {/* Total Communities Card */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+          {/* <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-4">
               <div>
                 <p className="text-sm text-gray-600 mb-2">Total des communautés</p>
@@ -107,6 +107,23 @@ export default function Stats() {
               </div>
               <MapPin className="w-10 h-10 text-gray-400" />
             </div>
+          </div> */}
+          {/* Community Types Bar Chart */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-sm text-gray-600 mb-4">Types de communautés</p>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={communityTypesData}>
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 11 }}
+                  angle={-15}
+                  textAnchor="end"
+                  height={80}
+                />
+                <YAxis tick={{ fontSize: 11 }} />
+                <Bar dataKey="value" fill="#4A90E2" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
 
           {/* Zone Distribution Chart */}
@@ -150,7 +167,7 @@ export default function Stats() {
         {/* Bottom Row - 2 Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Community Types Bar Chart */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+          {/* <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
             <p className="text-sm text-gray-600 mb-4">Types de communautés</p>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={communityTypesData}>
@@ -165,10 +182,10 @@ export default function Stats() {
                 <Bar dataKey="value" fill="#4A90E2" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </div> */}
 
           {/* Organization Categories Donut Chart */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+          {/* <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
             <p className="text-sm text-gray-600 mb-4">Catégories d'organisations</p>
             <div className="flex justify-center items-center mb-4" style={{ height: '250px' }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -202,7 +219,7 @@ export default function Stats() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
         </div>
       </div>
