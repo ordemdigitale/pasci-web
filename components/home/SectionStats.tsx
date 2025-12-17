@@ -36,19 +36,20 @@ export default function Stats() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-gray-900 font-bold text-3xl">Tableau de Bord des Statistiques</h2>
-          <Button 
+          <h2 className="text-gray-900 font-bold text-3xl">Chiffres clés</h2>
+          {/* <Button 
             variant="outline" 
             className="border border-[#E05017] text-[#E05017] hover:bg-[#E05017] hover:text-white rounded-lg px-6"
           >
             Voir plus
-          </Button>
+          </Button> */}
         </div>
 
         {/* Top Row - 3 Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          
           {/* Visitors Card */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+          {/* <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-4">
               <div>
                 <p className="text-sm text-gray-600 mb-2">Visiteurs en temps réel</p>
@@ -56,6 +57,43 @@ export default function Stats() {
                 <p className="text-xs text-gray-500 mt-1">Actuellement en ligne</p>
               </div>
               <Globe className="w-10 h-10 text-gray-400" />
+            </div>
+          </div> */}
+
+          {/* Organization Categories Donut Chart */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+            <p className="text-sm text-gray-600 mb-4">Catégories d'organisations</p>
+            <div className="flex justify-center items-center mb-4" style={{ height: '250px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    dataKey="value"
+                    label={({ value, u1 }) => `${u1} ${value}%`}
+                    labelLine={false}
+                    fontSize={10}
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex flex-col gap-2 text-xs">
+              {categoryData.map((category, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: category.color }}
+                  ></div>
+                  <span className="text-gray-600">{category.name}</span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -165,6 +203,7 @@ export default function Stats() {
               ))}
             </div>
           </div>
+
         </div>
       </div>
     </section>
