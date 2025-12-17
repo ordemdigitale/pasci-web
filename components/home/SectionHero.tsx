@@ -1,9 +1,16 @@
+"use client";
+
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
+import { useRouter } from 'next/navigation';
 import { ArrowRight, Play } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback"
 import Link from "next/link";
+//import SvgComponent from "../ui/svgComponent";
+import { CrascMapSvg } from "../ui/CrascMapSvg";
 
 export default function SectionHero() {
+  const router = useRouter();
   return (
     <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -29,7 +36,7 @@ export default function SectionHero() {
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
-
+              
               {/* Content */}
               <div className="p-6 flex flex-col">
                 <h3 className="text-gray-900 mb-3">Contexte</h3>
@@ -54,19 +61,33 @@ export default function SectionHero() {
             </h2>
 
             {/* Right side card */}
-            <div className="overflow-hidden">
-              <Link href="/annuaire/annuaire-des-crasc">
-                <ImageWithFallback
-                  alt="country-map"
-                  src="/images/hero-country-map.png"
-                  className="w-full h-full object-cover"
-                />
-              </Link>
-            </div>
+            {/* Clickable map */}
+            <CrascMapSvg
+              interactive={true}
+              onRegionClick={(regionId, href) => {
+                console.log(regionId)
+                router.push(href)
+              }}
+            />
+
           </div>
         </div>
 
       </div>
+      
+      {/* <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SvgComponent/>
+      </div> */}
+
+      {/* <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <CrascMapSvg
+          interactive={true}
+          onRegionClick={(regionId) => {
+            console.log('Region clicked:', regionId);
+            alert(`Clicked on region: ${regionId.toUpperCase()}`);
+          }}
+        />
+      </div> */}
     </section>
   )
 }
