@@ -35,12 +35,12 @@ export default function SubMenu() {
           </div>
 
           {/* Offres d'emploi */}
-          <a
+          {/* <a
             href="#"
             className="text-white hover:text-white/90 transition-colors"
           >
             Offres d&apos;emploi
-          </a>
+          </a> */}
 
           {/* Offres de projets */}
           <a
