@@ -1,54 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { ImageWithFallback } from '@/lib/imageWithFallback'
 
-import ActualitiesEvents from '@/components/aboutpage/ActuEvents';
-
-interface PasciTeamMember {
-  id: number;
-  name: string;
-  position: string;
-  image: string;
-}
-
-const teamMembers: PasciTeamMember[] = [
-  {
-    id: 1,
-    name: 'Laborum nisi',
-    position: 'Chef de Projet',
-    image: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGNvbmZlcmVuY2UlMjBtZWV0aW5nfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  },
-  {
-    id: 2,
-    name: 'Laborum nisi',
-    position: 'Architecte Logiciel',
-    image: 'https://images.unsplash.com/photo-1758691736067-b309ee3ef7b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwcmVzZW50YXRpb258ZW58MXx8fHwxNzYzMTA2NjU3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  },
-  {
-    id: 3,
-    name: 'Laborum nisi',
-    position: 'Spécialiste Cybersécurité',
-    image: 'https://images.unsplash.com/photo-1623177578701-2727010a3f1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3RoZXIlMjB3b3JraW5nJTIwb2ZmaWNlfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  },
-  {
-    id: 4,
-    name: 'Laborum nisi',
-    position: 'Responsable Communication',
-    image: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMGNvbmZlcmVuY2UlMjBtZWV0aW5nfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  },
-  {
-    id: 5,
-    name: 'Laborum nisi',
-    position: 'Développeur Principal',
-    image: 'https://images.unsplash.com/photo-1758691736067-b309ee3ef7b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwcmVzZW50YXRpb258ZW58MXx8fHwxNzYzMTA2NjU3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  },
-  {
-    id: 6,
-    name: 'Laborum nisi',
-    position: "Analyste Support",
-    image: 'https://images.unsplash.com/photo-1623177578701-2727010a3f1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3RoZXIlMjB3b3JraW5nJTIwb2ZmaWNlfGVufDF8fHx8MTc2MzIyMjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  },
-];
-
 interface IItems {
   id: number;
   name: string;
@@ -57,101 +9,65 @@ interface IItems {
 }
 
 export default async function AboutPage() {
-  /* const response = await fetch("http://localhost:8000/api/v1/items");
-  const data: IItems[] = await response.json();
-  console.log("Items data fetched from fastapi :", data); */
   return (
     <section className="mx-auto pt-12 pb-6 font-poppins">
       
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
-        {/* Left content */}
-        <div className="">
-          <h2 className="text-[#2a591d] font-bold text-4xl">Les CRASC pensent social pour l'avenir</h2>
-          <p className="text-gray-600 text-md max-w-xl mt-6">
-            Les CRASC (Centre Régional d'Appui à la Société Civile) est une initiative avant-gardiste visant à transformer les services numériques grâce à l'intelligence artificielle et l'apprentissage automatique. Nous développons des solutions innovantes pour optimiser les interactions utilisateurs, automatiser les processus complexes et fournir des analyses prédictives fiables.
-          </p>
-          <h2 className="text-gray-900 font-bold text-xl mt-6">Contexte</h2>
-          <p className="text-gray-600 text-sm max-w-xl">
-            Dans un monde où la numérisation s'accélère, les organisations font face à des défis croissants en matière de gestion de données, d'efficacité opérationnelle et de personnalisation de l'expérience client. PASCI répond à ces besoins en offrant une infrastructure robuste et des outils intelligents pour naviguer dans cet écosystème numérique en constante évolution.
-          </p>
-          <h2 className="text-gray-900 font-bold text-xl mt-6">Objectifs</h2>
-          <p className="text-gray-600 text-sm max-w-xl">
-            Nos principaux objectifs incluent l'amélioration de l'engagement client, la réduction des coûts opérationnels, la sécurisation des échanges de données, et l'autonomisation des entreprises à travers des insights basés sur l'IA. Nous visons à créer un écosystème numérique plus intelligent, plus intuitif et plus sûr pour tous.
-          </p>
-          <h2 className="text-gray-900 font-bold text-xl mt-6">Mission</h2>
-          <p className="text-gray-600 text-sm max-w-xl">
-            La mission de PASCI est de démocratiser l'accès aux technologies d'IA avancées, permettant à chaque entreprise, quelle que soit sa taille, de tirer pleinement parti de la révolution numérique. Nous nous engageons à construire des outils éthiques, transparents et performants qui redéfinissent les standards de l'innovation et de l'impact social.
-          </p>
-          <Button className="mt-12 border border-[#E05017] bg-[#E05017] text-white hover:text-[#E05017] hover:bg-white rounded-lg px-6">Explorer toutes les actualités</Button>
+      <div className="max-w-5xl mx-auto mb-10">
+      
+        <div className="pb-6">
+          <h2 className="text-xl">Présentation de LA plateforme</h2>
         </div>
+
+        <div className="pb-6">
+
+          <h2 className="text-xl">Présentation du CRASC</h2>
+
+          <h4 className="font-bold text-lg pt-4 pb-2">Historique de mise en place des CRASC</h4>
+          <p className='pb-3'>En Côte d&#39;Ivoire le Mapping en Juillet 2010 de la société civile a fait ressortir les principales difficultés auxquelles la société civile est confrontée.</p>
+          <p className='pb-3'>Pour combler ces multiples insuffisances, les principales stratégies à moyen et long termes identifiées par l&#39;État de Côte d&#39;Ivoire et l&#39;Union Européenne ont conduit à la création d&#39;un programme d&#39;appui aux organisations de la société civile ivoirienne intitulé LIANE (Leadership &amp; Initiatives des Acteurs Non Étatiques). Ce programme LIANE avait pour objectif de consolider la démocratie, de promouvoir la bonne gouvernance et de faciliter le partenariat entre l&#39;État et la société civile.</p>
+          <p className='pb-3'>L&#39;un des résultats du projet LIANE I, piloté par le CERAP, dans le cadre du processus de renforcement des capacités a été la création du &quot;Centre Régional d&#39;Appui à la Société Civile (CRASC)&quot; en Juillet 2015, pour pérenniser les acquis du projet.</p>
+          <p className='pb-3'>La création des CRASC s&#39;est faite selon le principe que pour atteindre facilement et pour couvrir les besoins les OSC sur toutes l&#39;étendue du territoire Ivoirien, il fallait les regrouper selon leur situation géographique (Centre, Est, Nord, ouest et Sud). De sorte qu&#39;à travers leur interlocuteur les appuis puissent toucher l&#39;ensemble de la zone. <br /> Il existe donc 5 CRASC : CRASC Centre, CRASC Est, CRASC Nord, CRASC ouest et CRASC Sud.</p>
+          <p className='pb-3'>De ce fait, le CRASC est un dispositif régional de mutualisation des compétences, des services et de divers appuis au bénéfice des organisations de la société civile de la Côte d&#39;Ivoire, pour construire une Société Civile responsable, unie et indépendante, actrice du développement local.</p>
+      
+          <h4 className="font-bold text-lg pt-4 pb-2">Missions des CRASC</h4>
+          <p>La mission essentielle des CRASC est de renforcer les capacités techniques, organisationnelles et institutionnelles des OSC de leur zone de couverture.</p>
+
+          <h4 className="font-bold text-lg pt-4 pb-2">Objectifs des CRASC</h4>
+          <p className='mb-3'>L&#39;objectif principal des CRASC est d&#39;apporter un appui aux OSC dans leur création, leur organisation, leur fonctionnement et tous autres services liés à la vie d&#39;une organisation.</p>
+          <p className='mb-3'>De façon spécifiques il s&#39;agit pour le CRASC de:</p>
+          <ul className="list-disc ml-12">
+            <li>Faciliter l&#39;accès à l&#39;information sur toutes les opportunités d&#39;appuis techniques et financiers pour les OSC.</li>
+            <li>Renforcer les capacités techniques, organisationnelles et institutionnelles des Organisations de la Société Civile de sa zone.</li>
+            <li>Améliorer les conditions et cadres de travail des OSC, les accompagner, leur apporter des appuis-conseils et des connaissances pour améliorer leurs performances, afin qu&#39;elles deviennent des interlocuteurs crédibles, reconnus, informés et compétents.</li>
+            <li>Créer un cadre d&#39;échanges et de mutualisation de différents services au bénéfice des OSC.</li>
+          </ul>
         
+          <h4 className="font-bold text-lg pt-4 pb-2">Structuration</h4>
+          <p className='pb-3'>Les CRASC ont 5 organes de gestion :</p>
+          <ul className="list-disc ml-12">
+            <li>L&#39;Assemblée Générale;</li>
+            <li>Le Conseil d&#39;Administration;</li>
+            <li>La direction exécutive;</li>
+            <li>Délégations régionales;</li>
+            <li>Le Commissariat aux comptes.</li>
+          </ul>
 
-        {/* Right content */}
-        <div className="space-y-12">
-          <div className="">
-            <ImageWithFallback
-              src="/images/about-page-thumb-1.png"
-              alt="image"
-              className="w-full h-[300px] object-cover rounded-lg"
-            />
-          </div>
-          <div className="">
-            <ImageWithFallback
-              src="/images/about-page-thumb-2.png"
-              alt="image"
-              className="w-full h-[300px] object-cover rounded-lg"
-            />
-          </div>
+          <h4 className="font-bold text-lg pt-4 pb-2">Les zones de couvertures par CRASC</h4>
+          <p className='pb-3'>CRASC Centre, <span className='font-bold'>(05 Régions)</span>: BÉLIER (Toumodi), GBÊKÈ (Bouake), HAMBOL (Katiola), MARAHOUÉ (Bouaflé), N&#39;ZI (Dimbokro)</p>
+
+          <p className='pb-3'>CRASC Est, <span className='font-bold'>(04 Régions)</span>: BOUNKANI (Bouna), GONTOUGO (Bondoukou), IFFOU (Daoukro), MORONOU (Bongouanou)</p>
+          
+          <p className='pb-3'>CRASC Nord, <span className='font-bold'>(07 Régions)</span>: BAGOUÉ (Boundiali), BERE (Mankono), (Minignan), KABADOUGOU (Odienné), PORO
+          (Korhogo), FOLON (Minignan), TCHOLOGO (Ferkessédougou), WORODOUGOU (Séguéla)</p>
+          
+          <p className='pb-3'>CRASC Ouest, <span className='font-bold'>(05 Régions)</span>: BAFING (Touba), CAVALLY (Guiglo), GUÉMON (Duékoué), HAUT-SASSANDRA (Daloa), TONKPI (Man)</p>
+
+          <p className='pb-3'>CRASC Sud, <span className='font-bold'>(10 Régions)</span>: AGNÉBY-TIASSA (Agboville), GBOKLE (Sassandra), GOH (Gagnoa), ME (Adzopé), SAN-
+          PEDRO (Touba), GRANDS-PONTS (Dabou), INDENIE-DJUABLIN (Abengourou), LOH-DJIBOUA (Divo), NAWA
+          (Soubré), SUD-COMOÉ (Aboisso), ABIDJAN.</p>
+
         </div>
       </div>
-
-      {/* Équipe PASCI */}
-      <div className="bg-gray-100 py-8">
-        <p className="font-bold text-4xl text-center pb-[50px]">Équipe PASCI</p>
-        <div className="max-w-5xl mx-auto">
-          {/* News Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {teamMembers.map((member) => (
-              <div
-                key={member.id}
-                className="border border-gray-200 rounded-lg overflow-hidden hover-shadow-lg transition-shadow bg-white items-center justify-center flex flex-col py-6"
-              >
-                {/* Image */}
-                <div className="">
-                  <ImageWithFallback
-                    src={member.image}
-                    alt={member.name}
-                    className="w-40 h-40 object-cover hover:scale-105 transition-transform duration-300 rounded-full"
-                  />
-                </div>
-                {/* Name and Role */}
-                <div className="p-4 text-center">
-                  <h3 className="text-lg font-semibold text-gray-900">{member.name}</h3>
-                  <p className="text-sm font-medium bg-gray-100 text-gray-600 rounded-full px-3 py-1 inline-block">{member.position}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Actualités et Événements */}
-      <div></div>
-      <ActualitiesEvents />
-
-      {/* <div>
-      <p>Hello World Page</p>
-      <ul className="events">
-        {data.map((d)=>(
-          <li key={d.id}>
-            <p>{d.name}</p>
-            <p>{d.description}</p>
-            <p>{d.price}</p>
-          </li>
-        ))}
-      </ul>
-    </div> */}
-
     </section>
   )
 }
