@@ -95,7 +95,8 @@ const sidebarItems = [
   { id: 2, label: 'Jeunesse', active: false },
   { id: 3, label: 'Politique', active: false },
   { id: 4, label: 'Agriculture', active: false },
-  { id: 5, label: 'Éducation', active: false }
+  { id: 5, label: 'Éducation', active: false },
+  { id: 6, label: 'Suivi-évaluation', active: false }
 ];
 
 export default function FormationsPage() {

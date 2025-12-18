@@ -12,7 +12,7 @@ export default async function AboutPage() {
   return (
     <section className="mx-auto pt-12 pb-6 font-poppins">
       
-      <div className="max-w-5xl mx-auto mb-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10">
       
         <div className="pb-6">
           <h2 className="text-xl">Présentation de LA plateforme</h2>
