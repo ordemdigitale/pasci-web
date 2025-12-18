@@ -17,7 +17,7 @@ export default function SectionHero() {
   }
 
   return (
-    <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
+    <section className="py-10 font-poppins">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <p className="text-[#2a591d] font-bold text-4xl text-center pb-[50px]">Plateforme digitale des OSC membres du CRASC</p>
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">

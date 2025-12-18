@@ -32,7 +32,7 @@ export default function Stats() {
   ];
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-10 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -62,7 +62,7 @@ export default function Stats() {
 
           {/* Organization Categories Donut Chart */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-sm text-gray-600 mb-4">Catégories d'organisations</p>
+            <p className="text-sm text-gray-600 font-semibold mb-4">Catégories d'organisations</p>
             <div className="flex justify-center items-center mb-4" style={{ height: '250px' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -110,7 +110,7 @@ export default function Stats() {
           </div> */}
           {/* Community Types Bar Chart */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-sm text-gray-600 mb-4">Types de communautés</p>
+            <p className="text-sm text-gray-600 font-semibold mb-4">Types d&apos;organisations de la société civile</p>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={communityTypesData}>
                 <XAxis 
@@ -123,12 +123,13 @@ export default function Stats() {
                 <YAxis tick={{ fontSize: 11 }} />
                 <Bar dataKey="value" fill="#4A90E2" radius={[4, 4, 0, 0]} />
               </BarChart>
+              
             </ResponsiveContainer>
           </div>
 
           {/* Zone Distribution Chart */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-sm text-gray-600 mb-4">Répartition des OSC par zone CRASC</p>
+            <p className="text-sm text-gray-600 font-semibold mb-4">Répartition des OSC par zone CRASC</p>
             <div className="flex justify-center items-center mb-4" style={{ height: '200px' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>

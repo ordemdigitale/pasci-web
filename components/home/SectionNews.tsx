@@ -16,18 +16,18 @@ export default function SectionNews() {
     {
       id: 1,
       date: '23 septembre 2025',
-      title: 'Laborum nisi',
+      title: 'Tournées d\'information',
       description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
-      image: '/images/about-page-thumb-2.png',
+      image: '/images/actualites/eda7c908-6e5a-4137-9b1e-ae6754146371.jpg',
       link: '#',
       crasc: "CRASC NORD"
     },
     {
       id: 2,
       date: '3 septembre 2025',
-      title: "Point sur l'avancement des travaux",
+      title: "Activités de supervision conjointe OCD",
       description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
-      image: '/images/page-annuaire-crasc/fondation-vie.jpg',
+      image: '/images/actualites/359a7b7d-c126-4fdf-934d-9038c01df7e0.jpg',
       link: '#',
       crasc: "CRASC OUEST"
     },
@@ -36,7 +36,7 @@ export default function SectionNews() {
       date: '4 juillet 2025',
       title: "Plan d'action",
       description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
-      image: '/images/page-annuaire-crasc/rec-add-2.jpg',
+      image: '/images/actualites/actu-plan-d-action.jpg',
       link: '#',
       crasc: "CRASC CENTRE"
     },
@@ -45,32 +45,32 @@ export default function SectionNews() {
       date: '23 septembre 2025',
       title: 'Laborum nisi',
       description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
-      image: '/images/page-annuaire-crasc/fefab.jpg',
+      image: '/images/actualites/99aff270-1397-4fe0-97df-b9c49415ceb1.jpg',
       link: '#',
       crasc: "CRASC EST"
     },
     {
       id: 5,
       date: '3 septembre 2025',
-      title: "Point sur l'avancement des travaux",
+      title: "Formation des OSC",
       description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
-      image: '/images/page-annuaire-crasc/5.jpg',
+      image: '/images/actualites/13bf15a5-0f87-415a-a05d-e3775879560d.jpg',
       link: '#',
       crasc: "CRASC SUD"
     },
     {
       id: 6,
       date: '4 juillet 2025',
-      title: "Plan d'action",
+      title: "Séance de simulation des formateurs ce jour",
       description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
-      image: '/images/page-annuaire-crasc/6.jpg',
+      image: '/images/actualites/4a89463f-f2e9-466f-93bd-03a25b381999.jpg',
       link: '#',
-      crasc: "RI CRASC"
+      crasc: "RI-CRASC"
     },
   ];
 
   return (
-    <section className="py-16 bg-white font-poppins">
+    <section className="py-10 bg-white font-poppins">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
@@ -108,7 +108,7 @@ export default function SectionNews() {
                 </p>
                 <a 
                   href={article.link}
-                  className="text-gray-700 text-sm hover:text-[#E05017] transition-colors inline-flex items-center group"
+                  className="text-[#2a591d] underline text-sm transition-colors inline-flex items-center group"
                 >
                   Lire l'article
                   <svg 
