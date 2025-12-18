@@ -38,12 +38,12 @@ export default function SectionHero() {
                 <ImageWithFallback
                   alt="card-image"
                   src="/images/hero-card-image.jpg"
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full"
                 />
               </div>
               
               {/* Content */}
-              <div className="p-6 flex flex-col">
+              <div className="px-6 pb-6 flex flex-col">
                 {/* <h3 className="text-gray-900 mb-3">Contexte</h3> */}
                 <p className="text-gray-600 text-sm mb-4">
                   Cette Plateforme digitale est la résultante d&apos;une démarche alliant à la fois, inclusivité, représentativité, accessibilité et pérennité. Multifonctionnelle et dynamique, elle vise à accroître la visibilité des OSC, la synergie d&apos;action, le partage d&apos;expérience et la professionnalisation.
