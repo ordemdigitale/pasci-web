@@ -44,6 +44,12 @@ const services: Service[] = [
     name: "Formation",
     content: "un processus d'apprentissage structuré qui permet à un individu ou à un groupe d'acquérir des connaissances."
   },
+  {
+    id: 6,
+    icon: "/icons/icon-suivi-evaluation.png",
+    name: "Suivi-évaluation",
+    content: "Mise en place d'outils et d'indicateurs de performance pour mesurer l’avancement et l’impact des actions menées."
+  },
 ];
 
 const redactionSpecialiseeDeDocuments = [
@@ -66,7 +72,7 @@ export default function ServicesPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
         {/* Left content */}
         <div className="">
-          <h2 className="text-[#2a591d] font-bold text-4xl">Des Services Stratégiques pour le Succès de Votre Projet</h2>
+          <h2 className="font-bold text-4xl">Des Services Stratégiques <br />pour le Succès de <br /> Votre Projet</h2>
           <p className="text-gray-600 text-md max-w-xl mt-6">
             Au CRASC, nous vous offrons un accompagnement sur mesure, de l'appui-conseil à la rédaction de documents complexes, pour garantir la conformité et l'efficacité de vos initiatives.
           </p>
@@ -174,18 +180,7 @@ export default function ServicesPage() {
           ))}
         </div>
       </div>
-
-      {/* Prêt à démarer votre projet */}
-      <div className="py-8">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 bg-[#E05017] rounded-lg py-8 space-y-6 text-center text-white">
-          <p className="font-bold text-4xl">Prêt à Démarer Votre Projet</p>
-          <p className="max-w-2xl mx-auto">Contactez PASCI dès aujourd'hui pour discuter de vos besoins et découvrir comment nous pouvons vous aider à atteindre vos objectifs.</p>
-          <Button className="border border-transparent hover:border-white text-[#E05017] hover:text-white bg-white hover:bg-transparent rounded-lg px-6">
-            Prendre Contact
-          </Button>
-        </div>
-      </div>
-
+      
     </section>
   )
 }

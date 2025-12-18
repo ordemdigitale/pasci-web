@@ -24,7 +24,7 @@ const NavLinks = [
   { href: "/services", key: 2, text: "Services" },
   { href: "/formations", key: 3, text: "Formations" },
   { href: "#", key: 4, text: "Ressources", hasDropdown: true },
-  { href: "/espace-collaboratif", key: 5, text: "Espace collaboratif" },
+  { href: "#", key: 5, text: "Espace collaboratif", hasDropdown: true },
   { href: "/a-propos", key: 6, text: "À propos" },
   { href: "/contact", key: 7, text: "Contact" },
 ];
@@ -51,6 +51,19 @@ const ressourcesSubmenu = {
       ]
     }
   };
+
+  const espaceCollabSubmenu = {
+    submenu1: {
+      title: 'Pôle de concertation',
+      href: "/espace-collaboratif/pole-concertation",
+    },
+    submenu2: {
+      title: 'Offres d\'emploi',
+      href: "/espace-collaboratif/offres-emploi",
+    }
+  };
+
+  
 
 // Mock user data - replace with actual user data
 const user = {
@@ -80,38 +93,61 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              {NavLinks.map((link) => (
-                link.hasDropdown ? (
-                  <DropdownMenu key={link.text}>
-                    <DropdownMenuTrigger className="text-gray-700 hover:text-gray-900 text-sm tracking-wide transition-colors flex items-center gap-1 focus:outline-none">
+              {NavLinks.map((link) => {
+                if (link.hasDropdown) {
+                  let submenuContent = null;
+                  if (link.text === "Ressources") {
+                    submenuContent = (
+                      <DropdownMenuContent className="w-48">
+                        <DropdownMenuSub>
+                          <Link href={ressourcesSubmenu.submenu1.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
+                            <span>{ressourcesSubmenu.submenu1.title}</span>
+                          </Link>
+                        </DropdownMenuSub>
+                        <DropdownMenuSub>
+                          <Link href={ressourcesSubmenu.submenu2.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
+                            <span>{ressourcesSubmenu.submenu2.title}</span>
+                          </Link>
+                        </DropdownMenuSub>
+                      </DropdownMenuContent>
+                    );
+                  } else if (link.text === "Espace collaboratif") {
+                    submenuContent = (
+                      <DropdownMenuContent className="w-48">
+                        <DropdownMenuSub>
+                          <Link href={espaceCollabSubmenu.submenu1.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
+                            <span>{espaceCollabSubmenu.submenu1.title}</span>
+                          </Link>
+                        </DropdownMenuSub>
+                        <DropdownMenuSub>
+                          <Link href={espaceCollabSubmenu.submenu2.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
+                            <span>{espaceCollabSubmenu.submenu2.title}</span>
+                          </Link>
+                        </DropdownMenuSub>
+                      </DropdownMenuContent>
+                    );
+                  }
+                  return (
+                    <DropdownMenu key={link.text}>
+                      <DropdownMenuTrigger className="text-gray-700 hover:text-gray-900 text-sm tracking-wide transition-colors flex items-center gap-1 focus:outline-none">
+                        {link.text}
+                        <ChevronDown className='w-4 h-4'/>
+                      </DropdownMenuTrigger>
+                      {submenuContent}
+                    </DropdownMenu>
+                  );
+                } else {
+                  return (
+                    <a
+                      key={link.text}
+                      href={link.href}
+                      className={`${isActive(link.href) ? "text-[#E05017] border-[#E05017]" : "text-gray-700 hover:text-[#E05017] border-transparent hover:border-[#E05017]"} text-sm tracking-wide transition-colors border-b-2 pb-1`}
+                    >
                       {link.text}
-                      <ChevronDown className='w-4 h-4'/>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-48">
-                      <DropdownMenuSub>
-                        <Link href={ressourcesSubmenu.submenu1.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
-                          <span>{ressourcesSubmenu.submenu1.title}</span>
-                        </Link>
-                      </DropdownMenuSub>
-                      
-                      <DropdownMenuSub>
-                        <Link href={ressourcesSubmenu.submenu2.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
-                          <span>{ressourcesSubmenu.submenu2.title}</span>
-                        </Link>
-                      </DropdownMenuSub>
-                    </DropdownMenuContent>
-
-                  </DropdownMenu>
-                ) : (
-                  <a
-                    key={link.text}
-                    href={link.href}
-                    className={`${isActive(link.href) ? "text-[#E05017] border-[#E05017]" : "text-gray-700 hover:text-[#E05017] border-transparent hover:border-[#E05017]"} text-sm tracking-wide transition-colors border-b-2 pb-1`}
-                  >
-                    {link.text}
-                  </a>
-                )
-              ))}
+                    </a>
+                  );
+                }
+              })}
             </div>
 
             {/* Right Side Actions */}

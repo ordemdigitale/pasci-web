@@ -229,6 +229,17 @@ export default function FormationsPage() {
             </div>
           </div>
         </div>
+
+        {/* Prêt à se faire accompagner */}
+        <div className="py-8">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 bg-[#E05017] rounded-lg py-8 space-y-6 text-center text-white">
+            <p className="font-bold text-4xl">Prêt à se faire accompagner ?</p>
+            <p className="max-w-2xl mx-auto">Contactez-nous dès aujourd'hui pour discuter de vos besoins et découvrir comment nous pouvons vous aider à atteindre vos objectifs.</p>
+            <Button className="border border-transparent hover:border-white text-[#E05017] hover:text-white bg-white hover:bg-transparent rounded-lg px-6">
+              Prendre Contact
+            </Button>
+          </div>
+        </div>
       </div>
     </section>
   )

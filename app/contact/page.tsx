@@ -52,7 +52,7 @@ export default function ContactPage() {
           <div>
             <div className="">
               <ImageWithFallback
-                src="/images/contact-page-thumbnail.png"
+                src="/images/contact-page/ef1309d0-dff3-4721-9bc8-0155ac89e0cb.jpg"
                 alt="image"
                 className="w-full h-[300px] object-contain"
               />
