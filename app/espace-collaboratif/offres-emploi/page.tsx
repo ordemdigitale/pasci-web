@@ -81,15 +81,12 @@ export default function PageOffreEmploi() {
 
   /* Categories data */
   const categories = [
-    "Rapport",
-    "Guide",
-    "Étude",
-    "Manuel",
-    "PV",
-    "Infographie",
-    "Politique",
-    "Récit",
-    "Plan",
+    "Gestion de projet",
+    "Administration",
+    "Développement",
+    "Marketing",
+    "Desing",
+    "Ressources Humaines"
   ];
 
   const toggleFaq = (id: number) => {
@@ -150,7 +147,7 @@ export default function PageOffreEmploi() {
                 className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
               >
                 <option value="">
-                  Sélectionner une catégorie
+                  Catégorie
                 </option>
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
@@ -168,10 +165,11 @@ export default function PageOffreEmploi() {
                 }
                 className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
               >
-                <option value="">Sélectionner un type</option>
-                <option value="type1">Type 1</option>
-                <option value="type2">Type 2</option>
-                <option value="type3">Type 3</option>
+                <option value="">Type de contrat</option>
+                <option value="type1" selected>Tous</option>
+                <option value="type2">CDI</option>
+                <option value="type3">CDD</option>
+                <option value="type4">Stage</option>
               </select>
             </div>
 
@@ -183,7 +181,7 @@ export default function PageOffreEmploi() {
                 }
                 className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
               >
-                <option value="">Sélectionner une date</option>
+                <option value="">Date</option>
                 <option value="2024">2024</option>
                 <option value="2023">2023</option>
                 <option value="2022">2022</option>
