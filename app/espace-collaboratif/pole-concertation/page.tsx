@@ -45,9 +45,6 @@ export default function PagePoleConcertation() {
           <p className="text-gray-600 text-md max-w-xl mt-6">
             Au nombre de 11, les pôles de concertation sont espaces de discussion, de libres échanges et de valorisation des domaines prioritaires des OSC. Ils sont les regroupements de l&apos;ensemble des OSC volontairement engagés dans la recherche des conditions de vie meilleure des acteurs du pôle. Les sujets abordés et discutés ne sauraient en aucun cas se détourner des principaux objectifs que l&apos;on s&apos;est assigné. Réservés uniquement aux OSC inscrits sur la plateforme, les partages, les échanges et les discussions s&apos;opèrent dans une dynamique de respect mutuel, de vivre ensemble et l&apos;intérêt commun des membres.
           </p>
-          <Button className="mt-12 border border-[#E05017] bg-[#E05017] text-white hover:text-[#E05017] hover:bg-white rounded-lg px-6">
-            Explorer les pôles
-          </Button>
         </div>
         
         {/* Right content */}

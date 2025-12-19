@@ -100,7 +100,7 @@ export default function PageOffreEmploi() {
       <div className="max-w-5xl mx-auto sm:px-6 lg:px-6 p-8 mb-10 grid lg:grid-cols-2 gap-6">
         {/* Left content */}
         <div className="">
-          <h2 className="font-bold text-4xl">Rejoignez l'équipe</h2>
+          <h2 className="text-[#2a591d] font-bold text-4xl">Rejoignez l'équipe</h2>
           <p className="text-gray-600 text-md max-w-xl mt-6">
             Découvrez les opportunités de carrière passionnantes et faites partie de notre mission de transformer l'avenir. Chez PASCI, nous construisons des solutions innovantes avec des talents exceptionnels.
           </p>

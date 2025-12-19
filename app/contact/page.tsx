@@ -39,13 +39,6 @@ export default function ContactPage() {
             <p className="text-gray-600 text-lg max-w-xl">
               Nous sommes là pour répondre à vos questions et vous fournir toute l'assistance nécessaire. N'hésitez pas à nous contacter.
             </p>
-
-            <Button 
-              variant="outline" 
-              className="border border-[#E05017] bg-[#E05017] text-white hover:text-[#e05017] hover:bg-white rounded-lg"
-            >
-              Envoyez-nous un message
-            </Button>
           </div>
 
           {/* Right content */}
