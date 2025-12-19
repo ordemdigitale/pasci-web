@@ -1,19 +1,14 @@
-"use client";
-
-import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button'
 import { ImageWithFallback } from '@/lib/imageWithFallback'
 
 
-interface Service {
+interface IService {
   id: number;
   icon: string;
   name: string;
   content: string;
 }
 
-const services: Service[] = [
+const services: IService[] = [
   {
     id: 1,
     icon: "/icons/icon-appui-conseil.png",
@@ -52,21 +47,7 @@ const services: Service[] = [
   },
 ];
 
-const redactionSpecialiseeDeDocuments = [
-  { id: 1, title: 'Statut et Règlement Intérieur', isOpen: false },
-  { id: 2, title: 'Projets (Propositions et Rapports)', isOpen: false },
-  { id: 3, title: 'Manuel de Procédures', isOpen: false },
-  { id: 4, title: 'Plan d\'Action', isOpen: false }
-];
-
 export default function ServicesPage() {
-  const [openRedactionSpecialiseeDeDocuments, setOpenRedactionSpecialiseeDeDocuments] = useState<number[]>([]);
-
-  const toggleRedactionSpecialiseeDeDocuments = (id: number) => {
-    setOpenRedactionSpecialiseeDeDocuments(prev =>
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
-  };
   return (
     <section className="mx-auto pt-12 pb-6 font-poppins">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
@@ -160,7 +141,6 @@ export default function ServicesPage() {
         </div>
       </div>
 
-      
     </section>
   )
 }

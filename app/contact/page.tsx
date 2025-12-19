@@ -34,7 +34,7 @@ export default function ContactPage() {
         <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
           {/* Left content */}
           <div className="space-y-8">
-            <h2 className="text-gray-900 font-bold text-3xl">Connectez-vous avec le projet PASCI</h2>
+            <h2 className="text-[#2a591d] font-bold text-5xl">Contactez-nous</h2>
 
             <p className="text-gray-600 text-lg max-w-xl">
               Nous sommes là pour répondre à vos questions et vous fournir toute l'assistance nécessaire. N'hésitez pas à nous contacter.
