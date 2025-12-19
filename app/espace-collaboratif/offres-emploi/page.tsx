@@ -166,7 +166,7 @@ export default function PageOffreEmploi() {
                 className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
               >
                 <option value="">Type de contrat</option>
-                <option value="type1" selected>Tous</option>
+                <option value="type1">Tous</option>
                 <option value="type2">CDI</option>
                 <option value="type3">CDD</option>
                 <option value="type4">Stage</option>

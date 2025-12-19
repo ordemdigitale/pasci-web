@@ -159,7 +159,7 @@ export default function PageDocumentation() {
         
         {/* Left content */}
         <div className="">
-          <h2 className="font-bold text-3xl">Documentation</h2>
+          <h2 className="font-bold text-5xl text-[#2a591d] uppercase">Documentation</h2>
           <p className="font-bold text-xl max-w-sm mt-6">
             Profitez de la Base de Données Documentaire des CRASC
           </p>
@@ -205,7 +205,7 @@ export default function PageDocumentation() {
                 onChange={(e) =>
                   setSelectedCategory(e.target.value)
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
+                className="w-full text-xs px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
               >
                 <option value="">
                   Sélectionner une catégorie
@@ -227,7 +227,7 @@ export default function PageDocumentation() {
                 onChange={(e) =>
                   setSelectedType(e.target.value)
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
+                className="w-full text-xs px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
               >
                 <option value="">Sélectionner un type</option>
                 <option value="type1">Type 1</option>
@@ -245,7 +245,7 @@ export default function PageDocumentation() {
                 onChange={(e) =>
                   setSelectedDate(e.target.value)
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
+                className="w-full text-xs px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
               >
                 <option value="">Sélectionner une date</option>
                 <option value="2024">2024</option>
@@ -257,13 +257,13 @@ export default function PageDocumentation() {
             <div className="flex gap-2">
               <button
                 onClick={handleApplyFilters}
-                className="flex-1 bg-[#ff8c42] text-white px-6 py-2 rounded-lg hover:bg-[#e67a35] transition-colors"
+                className="flex-1 bg-[#E05017] text-sm text-white px-2 py-1 rounded-lg hover:bg-[#e67a35] transition-colors cursor-pointer"
               >
                 Appliquer les filtres
               </button>
               <button
                 onClick={handleResetFilters}
-                className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors"
+                className="flex-1 bg-white text-sm px-2 rounded-lg cursor-pointer border border-gray-300 hover:bg-gray-100 transition-colors"
               >
                 Réinitialiser
               </button>
@@ -283,7 +283,7 @@ export default function PageDocumentation() {
               onClick={() => setViewMode("grid")}
               className={`p-2 rounded ${
                 viewMode === "grid"
-                  ? "bg-[#ff8c42] text-white"
+                  ? "bg-[#E05017] text-white"
                   : "bg-white text-gray-600 hover:bg-gray-100"
               } transition-colors`}
             >
@@ -293,7 +293,7 @@ export default function PageDocumentation() {
               onClick={() => setViewMode("list")}
               className={`p-2 rounded ${
                 viewMode === "list"
-                  ? "bg-[#ff8c42] text-white"
+                  ? "bg-[#E05017] text-white"
                   : "bg-white text-gray-600 hover:bg-gray-100"
               } transition-colors`}
             >
@@ -356,7 +356,7 @@ export default function PageDocumentation() {
               onClick={() => setCurrentPage(page)}
               className={`w-10 h-10 rounded-lg transition-colors ${
                 currentPage === page
-                  ? "bg-[#ff8c42] text-white"
+                  ? "bg-[#E05017] text-white"
                   : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >

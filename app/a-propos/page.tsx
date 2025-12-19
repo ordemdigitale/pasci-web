@@ -12,15 +12,16 @@ export default async function AboutPage() {
   return (
     <section className="mx-auto pt-12 pb-6 font-poppins">
       
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 bg-[#f0f9ff] rounded-lg p-8 mb-10">
       
         <div className="pb-6">
-          <h2 className="text-xl">Présentation de LA plateforme</h2>
+          <h2 className="text-[#2a591d] font-bold text-3xl pb-2">Présentation de la plateforme</h2>
+          <p>Nullam ultricies purus eget vestibulum volutpat. Aliquam erat volutpat. Sed nec dolor eu odio fermentum efficitur. Nunc sit amet est eu turpis suscipit porta. Mauris eget velit posuere, consequat ante sit amet, eleifend lorem. Nullam luctus malesuada ligula eget consectetur. Duis vel erat a metus eleifend blandit. Fusce viverra ante sit amet libero blandit, non tincidunt neque fermentum. Nam id varius quam. Sed in nisi ultrices, imperdiet mauris vel, sagittis sapien. Praesent tristique ex dignissim leo tincidunt, vitae tempus libero elementum. Curabitur dictum pulvinar lectus quis rutrum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras commodo neque non rutrum finibus.</p>
         </div>
 
         <div className="pb-6">
 
-          <h2 className="text-xl">Présentation du CRASC</h2>
+          <h2 className="text-[#2a591d] font-bold text-3xl">Présentation du CRASC</h2>
 
           <h4 className="font-bold text-lg pt-4 pb-2">Historique de mise en place des CRASC</h4>
           <p className='pb-3'>En Côte d&#39;Ivoire le Mapping en Juillet 2010 de la société civile a fait ressortir les principales difficultés auxquelles la société civile est confrontée.</p>
