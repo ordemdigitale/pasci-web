@@ -19,7 +19,7 @@ export default function Footer() {
 
           {/* Architecture Column */}
           <div>
-            <h3 className="text-white mb-4">Architecture</h3>
+            <h3 className="text-white mb-4 font-bold">Architecture</h3>
             <ul className="space-y-2">
               <li>
                 <a href="/" className="text-gray-300 hover:text-white text-sm transition-colors">
@@ -56,7 +56,7 @@ export default function Footer() {
 
           {/* Ressources Column */}
           <div>
-            <h3 className="text-white mb-4">Ressources</h3>
+            <h3 className="text-white mb-4 font-bold">Ressources</h3>
             <ul className="space-y-2">
               <li>
                 <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
@@ -88,7 +88,7 @@ export default function Footer() {
 
           {/* Organisation CRASC Column */}
           <div>
-            <h3 className="text-white mb-4">Organisation CRASC</h3>
+            <h3 className="text-white mb-4 font-bold">Organisation CRASC</h3>
             <ul className="space-y-2">
               <li>
                 <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
@@ -105,7 +105,7 @@ export default function Footer() {
 
           {/* Contact Column */}
           <div>
-            <h3 className="text-white mb-4">Contactez nous</h3>
+            <h3 className="text-white mb-4 font-bold">Contactez nous</h3>
             <div className="space-y-3 text-sm text-gray-300">
               <p>15, avenue Jean Mermoz, Cocody, Abidjan, Côte d'Ivoire</p>
               
@@ -147,12 +147,13 @@ export default function Footer() {
         <div className="border-t border-gray-700 my-8"></div>
 
         {/* Bottom Footer */}
-        <div className="flex flex-col md:flex-row justify-center items-center gap-4 text-sm text-gray-400">
+        <div className="flex flex-col md:flex-col justify-center items-center gap-4 text-sm text-gray-300">
           <p>Copyright © 2025 Projet PASCI. Tous droits réservés.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-white transition-colors">
               Politique de Confidentialité
             </a>
+            
             <a href="#" className="hover:text-white transition-colors">
               Conditions Générales
             </a>

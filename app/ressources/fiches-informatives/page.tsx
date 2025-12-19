@@ -241,7 +241,7 @@ export default function PageFichesInformatives() {
               onClick={() => setCurrentPage(page)}
               className={`w-10 h-10 rounded-lg transition-colors ${
                 currentPage === page
-                  ? "bg-[#ff8c42] text-white"
+                  ? "bg-[#E05017] text-white"
                   : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
