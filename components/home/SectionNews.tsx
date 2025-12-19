@@ -17,7 +17,7 @@ export default function SectionNews() {
       id: 1,
       date: '23 septembre 2025',
       title: 'Tournées d\'information',
-      description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
+      description: "Processus de soumission et les conditions d'éligibilité aux microfinancements et aux subventions",
       image: '/images/actualites/eda7c908-6e5a-4137-9b1e-ae6754146371.jpg',
       link: '#',
       crasc: "CRASC NORD"
@@ -26,7 +26,7 @@ export default function SectionNews() {
       id: 2,
       date: '3 septembre 2025',
       title: "Activités de supervision conjointe OCD",
-      description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
+      description: "Dans le cadre des activités de supervision conjointe OCD pour l'appui aux CRASC",
       image: '/images/actualites/359a7b7d-c126-4fdf-934d-9038c01df7e0.jpg',
       link: '#',
       crasc: "CRASC OUEST"
@@ -34,17 +34,17 @@ export default function SectionNews() {
     {
       id: 3,
       date: '4 juillet 2025',
-      title: "Plan d'action",
-      description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
-      image: '/images/actualites/actu-plan-d-action.jpg',
+      title: "Rapport préliminaire sur l'observation du scrutin présidentiel",
+      description: "rapport préliminaire dans le cadre du projet d'observation citoyenne des élections",
+      image: '/images/actualites/433ece92-1b86-441e-b78a-8382fcf60a00.jpg',
       link: '#',
       crasc: "CRASC CENTRE"
     },
     {
       id: 4,
       date: '23 septembre 2025',
-      title: 'Laborum nisi',
-      description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
+      title: "Atelier des membres du CRASC-Est",
+      description: "L'élaboration de stratégies cohérentes s'inscrit dans une logique de professionnalisation de l'action des OSC",
       image: '/images/actualites/99aff270-1397-4fe0-97df-b9c49415ceb1.jpg',
       link: '#',
       crasc: "CRASC EST"
@@ -53,7 +53,7 @@ export default function SectionNews() {
       id: 5,
       date: '3 septembre 2025',
       title: "Formation des OSC",
-      description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
+      description: "Ce fut une rencontre riche en partage, orientation et proposition",
       image: '/images/actualites/13bf15a5-0f87-415a-a05d-e3775879560d.jpg',
       link: '#',
       crasc: "CRASC SUD"
@@ -62,7 +62,7 @@ export default function SectionNews() {
       id: 6,
       date: '4 juillet 2025',
       title: "Séance de simulation des formateurs ce jour",
-      description: 'Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua sit minim',
+      description: "Lors de la formation des pools formateurs",
       image: '/images/actualites/4a89463f-f2e9-466f-93bd-03a25b381999.jpg',
       link: '#',
       crasc: "RI-CRASC"
@@ -88,7 +88,7 @@ export default function SectionNews() {
           {newsArticles.map((article) => (
             <div 
               key={article.id} 
-              className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+              className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative"
             >
               {/* Image */}
               <div className="aspect-video overflow-hidden">
@@ -103,12 +103,12 @@ export default function SectionNews() {
               <div className="p-6">
                 <p className="text-sm text-gray-800 mb-2">{article.crasc}</p>
                 <h3 className="text-gray-900 mb-3 font-bold">{article.title}</h3>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                <p className="text-gray-600 text-sm mb-4">
                   {article.description}
                 </p>
                 <a 
                   href={article.link}
-                  className="text-[#2a591d] underline text-sm transition-colors inline-flex items-center group"
+                  className="absolute bottom-0 left-0 right-0 p-4 text-[#2a591d] underline text-sm transition-colors inline-flex items-center group"
                 >
                   Lire l'article
                   <svg 
