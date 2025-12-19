@@ -95,9 +95,9 @@ const frequentQuestions = [
 export default function OffreEmploiFAQ() {
   const [openFaqs, setOpenFaqs] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("");
-    const [selectedType, setSelectedType] = useState("");
-    const [selectedDate, setSelectedDate] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
 
    /* Categories data */
   const categories = [
@@ -120,123 +120,11 @@ export default function OffreEmploiFAQ() {
 
   return (
     <div className="py-10 lg:pb-32 lg:pt-10 px-4 bg-gray-50">
-      <h2 className="text-gray-900 font-bold text-3xl text-center mb-2">Nos Offres d'Emploi</h2>
-
-      {/* Search bar + filters area*/}
-      <div className="p-6 mb-6">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <div className="grid grid-cols-6 md:grid-cols-6 gap-4 items-end">
-            {/* search bar */}
-            <div className="relative col-span-3">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Rechercher un emploi..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="text-sm w-full pl-12 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
-              />
-            </div>
-
-            {/* filters */}
-            <div>
-              <select
-                value={selectedCategory}
-                onChange={(e) =>
-                  setSelectedCategory(e.target.value)
-                }
-                className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
-              >
-                <option value="">
-                  Sélectionner une catégorie
-                </option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <select
-                value={selectedType}
-                onChange={(e) =>
-                  setSelectedType(e.target.value)
-                }
-                className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
-              >
-                <option value="">Sélectionner un type</option>
-                <option value="type1">Type 1</option>
-                <option value="type2">Type 2</option>
-                <option value="type3">Type 3</option>
-              </select>
-            </div>
-
-            <div>
-              <select
-                value={selectedDate}
-                onChange={(e) =>
-                  setSelectedDate(e.target.value)
-                }
-                className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
-              >
-                <option value="">Sélectionner une date</option>
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-              </select>
-            </div>
-
-          </div>
-        </div>
-      </div>
 
       <div className="max-w-5xl mx-auto">
 
-        {/* OFFRES D'EMPLOI Section */}
-        <div className="mb-20">
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            {jobOffers.map((item) => (
-              <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-                <div className="relative h-48">
-                  <ImageWithFallback
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-4">
-                  <h4 className="text-gray-800 mb-2">{item.title}</h4>
-                  <div className="inline-block px-3 py-1 rounded text-xs text-white mb-3 bg-[#E05017]">
-                    {item.category}
-                  </div>
-                  <p className="text-gray-600 text-sm mb-4">{item.description}</p>
-                  <div className="flex items-center gap-2 text-gray-700 text-sm">
-                    <Mail className="w-4 h-4" />
-                    <span>{item.email}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex justify-end">
-            <button className="px-6 py-2 border border-orange-500 text-orange-500 rounded hover:bg-orange-50 transition-colors">
-              VOIR PLUS
-            </button>
-          </div>
-        </div>
-
         {/* FOIRE AUX QUESTIONS Section */}
         <div>
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-gray-900 font-bold text-3xl">Foire Aux Questions</h2>
-            <button className="px-6 py-3 text-white rounded bg-[#E05017]">
-              Poser une question
-            </button>
-          </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column - FAQ Categories */}
