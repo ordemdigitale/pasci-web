@@ -18,73 +18,73 @@ interface Program {
 const programs: Program[] = [
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1554103210-26d928978fb5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdGlja3klMjBub3RlcyUyMGNvbG9yZnVsfGVufDF8fHx8MTc2NDE3NjIwNnww&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Comptabilité et finances',
-    description: 'Découvrez les principes fondamentaux de la comptabilité, des techniques de gestion financière et les outils pour améliorer la santé financière de votre organisation.',
+    image: "/images/page-formation/423dccc165037227487e63cd4a3c3daac3c77689b23dab692da976de13b1cc9f.png",
+    title: 'Notions essentielles de comptabilité financière',
+    description: 'Découvrez les principes fondamentaux et les méthodologies Agile pour optimiser la gestion de vos projets et améliorer la collaboration en équipe.',
     duration: '6 semaines',
     type: 'formation'
   },
   {
     id: 2,
-    image: 'https://images.unsplash.com/photo-1603351130949-476794ec3dff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsYXB0b3AlMjBjb2RpbmclMjBzY3JlZW58ZW58MXx8fHwxNzY0MTE2OTA0fDA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Ressources Humaines',
-    description: 'Apprenez à construire des pratiques RH modernes et efficaces : du recrutement à la gestion des talents en passant par la culture d\'entreprise.',
+    image: '/images/page-formation/325089b925013d8e1c19e49d60c060af5b15d40202bdaef5187ed1e44c67cedc.png',
+    title: 'Pilotage efficace des ressources humaines',
+    description: 'Au-delà des aspects administratifs, les ressources humaines jouent un rôle stratégique dans la performance et la pérennité des organisations.',
     duration: '4 semaines',
     type: 'formation'
   },
   {
     id: 3,
-    image: 'https://images.unsplash.com/photo-1717700299591-470e043edc9c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuZXR3b3JrJTIwZGlhZ3JhbSUyMGJsdWV8ZW58MXx8fHwxNzY0MDgxNTUyfDA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Juridique et administratif',
-    description: 'Maîtrisez les contrats, les bases du droit, stratégies réglementaires, la navigation dans les processus administratifs, et la conformité organisationnelle.',
+    image: '/images/page-formation/941bc7751a5e05e80271f1fdd72f88921040ea5d290167224c8cc6a973ab760d.png',
+    title: 'Gestion juridique et administrative',
+    description: 'Au-delà de la conformité, cette fonction joue un rôle clé dans la structuration et la pérennité des organisations. Elle facilite la prise de décision.',
     duration: '5 semaines',
     type: 'formation'
   },
   {
     id: 4,
-    image: 'https://images.unsplash.com/photo-1758599879065-46fd59235166?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aWRlbyUyMHR1dG9yaWFsJTIwc2NyZWVufGVufDF8fHx8MTc2NDEzNjU1OXww&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Tutoriel Vidéo : Créer un Portfolio Professionnel',
+    image: '/images/page-formation/325089b925013d8e1c19e49d60c060af5b15d40202bdaef5187ed1e44c67cedc.png',
+    title: 'Tutoriel Vidéo: Créer un Portfolio Professionnel',
     description: 'Suivez ce tutoriel détaillé pour construire votre portfolio professionnel en ligne et présenter efficacement vos compétences.',
     duration: '45 min',
     type: 'tutorial'
   },
   {
     id: 5,
-    image: 'https://images.unsplash.com/photo-1617791160536-598cf32026fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxicmFpbiUyMHRlY2hub2xvZ3l8ZW58MXx8fHwxNzY0MTc2MjA3fDA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Webinaire : Les Tendances Tech 2024',
-    description: 'Rejoignez notre webinaire pour discuter des tendances principales pour l\'intelligence artificielle en 2024, avec des experts du domaine.',
+    image: "/images/page-formation/0b84a30a040801f8886da2a298f7333b7d390fa11d6ff0950895cc6356a72b41.png",
+    title: 'Webinaire: Les Tendances IA en 2024',
+    description: "Explorez les dernières avancées et les prévisions pour l'intelligence artificielle en 2024, avec des experts du domaine.",
     duration: '1h 30min',
     type: 'webinar'
   },
   {
     id: 6,
-    image: 'https://images.unsplash.com/photo-1543269866-5a654716de64?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwZXJzb24lMjBjb3VjaCUyMGxhcHRvcHxlbnwxfHx8fDE3NjQxNzYyMDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Interview : Le Futur du Travail Hybride',
-    description: 'Écoutez cette interview captivante pour étudier des défis et des opportunités du travail à distance dans le monde post-pandémie.',
+    image: "/images/page-formation/f8ee35757b6c218aa4724bfdee2fa16fd2ec88a459ab7a9fc9de5402ade555eb.png",
+    title: 'Interview: Le Futur du Travail à Distance',
+    description: "Écoutez des leaders d'opinion discuter des défis et des opportunités du travail à distance dans le monde post-pandémique.",
     duration: '30 min',
     type: 'interview'
   },
   {
     id: 7,
-    image: 'https://images.unsplash.com/photo-1580236176063-bea7f16aec30?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoZWFkcGhvbmVzJTIwbWluaW1hbHxlbnwxfHx8fDE3NjQxNzYyMDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Podcast : Gérer le Stress et Burn-Out',
-    description: 'Des techniques et des conseils stratégiques pour identifier, prévenir et surmonter l\'épuisement professionnel.',
+    image: "/images/page-formation/595dfe83bf5a4b4ad09f8085f8ca47cad6958a0c0b343a4a071badac87db203f.png",
+    title: 'Podcast: Gérer le Stress au Travail',
+    description: 'Des techniques et des conseils pratiques pour identifier, prévenir et gérer le stress en milieu professionnel.',
     duration: '25 min',
     type: 'podcast'
   },
   {
     id: 8,
-    image: 'https://images.unsplash.com/photo-1682258370582-377d685156bc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb25mZXJlbmNlJTIwbWljcm9waG9uZXN8ZW58MXx8fHwxNzY0MTc2MjA4fDA&ixlib=rb-4.1.0&q=80&w=1080',
-    title: 'Conférence Audio : Leadership Inclusif',
-    description: 'Écoutez une conférence inspirante sur la qualité et les bienfaits d\'un style de leadership qui valorise la diversité.',
+    image: "/images/page-formation/387d668c67b16d2201d39b5519f434cd019a4cdab4c7fd9f99c3456c0d6d40ec.png",
+    title: 'Conférence Audio: Leadership et Motivation',
+    description: "Écoutez une conférence inspirante sur les qualités d'un bon leader et les stratégies pour motiver son équipe.",
     duration: '1h',
     type: 'conference'
   },
   {
     id: 9,
-    image: 'https://images.unsplash.com/photo-1691617051177-bcc71d95ec76?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZWRpdGF0aW9uJTIwb3V0ZG9vciUyMG5hdHVyZXxlbnwxfHx8fDE3NjQxNzYyMDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: "/images/page-formation/506ee6b1647fb568e2b4112507471561d4c817eec4dd9fb76a49a7473b19b4f5.png",
     title: 'Méditation Guidée pour la Concentration',
-    description: 'Une séance de méditation guidée pour améliorer votre concentration et réduire le stress au quotidien.',
+    description: "Une séance de méditation guidée pour améliorer votre concentration et votre clarté mentale.",
     duration: '15 min',
     type: 'meditation'
   }
@@ -152,7 +152,7 @@ export default function FormationsPage() {
             <div className="space-y-12">
               <div className="">
                 <ImageWithFallback
-                  src="/images/formation-page-thumb.png"
+                  src="/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg"
                   alt="image"
                   className="w-full h-[300px] object-cover rounded-lg"
                 />
@@ -189,16 +189,11 @@ export default function FormationsPage() {
                       />
                     </div>
                     <div className="p-5">
-                      <h4 className="text-gray-800 mb-3">{program.title}</h4>
+                      <h4 className="text-gray-800 text-xl font-semibold mb-3">{program.title}</h4>
                       <p className="text-gray-600 text-sm mb-4 line-clamp-3">
                         {program.description}
                       </p>
-                      {program.duration && (
-                        <div className="flex items-center gap-2 text-gray-500 text-sm mb-4">
-                          <Clock className="w-4 h-4" />
-                          <span>{program.duration}</span>
-                        </div>
-                      )}
+                      
                       <button
                         className="px-4 py-2 text-white rounded-full text-sm"
                         style={{ backgroundColor: '#E05107' }}

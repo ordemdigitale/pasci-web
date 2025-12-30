@@ -98,33 +98,11 @@ const activities = [
   'Agriculture'
 ];
 
-
-export default function PageAnnuaireCrasc() {
-  const [activeTab, setActiveTab] = useState(2);
+export default function PageCrascEst() {
+const [activeTab, setActiveTab] = useState(5);
 
   return (
     <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-[#2a591d] font-bold text-4xl text-center pb-[50px]">Annuaire des CRASC</p>
-
-        {/* Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-sm transition-colors ${
-                activeTab === tab.id
-                  ? 'border-b-2 border-b-[#E05017] text-[#E05017] font-semibold'
-                  : 'text-gray-700 hover:text-[#E05017]'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-      </div>
 
       {/* Map Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -150,7 +128,7 @@ export default function PageAnnuaireCrasc() {
 
           {/* Regions List */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
-            <h3 className="text-sm text-gray-900 font-bold mb-4">LES REGIONS DU CRASC SUD</h3>
+            <h3 className="text-sm text-gray-900 font-bold mb-4">LES REGIONS DU CRASC EST</h3>
             <div className="grid grid-cols-2 gap-2">
               {regions.map((region, index) => (
                 <div key={index} className="text-sm text-[#2a591d] font-bold">

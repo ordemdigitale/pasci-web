@@ -1,4 +1,3 @@
-import Image from "next/image";
 import SectionHero from "@/components/home/SectionHero";
 import SectionNews from "@/components/home/SectionNews";
 import SectionPartners from "@/components/home/SectionPartners";
