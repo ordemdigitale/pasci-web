@@ -149,8 +149,11 @@ const [activeTab, setActiveTab] = useState(1);
         </div>
       </div>
 
-      {/* Activity Cards Section */}
+      {/* OSC Section */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className='font-bold text-2xl'>OSC membres</h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {activityCards.map((card) => (
             <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
@@ -181,10 +184,10 @@ const [activeTab, setActiveTab] = useState(1);
         </div>
       </div>
 
-      {/* Recently added section */}
+      {/* News section */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
         <div className="flex items-center justify-between mb-6">
-          <h2 className='font-bold text-2xl'>OSC membres</h2>
+          <h2 className='font-bold text-2xl'>Nos actualités</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

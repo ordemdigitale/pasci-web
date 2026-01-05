@@ -152,64 +152,67 @@ export default function PageCrascSud() {
           </div>
         </div>
   
-        {/* Activity Cards Section */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            {activityCards.map((card) => (
-              <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <ImageWithFallback
-                    src={card.image}
-                    alt={card.title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="mb-3 text-center font-bold">{card.title}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    {card.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-  
-          {/* Load More Buttons */}
-          <div className="flex flex-wrap gap-3 justify-end">
-            <button
-              className="px-6 py-2 border border-[#E05107] text-[#E05107] rounded-lg transition-colors"
-            >
-              Voir plus
-            </button>
-          </div>
+      {/* OSC Section */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className='font-bold text-2xl'>OSC membres</h2>
         </div>
-  
-        {/* Recently added section */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className='font-bold text-2xl'>OSC membres</h2>
-          </div>
-  
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {recentlyAdded.map((card) => (
-              <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <ImageWithFallback
-                    src={card.image}
-                    alt={card.title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="mb-3">{card.title}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    {card.description}
-                  </p>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {activityCards.map((card) => (
+            <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div className="aspect-[4/3] overflow-hidden">
+                <ImageWithFallback
+                  src={card.image}
+                  alt={card.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
               </div>
-            ))}
-          </div>
+              <div className="p-6">
+                <h3 className="mb-3 text-center font-bold">{card.title}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {card.description}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
+
+        {/* Load More Buttons */}
+        <div className="flex flex-wrap gap-3 justify-end">
+          <button
+            className="px-6 py-2 border border-[#E05107] text-[#E05107] rounded-lg transition-colors"
+          >
+            Voir plus
+          </button>
+        </div>
+      </div>
+
+      {/* News section */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className='font-bold text-2xl'>Nos actualités</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {recentlyAdded.map((card) => (
+            <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div className="aspect-[4/3] overflow-hidden">
+                <ImageWithFallback
+                  src={card.image}
+                  alt={card.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="mb-3">{card.title}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {card.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
   
       </section>
     )
