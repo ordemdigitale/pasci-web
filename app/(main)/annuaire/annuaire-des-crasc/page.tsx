@@ -80,23 +80,20 @@ const tabs = [
   { id: 5, label: 'CRASC Est' }
 ];
 
-const regions = [
-  'Gbôklê',
-  'Gôh',
-  'Sud Comoé',
-  'Grand-ponts',
-  'La Mé',
-  'San Pédro',
-  'Nawa',
-  'Lôh Djiboua',
-  'Agneby Tiassa',
-  'Abidjan'
+const crasc = [
+  "CRASC Sud",
+  "CRASC Centre",
+  "CRASC Nord",
+  "CRASC Ouest",
+  "CRASC Est",
 ];
 
 const activities = [
-  'Education',
-  'Santé',
-  'Agriculture'
+  "L'Assemblée Générale",
+  "Le Conseil d'Administration",
+  "La direction exécutive",
+  "Délégations régionales",
+  "Le Commissariat aux comptes"
 ];
 
 
@@ -128,9 +125,9 @@ export default function PageAnnuaireCrasc() {
       </div> */}
 
       {/* Map Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="">
-          {/* Map Section */}
+          
           <section className="w-full h-[400px] lg:h-[500px]">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15904.342598404442!2d-6.663088693746229!3d4.755139038876891!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xf961300358df441%3A0x5939d6eb97423c5d!2sCRASC%20SUD!5e0!3m2!1sen!2sci!4v1765409873752!5m2!1sen!2sci"
@@ -138,7 +135,7 @@ export default function PageAnnuaireCrasc() {
               allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"/>
           </section>
         </div>
-      </div>
+      </div> */}
 
       {/* Statistics Section */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -146,14 +143,14 @@ export default function PageAnnuaireCrasc() {
           {/* Organizations Count */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
             <h3 className="text-sm text-gray-900 font-bold mb-2">ORGANISATIONS DE LA SOCIÉTÉ CIVILE</h3>
-            <div className="text-5xl text-[#2a591d] font-bold">486</div>
+            <div className="text-5xl text-[#2a591d] font-bold">3176</div>
           </div>
 
           {/* Regions List */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
-            <h3 className="text-sm text-gray-900 font-bold mb-4">LES REGIONS DU CRASC SUD</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {regions.map((region, index) => (
+            <h3 className="text-sm text-gray-900 font-bold mb-4">LES 5 CRASC</h3>
+            <div className="space-y-2">
+              {crasc.map((region, index) => (
                 <div key={index} className="text-sm text-[#2a591d] font-bold">
                   {region}
                 </div>

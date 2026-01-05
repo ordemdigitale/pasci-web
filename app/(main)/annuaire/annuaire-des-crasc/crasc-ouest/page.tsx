@@ -105,7 +105,7 @@ const [activeTab, setActiveTab] = useState(4);
           {/* Map Section */}
           <section className="w-full h-[400px] lg:h-[500px]">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15904.342598404442!2d-6.663088693746229!3d4.755139038876891!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xf961300358df441%3A0x5939d6eb97423c5d!2sCRASC%20SUD!5e0!3m2!1sen!2sci!4v1765409873752!5m2!1sen!2sci"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.539296694119!2d-7.561210924940003!3d7.405402892604712!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfbab90062de2b53%3A0x62958829307a2c15!2sCRASC%20OUEST!5e0!3m2!1sfr!2sci!4v1767651102299!5m2!1sfr!2sci"
               width="100%" height="100%" style={{ border: 0 }}
               allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"/>
           </section>

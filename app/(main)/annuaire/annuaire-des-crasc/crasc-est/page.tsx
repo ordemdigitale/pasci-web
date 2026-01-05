@@ -88,9 +88,11 @@ const regions = [
 ];
 
 const activities = [
-  'Education',
-  'Santé',
-  'Agriculture'
+  "L'Assemblée Générale",
+  "Le Conseil d'Administration",
+  "La direction exécutive",
+  "Délégations régionales",
+  "Le Commissariat aux comptes"
 ];
 
 export default function PageCrascEst() {
@@ -105,7 +107,7 @@ const [activeTab, setActiveTab] = useState(5);
           {/* Map Section */}
           <section className="w-full h-[400px] lg:h-[500px]">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15904.342598404442!2d-6.663088693746229!3d4.755139038876891!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xf961300358df441%3A0x5939d6eb97423c5d!2sCRASC%20SUD!5e0!3m2!1sen!2sci!4v1765409873752!5m2!1sen!2sci"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3962.295136436129!2d-3.4955533260418927!3d6.733802620685887!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfc415005f79c8bf%3A0xfae5469ab23e18a7!2sCRASC%20EST!5e0!3m2!1sen!2sci!4v1767650438985!5m2!1sen!2sci"
               width="100%" height="100%" style={{ border: 0 }}
               allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"/>
           </section>
@@ -135,7 +137,7 @@ const [activeTab, setActiveTab] = useState(5);
 
           {/* Activities */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
-            <h3 className="text-sm text-gray-900 font-bold mb-4">NOS DOMAINES D&apos;ACTIVITÉ</h3>
+            <h3 className="text-sm text-gray-900 font-bold mb-4">LES ORGANES DE GESTION</h3>
             <div className="space-y-2">
               {activities.map((activity, index) => (
                 <div key={index} className="text-sm text-[#2a591d] font-bold">
