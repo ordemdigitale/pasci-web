@@ -80,16 +80,16 @@ const tabs = [
 ];
 
 const regions = [
-  'Gbôklê',
-  'Gôh',
-  'Sud Comoé',
-  'Grand-ponts',
-  'La Mé',
-  'San Pédro',
-  'Nawa',
-  'Lôh Djiboua',
-  'Agneby Tiassa',
-  'Abidjan'
+  "Abidjan",
+  "San-Pédro",
+  "Gôh",
+  "Sud-comoé",
+  "Grand-ponts",
+  "Gbôklé",
+  "La Mé",
+  "Lôh-Djiboua",
+  "Nawa",
+  "Agnéby tiassa"
 ];
 
 const activities = [
@@ -123,7 +123,7 @@ export default function PageCrascSud() {
             {/* Organizations Count */}
             <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
               <h3 className="text-sm text-gray-900 font-bold mb-2">ORGANISATIONS DE LA SOCIÉTÉ CIVILE</h3>
-              <div className="text-5xl text-[#2a591d] font-bold">486</div>
+              <div className="text-5xl text-[#2a591d] font-bold">1160</div>
             </div>
   
             {/* Regions List */}
