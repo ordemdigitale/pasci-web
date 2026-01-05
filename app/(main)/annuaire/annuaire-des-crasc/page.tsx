@@ -91,9 +91,9 @@ const crasc = [
 const activities = [
   "L'Assemblée Générale",
   "Le Conseil d'Administration",
-  "La direction exécutive",
-  "Délégations régionales",
-  "Le Commissariat aux comptes"
+  "La Direction Exécutive",
+  "Délégations Régionales",
+  "Le Commissariat Aux Comptes"
 ];
 
 
