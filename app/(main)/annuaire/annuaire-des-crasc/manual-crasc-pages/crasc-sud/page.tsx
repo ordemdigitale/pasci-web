@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ImageWithFallback } from "@/lib/imageWithFallback"
+import Spinner from '@/components/ui/spinner';
 
 interface IActivityCard {
   id: number;
@@ -70,15 +71,6 @@ const recentlyAdded: IActivityCard[] = [
   }
 ];
 
-const tabs = [
-  { id: 0, label: 'Tous des CRASC' },
-  { id: 1, label: 'CRASC Nord' },
-  { id: 2, label: 'CRASC Sud' },
-  { id: 3, label: 'CRASC Centre' },
-  { id: 4, label: 'CRASC Ouest' },
-  { id: 5, label: 'CRASC Est' }
-];
-
 const regions = [
   'Gbôklê',
   'Gôh',
@@ -98,12 +90,46 @@ const activities = [
   'Agriculture'
 ];
 
+/* For server fetching */
+interface IOscs {
+  id: string;
+  name: string;
+  description: string;
+}
+
 export default function PageCrascSud() {
   const [activeTab, setActiveTab] = useState(2);
+  const [oscsSud, setOScsSud] = useState<IOscs[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  useEffect(() => {
+    // Fetch all OSC for Crasc Sud
+    async function fetchOscsSud() {
+      const response = await fetch("http://localhost:8000/api/v1/crasc/osc-with-region-and-type?skip=0&limit=100&region_id=1", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+        });
+        const oscs_sud: IOscs[] = await response.json();
+        console.log("Oscs fetched from API using useEffect: ", oscs_sud);
+        setOScsSud(oscs_sud);
+      }
+      fetchOscsSud();
+    }, []);
   
     return (
       <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
-  
+        <p>All OSC for Crasc Sud</p>
+        <div>
+          {oscsSud.map((osc) => (
+            <div key={osc.id}>
+              <h3>{osc.name}</h3>
+            </div>
+          ))}
+        </div>
+
         {/* Map Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="">
@@ -123,7 +149,13 @@ export default function PageCrascSud() {
             {/* Organizations Count */}
             <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
               <h3 className="text-sm text-gray-900 font-bold mb-2">ORGANISATIONS DE LA SOCIÉTÉ CIVILE</h3>
-              <div className="text-5xl text-[#2a591d] font-bold">486</div>
+              {/* Display the count of osc for Crasc Sud */}
+              {oscsSud.length === 0 ? (
+                <Spinner size="md" color="green" />
+              ) : (
+                <div className="text-5xl text-[#2a591d] font-bold">{oscsSud.length}</div>
+              )}
+              {/* <div className="text-5xl text-[#2a591d] font-bold">486</div> */}
             </div>
   
             {/* Regions List */}
@@ -152,22 +184,22 @@ export default function PageCrascSud() {
           </div>
         </div>
   
-        {/* Activity Cards Section */}
+        {/* Les OSCs du CRASC Sud */}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            {activityCards.map((card) => (
-              <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            {oscsSud.map((osc) => (
+              <div key={osc.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                 <div className="aspect-[4/3] overflow-hidden">
                   <ImageWithFallback
-                    src={card.image}
-                    alt={card.title}
+                    src="/images/page-annuaire-crasc/mplci.jpg"
+                    alt={osc.name}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="mb-3 text-center font-bold">{card.title}</h3>
+                  <h3 className="mb-3 text-center font-bold">{osc.name}</h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    {card.description}
+                    {osc.description}
                   </p>
                 </div>
               </div>

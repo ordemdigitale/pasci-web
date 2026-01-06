@@ -1,0 +1,65 @@
+{
+    "CrascRegion": [
+      { "id": "crasc-1", "crasc_region_name": "CRASC Nord", "slug": "crasc-nord" },
+      { "id": "crasc-2", "crasc_region_name": "CRASC Sud", "slug": "crasc-sud" },
+      { "id": "crasc-3", "crasc_region_name": "CRASC Centre", "slug": "crasc-centre" },
+      { "id": "crasc-4", "crasc_region_name": "CRASC Est", "slug": "crasc-est" },
+      { "id": "crasc-5", "crasc_region_name": "CRASC Ouest", "slug": "crasc-ouest" }
+    ],
+    "RegionCiv": [
+      { "id": "rciv-1", "region_name": "Agnéby-Tiassa", "crascRegionId": "crasc-2" },
+      { "id": "rciv-2", "region_name": "Bafing", "crascRegionId": "crasc-5" },
+      { "id": "rciv-3", "region_name": "Bagoué", "crascRegionId": "crasc-1" },
+      { "id": "rciv-4", "region_name": "Bélier", "crascRegionId": "crasc-1" },
+      { "id": "rciv-5", "region_name": "Béré", "crascRegionId": "crasc-1" },
+      { "id": "rciv-6", "region_name": "Bounkani", "crascRegionId": "crasc-4" },
+      { "id": "rciv-7", "region_name": "Cavally", "crascRegionId": "crasc-5" },
+      { "id": "rciv-8", "region_name": "Folon", "crascRegionId": "crasc-1" },
+      { "id": "rciv-9", "region_name": "Gbêkê", "crascRegionId": "crasc-3" },
+      { "id": "rciv-10", "region_name": "Gbôklé", "crascRegionId": "crasc-2" },
+      { "id": "rciv-11", "region_name": "Gôh", "crascRegionId": "crasc-1" },
+      { "id": "rciv-12", "region_name": "Gontougo", "crascRegionId": "crasc-2" },
+      { "id": "rciv-13", "region_name": "Guémon", "crascRegionId": "crasc-5" },
+      { "id": "rciv-14", "region_name": "Hambol", "crascRegionId": "crasc-1" },
+      { "id": "rciv-15", "region_name": "Haut-Sassandra", "crascRegionId": "crasc-5" },
+      { "id": "rciv-16", "region_name": "Iffou", "crascRegionId": "crasc-1" },
+      { "id": "rciv-17", "region_name": "Indénié-Djuablin", "crascRegionId": "crasc-1" },
+      { "id": "rciv-18", "region_name": "Kabadougou", "crascRegionId": "crasc-4" },
+      { "id": "rciv-19", "region_name": "Grans Ponts", "crascRegionId": "crasc-2" },
+      { "id": "rciv-20", "region_name": "Lôh-Djiboua", "crascRegionId": "crasc-2" },
+      { "id": "rciv-21", "region_name": "Marahoué", "crascRegionId": "crasc-3" },
+      { "id": "rciv-22", "region_name": "La Mé", "crascRegionId": "crasc-2" },
+      { "id": "rciv-23", "region_name": "Nawa", "crascRegionId": "crasc-2" },
+      { "id": "rciv-24", "region_name": "N'Zi", "crascRegionId": "crasc-3" },
+      { "id": "rciv-25", "region_name": "Poro", "crascRegionId": "crasc-1" },
+      { "id": "rciv-26", "region_name": "San Pédro", "crascRegionId": "crasc-2" },
+      { "id": "rciv-27", "region_name": "Sud-Comoé", "crascRegionId": "crasc-2" },
+      { "id": "rciv-28", "region_name": "Tchologo", "crascRegionId": "crasc-1" },
+      { "id": "rciv-29", "region_name": "Tonkpi", "crascRegionId": "crasc-5" },
+      { "id": "rciv-30", "region_name": "Worodougou", "crascRegionId": "crasc-1" },
+      { "id": "rciv-31", "region_name": "Abidjan", "crascRegionId": "crasc-2" },
+      { "id": "rciv-32", "region_name": "Yamoussoukro", "crascRegionId": "crasc-3" }
+    ],
+    "Osc": [
+      { "id": "osc-1", "name": "Association pour le Développement Durable", "slug": "association-pour-le-developpement-durable", "description": "Promotion du développement durable dans les communautés locales", "regionCivId": "", "crascRegionId": "crasc-2", "oscTypeId": "type-2", "address": "123 Rue de l'Association, Abidjan", "phone": "+225 01 23 45 67 89", "email": "" },
+      { "id": "osc-2", "name": "ONG Environnement Propre", "slug": "ong-environnement-propre", "description": "Promotion de l'environnement propre dans les communautés locales", "regionCivId": "", "crascRegionId": "crasc-2", "oscTypeId": "type-1", "address": "456 Avenue Verte, San Pédro", "phone": "+225 98 76 54 32 10", "email": "" },
+      { "id": "osc-3", "name": "Fondation Santé pour Tous", "slug": "fondation-sante-pour-tous", "description": "Promotion de la santé pour tous dans les communautés locales", "regionCivId": "", "crascRegionId": "crasc-2", "oscTypeId": "type-3", "address": "789 Boulevard de la Santé, Divo", "phone": "+225 11 22 33 44 55", "email": "" },
+      { "id": "osc-4", "name": "Organisation Cultuelle de Paix", "slug": "organisation-cultuelle-de-paix", "description": "Promotion de la paix dans les communautés locales", "regionCivId": "", "crascRegionId": "crasc-2", "oscTypeId": "type-4", "address": "321 Chemin de la Foi, Aboisso", "phone": "+225 66 77 88 99 00", "email": "" },
+      { "id": "osc-5", "name": "Association des Femmes Leaders", "slug": "association-des-femmes-leaders", "description": "Promotion de l'égalité des chances pour les femmes leaders", "regionCivId": "", "crascRegionId": "crasc-2", "oscTypeId": "type-2", "address": "654 Rue des Femmes, Agboville", "phone": "+225 44 55 66 77 88", "email": "" },
+      { "id": "osc-6", "name": "ONG Jeunesse Active", "slug": "ong-jeunesse-active", "description": "Promotion de l'engagement des jeunes dans les communautés locales", "regionCivId": "", "crascRegionId": "crasc-1", "oscTypeId": "type-1", "address": "987 Avenue des Jeunes, Boundiali", "phone": "+225 22 33 44 55 66", "email": "" }
+    ],
+    "OscType": [
+      { "id": "type-1", "osc_type_name": "ONG" },
+      { "id": "type-2", "osc_type_name": "Association" },
+      { "id": "type-3", "osc_type_name": "Fondation" },
+      { "id": "type-4", "osc_type_name": "Organisation cultuelle" }
+    ],
+    "NewsArticle": [
+      { "id": "news-1", "title": "Lancement d'une nouvelle initiative pour le développement durable", "slug": "lancement-dune-nouvelle-initiative-pour-le-developpement-durable", "summary": "Une nouvelle initiative visant à promouvoir le développement durable a été lancée aujourd'hui à Abidjan.", "content": "Le projet vise à sensibiliser les communautés locales aux pratiques durables et à encourager la participation active des citoyens.", "publication_date": "2024-06-15", "oscId": "osc-1" },
+      { "id": "news-2", "title": "Atelier sur la gestion des déchets plastiques", "slug": "atelier-sur-la-gestion-des-dechets-plastiques", "summary": "Un atelier de deux jours sur la gestion des déchets plastiques s'est tenu à San Pédro, réunissant des experts et des acteurs locaux.", "content": "L'atelier a mis en lumière les meilleures pratiques pour réduire l'impact des déchets plastiques sur l'environnement.", "publication_date": "2024-06-10", "oscId": "osc-2" },
+      { "id": "news-3", "title": "Campagne de sensibilisation à la santé communautaire", "slug": "campagne-de-sensibilisation-a-la-sante-communautaire", "summary": "La Fondation Santé pour Tous a lancé une campagne de sensibilisation visant à améliorer la santé communautaire dans les zones rurales.", "content": "La campagne comprend des ateliers éducatifs, des cliniques mobiles et la distribution de matériel de santé.", "publication_date": "2024-06-05", "oscId": "osc-3" },
+      { "id": "news-4", "title": "Célébration de la Journée Internationale de la Paix", "slug": "celebration-de-la-journee-internationale-de-la-paix", "summary": "L'Organisation Cultuelle de Paix a organisé une série d'événements pour célébrer la Journée Internationale de la Paix.", "content": "Les événements comprenaient des prières interreligieuses, des discussions sur la paix et des activités communautaires.", "publication_date": "2024-06-01", "oscId": "osc-4" },
+      { "id": "news-5", "title": "Programme de leadership pour les femmes", "slug": "programme-de-leadership-pour-les-femmes", "summary": "L'Association des Femmes Leaders a lancé un programme de leadership destiné à autonomiser les femmes dans les communautés locales.", "content": "Le programme offre des formations, du mentorat et des opportunités de réseautage pour les femmes aspirant à des rôles de leadership.", "publication_date": "2024-05-28", "oscId": "osc-5" },
+      { "id": "news-6", "title": "Initiative pour l'engagement des jeunes", "slug": "initiative-pour-lengagement-des-jeunes", "summary": "L'ONG Jeunesse Active a lancé une initiative visant à encourager l'engagement civique et social des jeunes.", "content": "L'initiative comprend des ateliers, des projets communautaires et des campagnes de sensibilisation.", "publication_date": "2024-05-20", "oscId": "osc-6" }
+    ]
+  }
