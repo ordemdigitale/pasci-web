@@ -12,6 +12,10 @@ export interface IRegionCiv {
   crascRegionId: string;
 }
 
+export interface IRegionCivWithCrascName extends IRegionCiv {
+  crasc_region_name?: string;
+}
+
 export interface IOsc {
   id: string;
   name: string;
@@ -23,10 +27,21 @@ export interface ICrascRegionWithOscs extends ICrascRegion {
   oscs: IOsc[];
 }
 
-// Load all Crasc Regions
+// Load all Crasc Regions from local data
 export function getAllCrascRegions(): ICrascRegion[] {
   return db.CrascRegion;
 }
+// Load all RegionCIV from local data with their respective CrascRegion Name
+export function getAllRegionCivs(): IRegionCivWithCrascName[] {
+  return db.RegionCiv.map((civ) => {
+    const crasc = db.CrascRegion.find((r: any) => r.id === civ.crascRegionId);
+    return {
+      ...civ,
+      crasc_region_name: crasc ? crasc.crasc_region_name : undefined,
+    };
+  });
+}
+
 // Load all Crasc Regions from API route
 export async function fetchAllCrascRegionsFromApi(): Promise<ICrascRegion[]> {
   const response = await fetch("http://localhost:8000/api/v1/crasc/region-crasc", {

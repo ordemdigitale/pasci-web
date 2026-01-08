@@ -1,5 +1,4 @@
-/* app/(main)/annuaire/annuaire-des-crasc/[crascSlug]/page.tsx: Page detail d'une Région CRASC */
-import React from 'react'
+/* app/admin/les-crasc/[crascSlug]/page.tsx: Page detail d'une Région CRASC */
 import { getCrascRegionWithCivsBySlug } from "@/localdata/helper/data"
 import { getCrascRegionOscsBySlug, fetchCrascRegionBySlugWithOscsFromApi } from "@/localdata/helper/data"
 import { getCrascRegionBySlugWithOscsFromApi } from "@/lib/fetch-crasc";
@@ -36,7 +35,7 @@ export default async function CrascRegionPage({ params }: CrascRegionPageProps) 
           {/* Nombre de OSCs */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
             <h3 className="text-sm text-gray-900 font-bold mb-2">ORGANISATIONS DE LA SOCIÉTÉ CIVILE</h3>
-            <div className="text-5xl text-[#2a591d] font-bold">{crascOscsDataFromApi?.oscs.length || 0}</div>
+            <div className="text-5xl text-[#2a591d] font-bold">{crascRegionWithOscsAndRegionCivs?.osc_count}</div>
           </div>
           {/* Liste des régions qui composent le CRASC */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
@@ -49,11 +48,7 @@ export default async function CrascRegionPage({ params }: CrascRegionPageProps) 
               ))}
             </div>
           </div>
-          {/* Domaines d'activité */}
-          <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
-            <h3 className="text-sm text-gray-900 font-bold mb-4">NOS DOMAINES D&apos;ACTIVITÉ</h3>
-            <div className="space-y-2">Liste des domaines d'activities ici</div>
-          </div>
+          
         </div>
       </div>
       

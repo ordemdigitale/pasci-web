@@ -1,8 +1,9 @@
 /* Page d'accueil ou Layout pour les régions CRASC */
-"use client";
+//"use client";
 
-import { useState } from 'react';
-import { ImageWithFallback } from "@/lib/imageWithFallback"
+//import { useState, useEffect } from 'react';
+import { ImageWithFallback } from "@/lib/imageWithFallback";
+import { fetchAllCrascRegions } from "@/lib/fetch-crasc";
 
 interface IActivityCard {
   id: number;
@@ -94,68 +95,53 @@ const regions = [
 ];
 
 const activities = [
-  'Education',
-  'Santé',
-  'Agriculture'
+  "L'Assemblée Générale",
+  "Le Conseil d'Administration",
+  "La Direction Exécutive",
+  "Délégations Régionales",
+  "Le Commissariat Aux Comptes"
 ];
 
 
-export default function PageAnnuaireCrasc() {
-  const [activeTab, setActiveTab] = useState(2);
+export default async function PageAnnuaireCrasc() {
+  const allCrascRegions = await fetchAllCrascRegions();
+  console.log("All CRASC Regions Data: ", allCrascRegions);
+  //const [crascRegions, setCrascRegions] = useState<any[]>([]);
+
+  // Fetch CRASC regions data on component mount
+/*   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const regionsData = await fetchAllCrascRegions();
+        console.log(regionsData);
+        setCrascRegions(regionsData);
+      }
+      catch (error) {
+        console.error("Error fetching CRASC regions data: ", error);
+      }
+    }
+    fetchData();
+  }, []); */
 
   return (
     <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
-      {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-[#2a591d] font-bold text-4xl text-center pb-[50px]">Annuaire des CRASC</p>
-
-        
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-sm transition-colors ${
-                activeTab === tab.id
-                  ? 'border-b-2 border-b-[#E05017] text-[#E05017] font-semibold'
-                  : 'text-gray-700 hover:text-[#E05017]'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-      </div> */}
-
-      {/* Map Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="">
-          {/* Map Section */}
-          <section className="w-full h-[400px] lg:h-[500px]">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15904.342598404442!2d-6.663088693746229!3d4.755139038876891!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xf961300358df441%3A0x5939d6eb97423c5d!2sCRASC%20SUD!5e0!3m2!1sen!2sci!4v1765409873752!5m2!1sen!2sci"
-              width="100%" height="100%" style={{ border: 0 }}
-              allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"/>
-          </section>
-        </div>
-      </div>
 
       {/* Statistics Section */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Organizations Count */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
             <h3 className="text-sm text-gray-900 font-bold mb-2">ORGANISATIONS DE LA SOCIÉTÉ CIVILE</h3>
-            <div className="text-5xl text-[#2a591d] font-bold">486</div>
+            <div className="text-5xl text-[#2a591d] font-bold">3176</div>
           </div>
 
           {/* Regions List */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
-            <h3 className="text-sm text-gray-900 font-bold mb-4">LES REGIONS DU CRASC SUD</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {regions.map((region, index) => (
-                <div key={index} className="text-sm text-[#2a591d] font-bold">
-                  {region}
+            <h3 className="text-sm text-gray-900 font-bold mb-4">LES 5 CRASC</h3>
+            <div className="space-y-2">
+              {allCrascRegions.map((crasc) => (
+                <div key={crasc.order} className="text-sm text-[#2a591d] font-bold">
+                  {crasc.name}
                 </div>
               ))}
             </div>

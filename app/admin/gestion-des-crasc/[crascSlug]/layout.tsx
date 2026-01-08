@@ -32,9 +32,7 @@ export default async function CrascRegionLayout({
   }
 
   return (
-    <div className="region-layout">
-      
-      
+    <div className="region-layout">      
       {/* Shared content area */}
       <div className="container mx-auto px-4">
         {children}

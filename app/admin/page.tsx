@@ -22,6 +22,7 @@ import {
 interface NavItem {
   icon: React.ReactNode;
   label: string;
+  href?: string;
   active?: boolean;
   dropdown?: boolean;
   submenus?: { label: string; href: string }[];
@@ -33,8 +34,8 @@ export default function Dashboard() {
   const [documentsDropdownOpen, setDocumentsDropdownOpen] = useState(false);
 
   const navItems: NavItem[] = [
-    { icon: <LayoutDashboard size={20} />, label: 'Dashboard', active: true },
-    { icon: <Map size={20} />, label: 'CRASC Regions' },
+    { icon: <LayoutDashboard size={20} />, label: 'Dashboard', active: true, href: "" },
+    { icon: <Map size={20} />, label: 'CRASC', href: "/admin/crasc" },
     {
       icon: <FileText size={20} />,
       label: 'Documents',
