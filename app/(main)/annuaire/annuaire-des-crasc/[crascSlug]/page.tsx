@@ -36,7 +36,7 @@ export default async function CrascRegionPage({ params }: CrascRegionPageProps) 
           {/* Nombre de OSCs */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
             <h3 className="text-sm text-gray-900 font-bold mb-2">ORGANISATIONS DE LA SOCIÉTÉ CIVILE</h3>
-            <div className="text-5xl text-[#2a591d] font-bold">{crascOscsDataFromApi?.oscs.length || 0}</div>
+            <div className="text-5xl text-[#2a591d] font-bold">{crascRegionWithOscsAndRegionCivs.osc_count}</div>
           </div>
           {/* Liste des régions qui composent le CRASC */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
@@ -56,35 +56,14 @@ export default async function CrascRegionPage({ params }: CrascRegionPageProps) 
           </div>
         </div>
       </div>
-      
-      <p>Liste des OSCs du {crascRegionData?.crasc_region_name}: données venant de "crasc.json" file</p>
-      {oscsData?.oscs.length === 0 ? (
-        <p>Nothing found</p>
-      ) : (
-        <ul>
-          {oscsData?.oscs.map((osc) => (
-            <li key={osc.id}>{osc.name}</li>
-          ))}
-        </ul>
-      )}
 
-      <div className="mt-10 p-6 border-t border-gray-300"> 
-        <p>Liste des OSCs du {crascRegionData?.crasc_region_name}: données venant de l'API</p>
-        {crascRegionOscsDataFromApi?.length === 0 ? (
-          <p>Aucune OSC trouvée</p>
-        ) : (
-          <ul>
-            {crascRegionOscsDataFromApi?.map((osc: any) => (
-              <li key={osc.id}>{osc.name}</li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* OSCs Card Section */}
+      {/* Section OSC membres */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {crascOscsDataFromApi?.oscs.length === 0 ? (
-            <p className="font-semibold text-4xl text-center pb-8">Aucune OSC trouvée.</p>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-bold text-2xl">OSC membres</h2>
+        </div>
+          {crascRegionWithOscsAndRegionCivs?.oscs.length === 0 ? (
+            <p className="text-2xl text-center pb-8">Aucune OSC ajoutée pour le moment.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
               {crascOscsDataFromApi?.oscs.map((osc: any) => (
@@ -106,6 +85,15 @@ export default async function CrascRegionPage({ params }: CrascRegionPageProps) 
             </div>
           )}
       </div>
+
+      {/* Section actualités des Oscs */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-bold text-2xl">Nos actualités</h2>
+        </div>
+        <p className="text-2xl text-center pb-8">Aucune actualité ajoutée pour le moment.</p>
+      </div>
+
     </section>
   )
 }
