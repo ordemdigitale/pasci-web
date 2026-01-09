@@ -29,3 +29,10 @@ export interface ICrascRegionDetails {
   oscs: IOsc[];
   regions_civ: IRegionCiv[];
 }
+
+// Interface for OscType
+export interface IOscType {
+  id: string;
+  name: string;
+  description: string;
+}

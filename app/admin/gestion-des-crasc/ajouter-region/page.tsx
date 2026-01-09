@@ -1,6 +1,7 @@
 "use client";
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -106,11 +107,15 @@ export default function AdminAddRegionCiv() {
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors"
+          className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors cursor-pointer"
         >
           {loading ? "Ajout en cours..." : "Ajouter la région"}
         </button>
       </form>
+
+      <div>
+        <Link href="/admin/gestion-des-crasc" className="underline mt-4 text-sm text-blue-600">Retour à la page de gestion des CRASC</Link>
+      </div>
     </section>
   )
 }
