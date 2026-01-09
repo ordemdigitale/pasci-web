@@ -1,11 +1,10 @@
-import { fetchAllCrascRegions } from "@/lib/fetch-crasc";
+import { fetchAllCrascRegions, fetchAllRegionCiv } from "@/lib/fetch-crasc";
 import { getAllRegionCivs } from "@/localdata/helper/data";
-import { MapPin } from "lucide-react";
 import Link from "next/link";
 
 export default async function AdminCrascPage() {
   const allCrascRegions = await fetchAllCrascRegions();
-	const regionCivs = getAllRegionCivs();
+	const allRegionCivs = await fetchAllRegionCiv();
 
   return (
     <section className="max-w-5xl mx-auto font-poppins bg-slate-50">
@@ -39,9 +38,9 @@ export default async function AdminCrascPage() {
 						Les Organisations de la Société Civile
 						<p className="mt-1.5 text-sm font-normal text-body">OSCs récemment ajoutées.</p>
 					</h3>
-					<Link href="/admin/gestion-des-crasc/ajouter-osc" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
+					{/* <Link href="/admin/gestion-des-crasc/ajouter-osc" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
 						Ajouter une OSC
-					</Link>
+					</Link> */}
 				</div>
 			</div>
 
@@ -66,10 +65,10 @@ export default async function AdminCrascPage() {
 								</tr>
 							</thead>
 							<tbody className="bg-white divide-y divide-gray-200">
-								{regionCivs.map((region) => (
+								{allRegionCivs.map((region) => (
 									<tr key={region.id}>
-										<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{region.region_name}</td>
-										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{region.crasc_region_name || '-'}</td>
+										<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{region.name}</td>
+										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{region.crasc_region.name || '-'}</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{region.crascRegionId}</td>
 									</tr>
 								))}

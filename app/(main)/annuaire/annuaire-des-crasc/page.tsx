@@ -105,7 +105,6 @@ const activities = [
 
 export default async function PageAnnuaireCrasc() {
   const allCrascRegions = await fetchAllCrascRegions();
-  console.log("All CRASC Regions Data: ", allCrascRegions);
   //const [crascRegions, setCrascRegions] = useState<any[]>([]);
 
   // Fetch CRASC regions data on component mount
