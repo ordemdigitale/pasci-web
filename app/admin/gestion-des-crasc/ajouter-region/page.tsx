@@ -60,7 +60,12 @@ export default function AdminAddRegionCiv() {
 
   return (
     <section className="max-w-5xl mx-auto font-poppins bg-slate-50">
-      <h2 className="text-2xl font-bold text-gray-900">Ajouter une région</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Ajouter une région</h2>
+        <Link href="/admin/gestion-des-crasc" className="underline mt-4 text-sm text-blue-600">
+          Retour à la page de gestion des CRASC
+        </Link>
+      </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 bg-white rounded-lg p-6 border border-gray-200">
         <div className="mb-4">
@@ -112,10 +117,6 @@ export default function AdminAddRegionCiv() {
           {loading ? "Ajout en cours..." : "Ajouter la région"}
         </button>
       </form>
-
-      <div>
-        <Link href="/admin/gestion-des-crasc" className="underline mt-4 text-sm text-blue-600">Retour à la page de gestion des CRASC</Link>
-      </div>
     </section>
   )
 }

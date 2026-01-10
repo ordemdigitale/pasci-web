@@ -243,7 +243,7 @@ export default function Dashboard() {
             <div className="bg-white rounded-lg p-6 border border-gray-200">
               <h3 className="text-gray-800 mb-4">Actions rapides</h3>
               <div className="flex flex-col space-y-3 items-center text-center">
-                <Link href="#" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
+                <Link href="/admin/gestion-des-crasc/osc/ajouter-osc" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
                   Ajouter une OSC
                 </Link>
                 <Link href="#" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">

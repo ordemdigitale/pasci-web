@@ -12,15 +12,15 @@ interface CrascRegionPageProps {
 export default async function CrascRegionPage({ params }: CrascRegionPageProps) {
   const { crascSlug } = await params;
   const crascRegionData = getCrascRegionWithCivsBySlug(crascSlug);
-  console.log("CrascRegionPage - Crasc Region Data:", crascRegionData);
+  //console.log("CrascRegionPage - Crasc Region Data:", crascRegionData);
   const regionCivs = crascRegionData?.civs || [];
-  console.log("CrascRegionPage - Region de la CIV:", regionCivs);
+  //console.log("CrascRegionPage - Region de la CIV:", regionCivs);
   const oscsData = getCrascRegionOscsBySlug(crascSlug);
-  console.log("CrascRegionPage - oscsData:", oscsData);
+  //console.log("CrascRegionPage - oscsData:", oscsData);
   const crascOscsDataFromApi = await fetchCrascRegionBySlugWithOscsFromApi(crascSlug);
-  console.log("CrascRegionPage - Fetch Crasc Region by slug with OSCs from API:", crascOscsDataFromApi);
+  //console.log("CrascRegionPage - Fetch Crasc Region by slug with OSCs from API:", crascOscsDataFromApi);
   const crascRegionOscsDataFromApi = crascOscsDataFromApi.oscs;
-  console.log("CrascRegionPage - OSCs for this Crasc Region:", crascRegionOscsDataFromApi);
+  //console.log("CrascRegionPage - OSCs for this Crasc Region:", crascRegionOscsDataFromApi);
   const crascRegionWithOscsAndRegionCivs = await getCrascRegionBySlugWithOscsFromApi(crascSlug);
 
   if (!crascRegionData) {

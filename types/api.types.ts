@@ -18,6 +18,8 @@ export interface IOsc {
   name: string;
   description: string;
   crascRegionId: string;
+  region: ICrascRegion;
+  type: IOscType;
 }
 
 // Interface for Crasc region by slug with OSCs and Region CIVs

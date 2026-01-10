@@ -2,7 +2,8 @@ import {
   ICrascRegion,
   ICrascRegionDetails,
   IRegionCiv,
-  IOscType
+  IOscType,
+  IOsc
 } from "@/types/api.types";
 
 // Fetch all Crasc regions data
@@ -63,4 +64,19 @@ export async function fetchAllOscType(): Promise<IOscType[]> {
     throw new Error("Échec du chargement des types de OSC à partir de l'API");
   }
   return res.json();
+}
+
+// Fetch all OSC from API
+export async function fetchAllOsc(): Promise<IOsc[]> {
+  const response = await fetch("http://localhost:8000/api/v1/crasc/osc-with-region-and-type?skip=0&limit=100", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    cache: "no-store"
+  });
+  if (!response.ok) {
+    throw new Error("Échec du chargement des types de OSC à partir de l'API");
+  }
+  return response.json();
 }
