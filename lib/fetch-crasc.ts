@@ -3,7 +3,8 @@ import {
   ICrascRegionDetails,
   IRegionCiv,
   IOscType,
-  IOsc
+  IOsc,
+  INews
 } from "@/types/api.types";
 
 // Fetch all Crasc regions data
@@ -77,6 +78,21 @@ export async function fetchAllOsc(): Promise<IOsc[]> {
   });
   if (!response.ok) {
     throw new Error("Échec du chargement des types de OSC à partir de l'API");
+  }
+  return response.json();
+}
+
+// Fetch all News from API
+export async function fetchAllNews(): Promise<INews[]> {
+  const response = await fetch("http://localhost:8000/api/v1/crasc/news-with-crasc-and-osc?skip=0&limit=100", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    cache: "no-store"
+  });
+  if (!response.ok) {
+    throw new Error("Échec du chargement des actualités à partir de l'API");
   }
   return response.json();
 }

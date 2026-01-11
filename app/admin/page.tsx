@@ -56,7 +56,7 @@ export default function Dashboard() {
 
   const stats = [
     { label: 'Nombre de CRASC', value: '5', icon: <Map size={24} />, trend: '+12%' },
-    { label: 'Nombre de OSC', value: '3176', icon: <GraduationCap size={24} />, trend: '+3' },
+    { label: "Nombre total d'OSC", value: '3176', icon: <GraduationCap size={24} />, trend: '+3' },
     //{ label: 'CRASC Zones', value: '5', icon: <MapPin size={24} />, trend: 'Complete' },
     { label: "Offres d'emploi postées", value: '7', icon: <BookOpen size={24} />, trend: '+24' },
   ];
@@ -215,7 +215,7 @@ export default function Dashboard() {
                   <div className="flex items-center gap-2 mb-2">
                     <p className="text-gray-800">{region.name}</p>
                   </div>
-                  <p className="text-gray-600 text-sm">Nombre de OSC: {region.count}</p>
+                  <p className="text-gray-600 text-sm">Nombre d&apos;OSC: {region.count}</p>
                 </div>
               ))}
             </div>
@@ -249,10 +249,10 @@ export default function Dashboard() {
                 <Link href="#" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
                   Poster une offre d'emploi
                 </Link>
-                {/* <Link href="" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
-                  Lorem ipsum
+                <Link href="/admin/gestion-des-crasc/articles/ajouter-article" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
+                  Poster une actualité
                 </Link>
-                <Link href="" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
+                {/* <Link href="" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
                   Dolor sit amet
                 </Link> */}
               </div>

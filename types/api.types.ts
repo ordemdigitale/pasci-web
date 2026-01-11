@@ -38,3 +38,11 @@ export interface IOscType {
   name: string;
   description: string;
 }
+
+// Interface for News
+export interface INews {
+  id: string;
+  title: string;
+  crasc: ICrascRegion;
+  osc: IOsc
+}
