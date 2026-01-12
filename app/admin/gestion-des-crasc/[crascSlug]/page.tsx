@@ -51,17 +51,6 @@ export default async function CrascRegionPage({ params }: CrascRegionPageProps) 
           
         </div>
       </div>
-      
-      <p>Liste des OSCs du {crascRegionData?.crasc_region_name}: données venant de "crasc.json" file</p>
-      {oscsData?.oscs.length === 0 ? (
-        <p>Nothing found</p>
-      ) : (
-        <ul>
-          {oscsData?.oscs.map((osc) => (
-            <li key={osc.id}>{osc.name}</li>
-          ))}
-        </ul>
-      )}
 
       <div className="mt-10 p-6 border-t border-gray-300"> 
         <p>Liste des OSCs du {crascRegionData?.crasc_region_name}: données venant de l'API</p>

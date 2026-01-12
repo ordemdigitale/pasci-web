@@ -246,11 +246,11 @@ export default function Dashboard() {
                 <Link href="/admin/gestion-des-crasc/osc/ajouter-osc" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
                   Ajouter une OSC
                 </Link>
-                <Link href="#" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
-                  Poster une offre d'emploi
-                </Link>
                 <Link href="/admin/gestion-des-crasc/articles/ajouter-article" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
                   Poster une actualité
+                </Link>
+                <Link href="#" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
+                  Poster une offre d'emploi
                 </Link>
                 {/* <Link href="" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
                   Dolor sit amet
