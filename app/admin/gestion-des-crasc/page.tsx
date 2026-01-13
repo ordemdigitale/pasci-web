@@ -22,9 +22,14 @@ export default async function AdminCrascPage() {
 
 			{/* Liste des CRASC */}
 			<div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
-				<h3 className="text-lg font-medium mb-4">
-          Les CRASC
-        </h3>
+				<div className="flex items-center justify-between">
+					<h3 className="text-lg font-medium mb-4">
+						Les CRASC
+					</h3>
+					<Link href="#" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
+						Ajouter un CRASC
+					</Link>
+				</div>
 				<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
 					{allCrascRegions.map((crasc) => (
 						<div key={crasc.order} className="p-4 border border-gray-200 rounded-lg hover:border-[#2A591D] transition-colors">

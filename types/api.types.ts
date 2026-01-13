@@ -46,3 +46,11 @@ export interface INews {
   crasc: ICrascRegion;
   osc: IOsc
 }
+// Interface for Spotlight News 
+export interface SpotlightNews {
+  id: string;
+  title: string;
+  thumbnail_url: string;
+  crasc: ICrascRegion;
+  osc?: IOsc;
+}

@@ -32,7 +32,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a href="/annuaire/annuaire-des-crasc" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Annuaire des CRASC
                 </a>
               </li>

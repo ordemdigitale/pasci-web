@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { ImageWithFallback } from "@/lib/imageWithFallback"
+import { fetchSpotlightNews } from "@/lib/fetch-crasc"
+import { INews } from "@/types/api.types"
 
 interface NewsArticle {
   id: number;
@@ -11,7 +13,9 @@ interface NewsArticle {
   crasc: string;
 }
 
-export default function SectionNews() {
+export default async function SectionNews() {
+  const spotlightNews = await fetchSpotlightNews();
+  console.log("Home page, News component - Fetch all news: ", spotlightNews)
   const newsArticles: NewsArticle[] = [
     {
       id: 1,
@@ -85,29 +89,29 @@ export default function SectionNews() {
 
         {/* News Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {newsArticles.map((article) => (
+          {spotlightNews.map((news) => (
             <div 
-              key={article.id} 
+              key={news.id} 
               className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative"
             >
               {/* Image */}
               <div className="aspect-video overflow-hidden">
                 <ImageWithFallback
-                  src={article.image}
-                  alt={article.title}
+                  src={news.thumbnail_url}
+                  alt={news.id}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
 
               {/* Content */}
-              <div className="p-6">
-                <p className="text-sm text-gray-800 mb-2">{article.crasc}</p>
-                <h3 className="text-gray-900 mb-3 font-bold">{article.title}</h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  {article.description}
+              <div className="p-4">
+                <p className="text-sm text-gray-800 mb-2">{news.crasc.name}</p>
+                <h3 className="text-gray-900 mb-3 font-bold">{news.title}</h3>
+                <p className="text-gray-600 text-sm mb-8">
+                  Contenu de l'article
                 </p>
                 <a 
-                  href={article.link}
+                  href="#"
                   className="absolute bottom-0 left-0 right-0 p-4 text-[#2a591d] underline text-sm transition-colors inline-flex items-center group"
                 >
                   Lire l'article

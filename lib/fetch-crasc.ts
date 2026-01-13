@@ -4,7 +4,8 @@ import {
   IRegionCiv,
   IOscType,
   IOsc,
-  INews
+  INews,
+  SpotlightNews
 } from "@/types/api.types";
 
 // Fetch all Crasc regions data
@@ -95,4 +96,27 @@ export async function fetchAllNews(): Promise<INews[]> {
     throw new Error("Échec du chargement des actualités à partir de l'API");
   }
   return response.json();
+}
+
+// Fetch spotlight news: single (latest) news per crasc
+export async function fetchSpotlightNews(): Promise<SpotlightNews[]> {
+  try {
+    const response = await fetch("http://localhost:8000/api/v1/crasc/news-spotlight-per-crasc", { 
+        next: { revalidate: 3600 }, // Revalidate every hour for SSG/ISR
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        cache: "no-store"
+      });
+    
+    if (!response.ok) {
+      throw new Error("Échec du chargement des actualités à partir de l'API");
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error("Échec du chargement des actualités à partir de l'API: ", error);
+    return [];
+  }
 }
