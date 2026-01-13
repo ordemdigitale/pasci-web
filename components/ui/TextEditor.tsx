@@ -2,6 +2,7 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
@@ -9,7 +10,7 @@ import Typography from "@tiptap/extension-typography";
 import { useEffect } from "react";
 import { ControllerRenderProps } from "react-hook-form";
 
-interface TextEditorProps {
+export interface TextEditorProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -26,6 +27,11 @@ export default function TextEditor({
 }: TextEditorProps) {
   const editor = useEditor({
     extensions: [
+      TextAlign.configure({
+        types: ['heading', 'paragraph'], // 2. Specify allowed nodes
+        alignments: ['left', 'center', 'right', 'justify'],
+        defaultAlignment: 'left',
+      }),
       StarterKit.configure({
         heading: {
           levels: [1, 2, 3],
@@ -64,6 +70,7 @@ export default function TextEditor({
         class: "prose prose-lg max-w-none focus:outline-none min-h-[200px] p-4",
       },
     },
+    immediatelyRender: false,
   });
 
   // Update editor content when value changes externally

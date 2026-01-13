@@ -9,10 +9,13 @@ import * as Select from "@radix-ui/react-select";
 import { ICrascRegion, IOsc } from "@/types/api.types";
 import { fetchAllCrascRegions, fetchAllOsc } from "@/lib/fetch-crasc";
 import Image from "next/image";
+import TextEditor from "@/components/ui/TextEditor";
+import ClientTextEditor from "@/components/ui/ClientTextEditor";
 
 // Schema de validation pour le formulaire d'ajout d'actualité
 const newsSchema = z.object({
   title: z.string().min(4, "Le titre de l'actualité doit contenir au moins 8 caractères."),
+  content: z.string().optional(),
   crasc_id: z.string().optional(),
   osc_id: z.string().optional(),
   thumbnail_path: z
@@ -53,7 +56,7 @@ export default function AdminAjoutArticle() {
 
   const { control, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<NewsForm>({
     resolver: zodResolver(newsSchema),
-    defaultValues: { title: "", crasc_id: "", osc_id: "" },
+    defaultValues: { title: "", content: "", crasc_id: "", osc_id: "" },
   });
   const thumbnailFile = watch("thumbnail_path");
   
@@ -96,6 +99,10 @@ export default function AdminAjoutArticle() {
       // Créer FormData pour envoyer l'image
       const formData = new FormData();
       formData.append("title", values.title);
+
+      if (values.content && values.content.trim() !== "") {
+        formData.append("content", values.content);
+      }
       
       if (values.crasc_id) {
         formData.append("crasc_id", values.crasc_id);
@@ -119,12 +126,51 @@ export default function AdminAjoutArticle() {
       
       xhr.onload = () => {
         if (xhr.status === 201) {
-          // Rediriger vers la liste des régions ou afficher un message de succès
+          // Rediriger ou afficher un message de succès
           reset();
           setPreviewImage(null);
           router.push("/admin/gestion-des-crasc");
         } else {
-          console.error("Erreur lors de l'ajout d'une actualité: ", xhr.statusText);
+          // Parse error response
+          let errorMessage = "Une erreur est survenue lors de l'ajout de l'actualité.";
+          let fieldErrors: Record<string, string> = {};
+
+          try {
+            const response = JSON.parse(xhr.responseText);
+
+            if(response.detail) {
+              // Handle structured error response
+              if (typeof response.detail === 'string') {
+                errorMessage = response.detail;
+              } else if (response.detail.type === 'duplicate_error' && response.detail.errors) {
+                // Handle duplicate title error
+                response.detail.errors.forEach((error: any) => {
+                  if (error.field === 'title') {
+                    errorMessage = error.message;
+                    fieldErrors.title = error.message;
+                  }
+                });
+              } else if (response.detail.type === 'validation_error' && response.detail.errors) {
+                // Handle validation errors
+                response.detail.errors.forEach((error: any) => {
+                  fieldErrors[error.field] = error.message;
+                  if (error.field === 'thumbnail') {
+                    errorMessage = error.message;
+                  }
+                });
+              }
+            }
+          } catch (e) {
+            // Response is not JSON or parsing failed
+            errorMessage = `Erreur ${xhr.status}: ${xhr.statusText}`;
+          }
+          // Show error message
+          alert(errorMessage);
+          // If we have field-specific errors, we could set them in form state
+          // For now, we just log them
+          if (Object.keys(fieldErrors).length > 0) {
+            console.log("Field errors:", fieldErrors);
+          }
         }
         setLoading(false);
         setUploadProgress(null);
@@ -132,6 +178,7 @@ export default function AdminAjoutArticle() {
       
       xhr.onerror = () => {
         console.error("Erreur réseau lors de l'envoi du formulaire");
+        alert("Erreur réseau. Vérifiez votre connexion et que l'API est en cours d'exécution.");
         setLoading(false);
         setUploadProgress(null);
       };
@@ -141,6 +188,7 @@ export default function AdminAjoutArticle() {
       
     } catch (error) {
       console.error("Erreur lors de l'ajout d'une actualité: ", error);
+      alert("Une erreur inattendue est survenue. Veuillez réessayer.");
       setLoading(false);
       setUploadProgress(null);
     }
@@ -157,6 +205,7 @@ export default function AdminAjoutArticle() {
 
       {/* Le formulaire */}
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 bg-white rounded-lg p-6 border border-gray-200">
+        {/* Titre */}
         <div className="mb-4">
           <label htmlFor="name" className="block text-gray-700 font-medium mb-2">Titre de l&apos;actualité</label>
           <input
@@ -167,6 +216,31 @@ export default function AdminAjoutArticle() {
             placeholder="Tournées d'information"
           />
           {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+        </div>
+        {/* Editeur */}
+        <div className="mb-6">
+          <label htmlFor="" className="block text-gray-700 font-medium mb-2">
+            Contenu de l&apos;actualité
+          </label>
+          <Controller
+            name="content"
+            control={control}
+            render={({ field }) => (
+              <ClientTextEditor
+                value={field.value || ""}
+                onChange={field.onChange}
+                placeholder="Écrivez le contenu de l'actualité..."
+                error={!!errors.content}
+                name="content"
+              />
+            )}
+          />
+          {errors.content && (
+            <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>
+          )}
+          <p className="text-gray-500 text-sm mt-2">
+            Utilisez l'éditeur pour formater votre texte. Le contenu sera sauvegardé au format HTML.
+          </p>
         </div>
         {/* Upload d'image */}
         <div className="mb-6">
