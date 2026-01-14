@@ -4,6 +4,7 @@ import { getCrascRegionOscsBySlug, fetchCrascRegionBySlugWithOscsFromApi } from 
 import { getCrascRegionBySlugWithOscsFromApi } from "@/lib/fetch-crasc";
 import { notFound } from "next/navigation";
 import { ImageWithFallback } from '@/lib/imageWithFallback';
+import Link from "next/link";
 
 interface CrascRegionPageProps {
   params: Promise<{ crascSlug: string }>
@@ -27,15 +28,21 @@ export default async function CrascRegionPage({ params }: CrascRegionPageProps) 
     notFound();
   }
   return (
-    <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
+    <section className="max-w-5xl mx-auto font-poppins bg-slate-50 py-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">{crascRegionData.crasc_region_name}</h2>
+        <Link href="/admin/gestion-des-crasc" className="underline mt-4 text-sm text-blue-600">
+          ← Retour à la page de gestion des CRASC
+        </Link>
+      </div>
 
       {/* Section statistiques */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Nombre de OSCs */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
-            <h3 className="text-sm text-gray-900 font-bold mb-2">ORGANISATIONS DE LA SOCIÉTÉ CIVILE</h3>
-            <div className="text-5xl text-[#2a591d] font-bold">{crascRegionWithOscsAndRegionCivs?.osc_count}</div>
+            <h3 className="text-sm text-gray-900 font-bold mb-2">Nombre d&apos;OSC du {crascRegionData.crasc_region_name} :</h3>
+            <div className="text-5xl font-bold">{crascRegionWithOscsAndRegionCivs?.osc_count}</div>
           </div>
           {/* Liste des régions qui composent le CRASC */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">

@@ -9,7 +9,7 @@ export interface ICrascRegion {
 export interface IRegionCiv {
   id: string;
   name: string;
-  crascRegionId: string;
+  crasc_id: string;
   crasc_region: ICrascRegion;
 }
 

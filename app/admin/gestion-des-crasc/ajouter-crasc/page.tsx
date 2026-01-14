@@ -6,45 +6,43 @@ import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import * as Select from "@radix-ui/react-select";
-import { ICrascRegion, IRegionCiv } from "@/types/api.types";
-import { fetchAllCrascRegions, fetchAllRegionCiv } from "@/lib/fetch-crasc";
 
 // Schema de validation pour le formulaire d'ajout de région CIV
-const regionCivSchema = z.object({
-  name: z.string().min(4, "Le nom de la région doit contenir au moins 4 caractères."),
-  crasc_id: z.string().min(1, "Veuillez sélectionner un CRASC pour cette région."),
+const crascSchema = z.object({
+  name: z.string().min(5, "Le nom du crasc doit contenir au moins 5 caractères."),
+  description: z.string().optional(),
+  osc_count: z.string().min(1, "Renseigner le nombre de OSC pour ce CRASC."),
 });
 
-type RegionCivForm = z.infer<typeof regionCivSchema>;
+type CrascSchemaForm = z.infer<typeof crascSchema>;
 
-export default function AdminAddRegionCiv() {
-  const [crascRegions, setCrascRegions] = useState<ICrascRegion[]>([]);
+export default function AdminAddCrasc() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Récupérer les régions CRASC depuis l'API lors du montage du composant
-  useEffect(() => {
-    fetchAllCrascRegions()
-      .then(data => setCrascRegions(data))
-      .catch(error => console.error("Erreur lors de la récupération des données relatives aux régions CRASC: ", error));
-  }, [])
-
-  const { control, handleSubmit, formState: { errors }, reset, setValue } = useForm<RegionCivForm>({
-    resolver: zodResolver(regionCivSchema),
-    defaultValues: { name: "", crasc_id: "" },
+  const { control, handleSubmit, formState: { errors }, reset, setValue, register } = useForm<CrascSchemaForm>({
+    resolver: zodResolver(crascSchema),
+    defaultValues: { name: "", description: "", osc_count: "" }
   });
 
   // Gestion de la soumission du formulaire
-  const onSubmit = async (values: RegionCivForm) => {
+  const onSubmit = async (values: CrascSchemaForm) => {
     setLoading(true);
     try {
       const formData = new FormData();
       formData.append("name", values.name);
 
-      if (values.crasc_id) {
-        formData.append("crasc_id", values.crasc_id);
+      if (values.name) {
+        formData.append("name", values.name);
       }
+      if (values.description && values.description.trim() !== "") {
+        formData.append("description", values.description);
+      }
+
+      if (values.osc_count) {
+        formData.append("osc_count", values.osc_count);
+      }
+      
       const xhr = new XMLHttpRequest();
 
       xhr.onload = () => {
@@ -53,7 +51,7 @@ export default function AdminAddRegionCiv() {
           router.push("/admin/gestion-des-crasc");
         } else {
           // Parse error response
-          let errorMessage = "Une erreur est survenue lors de l'ajout de region.";
+          let errorMessage = "Une erreur est survenue lors de la création du CRASC.";
           let fieldErrors: Record<string, string> = {};
 
           try {
@@ -94,11 +92,11 @@ export default function AdminAddRegionCiv() {
         setLoading(false);
       };
       
-      xhr.open("POST", "http://localhost:8000/api/v1/crasc/region-civ-with-crasc");
+      xhr.open("POST", "http://localhost:8000/api/v1/crasc/region-crasc");
       xhr.send(formData);
       
     } catch (error) {
-      console.error("Erreur lors de l'ajout d'une région: ", error);
+      console.error("Erreur lors de l'ajout du CRASC: ", error);
       alert("Une erreur inattendue est survenue. Veuillez réessayer.");
       setLoading(false);
     }
@@ -107,54 +105,48 @@ export default function AdminAddRegionCiv() {
   return (
     <section className="max-w-5xl mx-auto font-poppins bg-slate-50">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Ajouter une région</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Ajouter un CRASC</h2>
         <Link href="/admin/gestion-des-crasc" className="underline mt-4 text-sm text-blue-600">
           ← Retour à la page de gestion des CRASC
         </Link>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 bg-white rounded-lg p-6 border border-gray-200">
+        {/* Nom du CRASC */}
         <div className="mb-4">
-          <label htmlFor="name" className="block text-gray-700 font-medium mb-2">Nom de la région CIV</label>
+          <label htmlFor="name" className="block text-gray-700 font-medium mb-2">Nom du CRASC</label>
           <input
             id="name"
             type="text"
             {...control.register("name")}
             className="w-full p-2 border border-gray-300 rounded-lg"
+            placeholder="CRASC Sud"
           />
           {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
         </div>
+        {/* Description */}
         <div className="mb-4">
-          <label htmlFor="crasc_id" className="block text-gray-700 font-medium mb-2">Région CRASC associée</label>
-          <Controller
-            name="crasc_id"
-            control={control}
-            render={({ field }) => (
-              <Select.Root onValueChange={field.onChange} value={field.value}>
-                <Select.Trigger className="w-full p-2 border border-gray-300 rounded-lg text-left">
-                  <Select.Value placeholder="Sélectionnez une région CRASC" />
-                  <Select.Icon className="ml-2">▼</Select.Icon>
-                </Select.Trigger>
-                <Select.Content className="bg-white border border-gray-300 rounded-lg mt-1">
-                  <Select.ScrollUpButton className="text-center p-2 cursor-pointer">▲</Select.ScrollUpButton>
-                  <Select.Viewport>
-                    {crascRegions.map((region) => (
-                      <Select.Item
-                        key={region.id}
-                        value={region.id.toString()}
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                      >
-                        <Select.ItemText>{region.name}</Select.ItemText>
-                      </Select.Item>
-                    ))}
-                  </Select.Viewport>
-                  <Select.ScrollDownButton className="text-center p-2 cursor-pointer">▼</Select.ScrollDownButton>
-                </Select.Content>
-              </Select.Root>
-            )}
+          <label htmlFor="description" className="block text-gray-700 font-medium mb-2">Description (optionelle)</label>
+          <input
+            id="description"
+            type="text"
+            {...control.register("description")}
+            className="w-full p-2 border border-gray-300 rounded-lg"
           />
-          {errors.crasc_id && <p className="text-red-500 text-sm mt-1">{errors.crasc_id.message}</p>}
+          {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
         </div>
+        {/* Nombre de OSC du CRASC */}
+        <div className="mb-4">
+          <label htmlFor="osc_count" className="block text-gray-700 font-medium mb-2">Nombre de OSC</label>
+          <input
+            id="osc_count"
+            type="text"
+            {...control.register("osc_count")}
+            className="w-full p-2 border border-gray-300 rounded-lg"
+          />
+          {errors.osc_count && <p className="text-red-500 text-sm mt-1">{errors.osc_count.message}</p>}
+        </div>
+        {/* Groupe de boutons */}
         <div className="flex items-center justify-between pt-6 border-t border-gray-200">
           <button
             type="submit"

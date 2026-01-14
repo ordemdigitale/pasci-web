@@ -9,7 +9,6 @@ import * as Select from "@radix-ui/react-select";
 import { ICrascRegion, IOsc } from "@/types/api.types";
 import { fetchAllCrascRegions, fetchAllOsc } from "@/lib/fetch-crasc";
 import Image from "next/image";
-import TextEditor from "@/components/ui/TextEditor";
 import ClientTextEditor from "@/components/ui/ClientTextEditor";
 
 // Schema de validation pour le formulaire d'ajout d'actualité

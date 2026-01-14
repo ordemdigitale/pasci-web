@@ -50,7 +50,7 @@ export default function AdminAjoutTypeOsc() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">Ajouter un type de OSC</h2>
         <Link href="/admin/gestion-des-crasc" className="underline mt-4 text-sm text-blue-600">
-          Retour à la page de gestion des CRASC
+          ← Retour à la page de gestion des CRASC
         </Link>
       </div>
 
