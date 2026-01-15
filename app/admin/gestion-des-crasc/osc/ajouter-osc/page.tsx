@@ -6,8 +6,11 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import * as Select from "@radix-ui/react-select";
-import { ICrascRegion, IOscType } from "@/types/api.types";
-import { fetchAllCrascRegions, fetchAllOscType } from "@/lib/fetch-crasc";
+import { ICrasc, IOscType } from "@/types/api.types";
+import {
+  fetchAllCrasc,
+  fetchAllOscType
+} from "@/lib/fetch-crasc";
 import Image from "next/image";
 
 // Schema de validation pour le formulaire d'ajout de région CIV
@@ -32,7 +35,7 @@ const oscSchema = z.object({
 type OscForm = z.infer<typeof oscSchema>;
 
 export default function AdminAjoutOsc() {
-  const [crascRegions, setCrascRegions] = useState<ICrascRegion[]>([]);
+  const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
   const [oscType, setOscType] = useState<IOscType[]>([]);
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -41,7 +44,7 @@ export default function AdminAjoutOsc() {
   const router = useRouter();
   // Récupérer les régions CRASC depuis l'API lors du montage du composant
   useEffect(() => {
-    fetchAllCrascRegions()
+    fetchAllCrasc()
       .then(data => setCrascRegions(data))
       .catch(error => console.error("Erreur lors de la récupération des données relatives aux régions CRASC: ", error));
   }, []);
@@ -265,7 +268,7 @@ export default function AdminAjoutOsc() {
               render={({ field }) => (
                 <Select.Root onValueChange={field.onChange} value={field.value}>
                   <Select.Trigger className="w-full p-2 border border-gray-300 rounded-lg text-left">
-                    <Select.Value placeholder="Sélectionnez une région CRASC" />
+                    <Select.Value placeholder="Sélectionnez un type de OSC" />
                     <Select.Icon className="ml-2">▼</Select.Icon>
                   </Select.Trigger>
                   <Select.Content className="bg-white border border-gray-300 rounded-lg mt-1">

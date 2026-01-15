@@ -1,12 +1,16 @@
 import {
-	fetchAllCrascRegions, fetchAllRegionCiv, fetchAllOscType,
-	fetchAllOsc, fetchAllNews
+	fetchAllCrasc,
+	fetchAllRegion,
+	fetchAllOscType,
+	fetchAllOsc,
+	fetchAllNews
 } from "@/lib/fetch-crasc";
+import { SquarePen } from "lucide-react";
 import Link from "next/link";
 
 export default async function AdminCrascPage() {
-  const allCrascRegions = await fetchAllCrascRegions();
-	const allRegionCivs = await fetchAllRegionCiv();
+  const allCrasc = await fetchAllCrasc();
+	const allRegion = await fetchAllRegion();
 	const allOscType = await fetchAllOscType();
 	const allOsc = await fetchAllOsc();
 	const allNews = await fetchAllNews();
@@ -31,7 +35,7 @@ export default async function AdminCrascPage() {
 					</Link>
 				</div>
 				<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-					{allCrascRegions.map((crasc) => (
+					{allCrasc.map((crasc) => (
 						<div key={crasc.id} className="p-4 border border-gray-200 rounded-lg hover:border-[#2A591D] transition-colors">
 							<div className="flex items-center gap-2 mb-2">
 								<p className="text-gray-800 font-bold hover:cursor-pointer">
@@ -68,12 +72,12 @@ export default async function AdminCrascPage() {
 							</tr>
 						</thead>
 						<tbody className="bg-white divide-y divide-gray-200">
-							{/* les crasc ici */}
+							{/* Liste des OSC */}
 							{allOsc.map((osc) => (
 								<tr key={osc.id}>
 									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{osc.name}</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{osc.type.name}</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{osc.region.name}</td>
+									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{osc.type?.name}</td>
+									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{osc.crasc?.name}</td>
 								</tr>
 							))}
 						</tbody>
@@ -103,7 +107,7 @@ export default async function AdminCrascPage() {
 							</tr>
 						</thead>
 						<tbody className="bg-white divide-y divide-gray-200">
-							{/* les crasc ici */}
+							{/* Les actualités */}
 							{allNews.map((news) => (
 								<tr key={news.id}>
 									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{news.title}</td>
@@ -121,7 +125,9 @@ export default async function AdminCrascPage() {
 				<div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
 					<div className="flex items-center justify-between">
 						<h3 className="text-lg font-medium mb-4">
-							Les Types de OSC
+							<Link href="/admin/gestion-des-crasc/type-de-osc">
+								Les Types de OSC
+							</Link>
 						</h3>
 						<Link href="/admin/gestion-des-crasc/type-de-osc/ajouter-type-de-osc" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
 							Ajouter un type de OSC
@@ -130,14 +136,30 @@ export default async function AdminCrascPage() {
 					{/* list  */}
 					<div className="overflow-x-auto">
 						<table className="min-w-full divide-y divide-gray-200">
-							
+							<thead className="bg-gray-50">
+								<tr>
+									<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TYPE</th>
+									<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ACTION</th>
+								</tr>
+							</thead>
 							<tbody className="bg-white divide-y divide-gray-200">
 							{allOscType.map((osctype) => (
 								<tr key={osctype.id}>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{osctype.name}</td>
+									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+										<Link href={`/admin/gestion-des-crasc/type-de-osc/${osctype.slug}`}>
+											{osctype.name}
+										</Link>
+									</td>
+									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+										<Link
+                    href={`/admin/gestion-des-crasc/type-de-osc/${osctype.slug}`}
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    Voir
+                  </Link>
+									</td>
 								</tr>
 							))}
-
 							</tbody>
 						</table>
 					</div>
@@ -163,7 +185,7 @@ export default async function AdminCrascPage() {
 								</tr>
 							</thead>
 							<tbody className="bg-white divide-y divide-gray-200">
-								{allRegionCivs.map((region) => (
+								{allRegion.map((region) => (
 									<tr key={region.id}>
 										<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{region.name}</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{region.crasc_region?.name || '-'}</td>

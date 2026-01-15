@@ -7,8 +7,8 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import * as Select from "@radix-ui/react-select";
-import { ICrascRegion, IRegionCiv } from "@/types/api.types";
-import { fetchAllCrascRegions, fetchAllRegionCiv } from "@/lib/fetch-crasc";
+import { ICrasc, IRegionCiv } from "@/types/api.types";
+import { fetchAllCrasc, fetchAllRegionCiv } from "@/lib/fetch-crasc";
 
 // Schema de validation pour le formulaire d'ajout de région CIV
 const regionCivSchema = z.object({
@@ -19,13 +19,13 @@ const regionCivSchema = z.object({
 type RegionCivForm = z.infer<typeof regionCivSchema>;
 
 export default function AdminAddRegionCiv() {
-  const [crascRegions, setCrascRegions] = useState<ICrascRegion[]>([]);
+  const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   // Récupérer les régions CRASC depuis l'API lors du montage du composant
   useEffect(() => {
-    fetchAllCrascRegions()
+    fetchAllCrasc()
       .then(data => setCrascRegions(data))
       .catch(error => console.error("Erreur lors de la récupération des données relatives aux régions CRASC: ", error));
   }, [])
@@ -94,7 +94,7 @@ export default function AdminAddRegionCiv() {
         setLoading(false);
       };
       
-      xhr.open("POST", "http://localhost:8000/api/v1/crasc/region-civ-with-crasc");
+      xhr.open("POST", "http://localhost:8000/api/v1/crasc/region");
       xhr.send(formData);
       
     } catch (error) {

@@ -28,7 +28,14 @@ export default async function AdminOffresEmploi() {
 
   console.log("Jobs fetched from API into Admin Offres emploi: ", jobs);
   return (
-    <div>
+    <section className="max-w-5xl mx-auto font-poppins bg-slate-50">
+      <div className="mb-4">
+        <Link href="/admin" className="hover:underline text-sm text-blue-600">
+          ← Aller au tableau de bord
+        </Link>
+      </div>
+      <div className="flex items-center justify-between">
+      </div>
       <div className="max-w-5xl mx-auto">
         {/* Header with Title and Button */}
         <div className="flex items-center justify-between mb-6">
@@ -41,30 +48,6 @@ export default async function AdminOffresEmploi() {
           >
             Nouvelle offre d'emploi
           </Link>
-        </div>
-
-        {/* Section offres d'emploi */}
-        <div className="mb-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            {jobs.map((job) => (
-              <div key={job.id} className="p-6 bg-white rounded-lg shadow-sm overflow-hidden">
-                <div className="">
-                  <h4 className="font-bold text-lg mb-2">{job.title}</h4>
-                  <p className="text-gray-600 text-sm mb-4">{job.description.substring(0, 200)}...</p>
-                  <div className="flex flex-row items-center gap-2 text-gray-700 text-sm mb-3">
-                    <MapPin className="w-4 h-4" />
-                    <span className='text-sm'>{job.location}</span>
-                  </div>
-                  
-                  <div className="flex flex-row items-center gap-2 text-gray-700 text-sm">
-                    <Briefcase className="w-4 h-4" />
-                    <span className='inline-block px-3 py-1 rounded-full text-xs text-white bg-[#E05017]'>{job.type}</span>
-                  </div>
-                </div>
-                <Button className="w-full rounded-xl bg-[#E05017] hover:bg-orange-600 text-white mt-6">Postuler</Button>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Table of Jobs */}
@@ -95,6 +78,6 @@ export default async function AdminOffresEmploi() {
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
   )
 }

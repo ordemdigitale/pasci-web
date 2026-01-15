@@ -92,7 +92,7 @@ export default function AdminAddCrasc() {
         setLoading(false);
       };
       
-      xhr.open("POST", "http://localhost:8000/api/v1/crasc/region-crasc");
+      xhr.open("POST", "http://localhost:8000/api/v1/crasc/crasc");
       xhr.send(formData);
       
     } catch (error) {

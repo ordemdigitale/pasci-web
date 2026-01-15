@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -6,8 +7,8 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import * as Select from "@radix-ui/react-select";
-import { ICrascRegion, IOsc } from "@/types/api.types";
-import { fetchAllCrascRegions, fetchAllOsc } from "@/lib/fetch-crasc";
+import { ICrasc, IOsc } from "@/types/api.types";
+import { fetchAllCrasc, fetchAllOsc } from "@/lib/fetch-crasc";
 import Image from "next/image";
 import ClientTextEditor from "@/components/ui/ClientTextEditor";
 
@@ -33,7 +34,7 @@ const newsSchema = z.object({
 type NewsForm = z.infer<typeof newsSchema>;
 
 export default function AdminAjoutArticle() {
-  const [crascRegions, setCrascRegions] = useState<ICrascRegion[]>([]);
+  const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
   const [Osc, setOsc] = useState<IOsc[]>([]);
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -42,7 +43,7 @@ export default function AdminAjoutArticle() {
   const router = useRouter();
   // Récupérer les régions CRASC depuis l'API lors du montage du composant
   useEffect(() => {
-    fetchAllCrascRegions()
+    fetchAllCrasc()
       .then(data => setCrascRegions(data))
       .catch(error => console.error("Erreur lors de la récupération des données relatives aux régions CRASC: ", error));
   }, []);

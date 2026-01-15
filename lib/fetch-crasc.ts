@@ -1,5 +1,5 @@
 import {
-  ICrascRegion,
+  ICrasc,
   ICrascRegionDetails,
   IRegionCiv,
   IOscType,
@@ -8,9 +8,9 @@ import {
   SpotlightNews
 } from "@/types/api.types";
 
-// Fetch all Crasc regions data
-export async function fetchAllCrascRegions(): Promise<ICrascRegion[]> {
-  const res = await fetch("http://localhost:8000/api/v1/crasc/region-crasc", {
+// Fetch all Crasc
+export async function fetchAllCrasc(): Promise<ICrasc[]> {
+  const res = await fetch("http://localhost:8000/api/v1/crasc/crasc", {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -39,8 +39,8 @@ export async function getCrascRegionBySlugWithOscsFromApi(slug: string): Promise
 }
 
 // Fetch all RegionCIV from API
-export async function fetchAllRegionCiv(): Promise<IRegionCiv[]> {
-  const response = await fetch("http://localhost:8000/api/v1/crasc/region-civ", {
+export async function fetchAllRegion(): Promise<IRegionCiv[]> {
+  const response = await fetch("http://localhost:8000/api/v1/crasc/region", {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -70,7 +70,7 @@ export async function fetchAllOscType(): Promise<IOscType[]> {
 
 // Fetch all OSC from API
 export async function fetchAllOsc(): Promise<IOsc[]> {
-  const response = await fetch("http://localhost:8000/api/v1/crasc/osc-with-region-and-type?skip=0&limit=100", {
+  const response = await fetch("http://localhost:8000/api/v1/crasc/osc?skip=0&limit=100", {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -85,7 +85,7 @@ export async function fetchAllOsc(): Promise<IOsc[]> {
 
 // Fetch all News from API
 export async function fetchAllNews(): Promise<INews[]> {
-  const response = await fetch("http://localhost:8000/api/v1/crasc/news-with-crasc-and-osc?skip=0&limit=100", {
+  const response = await fetch("http://localhost:8000/api/v1/crasc/news?skip=0&limit=100", {
     method: "GET",
     headers: {
       "Content-Type": "application/json"

@@ -67,7 +67,7 @@ export function getCrascRegionBySlug(slug: string): ICrascRegion | undefined {
   return db.CrascRegion.find(crascRegion => crascRegion.slug === slug);
 }
 // Load a specific Crasc Region by slug from API route
-export async function fetchSpecificCrascRegionbySlugFromApi(slug: string): Promise<ICrascRegion[]> {
+/* export async function fetchSpecificCrascRegionbySlugFromApi(slug: string): Promise<ICrascRegion[]> {
   const response = await fetch(`http://localhost:8000/api/v1/crasc/region-crasc/${slug}`, {
     method: "GET",
     headers: {
@@ -79,7 +79,7 @@ export async function fetchSpecificCrascRegionbySlugFromApi(slug: string): Promi
     throw new Error("Failed to fetch Crasc Region by slug from API");
   }
   return response.json();
-}
+} */
 
 // Load all civs for a specific region
 export function getCivsByRegionId(crascId: string): IRegionCiv[] {

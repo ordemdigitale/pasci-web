@@ -7,52 +7,102 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-// Schema de validation pour le formulaire d'ajout de Type de OSC
+// Schema de validation formulaire d'ajout de Type de OSC
 const oscTypeSchema = z.object({
-  name: z.string().min(3, "Le type de OSC doit contenir au moins 3 caractères."),});
+  name: z.string().min(3, "Le type de OSC doit contenir au moins 3 caractères."),
+  description: z.string().optional(),
+});
 
 type OscTypeForm = z.infer<typeof oscTypeSchema>;
-
 
 export default function AdminAjoutTypeOsc() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const { control, handleSubmit, formState: { errors }, reset } = useForm<OscTypeForm>({
+  const { control, handleSubmit, formState: { errors }, reset, setValue } = useForm<OscTypeForm>({
     resolver: zodResolver(oscTypeSchema),
-    defaultValues: { name: "" }
+    defaultValues: { name: "", description: "" }
   });
+
   // Gestion de la soumission du formulaire
   const onSubmit = async (values: OscTypeForm) => {
     setLoading(true);
+    
     try {
-      const response = await fetch("http://localhost:8000/api/v1/crasc/osc-type", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: values.name
-        }),
-      });
-      if (response.ok) {
-        // Rediriger vers la page de gestion des crasc
-        reset();
-        router.push("/admin/gestion-des-crasc");
+      const formData = new FormData();
+      formData.append("name", values.name);
+
+      if (values.description && values.description.trim() !== "") {
+        formData.append("description", values.description)
       }
+
+      const xhr = new XMLHttpRequest();
+      xhr.onload = () => {
+        if (xhr.status === 201) {
+          // Rediriger ou afficher un message de succès
+          reset();
+          router.push("/admin/gestion-des-crasc/type-de-osc");
+        } else {
+          // Parse error response
+          let errorMessage = "Une erreur est survenue lors de l'ajout de l'actualité.";
+          let fieldErrors: Record<string, string> = {};
+
+          try {
+            const response = JSON.parse(xhr.responseText);
+
+            if(response.detail) {
+              // Handle structured error response
+              if (typeof response.detail === 'string') {
+                errorMessage = response.detail;
+              } else if (response.detail.type === 'duplicate_error' && response.detail.errors) {
+                // Handle duplicate title error
+                response.detail.errors.forEach((error: any) => {
+                  if (error.field === 'name') {
+                    errorMessage = error.message;
+                    fieldErrors.title = error.message;
+                  }
+                });
+              }
+            }
+          } catch (e) {
+            // Response is not JSON or parsing failed
+            errorMessage = `Erreur ${xhr.status}: ${xhr.statusText}`;
+          }
+          // Show error message
+          alert(errorMessage);
+          // If we have field-specific errors, we could set them in form state
+          // For now, we just log them
+          if (Object.keys(fieldErrors).length > 0) {
+            console.log("Field errors:", fieldErrors);
+          }
+        }
+        setLoading(false);
+      };
+      
+      xhr.onerror = () => {
+        console.error("Erreur réseau lors de l'envoi du formulaire");
+        alert("Erreur réseau. Vérifiez votre connexion et que l'API est en cours d'exécution.");
+        setLoading(false);
+      };
+      
+      xhr.open("POST", "http://localhost:8000/api/v1/crasc/osc-type");
+      xhr.send(formData);
+      
     } catch (error) {
-      console.error("Erreur lors de la création du type de osc: ", error);
-    } finally {
+      console.error("Erreur lors de l'ajout d'une actualité: ", error);
+      alert("Une erreur inattendue est survenue. Veuillez réessayer.");
       setLoading(false);
     }
   };
 
   return (
     <section className="max-w-5xl mx-auto font-poppins bg-slate-50">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Ajouter un type de OSC</h2>
-        <Link href="/admin/gestion-des-crasc" className="underline mt-4 text-sm text-blue-600">
-          ← Retour à la page de gestion des CRASC
+      <div className="mb-4">
+        <Link href="/admin/gestion-des-crasc" className="hover:underline text-sm text-blue-600">
+          ← Aller aux types de OSC
         </Link>
       </div>
+      <h1 className="text-2xl font-bold text-gray-900">Ajouter un type de OSC</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 bg-white rounded-lg p-6 border border-gray-200">
         <div className="mb-4">
