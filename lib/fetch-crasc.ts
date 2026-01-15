@@ -101,13 +101,12 @@ export async function fetchAllNews(): Promise<INews[]> {
 // Fetch spotlight news: single (latest) news per crasc
 export async function fetchSpotlightNews(): Promise<SpotlightNews[]> {
   try {
-    const response = await fetch("http://localhost:8000/api/v1/crasc/news-spotlight-per-crasc", { 
+    const response = await fetch("http://localhost:8000/api/v1/crasc/news-spotlight-crasc", { 
         next: { revalidate: 3600 }, // Revalidate every hour for SSG/ISR
         method: "GET",
         headers: {
           "Content-Type": "application/json"
-        },
-        cache: "no-store"
+        }
       });
     
     if (!response.ok) {

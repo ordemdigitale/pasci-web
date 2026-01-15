@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import * as Select from "@radix-ui/react-select";
 import { ICrasc, IRegionCiv } from "@/types/api.types";
-import { fetchAllCrasc, fetchAllRegionCiv } from "@/lib/fetch-crasc";
+import { fetchAllCrasc, fetchAllRegion } from "@/lib/fetch-crasc";
 
 // Schema de validation pour le formulaire d'ajout de région CIV
 const regionCivSchema = z.object({

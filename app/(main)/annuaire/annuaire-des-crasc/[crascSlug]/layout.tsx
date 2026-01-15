@@ -1,6 +1,6 @@
 import {
   getCrascRegionBySlug,
-  fetchAllCrascRegionsFromApi, fetchSpecificCrascRegionbySlugFromApi, fetchCrascRegionBySlugWithOscsFromApi
+  fetchAllCrascRegionsFromApi, fetchCrascRegionBySlugWithOscsFromApi
 } from "@/localdata/helper/data";
 
 import { getCrascRegionBySlugWithOscsFromApi } from "@/lib/fetch-crasc";
@@ -17,8 +17,6 @@ export default async function CrascRegionLayout({
 }: CrascRegionLayoutProps) {
   const { crascSlug } = await params;
   const crascRegion = getCrascRegionBySlug(crascSlug);
-  
-  const specificCrascRegionBySlugFromApi = await fetchSpecificCrascRegionbySlugFromApi(crascSlug);
   
   const allCrascRegionsFromApi = await fetchAllCrascRegionsFromApi();
   

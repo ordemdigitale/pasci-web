@@ -3,7 +3,7 @@
 
 //import { useState, useEffect } from 'react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
-import { fetchAllCrascRegions } from "@/lib/fetch-crasc";
+import { fetchAllCrasc } from "@/lib/fetch-crasc";
 
 interface IActivityCard {
   id: number;
@@ -104,14 +104,14 @@ const activities = [
 
 
 export default async function PageAnnuaireCrasc() {
-  const allCrascRegions = await fetchAllCrascRegions();
+  const allCrascRegions = await fetchAllCrasc();
   //const [crascRegions, setCrascRegions] = useState<any[]>([]);
 
   // Fetch CRASC regions data on component mount
 /*   useEffect(() => {
     const fetchData = async () => {
       try {
-        const regionsData = await fetchAllCrascRegions();
+        const regionsData = await fetchAllCrasc();
         console.log(regionsData);
         setCrascRegions(regionsData);
       }
@@ -139,7 +139,7 @@ export default async function PageAnnuaireCrasc() {
             <h3 className="text-sm text-gray-900 font-bold mb-4">LES 5 CRASC</h3>
             <div className="space-y-2">
               {allCrascRegions.map((crasc) => (
-                <div key={crasc.order} className="text-sm text-[#2a591d] font-bold">
+                <div key={crasc.id} className="text-sm text-[#2a591d] font-bold">
                   {crasc.name}
                 </div>
               ))}
