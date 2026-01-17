@@ -37,7 +37,7 @@ export default function SectionHero() {
               <div className="aspect-video overflow-hidden">
                 <ImageWithFallback
                   alt="card-image"
-                  src="/images/hero-card-image.jpg"
+                  src="/images/de715dfa-b501-4ea4-9532-9d32d85c10e0.png"
                   className="w-full h-full"
                 />
               </div>

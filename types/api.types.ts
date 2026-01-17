@@ -56,8 +56,9 @@ export interface INews {
 export interface SpotlightNews {
   id: string;
   title: string;
+  content?: string;
   thumbnail_url: string;
-  crasc: ICrasc;
+  crasc?: ICrasc;
   osc?: IOsc;
 }
 

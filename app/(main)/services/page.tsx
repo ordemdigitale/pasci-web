@@ -53,7 +53,7 @@ export default function ServicesPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
         {/* Left content */}
         <div className="">
-          <h2 className="font-bold text-5xl text-[#2a591d] leading-tight">Des Services Stratégiques <br />pour le Succès de <br /> Votre Projet</h2>
+          <h2 className="font-bold text-4xl text-[#2a591d] leading-tight">Des Services Stratégiques <br />pour le Succès de <br /> Votre Projet</h2>
           <p className="text-gray-600 text-md max-w-xl mt-6">
             Au CRASC, nous vous offrons un accompagnement sur mesure, de l'appui-conseil à la rédaction de documents complexes, pour garantir la conformité et l'efficacité de vos initiatives.
           </p>

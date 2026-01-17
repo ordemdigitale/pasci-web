@@ -51,7 +51,7 @@ export default function PagePoleConcertation() {
         <div className="space-y-12">
           <div className="">
             <ImageWithFallback
-              src="/images/espace-collab-page-thumb.png"
+              src="/images/b81daf7f-c015-4a68-942f-ce602fdf5542.jpg"
               alt="image"
               className="w-full h-[300px] object-cover rounded-lg"
             />

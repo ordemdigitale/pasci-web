@@ -1,22 +1,18 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button"
 import { ImageWithFallback } from "@/lib/imageWithFallback"
 import { fetchSpotlightNews } from "@/lib/fetch-crasc"
-import { INews } from "@/types/api.types"
+import { SpotlightNews } from "@/types/api.types"
+import DOMPurify from 'dompurify';
 
-interface NewsArticle {
-  id: number;
-  date: string;
-  title: string;
-  description: string;
-  image: string;
-  link: string;
-  crasc: string;
-}
-
-export default async function SectionNews() {
-  const spotlightNews = await fetchSpotlightNews();
-  console.log("Home page, News component - Fetch all news: ", spotlightNews)
-  const newsArticles: NewsArticle[] = [
+export default function SectionNews() {
+  const [spotlightNewsData, setSpotlightNewsData] = useState<SpotlightNews[] | null>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  //const spotlightNews = await fetchSpotlightNews();
+  const newsArticles = [
     {
       id: 1,
       date: '23 septembre 2025',
@@ -72,6 +68,29 @@ export default async function SectionNews() {
       crasc: "RI-CRASC"
     },
   ];
+  // fetch all crasc data
+  useEffect(() => {
+    const fetchSpotlightNewsData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch("http://localhost:8000/api/v1/crasc/news-spotlight-crasc");
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`)
+        }
+        const result = await response.json();
+        setSpotlightNewsData(result);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSpotlightNewsData();
+  }, []);
+
+  console.log("Spot light news: ", spotlightNewsData);
 
   return (
     <section className="py-10 bg-white font-poppins">
@@ -89,12 +108,12 @@ export default async function SectionNews() {
 
         {/* News Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {spotlightNews.map((news) => (
+          {spotlightNewsData?.map((news) => (
             <div 
               key={news.id} 
               className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative"
             >
-              {/* Image */}
+              
               <div className="aspect-video overflow-hidden">
                 <ImageWithFallback
                   src={news.thumbnail_url}
@@ -103,13 +122,11 @@ export default async function SectionNews() {
                 />
               </div>
 
-              {/* Content */}
+              
               <div className="p-4">
-                <p className="text-sm text-gray-800 mb-2">{news.crasc.name}</p>
+                <p className="text-sm text-gray-800 mb-2">{news.crasc?.name}</p>
                 <h3 className="text-gray-900 mb-3 font-bold">{news.title}</h3>
-                <p className="text-gray-600 text-sm mb-8">
-                  Contenu de l'article
-                </p>
+                <p className="text-gray-600 text-sm mb-8 line-clamp-2" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(news.content ?? '') }}></p>
                 <a 
                   href="#"
                   className="absolute bottom-0 left-0 right-0 p-4 text-[#2a591d] underline text-sm transition-colors inline-flex items-center group"

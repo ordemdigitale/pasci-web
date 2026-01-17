@@ -37,13 +37,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
-                  Statistiques
-                </a>
-              </li>
-              <li>
-                <a href="/espace-collaboratif" className="text-gray-300 hover:text-white text-sm transition-colors">
-                  Espace Collaboratif
+                <a href="/espace-collaboratif/pole-concertation" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Pôle de concertation
                 </a>
               </li>
               <li>
@@ -59,28 +54,28 @@ export default function Footer() {
             <h3 className="text-white mb-4 font-bold">Ressources</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a href="/formations" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Formation
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
-                  Cours
+                <a href="/ressources/documentation" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Documentation
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
-                  Vidéos
+                <a href="/ressources/fiches-informatives" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Fiche informative
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
-                  Audio
+                <a href="/espace-collaboratif/offres-emploi" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Offres d'emploi
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
-                  Foires Aux Questions
+                <a href="/offres-de-projets" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Offres de projets
                 </a>
               </li>
             </ul>
@@ -91,7 +86,7 @@ export default function Footer() {
             <h3 className="text-white mb-4 font-bold">Organisation CRASC</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a href="/à-propos" className="text-gray-300 hover:text-white text-sm transition-colors">
                   À propos
                 </a>
               </li>

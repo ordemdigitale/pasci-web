@@ -1,0 +1,21 @@
+Modification à apporter au frontend
+- Page accueil:
+  - Section stats: utiliser BAR CHART pour tous les statistiques - OK
+  - Modifier photo à côté de la carte de la CIV - OK
+  - Ajouter carousel de 3 images
+
+- Page pole de concertation:
+  - pole de concertation est un forum de discussion
+  - mettre à jour avec visily:
+    - Agriculture et éducation sont OK. Pour les autres dupliquer le pole éducation.
+
+- Créer pages (voir visily):
+  - Offre de projet
+  - Processus de formalisation
+
+- Mettre à jour page formation -> voir visily
+
+- Créer page FAQ (voir visily). Retirer FAQ de la page offre d'emploi
+
+- Page annuaire/annuaire-des-partenaires-techniques-et-financiers:
+  - faire un CRUD pour les PTF

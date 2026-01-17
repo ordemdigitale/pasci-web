@@ -71,6 +71,7 @@ export default function TextEditor({
       },
     },
     immediatelyRender: false,
+    //editable: false,
   });
 
   // Update editor content when value changes externally
