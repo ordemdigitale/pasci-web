@@ -152,18 +152,21 @@ export default function Navbar() {
 
             {/* Right Side Actions */}
             <div className="hidden md:flex items-center space-x-4">
+              <Link href="/rejoindre" className='px-4 py-2 border rounded-3xl bg-[#E05017] text-white'>
+                Rejoignez-nous
+              </Link>
               {/* Search Bar */}
-              <div className="relative">
+              {/* <div className="relative">
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Rechercher..."
                   className="bg-white border border-gray-300 rounded-lg pl-4 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent w-48"
                 />
-              </div>
+              </div> */}
 
               {/* User Avatar Dropdown */}
-              <DropdownMenu>
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger className="focus:outline-none">
                   <Avatar className="cursor-pointer border-2 border-transparent hover:border-[#ff8c42] transition-colors">
                     <AvatarImage src={user.avatar} alt={user.name} />
@@ -190,7 +193,7 @@ export default function Navbar() {
                     <span>Déconnexion</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
             </div>
 
             {/* Mobile menu button */}

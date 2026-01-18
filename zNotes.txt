@@ -1,8 +1,7 @@
 Modification à apporter au frontend
 - Page accueil:
-  - Section stats: utiliser BAR CHART pour tous les statistiques - OK
-  - Modifier photo à côté de la carte de la CIV - OK
-  - Ajouter carousel de 3 images
+  - Section stats: voir visily
+  - Ajouter carousel de 3 images - à voir...
 
 - Page pole de concertation:
   - pole de concertation est un forum de discussion
@@ -19,3 +18,9 @@ Modification à apporter au frontend
 
 - Page annuaire/annuaire-des-partenaires-techniques-et-financiers:
   - faire un CRUD pour les PTF
+
+- Créer page détail d'une actualité.
+
+- Bouton nous rejoindre dans menu navigation + formulaire d'inscription des OSCs -> https://ricrasc.org/adhesion
+
+- Page offre de projet

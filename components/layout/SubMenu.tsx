@@ -44,7 +44,7 @@ export default function SubMenu() {
 
           {/* Offres de projets */}
           <a
-            href="#"
+            href="/offre-projets"
             className="text-white hover:text-white/90 transition-colors"
           >
             Offres de projets

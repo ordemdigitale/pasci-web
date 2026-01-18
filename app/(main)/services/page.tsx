@@ -49,7 +49,7 @@ const services: IService[] = [
 
 export default function ServicesPage() {
   return (
-    <section className="mx-auto pt-12 pb-6 font-poppins">
+    <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
         {/* Left content */}
         <div className="">

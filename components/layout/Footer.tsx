@@ -74,7 +74,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="/offres-de-projets" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a href="/offre-projets" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Offres de projets
                 </a>
               </li>
