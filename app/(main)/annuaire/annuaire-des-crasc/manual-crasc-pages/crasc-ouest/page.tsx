@@ -80,16 +80,11 @@ const tabs = [
 ];
 
 const regions = [
-  'Gbôklê',
-  'Gôh',
-  'Sud Comoé',
-  'Grand-ponts',
-  'La Mé',
-  'San Pédro',
-  'Nawa',
-  'Lôh Djiboua',
-  'Agneby Tiassa',
-  'Abidjan'
+  "Guémon",
+  "Cavally",
+  "Bafing",
+  "Tonkpi",
+  "Haut sassandra"
 ];
 
 const activities = [
@@ -110,7 +105,7 @@ const [activeTab, setActiveTab] = useState(4);
           {/* Map Section */}
           <section className="w-full h-[400px] lg:h-[500px]">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15904.342598404442!2d-6.663088693746229!3d4.755139038876891!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xf961300358df441%3A0x5939d6eb97423c5d!2sCRASC%20SUD!5e0!3m2!1sen!2sci!4v1765409873752!5m2!1sen!2sci"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.539296694119!2d-7.561210924940003!3d7.405402892604712!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfbab90062de2b53%3A0x62958829307a2c15!2sCRASC%20OUEST!5e0!3m2!1sfr!2sci!4v1767651102299!5m2!1sfr!2sci"
               width="100%" height="100%" style={{ border: 0 }}
               allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"/>
           </section>
@@ -123,7 +118,7 @@ const [activeTab, setActiveTab] = useState(4);
           {/* Organizations Count */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
             <h3 className="text-sm text-gray-900 font-bold mb-2">ORGANISATIONS DE LA SOCIÉTÉ CIVILE</h3>
-            <div className="text-5xl text-[#2a591d] font-bold">486</div>
+            <div className="text-5xl text-[#2a591d] font-bold">877</div>
           </div>
 
           {/* Regions List */}
@@ -152,8 +147,11 @@ const [activeTab, setActiveTab] = useState(4);
         </div>
       </div>
 
-      {/* Activity Cards Section */}
+      {/* OSC Section */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className='font-bold text-2xl'>OSC membres</h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {activityCards.map((card) => (
             <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
@@ -184,10 +182,10 @@ const [activeTab, setActiveTab] = useState(4);
         </div>
       </div>
 
-      {/* Recently added section */}
+      {/* News section */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
         <div className="flex items-center justify-between mb-6">
-          <h2 className='font-bold text-2xl'>OSC récemment ajouté</h2>
+          <h2 className='font-bold text-2xl'>Nos actualités</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

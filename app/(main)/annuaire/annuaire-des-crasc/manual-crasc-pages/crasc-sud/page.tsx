@@ -72,16 +72,16 @@ const recentlyAdded: IActivityCard[] = [
 ];
 
 const regions = [
-  'Gbôklê',
-  'Gôh',
-  'Sud Comoé',
-  'Grand-ponts',
-  'La Mé',
-  'San Pédro',
-  'Nawa',
-  'Lôh Djiboua',
-  'Agneby Tiassa',
-  'Abidjan'
+  "Abidjan",
+  "San-Pédro",
+  "Gôh",
+  "Sud-comoé",
+  "Grand-ponts",
+  "Gbôklé",
+  "La Mé",
+  "Lôh-Djiboua",
+  "Nawa",
+  "Agnéby tiassa"
 ];
 
 const activities = [
@@ -149,6 +149,7 @@ export default function PageCrascSud() {
             {/* Organizations Count */}
             <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
               <h3 className="text-sm text-gray-900 font-bold mb-2">ORGANISATIONS DE LA SOCIÉTÉ CIVILE</h3>
+<<<<<<< HEAD:app/(main)/annuaire/annuaire-des-crasc/manual-crasc-pages/crasc-sud/page.tsx
               {/* Display the count of osc for Crasc Sud */}
               {oscsSud.length === 0 ? (
                 <Spinner size="md" color="green" />
@@ -156,6 +157,9 @@ export default function PageCrascSud() {
                 <div className="text-5xl text-[#2a591d] font-bold">{oscsSud.length}</div>
               )}
               {/* <div className="text-5xl text-[#2a591d] font-bold">486</div> */}
+=======
+              <div className="text-5xl text-[#2a591d] font-bold">1160</div>
+>>>>>>> 68d975db3f56701070abc0daa86ce8f7945a29d2:app/(main)/annuaire/annuaire-des-crasc/crasc-sud/page.tsx
             </div>
   
             {/* Regions List */}
@@ -184,6 +188,7 @@ export default function PageCrascSud() {
           </div>
         </div>
   
+<<<<<<< HEAD:app/(main)/annuaire/annuaire-des-crasc/manual-crasc-pages/crasc-sud/page.tsx
         {/* Les OSCs du CRASC Sud */}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -214,34 +219,69 @@ export default function PageCrascSud() {
               Voir plus
             </button>
           </div>
+=======
+      {/* OSC Section */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className='font-bold text-2xl'>OSC membres</h2>
+>>>>>>> 68d975db3f56701070abc0daa86ce8f7945a29d2:app/(main)/annuaire/annuaire-des-crasc/crasc-sud/page.tsx
         </div>
-  
-        {/* Recently added section */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className='font-bold text-2xl'>OSC récemment ajouté</h2>
-          </div>
-  
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {recentlyAdded.map((card) => (
-              <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <ImageWithFallback
-                    src={card.image}
-                    alt={card.title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="mb-3">{card.title}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    {card.description}
-                  </p>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {activityCards.map((card) => (
+            <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div className="aspect-[4/3] overflow-hidden">
+                <ImageWithFallback
+                  src={card.image}
+                  alt={card.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
               </div>
-            ))}
-          </div>
+              <div className="p-6">
+                <h3 className="mb-3 text-center font-bold">{card.title}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {card.description}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
+
+        {/* Load More Buttons */}
+        <div className="flex flex-wrap gap-3 justify-end">
+          <button
+            className="px-6 py-2 border border-[#E05107] text-[#E05107] rounded-lg transition-colors"
+          >
+            Voir plus
+          </button>
+        </div>
+      </div>
+
+      {/* News section */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className='font-bold text-2xl'>Nos actualités</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {recentlyAdded.map((card) => (
+            <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div className="aspect-[4/3] overflow-hidden">
+                <ImageWithFallback
+                  src={card.image}
+                  alt={card.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="mb-3">{card.title}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {card.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
   
       </section>
     )
