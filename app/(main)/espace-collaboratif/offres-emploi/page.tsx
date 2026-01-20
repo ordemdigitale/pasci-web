@@ -21,48 +21,67 @@ interface IJobItem {
   type: string;
 }
 
-const jobOffers: IJobItem[] = [
+// Mock data de fallback
+const mockJobs: IJobs[] = [
   {
-    id: 1,
-    title: 'Développeur Full Stack Senior',
-    description: 'Rejoignez notre équipe dynamique pour concevoir et développer des applications web complexes. Vous serez responsable de l\'architecture et de l\'implémentation des solutions front-end et back-end, en utilisant les dernières technologies.',
-    location: 'Paris, France',
+    id: "1",
+    title: 'Chargé de Mission Innovation',
+    description: 'Rejoignez notre équipe dynamique pour piloter des projets d\'innovation sociale au sein de l\'espace collaboratif PASCI. Vous serez responsable de la coordination de projets stratégiques et de l\'animation de l\'écosystème.',
+    location: 'Abidjan, Côte d\'Ivoire',
     type: 'CDI',
+    slug: 'charge-mission-innovation',
+    employer: 'PASCI Côte d\'Ivoire',
+    publication_date: new Date().toISOString()
   },
   {
-    id: 2,
-    title: 'Chef de Projet IT',
-    description: 'En tant que Chef de Projet IT, vous gérerez le cycle de vie complet de projets technologiques, de la planification à la livraison. Vous travaillerez en étroite collaboration avec les équipes techniques et les parties prenantes pour assurer le succès des projets.',
-    location: 'Lyon, France',
+    id: "2",
+    title: 'Coordonnateur de Projets Communautaires',
+    description: 'Gérez le cycle de vie complet de projets communautaires, de la planification à la livraison. Vous travaillerez en étroite collaboration avec les OSC et les partenaires pour assurer le succès des initiatives.',
+    location: 'Bouaké, Côte d\'Ivoire',
     type: 'CDI',
+    slug: 'coordonnateur-projets-communautaires',
+    employer: 'PASCI Bouaké',
+    publication_date: new Date(Date.now() - 86400000).toISOString()
   },
   {
-    id: 3,
-    title: 'Stagiaire en Marketing Digital',
-    description: 'Nous recherchons un stagiaire motivé pour nous aider à développer et à exécuter nos stratégies de marketing digital. Une opportunité unique d\'apprendre et de contribuer à des campagnes innovantes.',
-    location: 'Bordeaux, France',
+    id: "3",
+    title: 'Assistant Communication et Marketing',
+    description: 'Nous recherchons un assistant motivé pour nous aider à développer et à exécuter nos stratégies de communication. Une opportunité unique d\'apprendre et de contribuer à des campagnes innovantes.',
+    location: 'Yamoussoukro, Côte d\'Ivoire',
     type: 'Stage',
+    slug: 'assistant-communication-marketing',
+    employer: 'PASCI Yamoussoukro',
+    publication_date: new Date(Date.now() - 172800000).toISOString()
   },
   {
-    id: 4,
-    title: 'Analyste de Données Junior',
-    description: 'Contribuez à l\'analyse de grandes quantités de données pour identifier des tendances et des insights exploitables. Vous travaillerez avec des outils d\'analyse avancés et présenterez vos conclusions aux équipes opérationnelles.',
-    location: 'Toulouse, France',
+    id: "4",
+    title: 'Analyste de Données Impact',
+    description: 'Contribuez à l\'analyse de données pour mesurer l\'impact de nos projets et identifier des tendances exploitables. Vous travaillerez avec des outils d\'analyse avancés et présenterez vos conclusions.',
+    location: 'Dakar, Sénégal',
     type: 'CDD',
+    slug: 'analyste-donnees-impact',
+    employer: 'PASCI Sénégal',
+    publication_date: new Date(Date.now() - 259200000).toISOString()
   },
   {
-    id: 5,
-    title: 'Designer UX/UI',
-    description: 'Créez des expériences utilisateur intuitives et esthétiques pour nos produits numériques. Vous serez en charge de la recherche utilisateur, de la conception de wireframes, de prototypes et de l\'interface finale.',
-    location: 'Nantes, France',
+    id: "5",
+    title: 'Responsable Formation et Renforcement des Capacités',
+    description: 'Concevez et animez des programmes de formation pour les membres des OSC. Vous serez en charge de l\'identification des besoins, de la conception de modules et de l\'évaluation des formations.',
+    location: 'Abidjan, Côte d\'Ivoire',
     type: 'CDI',
+    slug: 'responsable-formation-capacites',
+    employer: 'PASCI Côte d\'Ivoire',
+    publication_date: new Date(Date.now() - 345600000).toISOString()
   },
   {
-    id: 6,
-    title: 'Ingénieur DevOps',
-    description: 'Optimisez et maintenez nos infrastructures de déploiement et d\'intégration continue. Vous contribuerez à l\'automatisation des processus et à l\'amélioration de la fiabilité de nos systèmes.',
-    location: 'Lille, France',
+    id: "6",
+    title: 'Coordonnateur RSE Senior',
+    description: 'Développez et mettez en œuvre la stratégie RSE de PASCI. Vous contribuerez à l\'alignement de nos projets avec les objectifs de développement durable et à l\'amélioration de notre impact social.',
+    location: 'Abidjan, Côte d\'Ivoire',
     type: 'CDI',
+    slug: 'coordonnateur-rse',
+    employer: 'PASCI Côte d\'Ivoire',
+    publication_date: new Date(Date.now() - 432000000).toISOString()
   },
 ];
 
@@ -77,7 +96,7 @@ const faqCategories = [
 
 export default function PageOffreEmploi() {
   const router = useRouter();
-  const [jobs, setJobs] = useState<IJobs[] | null>([]);
+  const [jobs, setJobs] = useState<IJobs[]>(mockJobs);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openFaqs, setOpenFaqs] = useState<number[]>([]);
@@ -86,15 +105,7 @@ export default function PageOffreEmploi() {
   const [selectedType, setSelectedType] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
 
-/*   const response = await fetch("http://localhost:8000/api/v1/jobs", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-  }); */
   useEffect(() => {
-    // Define an asynchronous function to fetch the data
     const fetchData = async () => {
       try {
         const response = await fetch('http://localhost:8000/api/v1/jobs');
@@ -102,9 +113,13 @@ export default function PageOffreEmploi() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        setJobs(result);
+        if (result && result.length > 0) {
+          setJobs(result);
+        }
       } catch (error: any) {
+        console.log("Erreur lors du chargement des offres:", error);
         setError(error.message || "Impossible de charger les offres d'emploi.");
+        // On garde les données mock en cas d'erreur
       } finally {
         setLoading(false);
       }

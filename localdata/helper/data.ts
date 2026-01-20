@@ -145,17 +145,135 @@ export async function fetchCrascRegionBySlugWithOscsFromApi(slug: string): Promi
   return response.json();
 }
 
+// Mock news data for fallback
+const mockNewsData: INews[] = [
+  {
+    id: "1",
+    title: "Lancement du nouveau programme de formation pour les OSC",
+    slug: "nouveau-programme-formation-osc",
+    content: `
+      <p>Le CRASC annonce le lancement d'un nouveau programme de formation destiné aux organisations de la société civile. Ce programme innovant vise à renforcer les capacités en gestion de projets et en gouvernance organisationnelle.</p>
+
+      <h3>Un programme complet et structuré</h3>
+
+      <p>Le programme s'étend sur une période de 6 mois et couvre plusieurs domaines essentiels pour le développement des OSC. Les participants bénéficieront d'une formation théorique et pratique adaptée aux réalités du terrain.</p>
+
+      <blockquote>
+        <p>"Ce programme représente une opportunité unique pour nos organisations membres de renforcer leurs capacités et d'améliorer leur impact sur le terrain."</p>
+        <footer>— Directeur du CRASC Abidjan</footer>
+      </blockquote>
+
+      <p>Les inscriptions sont ouvertes jusqu'à la fin du mois. Les OSC intéressées peuvent se rapprocher de leur CRASC régional pour plus d'informations.</p>
+    `,
+    thumbnail_url: "/images/actualites/formation-osc.jpg",
+    created_at: "2025-01-15T10:00:00Z",
+    tags: ["Formation", "OSC", "Renforcement des capacités"],
+    crasc: {
+      id: "1",
+      name: "CRASC Abidjan",
+      slug: "crasc-abidjan",
+      osc_count: 150
+    }
+  },
+  {
+    id: "2",
+    title: "Atelier de renforcement des capacités organisationnelles",
+    slug: "atelier-renforcement-capacites",
+    content: `
+      <p>Un atelier de trois jours se tiendra du 25 au 27 janvier 2025 pour améliorer les compétences organisationnelles des membres des OSC. Cette initiative vise à renforcer la gouvernance, la planification stratégique et la mobilisation de ressources.</p>
+
+      <h3>Programme de l'atelier</h3>
+
+      <p>L'atelier abordera plusieurs thématiques clés :</p>
+
+      <ul>
+        <li>Gouvernance et leadership transformationnel</li>
+        <li>Planification stratégique participative</li>
+        <li>Mobilisation de ressources et diversification des financements</li>
+        <li>Suivi-évaluation et redevabilité</li>
+      </ul>
+
+      <p>Des experts nationaux et internationaux animeront les sessions et partageront leurs expériences avec les participants.</p>
+
+      <blockquote>
+        <p>"L'excellence organisationnelle est la base d'un impact durable. Cet atelier permettra à nos membres d'acquérir les outils nécessaires pour exceller."</p>
+        <footer>— Coordinateur régional</footer>
+      </blockquote>
+    `,
+    thumbnail_url: "/images/actualites/atelier-capacites.jpg",
+    created_at: "2025-01-12T14:30:00Z",
+    tags: ["Atelier", "Capacités", "Gouvernance"],
+    crasc: {
+      id: "1",
+      name: "CRASC Bouaké",
+      slug: "crasc-bouake",
+      osc_count: 120
+    }
+  },
+  {
+    id: "3",
+    title: "Assemblée générale annuelle 2025",
+    slug: "assemblee-generale-2025",
+    content: `
+      <p>Convocation à l'assemblée générale ordinaire qui se tiendra le 15 février 2025 à 9h00 au siège du CRASC. Cette rencontre permettra de faire le bilan des activités de l'année écoulée et de définir les orientations stratégiques pour 2025.</p>
+
+      <h3>Ordre du jour</h3>
+
+      <p>Les points suivants seront abordés lors de cette assemblée :</p>
+
+      <ul>
+        <li>Rapport moral et d'activités 2024</li>
+        <li>Rapport financier et approbation des comptes</li>
+        <li>Plan d'action et budget 2025</li>
+        <li>Renouvellement partiel du bureau exécutif</li>
+        <li>Questions diverses</li>
+      </ul>
+
+      <p>La présence de tous les membres est vivement souhaitée pour enrichir les débats et contribuer à la définition de notre feuille de route commune.</p>
+
+      <blockquote>
+        <p>"L'assemblée générale est un moment privilégié de démocratie participative où chaque membre peut s'exprimer et contribuer à l'orientation de notre réseau."</p>
+        <footer>— Président du CRASC</footer>
+      </blockquote>
+    `,
+    thumbnail_url: "/images/actualites/assemblee-generale.jpg",
+    created_at: "2025-01-10T08:00:00Z",
+    tags: ["Assemblée", "Gouvernance", "Planification"],
+    crasc: {
+      id: "2",
+      name: "CRASC Yamoussoukro",
+      slug: "crasc-yamoussoukro",
+      osc_count: 80
+    }
+  }
+];
+
 // Get News by slug
 export async function getNewsBySlug(news_slug: string): Promise<INews> {
-  const response = await fetch (`http://localhost:8000/api/v1/crasc/news/${news_slug}`, {
-  method: "GET",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    cache: "no-store"
-  });
-  if (!response.ok) {
-    throw new Error("Failed news.");
+  try {
+    const response = await fetch(`http://localhost:8000/api/v1/crasc/news/${news_slug}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch from API");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.log("API non disponible, utilisation des données mock pour:", news_slug);
+
+    // Fallback to mock data
+    const mockNews = mockNewsData.find(news => news.slug === news_slug);
+
+    if (!mockNews) {
+      throw new Error(`Actualité non trouvée: ${news_slug}`);
+    }
+
+    return mockNews;
   }
-  return response.json();
 }

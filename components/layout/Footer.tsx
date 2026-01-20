@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Facebook, Linkedin } from 'lucide-react';
 import footerLogo from 'figma:asset/b43efaef04948e9d9cfc8116775c87a868a332af.png';
 import { ImageWithFallback } from "@/lib/imageWithFallback"
@@ -22,29 +23,29 @@ export default function Footer() {
             <h3 className="text-white mb-4 font-bold">Architecture</h3>
             <ul className="space-y-2">
               <li>
-                <a href="/" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Accueil
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/a-propos" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/a-propos" className="text-gray-300 hover:text-white text-sm transition-colors">
                   À propos
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/annuaire/annuaire-des-crasc" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/annuaire/annuaire-des-crasc" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Annuaire des CRASC
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/espace-collaboratif/pole-concertation" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/espace-collaboratif/pole-concertation" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Pôle de concertation
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/contact" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/contact" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Contact
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -54,29 +55,29 @@ export default function Footer() {
             <h3 className="text-white mb-4 font-bold">Ressources</h3>
             <ul className="space-y-2">
               <li>
-                <a href="/formations" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/formations" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Formation
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/ressources/documentation" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/ressources/documentation" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Documentation
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/ressources/fiches-informatives" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/ressources/fiches-informatives" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Fiche informative
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/espace-collaboratif/offres-emploi" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/espace-collaboratif/offres-emploi" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Offres d'emploi
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/offre-projets" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/offre-projets" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Offres de projets
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -86,14 +87,14 @@ export default function Footer() {
             <h3 className="text-white mb-4 font-bold">Organisation CRASC</h3>
             <ul className="space-y-2">
               <li>
-                <a href="/à-propos" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/a-propos" className="text-gray-300 hover:text-white text-sm transition-colors">
                   À propos
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/rejoindre" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Rejoignez-nous
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -145,13 +146,13 @@ export default function Footer() {
         <div className="flex flex-col md:flex-col justify-center items-center gap-4 text-sm text-gray-300">
           <p>Copyright © 2025 Projet PASCI. Tous droits réservés.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-white transition-colors">
+            <Link href="/politique-de-confidentialite" className="hover:text-white transition-colors">
               Politique de Confidentialité
-            </a>
-            
-            <a href="#" className="hover:text-white transition-colors">
+            </Link>
+
+            <Link href="/conditions-generales" className="hover:text-white transition-colors">
               Conditions Générales
-            </a>
+            </Link>
           </div>
         </div>
       </div>
