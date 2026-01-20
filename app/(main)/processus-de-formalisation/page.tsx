@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import { Button } from '@/components/ui/button'
 import {
@@ -187,9 +188,9 @@ export default function PageProcessusFormalisation() {
           <p className="max-w-2xl mx-auto text-gray-800">
             Nous sommes votre partenaire pour réussir votre processus de formalisation. Contactez-nous pour bénéficier d'un accompagnement personnalisé et propulser votre organisation vers de nouveaux sommets.
           </p>
-          <Button className="border border-transparent hover:border-[#E05017] text-white hover:text-[#E05017] bg-white hover:bg-transparent bg-[#E05017] rounded-lg px-6">
+          <Link href="/contact" className="border border-transparent hover:border-[#E05017] text-white hover:text-[#E05017] hover:bg-transparent bg-[#E05017] rounded-lg py-2 px-5">
             Contactez-nous
-          </Button>
+          </Link>
         </div>
       </div>
 

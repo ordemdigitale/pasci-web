@@ -1,32 +1,70 @@
 /* app/(main)/annuaire/annuaire-des-crasc/[crascSlug]/page.tsx: Page detail d'une Région CRASC */
-import React from 'react'
-import { getCrascRegionWithCivsBySlug } from "@/localdata/helper/data"
-import { getCrascRegionOscsBySlug, fetchCrascRegionBySlugWithOscsFromApi } from "@/localdata/helper/data"
-import { getCrascRegionBySlugWithOscsFromApi } from "@/lib/fetch-crasc";
+"use client";
+
+import React, { use, useState, useEffect } from "react";
+import { getCrascBySlug  } from "@/lib/fetch-crasc";
 import { notFound } from "next/navigation";
 import { ImageWithFallback } from '@/lib/imageWithFallback';
+import { ICrascDetail } from "@/types/api.types";
+import { domainesIntervention } from "../page";
 
-interface CrascRegionPageProps {
-  params: Promise<{ crascSlug: string }>
-}
 
-export default async function CrascRegionPage({ params }: CrascRegionPageProps) {
-  const { crascSlug } = await params;
-  const crascRegionData = getCrascRegionWithCivsBySlug(crascSlug);
-  console.log("CrascRegionPage - Crasc Region Data:", crascRegionData);
-  const regionCivs = crascRegionData?.civs || [];
-  console.log("CrascRegionPage - Region de la CIV:", regionCivs);
-  const oscsData = getCrascRegionOscsBySlug(crascSlug);
-  console.log("CrascRegionPage - oscsData:", oscsData);
-  const crascOscsDataFromApi = await fetchCrascRegionBySlugWithOscsFromApi(crascSlug);
-  console.log("CrascRegionPage - Fetch Crasc Region by slug with OSCs from API:", crascOscsDataFromApi);
-  const crascRegionOscsDataFromApi = crascOscsDataFromApi.oscs;
-  console.log("CrascRegionPage - OSCs for this Crasc Region:", crascRegionOscsDataFromApi);
-  const crascRegionWithOscsAndRegionCivs = await getCrascRegionBySlugWithOscsFromApi(crascSlug);
+export default function CrascRegionPage({ params }: { params: Promise<{ crascSlug: string }>; }) {
+  const resolvedParams = use(params);
+  const crascSlug = resolvedParams.crascSlug;
+  const [crascData, setCrascData] = useState<ICrascDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!crascRegionData) {
-    notFound();
+  useEffect(() => {
+    if (!crascSlug) return;
+    let isCurrent = true;
+
+    async function fetchCrasc() {
+      try {
+        setLoading(true);
+        const data = await getCrascBySlug(crascSlug);
+        if (isCurrent) setCrascData(data);
+      } catch (err: any) {
+        if (isCurrent) setError(err.message || "Impossible de charger les données du CRASC.");
+      } finally {
+        if (isCurrent) setLoading(false);
+      }
+    }
+
+    fetchCrasc();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [crascSlug]);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto font-poppins bg-slate-50 min-h-screen p-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-64 mb-6"></div>
+          <div className="bg-white rounded-lg p-6 border border-gray-200">
+            <div className="h-10 bg-gray-200 rounded mb-4"></div>
+            <div className="h-32 bg-gray-200 rounded mb-6"></div>
+            <div className="flex gap-4">
+              <div className="h-10 bg-gray-200 rounded w-32"></div>
+              <div className="h-10 bg-gray-200 rounded w-32"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
+
+  if (error || !crascSlug) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center text-red-600">
+        {error || "CRASC non trouvé."}
+      </div>
+    );
+  }
+
   return (
     <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
 
@@ -36,23 +74,29 @@ export default async function CrascRegionPage({ params }: CrascRegionPageProps) 
           {/* Nombre de OSCs */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
             <h3 className="text-sm text-gray-900 font-bold mb-2">ORGANISATIONS DE LA SOCIÉTÉ CIVILE</h3>
-            <div className="text-5xl text-[#2a591d] font-bold">{crascRegionWithOscsAndRegionCivs.osc_count}</div>
+            <div className="text-5xl text-[#2a591d] font-bold">{crascData?.osc_count}</div>
           </div>
           {/* Liste des régions qui composent le CRASC */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
-            <h3 className="text-sm text-gray-900 font-bold mb-4 uppercase">les régions du {crascRegionWithOscsAndRegionCivs?.name}</h3>
+            <h3 className="text-sm text-gray-900 font-bold mb-4 uppercase">les régions du {crascData?.name}</h3>
             <div className="grid grid-cols-2 gap-2">
-              {crascRegionWithOscsAndRegionCivs?.regions_civ.map((civ) => (
-                <div key={civ.id} className="text-sm text-[#2a591d] font-bold">
-                  {civ.name}
+              {crascData?.regions?.map((region) => (
+                <div key={region.id} className="text-sm text-[#2a591d] font-bold">
+                  {region.name}
                 </div>
               ))}
             </div>
           </div>
           {/* Domaines d'activité */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
-            <h3 className="text-sm text-gray-900 font-bold mb-4">NOS DOMAINES D&apos;ACTIVITÉ</h3>
-            <div className="space-y-2">Liste des domaines d'activities ici</div>
+            <h3 className="text-sm text-gray-900 font-bold mb-4">NOS DOMAINES D&apos;INTERVENTION</h3>
+            <div className="space-y-2">
+              {domainesIntervention.map((domaine, index) => (
+                <div key={index} className="text-sm text-[#2a591d] font-bold">
+                  {domaine}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -62,11 +106,11 @@ export default async function CrascRegionPage({ params }: CrascRegionPageProps) 
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-bold text-2xl">OSC membres</h2>
         </div>
-          {crascRegionWithOscsAndRegionCivs?.oscs.length === 0 ? (
+          {crascData?.oscs?.length === 0 ? (
             <p className="text-2xl text-center pb-8">Aucune OSC ajoutée pour le moment.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-              {crascOscsDataFromApi?.oscs.map((osc: any) => (
+              {crascData?.oscs?.map((osc) => (
                 <div key={osc.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                   <div className="aspect-[4/3] overflow-hidden">
                     <ImageWithFallback

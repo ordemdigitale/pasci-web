@@ -33,8 +33,6 @@ export default function Partners() {
                     src={partner.imageUrl}
                     alt={partner.name}
                     className="object-contain"
-                    width={400}
-                    height={400}
                   />
                 </div>
               </div>

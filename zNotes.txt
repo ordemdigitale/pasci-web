@@ -24,3 +24,59 @@ Modification à apporter au frontend
 - Bouton nous rejoindre dans menu navigation + formulaire d'inscription des OSCs -> https://ricrasc.org/adhesion
 
 - Page offre de projet
+
+- Page detail PTF
+  - child: appel à projet: Nom
+
+
+
+Les régions de la CIV:
+Abidjan
+District Autonome de Yamoussoukro
+Agnéby-Tiassa
+Bafing
+Bagoué
+Béré
+Bélier
+Lacs
+Bounkani
+Cavally
+Folon
+Gbêkê
+Gbôklé
+Gôh
+Gontougo
+Grands-Ponts
+Guémon
+Hambol
+Haut-Sassandra
+Iffou
+Indénié-Djuablin
+Kabadougou
+La Mé
+Lôh-Djiboua
+Marahoué
+Moronou
+Nawa
+N'Zi
+Poro
+San-Pédro
+Sud-Comoé
+Tonkpi
+Worodougou
+
+Les CRASC:
+CRASC Sud: 1160 osc
+CRASC Centre: 557osc
+CRASC Nord: 394 osc
+CRASC Ouest: 877 osc
+CRASC Est: 188 osc
+
+Type de OSC
+Association
+ONG
+Fondation
+Coopérative
+Groupement
+Réseau
+Autre

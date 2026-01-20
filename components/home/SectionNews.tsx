@@ -12,62 +12,7 @@ export default function SectionNews() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   //const spotlightNews = await fetchSpotlightNews();
-  const newsArticles = [
-    {
-      id: 1,
-      date: '23 septembre 2025',
-      title: 'Tournées d\'information',
-      description: "Processus de soumission et les conditions d'éligibilité aux microfinancements et aux subventions",
-      image: '/images/actualites/eda7c908-6e5a-4137-9b1e-ae6754146371.jpg',
-      link: '#',
-      crasc: "CRASC NORD"
-    },
-    {
-      id: 2,
-      date: '3 septembre 2025',
-      title: "Activités de supervision conjointe OCD",
-      description: "Dans le cadre des activités de supervision conjointe OCD pour l'appui aux CRASC",
-      image: '/images/actualites/359a7b7d-c126-4fdf-934d-9038c01df7e0.jpg',
-      link: '#',
-      crasc: "CRASC OUEST"
-    },
-    {
-      id: 3,
-      date: '4 juillet 2025',
-      title: "Rapport préliminaire sur l'observation du scrutin présidentiel",
-      description: "rapport préliminaire dans le cadre du projet d'observation citoyenne des élections",
-      image: '/images/actualites/433ece92-1b86-441e-b78a-8382fcf60a00.jpg',
-      link: '#',
-      crasc: "CRASC CENTRE"
-    },
-    {
-      id: 4,
-      date: '23 septembre 2025',
-      title: "Atelier des membres du CRASC-Est",
-      description: "L'élaboration de stratégies cohérentes s'inscrit dans une logique de professionnalisation de l'action des OSC",
-      image: '/images/actualites/99aff270-1397-4fe0-97df-b9c49415ceb1.jpg',
-      link: '#',
-      crasc: "CRASC EST"
-    },
-    {
-      id: 5,
-      date: '3 septembre 2025',
-      title: "Formation des OSC",
-      description: "Ce fut une rencontre riche en partage, orientation et proposition",
-      image: '/images/actualites/13bf15a5-0f87-415a-a05d-e3775879560d.jpg',
-      link: '#',
-      crasc: "CRASC SUD"
-    },
-    {
-      id: 6,
-      date: '4 juillet 2025',
-      title: "Séance de simulation des formateurs ce jour",
-      description: "Lors de la formation des pools formateurs",
-      image: '/images/actualites/4a89463f-f2e9-466f-93bd-03a25b381999.jpg',
-      link: '#',
-      crasc: "RI-CRASC"
-    },
-  ];
+
   // fetch all crasc data
   useEffect(() => {
     const fetchSpotlightNewsData = async () => {
@@ -89,8 +34,6 @@ export default function SectionNews() {
     };
     fetchSpotlightNewsData();
   }, []);
-
-  console.log("Spot light news: ", spotlightNewsData);
 
   return (
     <section className="py-10 bg-white font-poppins">
@@ -128,7 +71,7 @@ export default function SectionNews() {
                 <h3 className="text-gray-900 mb-3 font-bold">{news.title}</h3>
                 <p className="text-gray-600 text-sm mb-8 line-clamp-2" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(news.content ?? '') }}></p>
                 <a 
-                  href="#"
+                  href={`/actualites/${news.slug}`}
                   className="absolute bottom-0 left-0 right-0 p-4 text-[#2a591d] underline text-sm transition-colors inline-flex items-center group"
                 >
                   Lire l'article

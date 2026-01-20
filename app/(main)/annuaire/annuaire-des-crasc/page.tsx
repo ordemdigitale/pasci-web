@@ -1,9 +1,10 @@
 /* Page d'accueil ou Layout pour les régions CRASC */
-//"use client";
+"use client";
 
-//import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import { fetchAllCrasc } from "@/lib/fetch-crasc";
+import { ICrasc, IKeyStats } from "@/types/api.types";
 
 interface IActivityCard {
   id: number;
@@ -74,24 +75,11 @@ const recentlyAdded: IActivityCard[] = [
 
 const tabs = [
   { id: 0, label: 'Tous des CRASC' },
-  { id: 1, label: 'CRASC Nord' },
-  { id: 2, label: 'CRASC Sud' },
-  { id: 3, label: 'CRASC Centre' },
+  { id: 1, label: 'CRASC Sud' },
+  { id: 2, label: 'CRASC Centre' },
+  { id: 3, label: 'CRASC Nord' },
   { id: 4, label: 'CRASC Ouest' },
   { id: 5, label: 'CRASC Est' }
-];
-
-const regions = [
-  'Gbôklê',
-  'Gôh',
-  'Sud Comoé',
-  'Grand-ponts',
-  'La Mé',
-  'San Pédro',
-  'Nawa',
-  'Lôh Djiboua',
-  'Agneby Tiassa',
-  'Abidjan'
 ];
 
 const activities = [
@@ -102,25 +90,60 @@ const activities = [
   "Le Commissariat Aux Comptes"
 ];
 
+export const domainesIntervention = [
+  "Gouvernance",
+  "Développement durable",
+  "Développement local",
+  "Bien-être social",
+  "Cohésion social"
+];
 
-export default async function PageAnnuaireCrasc() {
-  const allCrascRegions = await fetchAllCrasc();
-  //const [crascRegions, setCrascRegions] = useState<any[]>([]);
 
-  // Fetch CRASC regions data on component mount
-/*   useEffect(() => {
-    const fetchData = async () => {
+export default function PageAnnuaireCrasc() {
+  const [keyStats, setKeyStats] = useState<IKeyStats[] | null>([]);
+  const [crascData, setCrascData] = useState<ICrasc[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch CRASC data on component mount
+   useEffect(() => {
+    const fetchCrascData = async () => {
       try {
-        const regionsData = await fetchAllCrasc();
-        console.log(regionsData);
-        setCrascRegions(regionsData);
+        const crasc = await fetchAllCrasc();
+        console.log("Page annuaire des CRASC: ", crasc);
+        setCrascData(crasc);
       }
       catch (error) {
         console.error("Error fetching CRASC regions data: ", error);
       }
     }
-    fetchData();
-  }, []); */
+    fetchCrascData();
+  }, []);
+
+  // fetch key stats data
+  useEffect(() => {
+    const fetchKeyStatsData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/key-stats`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`)
+        }
+        const result = await response.json();
+        setKeyStats(result);
+        console.log("Key Stats ", keyStats);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchKeyStatsData();
+  }, []);
+
+  const firstKeyStat = keyStats?.find(item => item.name === "osc");
 
   return (
     <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
@@ -131,14 +154,14 @@ export default async function PageAnnuaireCrasc() {
           {/* Organizations Count */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
             <h3 className="text-sm text-gray-900 font-bold mb-2">ORGANISATIONS DE LA SOCIÉTÉ CIVILE</h3>
-            <div className="text-5xl text-[#2a591d] font-bold">3176</div>
+            <div className="text-5xl text-[#2a591d] font-bold">{firstKeyStat?.number}</div>
           </div>
 
           {/* Regions List */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
             <h3 className="text-sm text-gray-900 font-bold mb-4">LES 5 CRASC</h3>
             <div className="space-y-2">
-              {allCrascRegions.map((crasc) => (
+              {crascData.map((crasc) => (
                 <div key={crasc.id} className="text-sm text-[#2a591d] font-bold">
                   {crasc.name}
                 </div>
@@ -146,13 +169,13 @@ export default async function PageAnnuaireCrasc() {
             </div>
           </div>
 
-          {/* Activities */}
+          {/* Domaines d'intervention */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
-            <h3 className="text-sm text-gray-900 font-bold mb-4">NOS DOMAINES D&apos;ACTIVITÉ</h3>
+            <h3 className="text-sm text-gray-900 font-bold mb-4">NOS DOMAINES D&apos;INTERVENTION</h3>
             <div className="space-y-2">
-              {activities.map((activity, index) => (
+              {domainesIntervention.map((domaine, index) => (
                 <div key={index} className="text-sm text-[#2a591d] font-bold">
-                  {activity}
+                  {domaine}
                 </div>
               ))}
             </div>

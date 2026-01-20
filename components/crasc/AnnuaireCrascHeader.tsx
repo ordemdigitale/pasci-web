@@ -12,13 +12,13 @@ export default function AnnuaireCrascHeader() {
 
   useEffect(() => {
     switch (pathname) {
-      case '/annuaire/annuaire-des-crasc/crasc-nord':
+      case '/annuaire/annuaire-des-crasc/crasc-sud':
         setActiveTab(1);
         break;
-      case '/annuaire/annuaire-des-crasc/crasc-sud':
+      case '/annuaire/annuaire-des-crasc/crasc-centre':
         setActiveTab(2);
         break;
-      case '/annuaire/annuaire-des-crasc/crasc-centre':
+      case '/annuaire/annuaire-des-crasc/crasc-nord':
         setActiveTab(3);
         break;
       case '/annuaire/annuaire-des-crasc/crasc-ouest':
@@ -36,9 +36,9 @@ export default function AnnuaireCrascHeader() {
   }
   const menuItems = [
     { id: 0, label: 'Tous les CRASC' },
-    { id: 1, label: 'CRASC Nord', href: '/annuaire/annuaire-des-crasc/crasc-nord' },
-    { id: 2, label: 'CRASC Sud', href: '/annuaire/annuaire-des-crasc/crasc-sud' },
-    { id: 3, label: 'CRASC Centre', href: '/annuaire/annuaire-des-crasc/crasc-centre' },
+    { id: 1, label: 'CRASC Sud', href: '/annuaire/annuaire-des-crasc/crasc-sud' },
+    { id: 2, label: 'CRASC Centre', href: '/annuaire/annuaire-des-crasc/crasc-centre' },
+    { id: 3, label: 'CRASC Nord', href: '/annuaire/annuaire-des-crasc/crasc-nord' },
     { id: 4, label: 'CRASC Ouest', href: '/annuaire/annuaire-des-crasc/crasc-ouest' },
     { id: 5, label: 'CRASC Est', href: '/annuaire/annuaire-des-crasc/crasc-est' }
   ];

@@ -30,9 +30,9 @@ export default async function AdminCrascPage() {
 					<h3 className="text-lg font-medium">
 						Les CRASC
 					</h3>
-					<Link href="/admin/gestion-des-crasc/ajouter-crasc" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
+{/* 					<Link href="/admin/gestion-des-crasc/ajouter-crasc" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
 						Ajouter un CRASC
-					</Link>
+					</Link> */}
 				</div>
 				<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
 					{allCrasc.map((crasc) => (
@@ -171,9 +171,9 @@ export default async function AdminCrascPage() {
 						<h3 className="text-lg font-medium mb-4">
 							Les Régions de la Côte d'Ivoire
 						</h3>
-						<Link href="/admin/gestion-des-crasc/ajouter-region" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
+{/* 						<Link href="/admin/gestion-des-crasc/ajouter-region" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
 							Ajouter une région
-						</Link>
+						</Link> */}
 					</div>
 					{/* list regions with their respective CRASC */}
 					<div className="overflow-x-auto">

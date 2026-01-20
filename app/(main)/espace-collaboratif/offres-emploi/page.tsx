@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from '@/components/ui/button'
 import { ImageWithFallback } from '@/lib/imageWithFallback'
 import {
@@ -9,6 +10,8 @@ import {
   Briefcase,
   MapPin
 } from "lucide-react";
+import { IJobs } from '@/types/api.types';
+import Link from "next/link";
 
 interface IJobItem {
   id: number;
@@ -73,11 +76,60 @@ const faqCategories = [
 ];
 
 export default function PageOffreEmploi() {
+  const router = useRouter();
+  const [jobs, setJobs] = useState<IJobs[] | null>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [openFaqs, setOpenFaqs] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+
+/*   const response = await fetch("http://localhost:8000/api/v1/jobs", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    cache: "no-store",
+  }); */
+  useEffect(() => {
+    // Define an asynchronous function to fetch the data
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/jobs');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        setJobs(result);
+      } catch (error: any) {
+        setError(error.message || "Impossible de charger les offres d'emploi.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto font-poppins bg-slate-50 min-h-screen p-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-64 mb-6"></div>
+          <div className="bg-white rounded-lg p-6 border border-gray-200">
+            <div className="h-10 bg-gray-200 rounded mb-4"></div>
+            <div className="h-32 bg-gray-200 rounded mb-6"></div>
+            <div className="flex gap-4">
+              <div className="h-10 bg-gray-200 rounded w-32"></div>
+              <div className="h-10 bg-gray-200 rounded w-32"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   /* Categories data */
   const categories = [
@@ -196,7 +248,7 @@ export default function PageOffreEmploi() {
         {/* Section offres d'emploi */}
         <div className="mb-20">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            {jobOffers.map((job) => (
+            {jobs?.map((job) => (
               <div key={job.id} className="p-6 bg-white rounded-lg shadow-sm overflow-hidden">
                 <div className="">
                   <h4 className="font-bold text-lg mb-2">{job.title}</h4>
@@ -206,12 +258,17 @@ export default function PageOffreEmploi() {
                     <span className='text-sm'>{job.location}</span>
                   </div>
                   
-                  <div className="flex flex-row items-center gap-2 text-gray-700 text-sm">
+                  <div className="flex flex-row items-center gap-2 text-gray-700 text-sm mb-8">
                     <Briefcase className="w-4 h-4" />
                     <span className='inline-block px-3 py-1 rounded-full text-xs text-white bg-[#E05017]'>{job.type}</span>
                   </div>
                 </div>
-                <Button className="w-full rounded-xl bg-[#E05017] hover:bg-orange-600 text-white mt-6">Postuler</Button>
+                <Link
+                  href={`/espace-collaboratif/offres-emploi/${job.slug}`}
+                  className="px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017]"
+                >
+                  Détails de l'offre
+                </Link>
               </div>
             ))}
           </div>

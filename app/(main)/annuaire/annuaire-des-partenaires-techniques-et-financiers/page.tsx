@@ -1,78 +1,61 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button'
 import { ImageWithFallback } from '@/lib/imageWithFallback'
-
-
-interface IPTFCard {
-  id: number;
-  image: string;
-  title: string;
-  description: string;
-}
-
-const ptfCards: IPTFCard[] = [
-  {
-    id: 1,
-    image: "/images/page-annuaire-ptf/a7a90ecc-482f-4606-9e82-86fb773560aa.png",
-    title: "Banque Mondiale",
-    description: "Brève description du PTF. Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua."
-  },
-  {
-    id: 2,
-    image: "/images/page-annuaire-ptf/UE.jpg",
-    title: "Union Européenne",
-    description: "Brève description du PTF. Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua."
-  },
-  {
-    id: 3,
-    image: "/images/page-annuaire-ptf/29d51a2a-3756-44db-9e75-3d8c61652f4d.png",
-    title: "UNICEF",
-    description: "Brève description du PTF. Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua."
-  },
-  {
-    id: 4,
-    image: "/images/page-annuaire-ptf/2746342a-7359-4f73-898a-3b8fa8d761f9.png",
-    title: "USAID",
-    description: "Brève description du PTF. Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua."
-  },
-  {
-    id: 5,
-    image: "/images/page-annuaire-ptf/f8c9521c-aa8e-4a00-bb7b-071434afdbf0.png",
-    title: "AFD",
-    description: "Brève description du PTF. Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua."
-  },
-  {
-    id: 6,
-    image: "/images/page-annuaire-ptf/694553e7-88e6-4485-8e81-d88acd6ca331.png",
-    title: "GIZ",
-    description: "Brève description du PTF. Sint aliquip nulla ad cillum ex eiusmod proident cupidatat aliqua."
-  }
-];
-
-const recentlyAdded: IPTFCard[] = [
-  {
-    id: 1,
-    image: "/images/page-annuaire-ptf/8d2511a1-f70c-4d1f-97b8-6ff62895cf30.jpg",
-    title: "KOICA",
-    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus"
-  },
-  {
-    id: 2,
-    image: "/images/page-annuaire-ptf/cf750268-9a0a-40dc-8d8c-c5f5d029cb3b.png",
-    title: "PNUD",
-    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus"
-  },
-  {
-    id: 3,
-    image: "/images/page-annuaire-ptf/8d4eaaa8-44ac-46ce-b966-2e0f4fa89570.png",
-    title: "JICA",
-    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus"
-  }
-];
+import { IPTF } from '@/types/api.types';
+import Link from 'next/link';
 
 export default function PageAnnuairePTF() {
+  const [ptfData, setPtfData] = useState<IPTF[] | null>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/ptf');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        setPtfData(result);
+      } catch (error: any) {
+        setError(error.message || "Impossible de charger les PTF.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto font-poppins bg-slate-50 min-h-screen p-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-64 mb-6"></div>
+          <div className="bg-white rounded-lg p-6 border border-gray-200">
+            <div className="h-10 bg-gray-200 rounded mb-4"></div>
+            <div className="h-32 bg-gray-200 rounded mb-6"></div>
+            <div className="flex gap-4">
+              <div className="h-10 bg-gray-200 rounded w-32"></div>
+              <div className="h-10 bg-gray-200 rounded w-32"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !ptfData) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center text-red-600">
+        {error || "PTF non trouvé."}
+      </div>
+    );
+  }
+
   return (
     <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -106,55 +89,21 @@ export default function PageAnnuairePTF() {
       {/* Activity Cards Section */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-          {ptfCards.map((ptf) => (
+          {ptfData.map((ptf) => (
             <div key={ptf.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <div className="aspect-[4/3] overflow-hidden">
                 <ImageWithFallback
-                  src={ptf.image}
-                  alt={ptf.title}
+                  src={ptf.thumbnail_url}
+                  alt={ptf.name}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <div className="p-6">
-                <h3 className="mb-3 text-center font-bold">{ptf.title}</h3>
+                <Link href={`/annuaire/annuaire-des-partenaires-techniques-et-financiers/${ptf.slug}`}>
+                  <h3 className="mb-3 text-center font-bold hover:underline">{ptf.name}</h3>
+                </Link>
                 <p className="text-sm text-gray-600 leading-relaxed">
                   {ptf.description}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Load More Buttons */}
-        <div className="flex flex-wrap gap-3 justify-end">
-          <button
-            className="px-6 py-2 border border-[#E05107] text-[#E05107] rounded-lg transition-colors"
-          >
-            Voir plus
-          </button>
-        </div>
-      </div>
-
-      {/* Recently added section */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className='font-bold text-2xl'>PTF récemment ajoutés</h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {recentlyAdded.map((card) => (
-            <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div className="aspect-[4/3] overflow-hidden">
-                <ImageWithFallback
-                  src={card.image}
-                  alt={card.title}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="mb-3">{card.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {card.description}
                 </p>
               </div>
             </div>

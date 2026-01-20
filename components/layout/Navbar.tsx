@@ -152,7 +152,7 @@ export default function Navbar() {
 
             {/* Right Side Actions */}
             <div className="hidden md:flex items-center space-x-4">
-              <Link href="/rejoindre" className='px-4 py-2 border rounded-3xl bg-[#E05017] text-white'>
+              <Link href="/rejoindre" className='px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017]'>
                 Rejoignez-nous
               </Link>
               {/* Search Bar */}

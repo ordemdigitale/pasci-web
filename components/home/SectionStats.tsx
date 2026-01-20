@@ -1,10 +1,47 @@
 "use client";
 
-import { Globe, MapPin } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Globe, MapPin, Users, Package, Landmark, LucideIcon } from "lucide-react";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Button } from "@/components/ui/button"
 import CustomBarChart from '../CustomBartChat';
+import { IKeyStats } from "@/types/api.types";
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  "osc": Users,
+  "crasc": Landmark,
+  "régions": MapPin,
+  "projets": Package,
+};
+
 export default function Stats() {
+  const [keyStats, setKeyStats] = useState<IKeyStats[] | null>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // fetch key stats data
+  useEffect(() => {
+    const fetchKeyStatsData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/key-stats`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`)
+        }
+        const result = await response.json();
+        setKeyStats(result);
+        console.log("Key Stats ", keyStats);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchKeyStatsData();
+  }, []);
+
   // Data for "Répartition des OSC par zone CRASC" donut chart.
   // UTILISER BAR CHART
   const zoneData = [
@@ -37,8 +74,8 @@ export default function Stats() {
   const colors = ['#2F80F9', '#4CAE4F', '#E74C3C', '#FFB200', '#92BCFC'];
 
   return (
-    <section className="py-10 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-10 bg-white font-poppins">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-gray-900 font-bold text-3xl">Chiffres clés</h2>
@@ -50,8 +87,27 @@ export default function Stats() {
           </Button> */}
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          {/* Stat card */}
+          {keyStats?.map((item) => {
+            const IconComponent = ICON_MAP[item.name] || MapPin;
+
+            return (
+              <div key={item.id} className="bg-white rounded-lg p-6 border border-gray-100 shadow-xl">
+                <div className="flex flex-col items-center justify-between gap-2">
+                  <div className="text-[#de3b40]">
+                    <IconComponent size={26} />
+                  </div>
+                  <p className="text-4xl font-bold">{item.number}</p>
+                  <p className="text-gray-600 text-md uppercase">{item.name}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
         {/* Top Row - 3 Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"> */}
           
           {/* Visitors Card */}
           {/* <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
@@ -66,7 +122,7 @@ export default function Stats() {
           </div> */}
 
           {/* Répartition des OSC par zone CRASC */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow font-poppins">
+          {/* <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow font-poppins">
             <p className="text-sm font-semibold mb-4">Répartition des OSC par zone CRASC</p>            
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={zoneData}>
@@ -79,7 +135,7 @@ export default function Stats() {
                 />
                 <YAxis tick={{ fontSize: 11 }} />
                 <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                  {/* Map through data to assign a unique color to each Cell */}
+                  
                   {zoneData.map((entry, index) => (
                     <Cell key={`cell-${index}`} className='cursor-pointer' fill={colors[index % colors.length]} />
                   ))}
@@ -98,10 +154,10 @@ export default function Stats() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Types de OSC  */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow font-poppins">
+          {/* <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow font-poppins">
             <p className="text-sm font-semibold mb-4">Types d&apos;organisations de la société civile</p>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={communityTypesData}>
@@ -116,10 +172,10 @@ export default function Stats() {
                 <Bar dataKey="value" fill="#4A90E2" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </div> */}
 
           {/* Catégories de OSC */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow font-poppins">
+          {/* <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow font-poppins">
             <p className="text-sm font-semibold mb-4">Catégories d'organisations</p>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={categoryData}>
@@ -129,7 +185,7 @@ export default function Stats() {
                 />
                 <YAxis tick={{ fontSize: 11 }}/>
                 <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                  {/* Map through data to assign a unique color to each Cell */}
+                  
                   {categoryData.map((entry, index) => (
                     <Cell key={`cell-${index}`} className='cursor-pointer' fill={colors[index % colors.length]} />
                   ))}
@@ -144,11 +200,11 @@ export default function Stats() {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
+          </div> */}
+        {/* </div> */}
 
         {/* Bottom Row - 2 Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> */}
           {/* Community Types Bar Chart */}
           {/* <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
             <p className="text-sm text-gray-600 mb-4">Types de communautés</p>
@@ -204,7 +260,7 @@ export default function Stats() {
             </div>
           </div> */}
 
-        </div>
+        {/* </div> */}
       </div>
     </section>
   );

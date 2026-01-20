@@ -27,13 +27,14 @@ export interface IOsc {
 }
 
 // Interface for Crasc region by slug with OSCs and Region CIVs
-export interface ICrascRegionDetails {
+export interface ICrascDetail {
   id: string;
   name: string;
   slug: string;
-  osc_count: number;
-  oscs: IOsc[];
-  regions_civ: IRegionCiv[];
+  osc_count?: number;
+  oscs?: IOsc[];
+  regions?: IRegionCiv[];
+  news?: INews[];
 }
 
 // Interface for OscType
@@ -49,13 +50,16 @@ export interface IOscType {
 export interface INews {
   id: string;
   title: string;
-  crasc: ICrasc;
-  osc: IOsc
+  slug: string;
+  content?: string;
+  crasc?: ICrasc;
+  osc?: IOsc
 }
 // Interface for Spotlight News 
 export interface SpotlightNews {
   id: string;
   title: string;
+  slug: string;
   content?: string;
   thumbnail_url: string;
   crasc?: ICrasc;
@@ -68,11 +72,33 @@ export interface IJobs {
   description: string;
   location: string;
   type: string;
+  slug: string;
+  employer: string;
+  publication_date: string,
   /* 
   "is_expired": false,
-  "publication_date": "2026-01-15T06:23:07.506Z",
-  "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "created_at": "2026-01-15T06:23:07.506Z",
   "updated_at":
   */
+}
+
+export interface IKeyStats {
+  id: number;
+  name: string;
+  number: number;
+}
+
+export interface IPTF {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  thumbnail_url?: string;
+  projets?: IProjet[]
+}
+
+export interface IProjet {
+  id: number;
+  name?: string;
+  ptf?: IPTF[]
 }

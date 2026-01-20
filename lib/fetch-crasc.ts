@@ -1,6 +1,6 @@
 import {
   ICrasc,
-  ICrascRegionDetails,
+  ICrascDetail,
   IRegionCiv,
   IOscType,
   IOsc,
@@ -23,9 +23,9 @@ export async function fetchAllCrasc(): Promise<ICrasc[]> {
   return res.json();
 }
 
-// Fetch specific Crasc region by slug with OSCs and Region CIVs from API
-export async function getCrascRegionBySlugWithOscsFromApi(slug: string): Promise<ICrascRegionDetails> {
-  const response = await fetch(`http://localhost:8000/api/v1/crasc/region-crasc/${slug}/details`, {
+// Fetch specific Crasc by slug with OSCs and Region CIVs from API
+export async function getCrascBySlug(crasc_slug: string): Promise<ICrascDetail> {
+  const response = await fetch(`http://localhost:8000/api/v1/crasc/crasc/${crasc_slug}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"

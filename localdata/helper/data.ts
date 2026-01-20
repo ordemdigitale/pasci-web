@@ -1,4 +1,5 @@
 import db from "@/localdata/crasc.json";
+import { INews } from "@/types/api.types";
 
 export interface ICrascRegion {
   id: string;
@@ -140,6 +141,21 @@ export async function fetchCrascRegionBySlugWithOscsFromApi(slug: string): Promi
   });
   if (!response.ok) {
     throw new Error("Failed to fetch OSCs for this Crasc Region by slug from API");
+  }
+  return response.json();
+}
+
+// Get News by slug
+export async function getNewsBySlug(news_slug: string): Promise<INews> {
+  const response = await fetch (`http://localhost:8000/api/v1/crasc/news/${news_slug}`, {
+  method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    cache: "no-store"
+  });
+  if (!response.ok) {
+    throw new Error("Failed news.");
   }
   return response.json();
 }
