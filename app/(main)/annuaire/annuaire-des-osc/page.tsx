@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Users2, Building } from 'lucide-react';
+import { Search, MapPin, Users2, Building, Filter, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from 'next/link';
 
@@ -26,7 +26,7 @@ const mockOSCs: IOSC[] = [
     logo: "/images/page-annuaire-crasc/mplci.jpg",
     description: "Organisation engagée dans la promotion de la justice sociale et la défense des droits humains en Côte d'Ivoire.",
     domaine: "Droits Humains",
-    region: "CRASC Sud",
+    region: "CRASC SUD",
     ville: "Abidjan",
     email: "contact@mplci.org",
     phone: "+225 07 00 00 00",
@@ -38,7 +38,7 @@ const mockOSCs: IOSC[] = [
     logo: "/images/page-annuaire-crasc/fefab.jpg",
     description: "Fédération qui œuvre pour l'autonomisation des femmes et le développement communautaire.",
     domaine: "Genre et Développement",
-    region: "CRASC Sud",
+    region: "CRASC SUD",
     ville: "Anyama",
     email: "contact@fefab.org",
     phone: "+225 07 11 11 11",
@@ -48,11 +48,11 @@ const mockOSCs: IOSC[] = [
     id: 3,
     name: "Fondation Vie",
     logo: "/images/page-annuaire-crasc/fondation-vie.jpg",
-    description: "Fondation dédiée à l'amélioration des conditions de vie des populations vulnérables.",
-    domaine: "Santé et Bien-être",
-    region: "CRASC Centre",
-    ville: "Bouaké",
-    email: "info@fondationvie.org",
+    description: "Organisation dédiée à l'amélioration des conditions de vie des communautés vulnérables.",
+    domaine: "Développement Communautaire",
+    region: "CRASC CENTRE",
+    ville: "Yamoussoukro",
+    email: "contact@fondationvie.org",
     phone: "+225 07 22 22 22",
     slug: "fondation-vie"
   },
@@ -62,11 +62,59 @@ const mockOSCs: IOSC[] = [
     logo: "/images/page-annuaire-crasc/asso-femme-soutra.jpg",
     description: "Association qui promeut l'entrepreneuriat féminin et l'éducation des jeunes filles.",
     domaine: "Éducation et Entrepreneuriat",
-    region: "CRASC Ouest",
+    region: "CRASC OUEST",
     ville: "Daloa",
     email: "contact@femmessoutra.org",
     phone: "+225 07 33 33 33",
     slug: "femmes-soutra"
+  },
+  {
+    id: 5,
+    name: "ONG Action pour l'Environnement",
+    logo: "/images/page-annuaire-crasc/5.jpg",
+    description: "Organisation spécialisée dans la protection de l'environnement et le développement durable.",
+    domaine: "Environnement",
+    region: "CRASC NORD",
+    ville: "Korhogo",
+    email: "contact@actionenv.org",
+    phone: "+225 07 44 44 44",
+    slug: "action-environnement"
+  },
+  {
+    id: 6,
+    name: "Association Jeunesse et Développement",
+    logo: "/images/page-annuaire-crasc/6.jpg",
+    description: "Accompagnement des jeunes dans leur insertion professionnelle et leur autonomisation.",
+    domaine: "Jeunesse",
+    region: "CRASC EST",
+    ville: "Abengourou",
+    email: "contact@jeunessedev.org",
+    phone: "+225 07 55 55 55",
+    slug: "jeunesse-developpement"
+  },
+  {
+    id: 7,
+    name: "Coalition Santé pour Tous",
+    logo: "/images/page-annuaire-crasc/mplci.jpg",
+    description: "Promotion de la santé communautaire et accès aux soins de santé primaires.",
+    domaine: "Santé",
+    region: "CRASC SUD",
+    ville: "San-Pédro",
+    email: "contact@santepourtrois.org",
+    phone: "+225 07 66 66 66",
+    slug: "sante-pour-tous"
+  },
+  {
+    id: 8,
+    name: "Réseau des Agriculteurs Solidaires",
+    logo: "/images/page-annuaire-crasc/fefab.jpg",
+    description: "Soutien aux petits agriculteurs et promotion de l'agriculture durable.",
+    domaine: "Agriculture",
+    region: "CRASC CENTRE",
+    ville: "Bouaké",
+    email: "contact@agrisolidaire.org",
+    phone: "+225 07 77 77 77",
+    slug: "agriculteurs-solidaires"
   }
 ];
 
@@ -74,20 +122,21 @@ const domaines = [
   "Tous les domaines",
   "Droits Humains",
   "Genre et Développement",
-  "Santé et Bien-être",
+  "Développement Communautaire",
   "Éducation et Entrepreneuriat",
-  "Agriculture",
   "Environnement",
-  "Jeunesse"
+  "Jeunesse",
+  "Santé",
+  "Agriculture"
 ];
 
 const regions = [
   "Toutes les régions",
-  "CRASC Sud",
-  "CRASC Centre",
-  "CRASC Nord",
-  "CRASC Ouest",
-  "CRASC Est"
+  "CRASC SUD",
+  "CRASC CENTRE",
+  "CRASC NORD",
+  "CRASC OUEST",
+  "CRASC EST"
 ];
 
 export default function AnnuaireOSCPage() {
@@ -96,6 +145,7 @@ export default function AnnuaireOSCPage() {
   const [selectedRegion, setSelectedRegion] = useState('Toutes les régions');
   const [oscData, setOscData] = useState<IOSC[]>(mockOSCs);
   const [filteredOSCs, setFilteredOSCs] = useState<IOSC[]>(mockOSCs);
+  const [visibleCount, setVisibleCount] = useState(6);
 
   // Filter OSCs based on search and filters
   useEffect(() => {
@@ -123,169 +173,247 @@ export default function AnnuaireOSCPage() {
     setFilteredOSCs(filtered);
   }, [searchQuery, selectedDomaine, selectedRegion, oscData]);
 
-  return (
-    <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
+  const loadMore = () => {
+    setVisibleCount(prev => prev + 6);
+  };
 
-      {/* Header Section */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 bg-[#f0f9ff] rounded-lg p-8 mb-10">
-        <div className="pb-6">
-          <h2 className="text-[#2a591d] font-bold text-3xl pb-2">Annuaire des OSC</h2>
-          <p className="mb-3">
-            Découvrez les Organisations de la Société Civile (OSC) membres des CRASC à travers toute la Côte d'Ivoire.
-            Cet annuaire vous permet d'identifier des partenaires potentiels pour vos projets et initiatives.
+  const resetFilters = () => {
+    setSearchQuery('');
+    setSelectedDomaine('Tous les domaines');
+    setSelectedRegion('Toutes les régions');
+  };
+
+  return (
+    <section className="py-12 bg-gradient-to-b from-gray-50 to-white font-poppins">
+
+      {/* Hero Section */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div className="text-center">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+            Annuaire des <span className="text-[#E05017]">OSC</span>
+          </h1>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Découvrez les Organisations de la Société Civile membres du réseau CRASC
           </p>
-          <p className="mb-3">
-            Utilisez les filtres ci-dessous pour rechercher des OSC par domaine d'intervention, région ou nom.
-          </p>
+          <div className="w-24 h-1 bg-gradient-to-r from-[#E05017] to-[#2a591d] mx-auto mt-6 rounded-full"></div>
         </div>
       </div>
 
       {/* Statistics */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-6 rounded-lg border-2 border-gray-300 text-center">
-            <div className="text-4xl text-[#2a591d] font-bold mb-2">{oscData.length}</div>
-            <div className="text-sm text-gray-600 font-semibold">OSC ENREGISTRÉES</div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="group bg-white rounded-xl p-6 border-2 border-[#E05017]/30 hover:border-[#E05017] hover:shadow-xl transition-all duration-300 text-center overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#E05017] to-[#d04010] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative z-10">
+              <div className="text-5xl font-extrabold text-[#E05017] group-hover:text-white transition-colors mb-2">
+                {oscData.length}
+              </div>
+              <div className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/80 transition-colors">
+                OSC Enregistrées
+              </div>
+            </div>
           </div>
-          <div className="bg-white p-6 rounded-lg border-2 border-gray-300 text-center">
-            <div className="text-4xl text-[#2a591d] font-bold mb-2">{domaines.length - 1}</div>
-            <div className="text-sm text-gray-600 font-semibold">DOMAINES D'INTERVENTION</div>
+
+          <div className="group bg-white rounded-xl p-6 border-2 border-[#E05017]/30 hover:border-[#E05017] hover:shadow-xl transition-all duration-300 text-center overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#E05017] to-[#d04010] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative z-10">
+              <div className="text-5xl font-extrabold text-[#E05017] group-hover:text-white transition-colors mb-2">
+                {domaines.length - 1}
+              </div>
+              <div className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/80 transition-colors">
+                Domaines d'Intervention
+              </div>
+            </div>
           </div>
-          <div className="bg-white p-6 rounded-lg border-2 border-gray-300 text-center">
-            <div className="text-4xl text-[#2a591d] font-bold mb-2">5</div>
-            <div className="text-sm text-gray-600 font-semibold">RÉGIONS COUVERTES</div>
+
+          <div className="group bg-white rounded-xl p-6 border-2 border-[#E05017]/30 hover:border-[#E05017] hover:shadow-xl transition-all duration-300 text-center overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#E05017] to-[#d04010] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative z-10">
+              <div className="text-5xl font-extrabold text-[#E05017] group-hover:text-white transition-colors mb-2">
+                5
+              </div>
+              <div className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/80 transition-colors">
+                Régions Couvertes
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div className="space-y-4">
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Rechercher une OSC par nom, domaine ou ville..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
-            />
-          </div>
-
-          {/* Filter Dropdowns */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Domaine d'intervention
-              </label>
-              <select
-                value={selectedDomaine}
-                onChange={(e) => setSelectedDomaine(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
-              >
-                {domaines.map((domaine) => (
-                  <option key={domaine} value={domaine}>{domaine}</option>
-                ))}
-              </select>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+        <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-lg">
+          <div className="space-y-4">
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Rechercher une OSC par nom, domaine ou ville..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
+              />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Région CRASC
-              </label>
-              <select
-                value={selectedRegion}
-                onChange={(e) => setSelectedRegion(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
-              >
-                {regions.map((region) => (
-                  <option key={region} value={region}>{region}</option>
-                ))}
-              </select>
+            {/* Filter Dropdowns */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
+                <select
+                  value={selectedDomaine}
+                  onChange={(e) => setSelectedDomaine(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent appearance-none cursor-pointer"
+                >
+                  {domaines.map((domaine) => (
+                    <option key={domaine} value={domaine}>{domaine}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
+                <select
+                  value={selectedRegion}
+                  onChange={(e) => setSelectedRegion(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent appearance-none cursor-pointer"
+                >
+                  {regions.map((region) => (
+                    <option key={region} value={region}>{region}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Results Count and Reset */}
+            <div className="flex items-center justify-between pt-2">
+              <p className="text-sm text-gray-600">
+                <span className="font-bold text-[#E05017]">{filteredOSCs.length}</span> OSC{filteredOSCs.length > 1 ? 's' : ''} trouvée{filteredOSCs.length > 1 ? 's' : ''}
+              </p>
+              {(searchQuery || selectedDomaine !== 'Tous les domaines' || selectedRegion !== 'Toutes les régions') && (
+                <button
+                  onClick={resetFilters}
+                  className="text-sm text-[#E05017] hover:text-[#d04010] font-semibold transition-colors"
+                >
+                  Réinitialiser les filtres
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* OSC List */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-bold text-2xl">
-            {filteredOSCs.length} OSC{filteredOSCs.length > 1 ? 's' : ''} trouvée{filteredOSCs.length > 1 ? 's' : ''}
-          </h2>
-        </div>
-
+      {/* OSC Grid */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {filteredOSCs.length === 0 ? (
-          <div className="text-center py-16">
-            <Users2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-2xl text-gray-500 mb-2">Aucune OSC trouvée</p>
-            <p className="text-gray-400">Essayez de modifier vos critères de recherche</p>
+          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-12 text-center border-2 border-orange-100">
+            <div className="max-w-2xl mx-auto">
+              <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Users2 className="w-10 h-10 text-[#E05017]" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                Aucune OSC trouvée
+              </h3>
+              <p className="text-gray-600 mb-8">
+                Aucune OSC ne correspond à vos critères de recherche. Essayez de modifier vos filtres.
+              </p>
+              <button
+                onClick={resetFilters}
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#E05017] to-[#d04010] text-white font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
+              >
+                Réinitialiser les filtres
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-6">
-            {filteredOSCs.map((osc) => (
-              <Link key={osc.id} href={`/annuaire/annuaire-des-osc/${osc.slug}`}>
-                <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-white cursor-pointer group">
-                  <div className="flex gap-4 p-5">
-                    {/* Logo */}
-                    <div className="flex-shrink-0">
-                      <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
-                        <ImageWithFallback
-                          src={osc.logo || "/images/default-osc-logo.png"}
-                          alt={osc.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#E05017] transition-colors line-clamp-2">
-                        {osc.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                        {osc.description}
-                      </p>
-
-                      <div className="space-y-1 text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Building className="w-4 h-4 flex-shrink-0" />
-                          <span className="font-semibold text-[#2a591d]">{osc.domaine}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <MapPin className="w-4 h-4 flex-shrink-0" />
-                          <span>{osc.ville}, {osc.region}</span>
-                        </div>
-                      </div>
+          <>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+              {filteredOSCs.slice(0, visibleCount).map((osc) => (
+                <Link
+                  key={osc.id}
+                  href={`/annuaire/annuaire-des-osc/${osc.slug}`}
+                  className="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block"
+                >
+                  {/* Logo */}
+                  <div className="aspect-video overflow-hidden relative bg-gray-100">
+                    <ImageWithFallback
+                      src={osc.logo || "/images/default-osc-logo.png"}
+                      alt={osc.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    {/* Region Badge */}
+                    <div className="absolute top-3 right-3">
+                      <span className="bg-[#E05017] text-white text-xs font-bold px-3 py-1 rounded-full">
+                        {osc.region}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="px-5 pb-4">
-                    <div className="text-[#E05017] text-sm font-semibold group-hover:underline">
-                      Voir les détails →
+                  {/* Content */}
+                  <div className="p-5">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#E05017] transition-colors">
+                      {osc.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                      {osc.description}
+                    </p>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Building className="w-4 h-4 text-[#E05017] flex-shrink-0" />
+                        <span className="font-semibold text-gray-700">{osc.domaine}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <MapPin className="w-4 h-4 text-[#E05017] flex-shrink-0" />
+                        <span>{osc.ville}</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <span className="inline-flex items-center gap-2 text-[#E05017] font-semibold text-sm group-hover:gap-3 transition-all">
+                        Voir les détails
+                        <ArrowRight className="w-4 h-4" />
+                      </span>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Load More Button */}
+            {visibleCount < filteredOSCs.length && (
+              <div className="text-center mb-12">
+                <button
+                  onClick={loadMore}
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#E05017] to-[#d04010] text-white font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
+                >
+                  Charger plus d'OSC
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
       {/* Call to Action */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12">
-        <div className="bg-[#E05017] rounded-lg py-12 px-8 text-center text-white">
-          <h3 className="font-bold text-3xl mb-4">Votre OSC n'est pas listée ?</h3>
-          <p className="max-w-2xl mx-auto mb-6">
-            Rejoignez le réseau des CRASC pour bénéficier d'un accompagnement personnalisé et apparaître dans cet annuaire.
-          </p>
-          <Link
-            href="/rejoindre"
-            className="inline-block px-8 py-3 border-2 border-white text-white hover:bg-white hover:text-[#E05017] rounded-lg transition-colors font-semibold"
-          >
-            Rejoignez-nous
-          </Link>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div className="bg-gradient-to-r from-[#E05017] to-[#d04010] rounded-2xl p-12 text-center text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-10"></div>
+          <div className="relative z-10">
+            <h3 className="font-extrabold text-3xl mb-4">Votre OSC n'est pas listée ?</h3>
+            <p className="max-w-2xl mx-auto mb-8 text-lg">
+              Rejoignez le réseau des CRASC pour bénéficier d'un accompagnement personnalisé et apparaître dans cet annuaire.
+            </p>
+            <Link
+              href="/rejoindre"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#E05017] font-bold rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300"
+            >
+              Rejoignez-nous
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
         </div>
       </div>
 

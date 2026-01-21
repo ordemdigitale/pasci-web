@@ -92,6 +92,39 @@ const mockOSCData: Record<string, IOSCDetail> = {
       "Octroi de micro-crédits à 300 femmes entrepreneures",
       "Création de 5 coopératives féminines"
     ]
+  },
+  "fondation-vie": {
+    id: 3,
+    name: "Fondation Vie",
+    logo: "/images/page-annuaire-crasc/fondation-vie.jpg",
+    coverImage: "/images/page-annuaire-crasc/fondation-vie.jpg",
+    description: "Organisation dédiée à l'amélioration des conditions de vie des communautés vulnérables.",
+    domaine: "Développement Communautaire",
+    region: "CRASC Centre",
+    ville: "Yamoussoukro",
+    adresse: "Yamoussoukro, Boulevard de la République",
+    email: "contact@fondationvie.org",
+    phone: "+225 07 22 22 22",
+    website: "www.fondationvie.org",
+    createdAt: "2010",
+    president: "Jean-Baptiste Konan",
+    nombreMembres: 180,
+    mission: "Améliorer durablement les conditions de vie des populations vulnérables à travers des projets de développement communautaire intégrés.",
+    vision: "Des communautés autonomes et résilientes où chaque individu a accès aux services de base et aux opportunités de développement.",
+    objectifs: [
+      "Améliorer l'accès à l'eau potable et à l'assainissement",
+      "Renforcer la sécurité alimentaire des ménages",
+      "Promouvoir l'éducation et la santé communautaire",
+      "Développer des activités génératrices de revenus"
+    ],
+    realisations: [
+      "Construction de 10 forages d'eau potable dans les villages",
+      "Distribution de kits alimentaires à 500 familles",
+      "Alphabétisation de 200 adultes",
+      "Création de 3 jardins maraîchers communautaires"
+    ],
+    facebook: "https://facebook.com/fondationvie",
+    linkedin: "https://linkedin.com/company/fondationvie"
   }
 };
 
