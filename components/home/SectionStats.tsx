@@ -26,7 +26,7 @@ export default function Stats() {
       setError(null);
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/key-stats`);
+        const response = await fetch(`http://localhost:8000/api/v1/key-stats`);
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`)
         }
