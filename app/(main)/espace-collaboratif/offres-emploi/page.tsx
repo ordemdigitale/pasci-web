@@ -108,17 +108,31 @@ export default function PageOffreEmploi() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/jobs');
+        // Timeout de 3 secondes pour l'appel API
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+        const response = await fetch('http://localhost:8000/api/v1/jobs', {
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
         if (result && result.length > 0) {
           setJobs(result);
+          setError(null);
         }
       } catch (error: any) {
         console.log("Erreur lors du chargement des offres:", error);
-        setError(error.message || "Impossible de charger les offres d'emploi.");
+        if (error.name === 'AbortError') {
+          setError("Le serveur met trop de temps à répondre. Affichage des données de démonstration.");
+        } else {
+          setError("Impossible de charger les offres depuis le serveur. Affichage des données de démonstration.");
+        }
         // On garde les données mock en cas d'erreur
       } finally {
         setLoading(false);
@@ -187,6 +201,24 @@ export default function PageOffreEmploi() {
       <div className="flex justify-center items-center mb-2">
         <h2 className="text-gray-900 font-bold text-3xl">Nos Offres d'Emploi</h2>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="max-w-5xl mx-auto px-4 mb-6">
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-700">{error}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search bar + filters area*/}
       <div className="p-6 mb-6">
@@ -278,11 +310,10 @@ export default function PageOffreEmploi() {
                     <span className='inline-block px-3 py-1 rounded-full text-xs text-white bg-[#E05017]'>{job.type}</span>
                   </div>
                 </div>
-                <Link
-                  href={`/espace-collaboratif/offres-emploi/${job.slug}`}
-                  className="px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017]"
-                >
-                  Détails de l'offre
+                <Link href={`/espace-collaboratif/offres-emploi/${job.slug}`}>
+                  <button className="px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017] transition-all">
+                    Détails de l'offre
+                  </button>
                 </Link>
               </div>
             ))}
