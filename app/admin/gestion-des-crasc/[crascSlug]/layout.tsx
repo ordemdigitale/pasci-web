@@ -3,7 +3,6 @@ import {
   //fetchAllCrascRegionsFromApi, fetchSpecificCrascRegionbySlugFromApi, fetchCrascRegionBySlugWithOscsFromApi
 } from "@/localdata/helper/data";
 
-import { getCrascRegionBySlugWithOscsFromApi } from "@/lib/fetch-crasc";
 import { notFound } from "next/navigation";
 
 interface CrascRegionLayoutProps {
