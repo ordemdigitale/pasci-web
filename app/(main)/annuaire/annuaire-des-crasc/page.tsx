@@ -82,7 +82,6 @@ const tabs = [
   { id: 5, label: 'CRASC Est' }
 ];
 
-<<<<<<< HEAD
 const activities = [
   "L'Assemblée Générale",
   "Le Conseil d'Administration",
@@ -97,22 +96,6 @@ export const domainesIntervention = [
   "Développement local",
   "Bien-être social",
   "Cohésion social"
-=======
-const crasc = [
-  "CRASC Sud",
-  "CRASC Centre",
-  "CRASC Nord",
-  "CRASC Ouest",
-  "CRASC Est",
-];
-
-const activities = [
-  "L'Assemblée Générale",
-  "Le Conseil d'Administration",
-  "La Direction Exécutive",
-  "Délégations Régionales",
-  "Le Commissariat Aux Comptes"
->>>>>>> 68d975db3f56701070abc0daa86ce8f7945a29d2
 ];
 
 
@@ -164,43 +147,6 @@ export default function PageAnnuaireCrasc() {
 
   return (
     <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
-<<<<<<< HEAD
-=======
-      {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-[#2a591d] font-bold text-4xl text-center pb-[50px]">Annuaire des CRASC</p>
-
-        
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-sm transition-colors ${
-                activeTab === tab.id
-                  ? 'border-b-2 border-b-[#E05017] text-[#E05017] font-semibold'
-                  : 'text-gray-700 hover:text-[#E05017]'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-      </div> */}
-
-      {/* Map Section */}
-      {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="">
-          
-          <section className="w-full h-[400px] lg:h-[500px]">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15904.342598404442!2d-6.663088693746229!3d4.755139038876891!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xf961300358df441%3A0x5939d6eb97423c5d!2sCRASC%20SUD!5e0!3m2!1sen!2sci!4v1765409873752!5m2!1sen!2sci"
-              width="100%" height="100%" style={{ border: 0 }}
-              allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"/>
-          </section>
-        </div>
-      </div> */}
->>>>>>> 68d975db3f56701070abc0daa86ce8f7945a29d2
 
       {/* Statistics Section */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -208,26 +154,16 @@ export default function PageAnnuaireCrasc() {
           {/* Organizations Count */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
             <h3 className="text-sm text-gray-900 font-bold mb-2">ORGANISATIONS DE LA SOCIÉTÉ CIVILE</h3>
-<<<<<<< HEAD
             <div className="text-5xl text-[#2a591d] font-bold">{firstKeyStat?.number}</div>
-=======
-            <div className="text-5xl text-[#2a591d] font-bold">3176</div>
->>>>>>> 68d975db3f56701070abc0daa86ce8f7945a29d2
           </div>
 
           {/* Regions List */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-300">
             <h3 className="text-sm text-gray-900 font-bold mb-4">LES 5 CRASC</h3>
             <div className="space-y-2">
-<<<<<<< HEAD
               {crascData.map((crasc) => (
                 <div key={crasc.id} className="text-sm text-[#2a591d] font-bold">
                   {crasc.name}
-=======
-              {crasc.map((region, index) => (
-                <div key={index} className="text-sm text-[#2a591d] font-bold">
-                  {region}
->>>>>>> 68d975db3f56701070abc0daa86ce8f7945a29d2
                 </div>
               ))}
             </div>
@@ -247,36 +183,10 @@ export default function PageAnnuaireCrasc() {
         </div>
       </div>
 
-<<<<<<< HEAD
       {/* Section OSC membres */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-bold text-2xl">OSC membres</h2>
-=======
-      {/* OSC Section */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className='font-bold text-2xl'>OSC membres</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-          {activityCards.map((card) => (
-            <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div className="aspect-[4/3] overflow-hidden">
-                <ImageWithFallback
-                  src={card.image}
-                  alt={card.title}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="mb-3 text-center font-bold">{card.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {card.description}
-                </p>
-              </div>
-            </div>
-          ))}
->>>>>>> 68d975db3f56701070abc0daa86ce8f7945a29d2
         </div>
         <p className="text-2xl text-center pb-8">Aucune OSC ajoutée pour le moment.</p>
 
@@ -290,37 +200,10 @@ export default function PageAnnuaireCrasc() {
         </div> */}
       </div>
 
-<<<<<<< HEAD
       {/* Section actualités des Oscs */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-bold text-2xl">Nos actualités</h2>
-=======
-      {/* News section */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className='font-bold text-2xl'>Nos actualités</h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {recentlyAdded.map((card) => (
-            <div key={card.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div className="aspect-[4/3] overflow-hidden">
-                <ImageWithFallback
-                  src={card.image}
-                  alt={card.title}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="mb-3">{card.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {card.description}
-                </p>
-              </div>
-            </div>
-          ))}
->>>>>>> 68d975db3f56701070abc0daa86ce8f7945a29d2
         </div>
         <p className="text-2xl text-center pb-8">Aucune actualité ajoutée pour le moment.</p>
       </div>
