@@ -160,7 +160,7 @@ const mockNewsData: INews[] = [
 
       <blockquote>
         <p>"Ce programme représente une opportunité unique pour nos organisations membres de renforcer leurs capacités et d'améliorer leur impact sur le terrain."</p>
-        <footer>— Directeur du CRASC Abidjan</footer>
+        <footer>— Directeur du CRASC SUD</footer>
       </blockquote>
 
       <p>Les inscriptions sont ouvertes jusqu'à la fin du mois. Les OSC intéressées peuvent se rapprocher de leur CRASC régional pour plus d'informations.</p>
@@ -170,8 +170,8 @@ const mockNewsData: INews[] = [
     tags: ["Formation", "OSC", "Renforcement des capacités"],
     crasc: {
       id: "1",
-      name: "CRASC Abidjan",
-      slug: "crasc-abidjan",
+      name: "CRASC SUD",
+      slug: "crasc-sud",
       osc_count: 150
     }
   },
@@ -204,9 +204,9 @@ const mockNewsData: INews[] = [
     created_at: "2025-01-12T14:30:00Z",
     tags: ["Atelier", "Capacités", "Gouvernance"],
     crasc: {
-      id: "1",
-      name: "CRASC Bouaké",
-      slug: "crasc-bouake",
+      id: "2",
+      name: "CRASC CENTRE",
+      slug: "crasc-centre",
       osc_count: 120
     }
   },
@@ -240,9 +240,9 @@ const mockNewsData: INews[] = [
     created_at: "2025-01-10T08:00:00Z",
     tags: ["Assemblée", "Gouvernance", "Planification"],
     crasc: {
-      id: "2",
-      name: "CRASC Yamoussoukro",
-      slug: "crasc-yamoussoukro",
+      id: "3",
+      name: "CRASC NORD",
+      slug: "crasc-nord",
       osc_count: 80
     }
   }

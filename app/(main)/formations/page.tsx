@@ -113,10 +113,10 @@ const sidebarItems = [
 export default function FormationsPage() {
   const [activeCategory, setActiveCategory] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  const [visiblePrograms, setVisiblePrograms] = useState(6);
+  const [visiblePrograms, setVisiblePrograms] = useState(5);
 
   const loadMorePrograms = () => {
-    setVisiblePrograms(prev => Math.min(prev + 3, programs.length));
+    setVisiblePrograms(prev => Math.min(prev + 5, programs.length));
   };
 
   return (

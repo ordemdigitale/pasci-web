@@ -18,8 +18,8 @@ const mockNews: SpotlightNews[] = [
     thumbnail_url: "/images/actualites/formation-osc.jpg",
     crasc: {
       id: "1",
-      name: "CRASC Abidjan",
-      slug: "crasc-abidjan",
+      name: "CRASC SUD",
+      slug: "crasc-sud",
       osc_count: 150
     }
   },
@@ -30,9 +30,9 @@ const mockNews: SpotlightNews[] = [
     content: "Un atelier de trois jours pour améliorer les compétences organisationnelles des membres des OSC. Formation sur la gouvernance, la planification stratégique et la mobilisation de ressources.",
     thumbnail_url: "/images/actualites/atelier-capacites.jpg",
     crasc: {
-      id: "1",
-      name: "CRASC Bouaké",
-      slug: "crasc-bouake",
+      id: "2",
+      name: "CRASC CENTRE",
+      slug: "crasc-centre",
       osc_count: 120
     }
   },
@@ -43,10 +43,36 @@ const mockNews: SpotlightNews[] = [
     content: "Convocation à l'assemblée générale ordinaire pour faire le bilan des activités de l'année écoulée et définir les orientations stratégiques pour 2025.",
     thumbnail_url: "/images/actualites/assemblee-generale.jpg",
     crasc: {
-      id: "2",
-      name: "CRASC Yamoussoukro",
-      slug: "crasc-yamoussoukro",
+      id: "3",
+      name: "CRASC NORD",
+      slug: "crasc-nord",
       osc_count: 80
+    }
+  },
+  {
+    id: "4",
+    title: "Forum régional sur le développement durable",
+    slug: "forum-regional-developpement-durable",
+    content: "Le CRASC organise un forum régional réunissant les acteurs du développement durable pour échanger sur les bonnes pratiques et renforcer les synergies d'action.",
+    thumbnail_url: "/images/actualites/formation-osc.jpg",
+    crasc: {
+      id: "4",
+      name: "CRASC EST",
+      slug: "crasc-est",
+      osc_count: 95
+    }
+  },
+  {
+    id: "5",
+    title: "Campagne de sensibilisation sur les droits humains",
+    slug: "campagne-sensibilisation-droits-humains",
+    content: "Lancement d'une vaste campagne de sensibilisation aux droits humains dans les communautés locales, avec l'appui des OSC membres du réseau CRASC.",
+    thumbnail_url: "/images/actualites/atelier-capacites.jpg",
+    crasc: {
+      id: "5",
+      name: "CRASC OUEST",
+      slug: "crasc-ouest",
+      osc_count: 110
     }
   }
 ];
@@ -83,7 +109,7 @@ export default function SectionNews() {
   }, []);
 
   return (
-    <section className="py-10 bg-white font-poppins">
+    <section className="py-8 bg-white font-poppins">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
