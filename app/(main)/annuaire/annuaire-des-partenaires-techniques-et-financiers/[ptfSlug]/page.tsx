@@ -4,7 +4,7 @@ import React, { use, useState, useEffect } from "react";
 import { IPTF } from '@/types/api.types';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from "next/link";
-import { MapPin, Mail, Phone, Globe, Building2, Calendar, Users, Target, ArrowRight, ExternalLink } from 'lucide-react';
+import { MapPin, Mail, Phone, Globe, Building2, Calendar, Users, Target, ArrowRight, ExternalLink, FileText, Clock } from 'lucide-react';
 
 // Mock data complet pour les PTF
 const mockPTFDetails: Record<string, any> = {
@@ -50,6 +50,22 @@ const mockPTFDetails: Record<string, any> = {
         montant: "100 millions USD",
         periode: "2022-2026"
       }
+    ],
+    appels_propositions: [
+      {
+        id: "1",
+        titre: "Appel à propositions - Infrastructure routière durable",
+        description: "Recherche d'organisations pour des projets d'infrastructure routière en zone rurale.",
+        date_limite: "2026-03-15",
+        budget: "50 millions USD"
+      },
+      {
+        id: "2",
+        titre: "Financement de projets éducatifs innovants",
+        description: "Soutien aux initiatives visant à améliorer l'accès à l'éducation de qualité.",
+        date_limite: "2026-04-30",
+        budget: "25 millions USD"
+      }
     ]
   },
   "union-europeenne": {
@@ -87,6 +103,15 @@ const mockPTFDetails: Record<string, any> = {
         name: "Projet Routes et Infrastructures",
         montant: "120 millions EUR",
         periode: "2020-2025"
+      }
+    ],
+    appels_propositions: [
+      {
+        id: "1",
+        titre: "Appel à propositions - Renforcement de la société civile",
+        description: "Financement d'initiatives pour renforcer les capacités des OSC locales.",
+        date_limite: "2026-02-28",
+        budget: "30 millions EUR"
       }
     ]
   },
@@ -126,6 +151,15 @@ const mockPTFDetails: Record<string, any> = {
         montant: "35 millions USD",
         periode: "2021-2025"
       }
+    ],
+    appels_propositions: [
+      {
+        id: "1",
+        titre: "Appel à propositions - Protection de l'enfance",
+        description: "Recherche de partenaires pour renforcer les systèmes de protection des enfants vulnérables.",
+        date_limite: "2026-05-15",
+        budget: "15 millions USD"
+      }
     ]
   },
   "usaid": {
@@ -151,7 +185,16 @@ const mockPTFDetails: Record<string, any> = {
       "Éducation",
       "Environnement"
     ],
-    projets: []
+    projets: [],
+    appels_propositions: [
+      {
+        id: "1",
+        titre: "Appel à propositions - Santé publique et VIH/SIDA",
+        description: "Financement de programmes de prévention et de traitement du VIH/SIDA.",
+        date_limite: "2026-04-10",
+        budget: "40 millions USD"
+      }
+    ]
   },
   "afd": {
     id: "5",
@@ -328,7 +371,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
     return (
       <div className="min-h-screen flex items-center justify-center font-poppins">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#2a591d] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#E05017] mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement...</p>
         </div>
       </div>
@@ -344,7 +387,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
           <p className="text-gray-600 mb-6">Ce partenaire n'existe pas ou a été supprimé.</p>
           <Link
             href="/annuaire/annuaire-des-partenaires-techniques-et-financiers"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#2a591d] text-white rounded-lg hover:bg-[#1f4416] transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors"
           >
             <ArrowRight className="w-5 h-5 rotate-180" />
             Retour à l'annuaire
@@ -396,13 +439,13 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
               <div className="grid md:grid-cols-2 gap-3 text-sm">
                 {ptfData.pays && (
                   <div className="flex items-center gap-2 text-gray-600">
-                    <MapPin className="w-4 h-4 text-[#2a591d]" />
+                    <MapPin className="w-4 h-4 text-[#E05017]" />
                     <span><span className="font-semibold">Pays:</span> {ptfData.pays}</span>
                   </div>
                 )}
                 {ptfData.date_creation && (
                   <div className="flex items-center gap-2 text-gray-600">
-                    <Calendar className="w-4 h-4 text-[#2a591d]" />
+                    <Calendar className="w-4 h-4 text-[#E05017]" />
                     <span><span className="font-semibold">Création:</span> {ptfData.date_creation}</span>
                   </div>
                 )}
@@ -418,9 +461,9 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
 
             {/* Mission */}
             {ptfData.mission && (
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6">
+              <div className="bg-[#f0f9ff] border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4 flex items-center gap-2">
-                  <Target className="w-6 h-6" />
+                  <Target className="w-6 h-6 text-[#E05017]" />
                   Mission
                 </h2>
                 <p className="text-gray-700">{ptfData.mission}</p>
@@ -442,7 +485,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
                 <div className="grid md:grid-cols-2 gap-3">
                   {ptfData.domaines.map((domaine: string, index: number) => (
                     <div key={index} className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-[#2a591d] text-white rounded-full flex items-center justify-center text-xs font-semibold">
+                      <span className="flex-shrink-0 w-6 h-6 bg-[#E05017] text-white rounded-full flex items-center justify-center text-xs font-semibold">
                         {index + 1}
                       </span>
                       <span className="text-gray-700 pt-0.5">{domaine}</span>
@@ -452,21 +495,39 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
               </div>
             )}
 
-            {/* Projets */}
-            {ptfData.projets && ptfData.projets.length > 0 && (
-              <div className="bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200 rounded-lg p-6">
-                <h2 className="text-2xl font-bold text-[#E05017] mb-4">Projets en cours</h2>
+            {/* Appels à propositions */}
+            {ptfData.appels_propositions && ptfData.appels_propositions.length > 0 && (
+              <div className="bg-[#f0f9ff] border border-gray-200 rounded-lg p-6">
+                <h2 className="text-2xl font-bold text-[#2a591d] mb-4 flex items-center gap-2">
+                  <FileText className="w-6 h-6 text-[#E05017]" />
+                  Appels à propositions
+                </h2>
                 <div className="space-y-4">
-                  {ptfData.projets.map((projet: any) => (
-                    <div key={projet.id} className="bg-white rounded-lg p-4 border border-orange-200">
-                      <h3 className="font-bold text-lg text-gray-900 mb-2">{projet.name}</h3>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                        {projet.montant && (
-                          <span className="font-semibold text-[#2a591d]">💰 {projet.montant}</span>
-                        )}
-                        {projet.periode && (
-                          <span>📅 {projet.periode}</span>
-                        )}
+                  {ptfData.appels_propositions.map((appel: any) => (
+                    <div key={appel.id} className="bg-white rounded-lg p-5 border border-gray-200 hover:shadow-md transition-shadow">
+                      <h3 className="font-bold text-lg text-gray-900 mb-2">{appel.titre}</h3>
+                      <p className="text-sm text-gray-700 mb-4">{appel.description}</p>
+                      <div className="flex flex-wrap items-center justify-between gap-4">
+                        <div className="flex flex-wrap gap-4 text-sm">
+                          {appel.budget && (
+                            <span className="flex items-center gap-1 text-[#E05017] font-semibold">
+                              <span>💰</span> {appel.budget}
+                            </span>
+                          )}
+                          {appel.date_limite && (
+                            <span className="flex items-center gap-1 text-gray-600">
+                              <Clock className="w-4 h-4" />
+                              Date limite: {new Date(appel.date_limite).toLocaleDateString('fr-FR')}
+                            </span>
+                          )}
+                        </div>
+                        <Link
+                          href={`/contact?ptf=${ptfData.name}&appel=${appel.titre}`}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-semibold text-sm whitespace-nowrap"
+                        >
+                          Postuler
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
                       </div>
                     </div>
                   ))}
@@ -485,7 +546,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
               <div className="space-y-4">
                 {ptfData.address && (
                   <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-[#2a591d] flex-shrink-0 mt-0.5" />
+                    <MapPin className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">Adresse</p>
                       <p className="text-sm text-gray-600">{ptfData.address}</p>
@@ -495,10 +556,10 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
 
                 {ptfData.email && (
                   <div className="flex items-start gap-3">
-                    <Mail className="w-5 h-5 text-[#2a591d] flex-shrink-0 mt-0.5" />
+                    <Mail className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">Email</p>
-                      <a href={`mailto:${ptfData.email}`} className="text-sm text-[#2a591d] hover:underline break-all">
+                      <a href={`mailto:${ptfData.email}`} className="text-sm text-[#E05017] hover:underline break-all">
                         {ptfData.email}
                       </a>
                     </div>
@@ -507,10 +568,10 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
 
                 {ptfData.phone && (
                   <div className="flex items-start gap-3">
-                    <Phone className="w-5 h-5 text-[#2a591d] flex-shrink-0 mt-0.5" />
+                    <Phone className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">Téléphone</p>
-                      <a href={`tel:${ptfData.phone}`} className="text-sm text-[#2a591d] hover:underline">
+                      <a href={`tel:${ptfData.phone}`} className="text-sm text-[#E05017] hover:underline">
                         {ptfData.phone}
                       </a>
                     </div>
@@ -519,14 +580,14 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
 
                 {ptfData.website && (
                   <div className="flex items-start gap-3">
-                    <Globe className="w-5 h-5 text-[#2a591d] flex-shrink-0 mt-0.5" />
+                    <Globe className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">Site Web</p>
                       <a
                         href={`https://${ptfData.website}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-[#2a591d] hover:underline inline-flex items-center gap-1"
+                        className="text-sm text-[#E05017] hover:underline inline-flex items-center gap-1"
                       >
                         {ptfData.website}
                         <ExternalLink className="w-3 h-3" />
@@ -540,7 +601,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
               <div className="mt-6">
                 <Link
                   href={`/contact?ptf=${ptfData.name}`}
-                  className="block w-full text-center px-4 py-3 bg-[#2a591d] text-white rounded-lg hover:bg-[#1f4416] transition-colors font-semibold"
+                  className="block w-full text-center px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-semibold"
                 >
                   Contacter le PTF
                 </Link>
@@ -553,7 +614,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
         <div className="mt-12 text-center">
           <Link
             href="/annuaire/annuaire-des-partenaires-techniques-et-financiers"
-            className="inline-flex items-center gap-2 text-[#2a591d] hover:underline font-semibold"
+            className="inline-flex items-center gap-2 text-[#E05017] hover:underline font-semibold"
           >
             ← Retour à l'annuaire des PTF
           </Link>
