@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react'
+import { usePathname } from 'next/navigation';
 import { Karla, Poppins } from "next/font/google";
 import "../globals.css";
 import AdminSidebar from "@/components/admin/AdminSidebar";
@@ -25,36 +26,48 @@ export default function AdminRootLayout({
   children: React.ReactNode;
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Pages qui ne doivent pas afficher le sidebar et la navbar
+  const isAuthPage = pathname === '/admin/login';
 
   return (
     <html lang="en" className={`${karla.variable} ${poppins.variable} antialiased`}>
       <body>
-        <div className="flex h-screen bg-cyan-50/50 font-poppins">
-          {/* Sidebar */}
-          <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
-          {/* Overlay for mobile */}
-          {sidebarOpen && (
-            <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-              onClick={() => setSidebarOpen(false)}
-            />
-          )}
-
-          {/* Main Content */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Top Bar */}
-            <AdminNavbar setSidebarOpen={setSidebarOpen} />
-
-            {/* Page Content */}
-            <main className="flex-1 overflow-y-auto">
-              {children}
-            </main>
-
-            {/* Footer */}
-            <AdminFooter />
+        {isAuthPage ? (
+          // Layout simple pour les pages d'authentification
+          <div className="h-screen overflow-hidden">
+            {children}
           </div>
-        </div>
+        ) : (
+          // Layout complet avec sidebar et navbar pour les autres pages
+          <div className="flex h-screen bg-cyan-50/50 font-poppins">
+            {/* Sidebar */}
+            <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+
+            {/* Overlay for mobile */}
+            {sidebarOpen && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                onClick={() => setSidebarOpen(false)}
+              />
+            )}
+
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Top Bar */}
+              <AdminNavbar setSidebarOpen={setSidebarOpen} />
+
+              {/* Page Content */}
+              <main className="flex-1 overflow-y-auto">
+                {children}
+              </main>
+
+              {/* Footer */}
+              <AdminFooter />
+            </div>
+          </div>
+        )}
       </body>
     </html>
   )

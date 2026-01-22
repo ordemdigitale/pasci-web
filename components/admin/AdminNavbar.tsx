@@ -1,7 +1,9 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Menu, Bell, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Menu, Bell, User, LogOut, Settings, UserCircle, ChevronDown } from "lucide-react";
 
 interface AdminNavbarProps {
   setSidebarOpen: (open: boolean) => void;
@@ -9,6 +11,28 @@ interface AdminNavbarProps {
 }
 
 export default function AdminNavbar({ setSidebarOpen, title = "Tableau de bord" }: AdminNavbarProps) {
+  const router = useRouter();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    // Ici vous pouvez ajouter la logique de déconnexion (clear tokens, etc.)
+    // Pour l'instant, on redirige simplement vers la page de login
+    router.push('/admin/login');
+  };
+
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
       <div className="flex items-center gap-4">
@@ -28,12 +52,70 @@ export default function AdminNavbar({ setSidebarOpen, title = "Tableau de bord" 
         >
           Visiter le site
         </Link>
-        <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
+
+        {/* Notifications Button */}
+        <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
           <Bell size={20} />
           <span className="absolute top-1 right-1 w-2 h-2 bg-[#2a591d] rounded-full"></span>
         </button>
-        <div className="w-8 h-8 bg-[#2a591d] rounded-full flex items-center justify-center text-white">
-          <User size={16} />
+
+        {/* User Menu Dropdown */}
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="flex items-center gap-2 hover:bg-gray-100 rounded-lg p-1 pr-2 transition-colors"
+          >
+            <div className="w-8 h-8 bg-[#2a591d] rounded-full flex items-center justify-center text-white">
+              <User size={16} />
+            </div>
+            <ChevronDown
+              size={16}
+              className={`text-gray-500 transition-transform ${showUserMenu ? 'rotate-180' : ''}`}
+            />
+          </button>
+
+          {/* Dropdown Menu */}
+          {showUserMenu && (
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              {/* User Info */}
+              <div className="px-4 py-3 border-b border-gray-200">
+                <p className="text-sm font-semibold text-gray-900">Administrateur</p>
+                <p className="text-xs text-gray-500">admin@pasci.ci</p>
+              </div>
+
+              {/* Menu Items */}
+              <div className="py-2">
+                <Link
+                  href="/admin/profile"
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  onClick={() => setShowUserMenu(false)}
+                >
+                  <UserCircle size={18} className="text-gray-500" />
+                  Mon profil
+                </Link>
+
+                <Link
+                  href="/admin/settings"
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  onClick={() => setShowUserMenu(false)}
+                >
+                  <Settings size={18} className="text-gray-500" />
+                  Paramètres
+                </Link>
+              </div>
+
+              {/* Logout */}
+              <div className="border-t border-gray-200 pt-2">
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full"
+                >
+                  <LogOut size={18} />
+                  Se déconnecter
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>
