@@ -12,8 +12,6 @@ import {
   ChevronRight,
   Download,
   Share2,
-  ThumbsUp,
-  MessageSquare,
   Star,
   Users,
   BookOpen,
@@ -116,8 +114,6 @@ export default function FormationDetailPage() {
   const formationSlug = params.formationSlug as string;
 
   const [formation, setFormation] = useState<IFormation | null>(mockFormation);
-  const [comment, setComment] = useState('');
-  const [isPlaying, setIsPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const getResourceIcon = (type: string) => {
@@ -310,55 +306,6 @@ export default function FormationDetailPage() {
                     </ul>
                   </div>
                 </div>
-
-                {/* Discussion Space */}
-                <div className="space-y-4">
-                  <h2 className="text-xl font-bold">Espace de discussion (14)</h2>
-
-                  {/* Comment Form */}
-                  <div className="flex gap-4 p-4 bg-white rounded-xl border border-gray-200">
-                    <div className="w-10 h-10 rounded-full bg-[#E05017]/20 flex items-center justify-center text-[#E05017] font-bold">
-                      JD
-                    </div>
-                    <div className="flex-1">
-                      <textarea
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        className="w-full rounded-lg border-gray-300 text-sm focus:ring-[#E05017] focus:border-[#E05017] resize-none h-20"
-                        placeholder="Posez une question ou partagez vos réflexions..."
-                      />
-                      <div className="flex justify-end mt-3">
-                        <button className="bg-[#E05017] text-white text-sm font-bold px-6 py-2 rounded-lg hover:bg-[#c44315] transition-colors">
-                          Publier le commentaire
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Comment Example */}
-                  <div className="flex gap-4 p-5 bg-white rounded-xl border border-gray-200">
-                    <div className="w-10 h-10 rounded-full bg-gray-300"></div>
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-bold">
-                          Sarah Miller <span className="text-gray-500 font-normal ml-2 text-xs">il y a 2 heures</span>
-                        </h4>
-                        <button className="text-[#E05017] text-xs font-bold">Répondre</button>
-                      </div>
-                      <p className="text-sm text-gray-600 leading-normal">
-                        L'explication du processus de réconciliation était passionnante ! Est-ce que cela change avec le nouveau Concurrent Mode de React 18 ?
-                      </p>
-                      <div className="flex items-center gap-4 pt-2">
-                        <button className="flex items-center gap-1 text-xs text-gray-600 hover:text-[#E05017]">
-                          <ThumbsUp className="w-4 h-4" /> 12
-                        </button>
-                        <button className="flex items-center gap-1 text-xs text-gray-600 hover:text-[#E05017]">
-                          <MessageSquare className="w-4 h-4" /> 2 réponses
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               {/* Right Column */}
@@ -388,23 +335,6 @@ export default function FormationDetailPage() {
                         <Download className="w-4 h-4 text-gray-600 group-hover:text-[#E05017]" />
                       </a>
                     ))}
-                  </div>
-                </div>
-
-                {/* Instructor Note */}
-                <div className="bg-[#E05017]/5 p-6 rounded-xl border border-[#E05017]/20">
-                  <h2 className="text-sm font-bold text-[#E05017] mb-2 flex items-center gap-2">
-                    <Star className="w-4 h-4" />
-                    Note de l'instructeur
-                  </h2>
-                  <p className="text-xs text-[#E05017]/80 leading-relaxed italic">
-                    "{formation.instructor.note}"
-                  </p>
-                  <div className="mt-4 flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gray-300"></div>
-                    <span className="text-[10px] font-bold text-[#E05017]">
-                      — {formation.instructor.name}
-                    </span>
                   </div>
                 </div>
 

@@ -6,195 +6,267 @@ import {
   CircleCheckBig,
   Handshake,
   DollarSign,
-  Search
+  Search,
+  MapPin,
+  Clock,
+  Building2,
+  Target,
+  Calendar,
+  ArrowRight
 } from 'lucide-react';
 import { offreProjet } from '@/localdata/offreProjetData';
-import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
-  /* Categories data */
-  const categories = [
-    "Gestion de projet",
-    "Administration",
-    "Développement",
-    "Marketing",
-    "Desing",
-    "Ressources Humaines"
-  ];
+/* Categories data */
+const domaines = [
+  "Environnement",
+  "Éducation",
+  "Santé",
+  "Culture & Économie",
+  "Agriculture",
+  "Développement communautaire"
+];
+
+const zones = [
+  "Abidjan",
+  "Bouaké",
+  "Yamoussoukro",
+  "Korhogo",
+  "San-Pédro",
+  "Daloa"
+];
 
 export default function PageOffreProjet() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedType, setSelectedType] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDomaine, setSelectedDomaine] = useState("");
+  const [selectedZone, setSelectedZone] = useState("");
+
+  // Filtrer les projets
+  const filteredProjets = offreProjet.filter((projet) => {
+    const matchSearch = projet.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                       projet.osc.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchDomaine = !selectedDomaine || projet.domaine === selectedDomaine;
+    const matchZone = !selectedZone || projet.zone === selectedZone;
+
+    return matchSearch && matchDomaine && matchZone;
+  });
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  };
+
   return (
-    <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
-        {/* Left content */}
-        <div className="">
-          <h2 className="font-bold text-4xl text-[#2a591d] leading-tight">Offre de projets</h2>
-          <p className="text-gray-600 text-md max-w-xl mt-6">
-            Nous mettons en lumière des initiatives à fort impact social portées par les Organisations de la Société Civile en Côte d’Ivoire. Elle constitue un pont entre les OSC et les partenaires techniques et financiers, en facilitant l’accès à des projets structurés, transparents et alignés sur les priorités de développement durable.
-          </p>
-        </div>
-        
-        {/* Right content */}
-        <div className="space-y-12">
-          <div className="">
-            <ImageWithFallback
-              src="/images/process-formalisation-page.png"
-              alt="image"
-              className="w-full h-[300px] object-cover rounded-lg"
-            />
+    <section className="py-10 lg:pb-32 lg:pt-10 font-poppins bg-gray-50">
+      {/* Hero Section */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div className="bg-gradient-to-br from-[#2a591d] to-[#1f4416] rounded-2xl p-8 md:p-12 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
+
+          <div className="relative z-10 grid lg:grid-cols-2 gap-8 items-center">
+            <div>
+              <h1 className="font-extrabold text-4xl md:text-5xl leading-tight mb-4">
+                Offres de Projets
+              </h1>
+              <p className="text-white/90 text-lg leading-relaxed">
+                Découvrez des initiatives à fort impact social portées par les OSC en Côte d'Ivoire.
+                Facilitez l'accès à des projets structurés et alignés sur les priorités de développement durable.
+              </p>
+            </div>
+
+            <div className="hidden lg:block">
+              <ImageWithFallback
+                src="/images/process-formalisation-page.png"
+                alt="Offres de projets"
+                className="w-full h-64 object-cover rounded-xl shadow-2xl"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Search bar + filters area*/}
-      <div className="p-6 mb-6">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <div className="grid grid-cols-6 md:grid-cols-6 gap-4 items-end">
-            {/* search bar */}
-            <div className="relative col-span-3">
+      {/* Search & Filters */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Search bar */}
+            <div className="relative md:col-span-2">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Rechercher un projet..."
+                placeholder="Rechercher un projet ou une OSC..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="text-sm w-full pl-12 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
               />
             </div>
 
-            {/* filters */}
+            {/* Domaine filter */}
             <div>
               <select
-                value={selectedCategory}
-                onChange={(e) =>
-                  setSelectedCategory(e.target.value)
-                }
-                className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
+                value={selectedDomaine}
+                onChange={(e) => setSelectedDomaine(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
               >
-                <option value="">
-                  Catégorie
-                </option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
+                <option value="">Tous les domaines</option>
+                {domaines.map((domaine) => (
+                  <option key={domaine} value={domaine}>
+                    {domaine}
                   </option>
                 ))}
               </select>
             </div>
 
+            {/* Zone filter */}
             <div>
               <select
-                value={selectedType}
-                onChange={(e) =>
-                  setSelectedType(e.target.value)
-                }
-                className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
+                value={selectedZone}
+                onChange={(e) => setSelectedZone(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
               >
-                <option value="">Type</option>
-                <option value="type1">Tous</option>
-                {/* <option value="type2">CDI</option>
-                <option value="type3">CDD</option>
-                <option value="type4">Stage</option> */}
+                <option value="">Toutes les zones</option>
+                {zones.map((zone) => (
+                  <option key={zone} value={zone}>
+                    {zone}
+                  </option>
+                ))}
               </select>
             </div>
-
-            <div>
-              <select
-                value={selectedDate}
-                onChange={(e) =>
-                  setSelectedDate(e.target.value)
-                }
-                className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
-              >
-                <option value="">Date</option>
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-              </select>
-            </div>
-
           </div>
+
+          {/* Results count */}
+          {(searchQuery || selectedDomaine || selectedZone) && (
+            <div className="mt-4 text-sm text-gray-600">
+              <span className="font-bold text-[#E05017]">{filteredProjets.length}</span> projet{filteredProjets.length > 1 ? 's' : ''} trouvé{filteredProjets.length > 1 ? 's' : ''}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Projets disponibles */}
-      <div className="max-w-5xl mx-auto">
-        <h2 className='font-bold'>Projets disponibles</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          {offreProjet.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden p-4 relative">
-              <div className="relative h-48">
-                <ImageWithFallback
-                  src={item.image}
-                  alt={item.nom}
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              </div>
-              <div className="mt-4">    
-                <div key={item.nom} className="mb-4">
-                  <h2 className="text-xl font-bold">{item.nom}</h2>
+      {/* Projets Grid */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <h2 className="font-bold text-2xl text-gray-900 mb-6">
+          Projets disponibles
+        </h2>
+
+        {filteredProjets.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+            <Target className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">Aucun projet trouvé</p>
+            <p className="text-gray-400 text-sm mt-2">Essayez de modifier vos critères de recherche</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProjets.map((projet) => (
+              <Link
+                key={projet.id}
+                href={`/offre-projets/${projet.slug}`}
+                className="group"
+              >
+                <div className="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-[#E05017]/30 overflow-hidden h-full flex flex-col">
+                  {/* Image */}
+                  <div className="relative h-48 overflow-hidden">
+                    <ImageWithFallback
+                      src={projet.image || '/images/placeholder.jpg'}
+                      alt={projet.nom}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute top-3 right-3">
+                      <span className="bg-[#E05017] text-white text-xs font-bold px-3 py-1 rounded-full">
+                        {projet.statut}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-5 flex flex-col flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-bold text-[#2a591d] bg-[#2a591d]/10 px-2 py-1 rounded">
+                        {projet.domaine}
+                      </span>
+                    </div>
+
+                    <h3 className="font-bold text-lg text-gray-900 mb-3 line-clamp-2 group-hover:text-[#E05017] transition-colors">
+                      {projet.nom}
+                    </h3>
+
+                    <div className="space-y-2 text-sm text-gray-600 mb-4">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="w-4 h-4 text-[#E05017]" />
+                        <span className="truncate">{projet.osc}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-[#E05017]" />
+                        <span>{projet.zone}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-[#E05017]" />
+                        <span>{projet.durée}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-[#E05017]" />
+                        <span className="font-semibold">{projet.budget}</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-auto pt-4 border-t border-gray-100">
+                      <span className="inline-flex items-center gap-2 text-[#E05017] font-semibold text-sm group-hover:gap-3 transition-all">
+                        Voir les détails
+                        <ArrowRight className="w-4 h-4" />
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className='flex flex-col gap-2 mb-8'>
-                <p><span className="font-bold">OSC:</span> {item.osc}</p>
-                <p><span className="font-bold">Domaine:</span> {item.domaine}</p>
-                <p><span className="font-bold">Zone:</span> {item.zone}</p>
-                <p><span className="font-bold">Durée:</span> {item.durée}</p>
-                <p><span className="font-bold">Budget:</span> {item.budget}</p>
-                <p><span className="font-bold">Objectif:</span> {item.objectif}</p>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <Button className="border border-transparent hover:border-[#E05017] text-white hover:text-[#E05017] bg-white hover:bg-transparent bg-[#E05017] rounded-lg px-6">
-                  Voir le projet
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Pourquoi être membre du CRASC ? */}
-      <div className="py-8">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 rounded-lg py-8 space-y-6 text-center shadow-md border border-gray-200">
-          <p className="font-bold text-4xl text-black">Pourquoi être membre du CRASC ?</p>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="flex flex-col items-center justify-between gap-2">
-              <div className="p-2 bg-orange-100 rounded-full">
-                <CircleCheckBig size={24} color="#E05017" />
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-12">
+          <h2 className="font-extrabold text-3xl md:text-4xl text-center text-gray-900 mb-4">
+            Pourquoi être membre du CRASC ?
+          </h2>
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Rejoignez notre réseau et bénéficiez d'opportunités uniques pour développer vos projets
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-[#E05017]/10 rounded-2xl flex items-center justify-center mx-auto">
+                <CircleCheckBig className="w-8 h-8 text-[#E05017]" />
               </div>
-              <h2 className="font-bold">Visibilité accrue</h2>
-              <p>
+              <h3 className="font-bold text-xl text-gray-900">Visibilité accrue</h3>
+              <p className="text-gray-600 leading-relaxed">
                 Augmentez la portée de vos projets auprès d'un large réseau de partenaires et de financeurs potentiels, au niveau local et international.
               </p>
             </div>
 
-            <div className="flex flex-col items-center justify-between gap-2">
-              <div className="p-2 bg-orange-100 rounded-full">
-                <DollarSign size={24} color="#E05017" />
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-[#E05017]/10 rounded-2xl flex items-center justify-center mx-auto">
+                <DollarSign className="w-8 h-8 text-[#E05017]" />
               </div>
-              <h2 className="font-bold">Accès aux ressources</h2>
-              <p>
+              <h3 className="font-bold text-xl text-gray-900">Accès aux ressources</h3>
+              <p className="text-gray-600 leading-relaxed">
                 Bénéficiez d'une plateforme centralisée pour soumettre vos initiatives et trouver les ressources nécessaires à leur concrétisation.
               </p>
             </div>
-            
-            <div className="flex flex-col items-center justify-between gap-2">
-              <div className="p-2 bg-orange-100 rounded-full">
-                <Handshake size={24} color="#E05017" />
+
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-[#E05017]/10 rounded-2xl flex items-center justify-center mx-auto">
+                <Handshake className="w-8 h-8 text-[#E05017]" />
               </div>
-              <h2 className="font-bold">Partenariats stratégiques</h2>
-              <p>
+              <h3 className="font-bold text-xl text-gray-900">Partenariats stratégiques</h3>
+              <p className="text-gray-600 leading-relaxed">
                 Connectez-vous avec des organisations partageant les mêmes valeurs et construisez des collaborations solides pour un impact plus grand.
               </p>
             </div>
           </div>
-          
         </div>
       </div>
     </section>
-  )
+  );
 }

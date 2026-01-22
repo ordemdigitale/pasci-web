@@ -128,34 +128,28 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex gap-2">
-              <button className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
-                <div className="bg-[#E05017]/10 p-2 rounded-full text-[#E05017]">
-                  <Share2 className="w-5 h-5" />
-                </div>
-                <span className="text-[10px] font-bold text-gray-500 uppercase">Partager</span>
-              </button>
+          <div className="mt-8 pt-8 border-t border-gray-100 flex flex-wrap items-center justify-center gap-2">
+            <button className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
+              <div className="bg-[#E05017]/10 p-2 rounded-full text-[#E05017]">
+                <Share2 className="w-5 h-5" />
+              </div>
+              <span className="text-[10px] font-bold text-gray-500 uppercase">Partager</span>
+            </button>
 
-              <button className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
-                <div className="bg-[#E05017]/10 p-2 rounded-full text-[#E05017]">
-                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                  </svg>
-                </div>
-                <span className="text-[10px] font-bold text-gray-500 uppercase">LinkedIn</span>
-              </button>
+            <button className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
+              <div className="bg-[#E05017]/10 p-2 rounded-full text-[#E05017]">
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                </svg>
+              </div>
+              <span className="text-[10px] font-bold text-gray-500 uppercase">LinkedIn</span>
+            </button>
 
-              <button className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
-                <div className="bg-[#E05017]/10 p-2 rounded-full text-[#E05017]">
-                  <LinkIcon className="w-5 h-5" />
-                </div>
-                <span className="text-[10px] font-bold text-gray-500 uppercase">Lien</span>
-              </button>
-            </div>
-
-            <button className="bg-[#E05017] text-white h-12 px-10 rounded-xl font-extrabold text-sm shadow-lg shadow-[#E05017]/30 hover:scale-[1.02] active:scale-[0.98] transition-all">
-              POSTULER MAINTENANT
+            <button className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
+              <div className="bg-[#E05017]/10 p-2 rounded-full text-[#E05017]">
+                <LinkIcon className="w-5 h-5" />
+              </div>
+              <span className="text-[10px] font-bold text-gray-500 uppercase">Lien</span>
             </button>
           </div>
         </div>
@@ -309,16 +303,13 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
 
           {/* Final CTA */}
           <section className="bg-[#E05017]/5 rounded-2xl p-8 md:p-12 text-center border border-[#E05017]/10">
-            <h3 className="text-2xl font-extrabold mb-4">Prêt à rejoindre l'aventure PASCI ?</h3>
+            <h3 className="text-2xl font-extrabold mb-4">Découvrez d'autres opportunités</h3>
             <p className="text-gray-600 mb-8 max-w-lg mx-auto leading-relaxed">
-              Rejoignez une équipe dynamique et contribuez à des projets qui ont un réel impact social et environnemental en Afrique de l'Ouest.
+              Explorez notre plateforme pour découvrir plus d'offres d'emploi et d'opportunités de collaboration au sein de l'écosystème PASCI.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-[#E05017] text-white h-14 px-12 rounded-xl font-extrabold shadow-xl shadow-[#E05017]/30 hover:-translate-y-1 transition-all">
-                Postuler Directement
-              </button>
+            <div className="flex justify-center">
               <Link href="/espace-collaboratif/offres-emploi">
-                <button className="bg-white border border-[#E05017] text-[#E05017] h-14 px-10 rounded-xl font-extrabold hover:bg-[#E05017]/5 transition-all">
+                <button className="bg-[#E05017] text-white h-14 px-12 rounded-xl font-extrabold shadow-xl shadow-[#E05017]/30 hover:-translate-y-1 transition-all">
                   Consulter d'autres offres
                 </button>
               </Link>
