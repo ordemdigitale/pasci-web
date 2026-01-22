@@ -1,13 +1,88 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button'
 import { ImageWithFallback } from '@/lib/imageWithFallback'
 import { IPTF } from '@/types/api.types';
 import Link from 'next/link';
 
+// Mock data de fallback
+const mockPTFData: IPTF[] = [
+  {
+    id: "1",
+    name: "Banque Mondiale",
+    slug: "banque-mondiale",
+    description: "Institution financière internationale qui fournit des prêts et des dons aux gouvernements des pays en développement pour des projets de développement.",
+    thumbnail_url: "/images/partenaires/banque-mondiale.png",
+    logo_url: "/images/partenaires/banque-mondiale.png"
+  },
+  {
+    id: "2",
+    name: "Union Européenne",
+    slug: "union-europeenne",
+    description: "Principal partenaire de développement de la Côte d'Ivoire, soutenant la gouvernance, l'éducation et le développement économique.",
+    thumbnail_url: "/images/partenaires/union-europeenne.png",
+    logo_url: "/images/partenaires/union-europeenne.png"
+  },
+  {
+    id: "3",
+    name: "UNICEF",
+    slug: "unicef",
+    description: "Fonds des Nations Unies pour l'enfance, œuvrant pour la protection des droits des enfants et l'amélioration de leurs conditions de vie.",
+    thumbnail_url: "/images/partenaires/unicef.png",
+    logo_url: "/images/partenaires/unicef.png"
+  },
+  {
+    id: "4",
+    name: "USAID",
+    slug: "usaid",
+    description: "Agence des États-Unis pour le développement international, promouvant la croissance économique, la santé et la démocratie.",
+    thumbnail_url: "/images/partenaires/usaid.png",
+    logo_url: "/images/partenaires/usaid.png"
+  },
+  {
+    id: "5",
+    name: "AFD",
+    slug: "afd",
+    description: "Agence Française de Développement, accompagnant les projets de développement durable et de lutte contre la pauvreté.",
+    thumbnail_url: "/images/partenaires/afd.png",
+    logo_url: "/images/partenaires/afd.png"
+  },
+  {
+    id: "6",
+    name: "GIZ",
+    slug: "giz",
+    description: "Coopération allemande pour le développement, soutenant les projets de formation professionnelle et de gouvernance.",
+    thumbnail_url: "/images/partenaires/giz.png",
+    logo_url: "/images/partenaires/giz.png"
+  },
+  {
+    id: "7",
+    name: "KOICA",
+    slug: "koica",
+    description: "Agence coréenne de coopération internationale, investissant dans l'éducation, la santé et les infrastructures.",
+    thumbnail_url: "/images/partenaires/koica.png",
+    logo_url: "/images/partenaires/koica.png"
+  },
+  {
+    id: "8",
+    name: "PNUD",
+    slug: "pnud",
+    description: "Programme des Nations Unies pour le développement, appuyant la gouvernance démocratique et le développement durable.",
+    thumbnail_url: "/images/partenaires/pnud.png",
+    logo_url: "/images/partenaires/pnud.png"
+  },
+  {
+    id: "9",
+    name: "JICA",
+    slug: "jica",
+    description: "Agence japonaise de coopération internationale, soutenant le développement des infrastructures et le renforcement des capacités.",
+    thumbnail_url: "/images/partenaires/jica.png",
+    logo_url: "/images/partenaires/jica.png"
+  }
+];
+
 export default function PageAnnuairePTF() {
-  const [ptfData, setPtfData] = useState<IPTF[] | null>([]);
+  const [ptfData, setPtfData] = useState<IPTF[]>(mockPTFData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,9 +94,13 @@ export default function PageAnnuairePTF() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        setPtfData(result);
+        if (result && result.length > 0) {
+          setPtfData(result);
+        }
       } catch (error: any) {
+        console.log("Erreur lors du chargement des PTF:", error);
         setError(error.message || "Impossible de charger les PTF.");
+        // On garde les données mock en cas d'erreur
       } finally {
         setLoading(false);
       }
@@ -32,84 +111,113 @@ export default function PageAnnuairePTF() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto font-poppins bg-slate-50 min-h-screen p-8">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-64 mb-6"></div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200">
-            <div className="h-10 bg-gray-200 rounded mb-4"></div>
-            <div className="h-32 bg-gray-200 rounded mb-6"></div>
-            <div className="flex gap-4">
-              <div className="h-10 bg-gray-200 rounded w-32"></div>
-              <div className="h-10 bg-gray-200 rounded w-32"></div>
-            </div>
-          </div>
+      <div className="min-h-screen flex items-center justify-center font-poppins">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#2a591d] mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement...</p>
         </div>
-      </div>
-    );
-  }
-
-  if (error || !ptfData) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center text-red-600">
-        {error || "PTF non trouvé."}
       </div>
     );
   }
 
   return (
-    <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-[#2a591d] font-bold text-4xl text-center mx-auto w-180 pb-[50px]">Annuaire des Partenaires Techniques et Financiers (PTF)</p>
+    <section className="py-12 bg-white font-poppins">
+
+      {/* Hero Section - Titre principal */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <h1 className="text-[#2a591d] font-extrabold text-4xl md:text-5xl text-center">
+          Annuaire des Partenaires Techniques<br />et Financiers (PTF)
+        </h1>
       </div>
-      <div className="max-w-5xl mx-auto sm:px-6 lg:px-8 p-8 mb-10 grid lg:grid-cols-2 gap-12">
-        {/* Left content */}
-        <div className="">
-          <h2 className="text-[#E05017] font-bold text-4xl">Ensemble, nous pouvons renforcer l&apos;impact</h2>
-          <p className="text-gray-600 text-md max-w-xl mt-6">
-            Notre communauté open source est dédiée à la promotion de l'innovation et à la collaboration à travers des projets transformateurs. Nous croyons au pouvoir du partage des connaissances et des ressources pour résoudre des défis complexes.
-          </p>
-          <p className='font-bold text-2xl mt-6'>Notre Mission</p>
-          <p className="text-gray-600 text-md max-w-xl mt-2">
-            Nous nous engageons à créer des solutions durables et accessibles qui ont un impact positif sur le monde. En favorisant un environnement inclusif, nous permettons aux développeurs et aux contributeurs de tous horizons de s'épanouir, en créant des outils et des technologies qui façonnent un avenir meilleur pour tous.
-          </p>
-        </div>
-        
-        {/* Right content */}
-        <div className="space-y-12">
-          <div className="">
-            <ImageWithFallback
-              src="/images/page-annuaire-ptf/5b35a95d-42c6-4b6b-8747-0ad82731174d.jpg"
-              alt="image"
-              className="w-full h-[300px] object-cover rounded-lg"
-            />
+
+      {/* Section Introduction avec image */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
+
+          {/* Left content - Text */}
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-[#E05017] font-bold text-3xl md:text-4xl mb-6">
+                Ensemble, nous pouvons renforcer l'impact
+              </h2>
+              <p className="text-gray-600 text-base leading-relaxed">
+                Notre communauté open source est dédiée à la promotion de l'innovation et à la collaboration à travers des projets transformateurs. Nous croyons au pouvoir du partage des connaissances et des ressources pour résoudre des défis complexes.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-bold text-2xl text-gray-900 mb-4">Notre Mission</h3>
+              <p className="text-gray-600 text-base leading-relaxed">
+                Nous nous engageons à créer des solutions durables et accessibles qui ont un impact positif sur le monde. En favorisant un environnement inclusif, nous permettons aux développeurs et aux contributeurs de tous horizons de s'épanouir, en créant des outils et des technologies qui façonnent un avenir meilleur pour tous.
+              </p>
+            </div>
+          </div>
+
+          {/* Right content - Image */}
+          <div className="lg:pl-8">
+            <div className="rounded-2xl overflow-hidden shadow-xl">
+              <ImageWithFallback
+                src="/images/page-annuaire-ptf/5b35a95d-42c6-4b6b-8747-0ad82731174d.jpg"
+                alt="Collaboration et partenariat"
+                className="w-full h-[400px] object-cover"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Activity Cards Section */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+      {/* Section PTF Cards - 3 colonnes comme dans l'image */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
+            <p className="text-yellow-800 text-sm">
+              ⚠️ Impossible de charger les PTF depuis le serveur. Affichage des données de démonstration.
+            </p>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {ptfData.map((ptf) => (
-            <div key={ptf.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div className="aspect-[4/3] overflow-hidden">
-                <ImageWithFallback
-                  src={ptf.thumbnail_url}
-                  alt={ptf.name}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                />
+            <Link
+              key={ptf.id}
+              href={`/annuaire/annuaire-des-partenaires-techniques-et-financiers/${ptf.slug}`}
+              className="group"
+            >
+              <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden hover:shadow-2xl hover:border-[#2a591d]/30 transition-all duration-300">
+
+                {/* Logo/Image container - Taille carrée pour les logos */}
+                <div className="aspect-square bg-gray-50 flex items-center justify-center p-8 border-b-2 border-gray-200 group-hover:bg-gray-100 transition-colors">
+                  <ImageWithFallback
+                    src={ptf.logo_url || ptf.thumbnail_url}
+                    alt={ptf.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="p-6 text-center">
+                  <h3 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-[#2a591d] transition-colors">
+                    {ptf.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {ptf.description}
+                  </p>
+                </div>
               </div>
-              <div className="p-6">
-                <Link href={`/annuaire/annuaire-des-partenaires-techniques-et-financiers/${ptf.slug}`}>
-                  <h3 className="mb-3 text-center font-bold hover:underline">{ptf.name}</h3>
-                </Link>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {ptf.description}
-                </p>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
+
+        {/* Empty state si pas de PTF */}
+        {ptfData.length === 0 && (
+          <div className="text-center py-16">
+            <p className="text-gray-500 text-lg">Aucun partenaire disponible pour le moment.</p>
+          </div>
+        )}
       </div>
+
     </section>
-  )
+  );
 }
