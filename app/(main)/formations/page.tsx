@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Search, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 import { ImageWithFallback } from "@/lib/imageWithFallback"
@@ -13,6 +14,7 @@ interface Program {
   description: string;
   duration?: string;
   type: 'formation' | 'tutorial' | 'webinar' | 'interview' | 'podcast' | 'conference' | 'meditation';
+  slug: string;
 }
 
 const programs: Program[] = [
@@ -22,7 +24,8 @@ const programs: Program[] = [
     title: 'Notions essentielles de comptabilité financière',
     description: 'Découvrez les principes fondamentaux et les méthodologies Agile pour optimiser la gestion de vos projets et améliorer la collaboration en équipe.',
     duration: '6 semaines',
-    type: 'formation'
+    type: 'formation',
+    slug: 'comptabilite-financiere'
   },
   {
     id: 2,
@@ -30,7 +33,8 @@ const programs: Program[] = [
     title: 'Pilotage efficace des ressources humaines',
     description: 'Au-delà des aspects administratifs, les ressources humaines jouent un rôle stratégique dans la performance et la pérennité des organisations.',
     duration: '4 semaines',
-    type: 'formation'
+    type: 'formation',
+    slug: 'ressources-humaines'
   },
   {
     id: 3,
@@ -38,7 +42,8 @@ const programs: Program[] = [
     title: 'Gestion juridique et administrative',
     description: 'Au-delà de la conformité, cette fonction joue un rôle clé dans la structuration et la pérennité des organisations. Elle facilite la prise de décision.',
     duration: '5 semaines',
-    type: 'formation'
+    type: 'formation',
+    slug: 'gestion-juridique'
   },
   {
     id: 4,
@@ -46,7 +51,8 @@ const programs: Program[] = [
     title: 'Tutoriel Vidéo: Créer un Portfolio Professionnel',
     description: 'Suivez ce tutoriel détaillé pour construire votre portfolio professionnel en ligne et présenter efficacement vos compétences.',
     duration: '45 min',
-    type: 'tutorial'
+    type: 'tutorial',
+    slug: 'portfolio-professionnel'
   },
   {
     id: 5,
@@ -54,7 +60,8 @@ const programs: Program[] = [
     title: 'Webinaire: Les Tendances IA en 2024',
     description: "Explorez les dernières avancées et les prévisions pour l'intelligence artificielle en 2024, avec des experts du domaine.",
     duration: '1h 30min',
-    type: 'webinar'
+    type: 'webinar',
+    slug: 'tendances-ia-2024'
   },
   {
     id: 6,
@@ -62,7 +69,8 @@ const programs: Program[] = [
     title: 'Interview: Le Futur du Travail à Distance',
     description: "Écoutez des leaders d'opinion discuter des défis et des opportunités du travail à distance dans le monde post-pandémique.",
     duration: '30 min',
-    type: 'interview'
+    type: 'interview',
+    slug: 'travail-a-distance'
   },
   {
     id: 7,
@@ -70,7 +78,8 @@ const programs: Program[] = [
     title: 'Podcast: Gérer le Stress au Travail',
     description: 'Des techniques et des conseils pratiques pour identifier, prévenir et gérer le stress en milieu professionnel.',
     duration: '25 min',
-    type: 'podcast'
+    type: 'podcast',
+    slug: 'gerer-stress-travail'
   },
   {
     id: 8,
@@ -78,7 +87,8 @@ const programs: Program[] = [
     title: 'Conférence Audio: Leadership et Motivation',
     description: "Écoutez une conférence inspirante sur les qualités d'un bon leader et les stratégies pour motiver son équipe.",
     duration: '1h',
-    type: 'conference'
+    type: 'conference',
+    slug: 'leadership-motivation'
   },
   {
     id: 9,
@@ -86,7 +96,8 @@ const programs: Program[] = [
     title: 'Méditation Guidée pour la Concentration',
     description: "Une séance de méditation guidée pour améliorer votre concentration et votre clarté mentale.",
     duration: '15 min',
-    type: 'meditation'
+    type: 'meditation',
+    slug: 'meditation-concentration'
   }
 ];
 
@@ -102,10 +113,10 @@ const sidebarItems = [
 export default function FormationsPage() {
   const [activeCategory, setActiveCategory] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  const [visiblePrograms, setVisiblePrograms] = useState(6);
+  const [visiblePrograms, setVisiblePrograms] = useState(5);
 
   const loadMorePrograms = () => {
-    setVisiblePrograms(prev => Math.min(prev + 3, programs.length));
+    setVisiblePrograms(prev => Math.min(prev + 5, programs.length));
   };
 
   return (
@@ -193,13 +204,15 @@ export default function FormationsPage() {
                       <p className="text-gray-600 text-sm mb-4 line-clamp-3">
                         {program.description}
                       </p>
-                      
-                      <button
-                        className="px-4 py-2 text-white rounded-full text-sm"
-                        style={{ backgroundColor: '#E05107' }}
-                      >
-                        Voir plus
-                      </button>
+
+                      <Link href={`/formations/${program.slug}`}>
+                        <button
+                          className="px-4 py-2 text-white rounded-full text-sm hover:bg-[#c44315] transition-colors"
+                          style={{ backgroundColor: '#E05107' }}
+                        >
+                          Voir plus
+                        </button>
+                      </Link>
                     </div>
                   </div>
                 ))}

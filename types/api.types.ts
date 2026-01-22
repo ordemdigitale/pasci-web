@@ -52,6 +52,9 @@ export interface INews {
   title: string;
   slug: string;
   content?: string;
+  thumbnail_url?: string;
+  created_at?: string;
+  tags?: string[];
   crasc?: ICrasc;
   osc?: IOsc
 }

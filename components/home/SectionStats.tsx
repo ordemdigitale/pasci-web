@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Globe, MapPin, Users, Package, Landmark, LucideIcon } from "lucide-react";
+import { Globe, MapPin, Users, Package, Landmark, LucideIcon, TrendingUp } from "lucide-react";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Button } from "@/components/ui/button"
 import CustomBarChart from '../CustomBartChat';
@@ -12,6 +12,34 @@ const ICON_MAP: Record<string, LucideIcon> = {
   "crasc": Landmark,
   "régions": MapPin,
   "projets": Package,
+};
+
+// Couleurs spécifiques pour chaque indicateur
+const COLOR_MAP: Record<string, { bg: string; icon: string; border: string; gradient: string }> = {
+  "osc": {
+    bg: "bg-blue-50",
+    icon: "text-blue-600",
+    border: "border-blue-200",
+    gradient: "from-blue-500 to-blue-600"
+  },
+  "crasc": {
+    bg: "bg-[#E05017]/10",
+    icon: "text-[#E05017]",
+    border: "border-[#E05017]/30",
+    gradient: "from-[#E05017] to-[#d04010]"
+  },
+  "régions": {
+    bg: "bg-green-50",
+    icon: "text-green-600",
+    border: "border-green-200",
+    gradient: "from-green-500 to-green-600"
+  },
+  "projets": {
+    bg: "bg-purple-50",
+    icon: "text-purple-600",
+    border: "border-purple-200",
+    gradient: "from-purple-500 to-purple-600"
+  },
 };
 
 export default function Stats() {
@@ -73,38 +101,99 @@ export default function Stats() {
   // Define a list of colors for the bars
   const colors = ['#2F80F9', '#4CAE4F', '#E74C3C', '#FFB200', '#92BCFC'];
 
+  // Mock data de fallback si l'API ne répond pas
+  const mockStats: IKeyStats[] = [
+    { id: 1, name: "osc", number: 850 },
+    { id: 2, name: "crasc", number: 5 },
+    { id: 3, name: "régions", number: 33 },
+    { id: 4, name: "projets", number: 120 }
+  ];
+
+  // Utiliser les données de l'API si disponibles, sinon utiliser les données mock
+  const displayStats = keyStats && keyStats.length > 0 ? keyStats : mockStats;
+
   return (
-    <section className="py-10 bg-white font-poppins">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-12 bg-gradient-to-b from-gray-50 to-white font-poppins">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-gray-900 font-bold text-3xl">Chiffres clés</h2>
-          {/* <Button 
-            variant="outline" 
-            className="border border-[#E05017] text-[#E05017] hover:bg-[#E05017] hover:text-white rounded-lg px-6"
-          >
-            Voir plus
-          </Button> */}
+        <div className="text-center mb-12">
+          <h2 className="text-gray-900 font-extrabold text-4xl mb-3">Chiffres clés</h2>
+          <p className="text-gray-600 text-lg">Notre impact en quelques chiffres</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          {/* Stat card */}
-          {keyStats?.map((item) => {
-            const IconComponent = ICON_MAP[item.name] || MapPin;
-
-            return (
-              <div key={item.id} className="bg-white rounded-lg p-6 border border-gray-100 shadow-xl">
-                <div className="flex flex-col items-center justify-between gap-2">
-                  <div className="text-[#de3b40]">
-                    <IconComponent size={26} />
-                  </div>
-                  <p className="text-4xl font-bold">{item.number}</p>
-                  <p className="text-gray-600 text-md uppercase">{item.name}</p>
+        {/* Loading State */}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white rounded-2xl p-8 border border-gray-200 animate-pulse">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 bg-gray-200 rounded-2xl"></div>
+                  <div className="w-24 h-12 bg-gray-200 rounded"></div>
+                  <div className="w-20 h-4 bg-gray-200 rounded"></div>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
+
+        {/* Stats Cards */}
+        {!loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            {displayStats.map((item) => {
+              const IconComponent = ICON_MAP[item.name] || Package;
+              const colors = COLOR_MAP[item.name] || COLOR_MAP["projets"];
+
+              return (
+                <div
+                  key={item.id}
+                  className={`group relative bg-white rounded-2xl p-8 border-2 ${colors.border} hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden`}
+                >
+                  {/* Gradient background on hover */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+
+                  {/* Content */}
+                  <div className="relative z-10 flex flex-col items-center gap-4">
+                    {/* Icon container with background */}
+                    <div className={`${colors.bg} group-hover:bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300`}>
+                      <IconComponent
+                        className={`${colors.icon} group-hover:text-white transition-colors duration-300`}
+                        size={32}
+                        strokeWidth={2.5}
+                      />
+                    </div>
+
+                    {/* Number */}
+                    <p className="text-5xl font-extrabold text-gray-900 group-hover:text-white transition-colors duration-300 tracking-tight">
+                      {item.number}
+                    </p>
+
+                    {/* Label */}
+                    <p className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/90 transition-colors duration-300">
+                      {item.name}
+                    </p>
+
+                    {/* Decorative element */}
+                    <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-300"></div>
+                  </div>
+
+                  {/* Trend indicator (optionnel - peut être ajouté plus tard) */}
+                  {/* <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <TrendingUp className="text-white w-5 h-5" />
+                  </div> */}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <div className="text-center py-8">
+            <p className="text-gray-500 text-sm">
+              Les statistiques en temps réel ne sont pas disponibles. Affichage des données de référence.
+            </p>
+          </div>
+        )}
 
         {/* Top Row - 3 Cards */}
         {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"> */}

@@ -17,7 +17,7 @@ export default function SectionHero() {
   }
 
   return (
-    <section className="py-10 font-poppins">
+    <section className="py-8 font-poppins">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <p className="text-[#2a591d] font-bold text-4xl text-center pb-[50px]">Plateforme digitale des OSC membres du CRASC</p>
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
@@ -44,7 +44,6 @@ export default function SectionHero() {
               
               {/* Content */}
               <div className="px-6 pb-6 flex flex-col">
-                {/* <h3 className="text-gray-900 mb-3">Contexte</h3> */}
                 <p className="text-gray-600 text-sm mb-4">
                   Cette Plateforme digitale est la résultante d&apos;une démarche alliant à la fois, inclusivité, représentativité, accessibilité et pérennité. Multifonctionnelle et dynamique, elle vise à accroître la visibilité des OSC, la synergie d&apos;action, le partage d&apos;expérience et la professionnalisation.
                 </p>

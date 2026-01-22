@@ -21,48 +21,67 @@ interface IJobItem {
   type: string;
 }
 
-const jobOffers: IJobItem[] = [
+// Mock data de fallback
+const mockJobs: IJobs[] = [
   {
-    id: 1,
-    title: 'Développeur Full Stack Senior',
-    description: 'Rejoignez notre équipe dynamique pour concevoir et développer des applications web complexes. Vous serez responsable de l\'architecture et de l\'implémentation des solutions front-end et back-end, en utilisant les dernières technologies.',
-    location: 'Paris, France',
+    id: "1",
+    title: 'Chargé de Mission Innovation',
+    description: 'Rejoignez notre équipe dynamique pour piloter des initiatives stratégiques au sein de l\'espace collaboratif PASCI. Vous serez au cœur de l\'innovation sociale et environnementale en Afrique de l\'Ouest.',
+    location: 'Abidjan, Côte d\'Ivoire',
     type: 'CDI',
+    slug: 'charge-mission-innovation',
+    employer: 'PASCI Côte d\'Ivoire',
+    publication_date: new Date().toISOString()
   },
   {
-    id: 2,
-    title: 'Chef de Projet IT',
-    description: 'En tant que Chef de Projet IT, vous gérerez le cycle de vie complet de projets technologiques, de la planification à la livraison. Vous travaillerez en étroite collaboration avec les équipes techniques et les parties prenantes pour assurer le succès des projets.',
-    location: 'Lyon, France',
-    type: 'CDI',
-  },
-  {
-    id: 3,
-    title: 'Stagiaire en Marketing Digital',
-    description: 'Nous recherchons un stagiaire motivé pour nous aider à développer et à exécuter nos stratégies de marketing digital. Une opportunité unique d\'apprendre et de contribuer à des campagnes innovantes.',
-    location: 'Bordeaux, France',
-    type: 'Stage',
-  },
-  {
-    id: 4,
-    title: 'Analyste de Données Junior',
-    description: 'Contribuez à l\'analyse de grandes quantités de données pour identifier des tendances et des insights exploitables. Vous travaillerez avec des outils d\'analyse avancés et présenterez vos conclusions aux équipes opérationnelles.',
-    location: 'Toulouse, France',
+    id: "2",
+    title: 'Responsable Communication Digitale',
+    description: 'Nous recherchons un(e) Responsable Communication Digitale passionné(e) pour développer et animer notre présence en ligne. Vous serez en charge de la stratégie digitale et de l\'engagement de nos communautés.',
+    location: 'Dakar, Sénégal',
     type: 'CDD',
+    slug: 'responsable-communication-digitale',
+    employer: 'PASCI Sénégal',
+    publication_date: new Date(Date.now() - 86400000).toISOString()
   },
   {
-    id: 5,
-    title: 'Designer UX/UI',
-    description: 'Créez des expériences utilisateur intuitives et esthétiques pour nos produits numériques. Vous serez en charge de la recherche utilisateur, de la conception de wireframes, de prototypes et de l\'interface finale.',
-    location: 'Nantes, France',
+    id: "3",
+    title: 'Chef de Projet Développement Durable',
+    description: 'Pilotez des projets d\'envergure dans le domaine du développement durable et de la responsabilité sociétale. Vous coordonnerez des initiatives multi-partenaires et contribuerez à l\'impact positif de PASCI.',
+    location: 'Ouagadougou, Burkina Faso',
     type: 'CDI',
+    slug: 'chef-projet-developpement-durable',
+    employer: 'PASCI Burkina Faso',
+    publication_date: new Date(Date.now() - 172800000).toISOString()
   },
   {
-    id: 6,
-    title: 'Ingénieur DevOps',
-    description: 'Optimisez et maintenez nos infrastructures de déploiement et d\'intégration continue. Vous contribuerez à l\'automatisation des processus et à l\'amélioration de la fiabilité de nos systèmes.',
-    location: 'Lille, France',
+    id: "4",
+    title: 'Analyste de Données Impact',
+    description: 'Transformez les données en insights stratégiques pour mesurer et optimiser l\'impact de nos programmes. Vous développerez des outils d\'analyse et de reporting pour nos partenaires.',
+    location: 'Dakar, Sénégal',
     type: 'CDI',
+    slug: 'analyste-donnees-impact',
+    employer: 'PASCI Sénégal',
+    publication_date: new Date(Date.now() - 259200000).toISOString()
+  },
+  {
+    id: "5",
+    title: 'Coordonnateur RSE Senior',
+    description: 'Accompagnez les entreprises dans leur démarche RSE et favorisez les partenariats stratégiques. Vous serez l\'interface entre le secteur privé et les organisations de la société civile.',
+    location: 'Abidjan, Côte d\'Ivoire',
+    type: 'CDI',
+    slug: 'coordonnateur-rse-senior',
+    employer: 'PASCI Côte d\'Ivoire',
+    publication_date: new Date(Date.now() - 345600000).toISOString()
+  },
+  {
+    id: "6",
+    title: 'Assistant(e) de Direction',
+    description: 'Apportez votre soutien à l\'équipe de direction dans la gestion quotidienne et la coordination des activités de PASCI. Un rôle polyvalent au cœur de notre organisation.',
+    location: 'Lomé, Togo',
+    type: 'CDD',
+    slug: 'assistant-direction',
+    employer: 'PASCI Togo',
+    publication_date: new Date(Date.now() - 432000000).toISOString()
   },
 ];
 
@@ -77,7 +96,7 @@ const faqCategories = [
 
 export default function PageOffreEmploi() {
   const router = useRouter();
-  const [jobs, setJobs] = useState<IJobs[] | null>([]);
+  const [jobs, setJobs] = useState<IJobs[]>(mockJobs);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openFaqs, setOpenFaqs] = useState<number[]>([]);
@@ -86,25 +105,35 @@ export default function PageOffreEmploi() {
   const [selectedType, setSelectedType] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
 
-/*   const response = await fetch("http://localhost:8000/api/v1/jobs", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-  }); */
   useEffect(() => {
-    // Define an asynchronous function to fetch the data
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/jobs');
+        // Timeout de 3 secondes pour l'appel API
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+        const response = await fetch('http://localhost:8000/api/v1/jobs', {
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        setJobs(result);
+        if (result && result.length > 0) {
+          setJobs(result);
+          setError(null);
+        }
       } catch (error: any) {
-        setError(error.message || "Impossible de charger les offres d'emploi.");
+        console.log("Erreur lors du chargement des offres:", error);
+        if (error.name === 'AbortError') {
+          setError("Le serveur met trop de temps à répondre. Affichage des données de démonstration.");
+        } else {
+          setError("Impossible de charger les offres depuis le serveur. Affichage des données de démonstration.");
+        }
+        // On garde les données mock en cas d'erreur
       } finally {
         setLoading(false);
       }
@@ -172,6 +201,24 @@ export default function PageOffreEmploi() {
       <div className="flex justify-center items-center mb-2">
         <h2 className="text-gray-900 font-bold text-3xl">Nos Offres d'Emploi</h2>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="max-w-5xl mx-auto px-4 mb-6">
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-700">{error}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search bar + filters area*/}
       <div className="p-6 mb-6">
@@ -263,11 +310,10 @@ export default function PageOffreEmploi() {
                     <span className='inline-block px-3 py-1 rounded-full text-xs text-white bg-[#E05017]'>{job.type}</span>
                   </div>
                 </div>
-                <Link
-                  href={`/espace-collaboratif/offres-emploi/${job.slug}`}
-                  className="px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017]"
-                >
-                  Détails de l'offre
+                <Link href={`/espace-collaboratif/offres-emploi/${job.slug}`}>
+                  <button className="px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017] transition-all">
+                    Détails de l'offre
+                  </button>
                 </Link>
               </div>
             ))}
