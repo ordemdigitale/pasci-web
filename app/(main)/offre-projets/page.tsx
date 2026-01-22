@@ -60,9 +60,9 @@ export default function PageOffreProjet() {
     <section className="py-10 lg:pb-32 lg:pt-10 font-poppins bg-gray-50">
       {/* Hero Section */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <div className="bg-gradient-to-br from-[#2a591d] to-[#1f4416] rounded-2xl p-8 md:p-12 text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
+        <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 md:p-12 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#E05017]/20 rounded-full -mr-32 -mt-32"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#E05017]/20 rounded-full -ml-24 -mb-24"></div>
 
           <div className="relative z-10 grid lg:grid-cols-2 gap-8 items-center">
             <div>
@@ -182,7 +182,7 @@ export default function PageOffreProjet() {
                   {/* Content */}
                   <div className="p-5 flex flex-col flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs font-bold text-[#2a591d] bg-[#2a591d]/10 px-2 py-1 rounded">
+                      <span className="text-xs font-bold text-[#E05017] bg-[#E05017]/10 px-2 py-1 rounded">
                         {projet.domaine}
                       </span>
                     </div>

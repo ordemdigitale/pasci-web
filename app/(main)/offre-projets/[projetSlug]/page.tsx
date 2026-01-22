@@ -108,10 +108,10 @@ export default function PageDetailOffreProjet({
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center gap-3 mb-3">
-              <span className="bg-[#2a591d] text-white text-sm font-bold px-3 py-1 rounded-full">
+              <span className="bg-[#E05017] text-white text-sm font-bold px-3 py-1 rounded-full">
                 {projet.domaine}
               </span>
-              <span className="bg-[#E05017] text-white text-sm font-bold px-3 py-1 rounded-full">
+              <span className="bg-gray-900 text-white text-sm font-bold px-3 py-1 rounded-full">
                 {projet.statut}
               </span>
             </div>
@@ -154,7 +154,7 @@ export default function PageDetailOffreProjet({
           {/* Colonne principale */}
           <div className="lg:col-span-2 space-y-8">
             {/* Objectif */}
-            <section className="bg-gradient-to-br from-[#2a591d] to-[#1f4416] rounded-xl p-6 text-white">
+            <section className="bg-gradient-to-br from-[#E05017] to-[#c44315] rounded-xl p-6 text-white">
               <div className="flex items-center gap-3 mb-4">
                 <Target className="w-6 h-6" />
                 <h2 className="text-2xl font-bold">Objectif du projet</h2>
@@ -217,7 +217,7 @@ export default function PageDetailOffreProjet({
                 <ul className="space-y-3">
                   {projet.resultats_attendus.map((resultat, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-[#2a591d] mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="w-5 h-5 text-[#E05017] mt-0.5 flex-shrink-0" />
                       <span className="text-gray-700">{resultat}</span>
                     </li>
                   ))}
@@ -307,14 +307,14 @@ export default function PageDetailOffreProjet({
             </div>
 
             {/* Contact */}
-            <div className="bg-gradient-to-br from-[#2a591d] to-[#1f4416] rounded-xl p-6 text-white">
+            <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 text-white">
               <h3 className="text-xl font-bold mb-3">Intéressé par ce projet ?</h3>
               <p className="text-white/90 text-sm mb-4">
                 Contactez l'OSC porteuse pour plus d'informations ou pour explorer des opportunités de partenariat.
               </p>
               <Link
                 href={`/contact?projet=${projet.nom}&osc=${projet.osc}`}
-                className="block w-full text-center px-4 py-3 bg-white text-[#2a591d] rounded-lg hover:bg-gray-100 transition-colors font-bold"
+                className="block w-full text-center px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold"
               >
                 Contacter l'OSC
               </Link>
@@ -350,7 +350,7 @@ export default function PageDetailOffreProjet({
                       />
                     </div>
                     <div className="p-4">
-                      <span className="text-xs font-bold text-[#2a591d] bg-[#2a591d]/10 px-2 py-1 rounded">
+                      <span className="text-xs font-bold text-[#E05017] bg-[#E05017]/10 px-2 py-1 rounded">
                         {projetSimilaire.domaine}
                       </span>
                       <h3 className="font-bold text-base mt-2 mb-2 line-clamp-2 group-hover:text-[#E05017] transition-colors">
