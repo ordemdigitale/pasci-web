@@ -1,90 +1,31 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  LayoutDashboard, 
-  Map, 
-  FileText, 
-  GraduationCap, 
-  Calendar, 
-  Users, 
-  Settings, 
-  User, 
-  Menu, 
-  X,
-  Bell,
+import {
+  Map,
+  GraduationCap,
   BookOpen,
+  Users,
+  Building2,
+  FileText,
+  Briefcase,
+  TrendingUp,
+  Award,
+  Calendar,
+  ArrowUpRight,
+  ArrowDownRight,
+  Activity,
+  Newspaper,
+  FolderOpen,
 } from 'lucide-react';
 import { ICrasc, IJobs } from '@/types/api.types';
 
-interface NavItem {
-  icon: React.ReactNode;
-  label: string;
-  href?: string;
-  active?: boolean;
-  dropdown?: boolean;
-  submenus?: { label: string; href: string }[];
-}
-
 export default function Dashboard() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState("Tableau de bord");
-  const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
   const [crascData, setCrascData] = useState<ICrasc[] | null>(null);
   const [jobsData, setJobsData] = useState<IJobs[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const router = useRouter();
-
-  const navItems: NavItem[] = [
-    { icon: <LayoutDashboard size={20} />, label: "Tableau de bord", active: true, href: "/admin" },
-    { icon: <Users size={20} />, label: 'Utilisateurs', href: "/admin/utilisateurs" },
-    { icon: <Map size={20} />, label: 'Gestion des CRASC', href: "/admin/gestion-des-crasc" },
-    {
-      icon: <FileText size={20} />,
-      label: 'Organisations',
-      dropdown: true,
-      submenus: [
-        { label: 'PTF', href: '/admin/ptf' },
-        { label: 'OSC', href: '/admin/gestion-des-crasc/osc' },
-      ],
-    },
-    {
-      icon: <BookOpen size={20} />,
-      label: 'Contenu',
-      dropdown: true,
-      submenus: [
-        { label: 'Formations', href: '/admin/formations' },
-        { label: 'Offres de Projets', href: '/admin/projets' },
-        { label: "Offres d'emploi", href: '/admin/emplois' },
-        { label: 'Actualités', href: '/admin/actualites' },
-      ],
-    },
-    {
-      icon: <FileText size={20} />,
-      label: 'Ressources',
-      dropdown: true,
-      submenus: [
-        { label: 'Documentation', href: '/admin/ressources' },
-        { label: 'Fiches Informatives', href: '/ressources/fiches-informatives' },
-      ],
-    },
-    { icon: <Settings size={20} />, label: 'Paramètres', href: "/admin/parametres" },
-  ];
-
-  const stats = [
-    { label: 'Nombre de CRASC', value: '5', icon: <Map size={24} />, trend: '+12%' },
-    { label: "Nombre total d'OSC", value: '3176', icon: <GraduationCap size={24} />, trend: '+3' },
-    //{ label: 'CRASC Zones', value: '5', icon: <MapPin size={24} />, trend: 'Complete' },
-    { label: "Offres d'emploi postées", value: '7', icon: <BookOpen size={24} />, trend: '+24' },
-  ];
-
-  const recentActivities = [
-    { title: 'CRASC Nord mis à jour', time: '2 hours ago', type: 'program' },
-    { title: 'ONG Femmes Soutra crée', time: '5 hours ago', type: 'update' },
-  ];
 
   // fetch all crasc data
   useEffect(() => {
@@ -177,223 +118,261 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-cyan-50/50 font-poppins">
-      {/* Sidebar */}
-      <aside 
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
-      >
-        {/* Logo */}
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-          <div className="flex items-center gap-2">
-            <span className="text-4xl text-[#2a591d] font-extrabold font-karla">PASCI</span>
+    <div className="p-6">
+      {/* Welcome Section */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
+          Tableau de bord
+        </h1>
+        <p className="text-gray-600">
+          Bienvenue sur votre espace d'administration PASCI
+        </p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Stats CRASC */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-green-100 rounded-lg">
+              <Map className="w-6 h-6 text-[#2a591d]" />
+            </div>
+            <div className="flex items-center gap-1 text-green-600 text-sm font-semibold">
+              <ArrowUpRight className="w-4 h-4" />
+              +12%
+            </div>
           </div>
-          <button 
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
-          >
-            <X size={20} />
-          </button>
+          <p className="text-gray-600 text-sm mb-1">Nombre de CRASC</p>
+          <p className="text-3xl font-bold text-gray-900">{crascData?.length || 0}</p>
+          <Link href="/admin/gestion-des-crasc" className="text-[#2a591d] text-xs font-semibold mt-2 inline-block hover:underline">
+            Voir détails →
+          </Link>
         </div>
 
-        {/* Navigation */}
-        <nav className="p-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
-            const isDropdownOpen = openDropdowns.includes(item.label);
+        {/* Stats OSC */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-blue-100 rounded-lg">
+              <Building2 className="w-6 h-6 text-blue-600" />
+            </div>
+            <div className="flex items-center gap-1 text-green-600 text-sm font-semibold">
+              <ArrowUpRight className="w-4 h-4" />
+              +8%
+            </div>
+          </div>
+          <p className="text-gray-600 text-sm mb-1">Total OSC</p>
+          <p className="text-3xl font-bold text-gray-900">3,176</p>
+          <Link href="/admin/gestion-des-crasc/osc" className="text-[#2a591d] text-xs font-semibold mt-2 inline-block hover:underline">
+            Gérer les OSC →
+          </Link>
+        </div>
 
-            if (item.dropdown && item.submenus) {
-              return (
-                <div key={item.label}>
-                  <button
-                    onClick={() => {
-                      setOpenDropdowns(prev =>
-                        prev.includes(item.label)
-                          ? prev.filter(label => label !== item.label)
-                          : [...prev, item.label]
-                      );
-                    }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-                      activeItem === item.label
-                        ? 'bg-[#E05017]/10 text-[#E05017]'
-                        : 'text-gray-700 hover:bg-[#E05017]/10 hover:text-[#E05017]'
-                    }`}
-                  >
-                    {item.icon}
-                    <span className="text-sm font-medium">{item.label}</span>
-                    <svg className={`ml-auto transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6"/></svg>
-                  </button>
-                  {isDropdownOpen && (
-                    <div className="ml-4 mt-1 space-y-1">
-                      {item.submenus.map((submenu) => (
-                        <Link
-                          key={submenu.label}
-                          href={submenu.href}
-                          className="block px-4 py-2 text-sm text-gray-600 hover:text-[#E05017] hover:bg-[#E05017]/5 rounded-lg cursor-pointer transition-colors"
-                          onClick={() => {
-                            setActiveItem(submenu.label);
-                            setSidebarOpen(false);
-                          }}
-                        >
-                          {submenu.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            }
-            return (
-              <Link
-                key={item.label}
-                href={item.href || "/admin"}
-                onClick={() => {
-                  setActiveItem(item.label);
-                  setSidebarOpen(false);
-                }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-                  activeItem === item.label
-                    ? 'bg-[#E05017]/10 text-[#E05017]'
-                    : 'text-gray-700 hover:bg-[#E05017]/10 hover:text-[#E05017]'
-                }`}
-              >
-                {item.icon}
-                <span className="text-sm font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </aside>
+        {/* Stats Emplois */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-purple-100 rounded-lg">
+              <Briefcase className="w-6 h-6 text-purple-600" />
+            </div>
+            <div className="flex items-center gap-1 text-green-600 text-sm font-semibold">
+              <ArrowUpRight className="w-4 h-4" />
+              +15%
+            </div>
+          </div>
+          <p className="text-gray-600 text-sm mb-1">Offres d'emploi</p>
+          <p className="text-3xl font-bold text-gray-900">{jobsData?.length || 0}</p>
+          <Link href="/admin/emplois" className="text-[#2a591d] text-xs font-semibold mt-2 inline-block hover:underline">
+            Gérer les offres →
+          </Link>
+        </div>
 
-      {/* Overlay for mobile */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+        {/* Stats Utilisateurs */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-orange-100 rounded-lg">
+              <Users className="w-6 h-6 text-orange-600" />
+            </div>
+            <div className="flex items-center gap-1 text-green-600 text-sm font-semibold">
+              <ArrowUpRight className="w-4 h-4" />
+              +5%
+            </div>
+          </div>
+          <p className="text-gray-600 text-sm mb-1">Utilisateurs actifs</p>
+          <p className="text-3xl font-bold text-gray-900">1,245</p>
+          <Link href="/admin/utilisateurs" className="text-[#2a591d] text-xs font-semibold mt-2 inline-block hover:underline">
+            Gérer les utilisateurs →
+          </Link>
+        </div>
+      </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Bar */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+      {/* CRASC Overview Section */}
+      <div className="mb-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-900">Aperçu des CRASC</h2>
+          <Link
+            href="/admin/gestion-des-crasc"
+            className="text-[#2a591d] text-sm font-semibold hover:underline flex items-center gap-1"
           >
-            <Menu size={24} />
-          </button>
+            Voir tous
+            <ArrowUpRight className="w-4 h-4" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          {crascData && crascData.map((crasc) => (
+            <div
+              key={crasc.id}
+              className="p-4 bg-gradient-to-br from-green-50 to-white border border-gray-200 rounded-lg hover:border-[#2a591d] hover:shadow-md cursor-pointer transition-all group"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-2 bg-green-100 rounded-lg group-hover:bg-[#2a591d] transition-colors">
+                  <Map className="w-4 h-4 text-[#2a591d] group-hover:text-white transition-colors" />
+                </div>
+              </div>
+              <p className="text-gray-900 font-semibold text-sm mb-2">{crasc.name}</p>
+              <div className="flex items-center justify-between">
+                <p className="text-gray-600 text-xs">OSC</p>
+                <p className="text-[#2a591d] font-bold text-lg">{crasc.osc_count}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-          <h1 className="font-semibold text-xl text-gray-800">Tableau de bord</h1>
-
-          <div className="flex items-center gap-4">
-            <Link href="/" className="hover:underline text-sm">Visiter le site</Link>
-            <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
-              <Bell size={20} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-[#2a591d] rounded-full"></span>
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Activités récentes */}
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-[#2a591d]" />
+              Activités récentes
+            </h2>
+            <button className="text-[#2a591d] text-sm font-semibold hover:underline">
+              Voir tout
             </button>
-            <div className="w-8 h-8 bg-[#2a591d] rounded-full flex items-center justify-center text-white">
-              <User size={16} />
-            </div>
           </div>
-        </header>
-
-        {/* Dashboard Content */}
-        <main className="flex-1 overflow-y-auto p-6">
-          {/* Welcome Section */}
-{/*           <div className="mb-8">
-            <h2 className="text-gray-800 mb-2">Welcome back!</h2>
-            <p className="text-gray-600">Here's what's happening with your CRASC community today.</p>
-          </div> */}
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Stats crasc */}
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-green-100 rounded-lg text-[#2a591d]">
-                  <Map size={24} />
+          <div className="space-y-4">
+            <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Building2 className="w-4 h-4 text-[#2a591d]" />
+              </div>
+              <div className="flex-1">
+                <p className="text-gray-900 font-medium">Nouvelle OSC enregistrée</p>
+                <p className="text-gray-600 text-sm">Association pour le Développement Rural a été ajoutée</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Calendar className="w-3 h-3 text-gray-400" />
+                  <p className="text-gray-400 text-xs">Il y a 2 heures</p>
                 </div>
               </div>
-              <p className="text-gray-600 text-sm mb-1">Nombre de CRASC</p>
-              <p className="text-2xl text-gray-800">{crascData?.length}</p>
             </div>
-            {/* Stats nombre osc */}
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-green-100 rounded-lg text-[#2a591d]">
-                  <BookOpen size={24} />
-                </div>
-              </div>
-              <p className="text-gray-600 text-sm mb-1">Nombre total d'OSC</p>
-              <p className="text-2xl text-gray-800">3176</p>
-            </div>
-            {/* Stats emploi */}
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-green-100 rounded-lg text-[#2a591d]">
-                  <GraduationCap size={24} />
-                </div>
-              </div>
-              <p className="text-gray-600 text-sm mb-1">Offres d'emploi postées</p>
-              <p className="text-2xl text-gray-800">{jobsData?.length}</p>
-            </div>
-          </div>
 
-          {/* Additional Section */}
-          <div className="my-6 bg-white rounded-lg p-6 border border-gray-200">
-            <h3 className="text-gray-800 mb-4">Aperçu des CRASC</h3>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {crascData && crascData.map((crasc) => (
-                <div key={crasc.id} className="p-4 border border-gray-200 rounded-lg hover:border-[#2a591d] cursor-pointer transition-colors">
-                  <div className="flex items-center gap-2 mb-2">
-                    <p className="text-gray-800">{crasc.name}</p>
-                  </div>
-                  <p className="text-gray-600 text-sm">Nombre d&apos;OSC: {crasc.osc_count}</p>
+            <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Briefcase className="w-4 h-4 text-purple-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-gray-900 font-medium">Offre d'emploi publiée</p>
+                <p className="text-gray-600 text-sm">Coordinateur de projet - Save The Children</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Calendar className="w-3 h-3 text-gray-400" />
+                  <p className="text-gray-400 text-xs">Il y a 3 heures</p>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Two Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Activités récentes */}
-            <div className="lg:col-span-2 bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="text-gray-800 mb-4">Activités récentes</h3>
-              <div className="space-y-4">
-                {/* {recentActivities.map((activity, index) => (
-                  <div key={index} className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0">
-                    <div className="w-2 h-2 bg-[#2a591d] rounded-full mt-2"></div>
-                    <div className="flex-1">
-                      <p className="text-gray-800">{activity.title}</p>
-                      <p className="text-gray-500 text-sm">par administrateur</p>
-                    </div>
-                  </div>
-                ))} */}
               </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="text-gray-800 mb-4">Actions rapides</h3>
-              <div className="flex flex-col space-y-3 items-center text-center">
-                <Link href="/admin/gestion-des-crasc/osc/ajouter-osc" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
-                  Ajouter une OSC
-                </Link>
-                <Link href="/admin/gestion-des-crasc/articles/ajouter-article" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
-                  Poster une actualité
-                </Link>
-                <Link href="/admin/espace-collaboratif/offres-emploi/ajouter" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
-                  Poster une offre d'emploi
-                </Link>
-                {/* <Link href="" className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
-                  Dolor sit amet
-                </Link> */}
+            <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Newspaper className="w-4 h-4 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-gray-900 font-medium">Actualité publiée</p>
+                <p className="text-gray-600 text-sm">Lancement du nouveau programme de formation CRASC 2026</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Calendar className="w-3 h-3 text-gray-400" />
+                  <p className="text-gray-400 text-xs">Il y a 5 heures</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Users className="w-4 h-4 text-orange-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-gray-900 font-medium">Nouvel utilisateur</p>
+                <p className="text-gray-600 text-sm">Jean-Baptiste KOFFI a créé un compte</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Calendar className="w-3 h-3 text-gray-400" />
+                  <p className="text-gray-400 text-xs">Il y a 1 jour</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <FolderOpen className="w-4 h-4 text-[#2a591d]" />
+              </div>
+              <div className="flex-1">
+                <p className="text-gray-900 font-medium">Ressource ajoutée</p>
+                <p className="text-gray-600 text-sm">Guide de rédaction de propositions de projets (PDF)</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Calendar className="w-3 h-3 text-gray-400" />
+                  <p className="text-gray-400 text-xs">Il y a 2 jours</p>
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
-        </main>
+        {/* Quick Actions */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Actions rapides</h2>
+          <div className="flex flex-col space-y-3">
+            <Link
+              href="/admin/gestion-des-crasc/osc/ajouter-osc"
+              className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-50 to-green-100 text-[#2a591d] rounded-lg hover:from-[#2a591d] hover:to-green-700 hover:text-white transition-all group"
+            >
+              <Building2 className="w-5 h-5" />
+              <span className="font-medium">Ajouter une OSC</span>
+              <ArrowUpRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
+
+            <Link
+              href="/admin/actualites"
+              className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 rounded-lg hover:from-blue-600 hover:to-blue-700 hover:text-white transition-all group"
+            >
+              <Newspaper className="w-5 h-5" />
+              <span className="font-medium">Poster une actualité</span>
+              <ArrowUpRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
+
+            <Link
+              href="/admin/emplois"
+              className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-purple-50 to-purple-100 text-purple-700 rounded-lg hover:from-purple-600 hover:to-purple-700 hover:text-white transition-all group"
+            >
+              <Briefcase className="w-5 h-5" />
+              <span className="font-medium">Poster une offre d'emploi</span>
+              <ArrowUpRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
+
+            <Link
+              href="/admin/ressources"
+              className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-orange-50 to-orange-100 text-orange-700 rounded-lg hover:from-orange-600 hover:to-orange-700 hover:text-white transition-all group"
+            >
+              <FolderOpen className="w-5 h-5" />
+              <span className="font-medium">Ajouter une ressource</span>
+              <ArrowUpRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
+
+            <Link
+              href="/admin/projets"
+              className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-teal-50 to-teal-100 text-teal-700 rounded-lg hover:from-teal-600 hover:to-teal-700 hover:text-white transition-all group"
+            >
+              <Award className="w-5 h-5" />
+              <span className="font-medium">Créer un projet</span>
+              <ArrowUpRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

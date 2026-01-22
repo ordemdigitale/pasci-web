@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Search, FileText, Users, Building, Briefcase, Calendar } from 'lucide-react';
@@ -81,7 +81,7 @@ const typeColors = {
   emploi: 'bg-orange-100 text-orange-800'
 };
 
-export default function RecherchePage() {
+function RechercheContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
 
@@ -308,5 +308,24 @@ export default function RecherchePage() {
 
       </div>
     </section>
+  );
+}
+
+export default function RecherchePage() {
+  return (
+    <Suspense fallback={
+      <section className="py-10 bg-gray-50 font-poppins min-h-screen">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-64 mb-4"></div>
+              <div className="h-12 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    }>
+      <RechercheContent />
+    </Suspense>
   );
 }

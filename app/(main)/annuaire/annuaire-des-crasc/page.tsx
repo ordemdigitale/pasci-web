@@ -43,19 +43,22 @@ const activityCards: IActivityCard[] = [
     id: 4,
     image: "/images/page-annuaire-crasc/asso-femme-soutra.jpg",
     title: "Association des Femmes Soutra",
-    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus"
+    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus",
+    slug: "association-femmes-soutra"
   },
   {
     id: 5,
     image: "/images/page-annuaire-crasc/5.jpg",
     title: "Nom de l'OSC",
-    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus"
+    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus",
+    slug: "osc-5"
   },
   {
     id: 6,
     image: "/images/page-annuaire-crasc/6.jpg",
     title: "Nom de l'OSC",
-    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus"
+    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus",
+    slug: "osc-6"
   }
 ];
 
@@ -64,19 +67,22 @@ const recentlyAdded: IActivityCard[] = [
     id: 1,
     image: "/images/page-annuaire-crasc/fefab.jpg",
     title: "Nom de l'OSC",
-    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus"
+    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus",
+    slug: "recent-osc-1"
   },
   {
     id: 2,
     image: "/images/page-annuaire-crasc/rec-add-2.jpg",
     title: "Nom de l'OSC",
-    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus"
+    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus",
+    slug: "recent-osc-2"
   },
   {
     id: 3,
     image: "/images/page-annuaire-crasc/rec-add-3.jpg",
     title: "Nom de l'OSC",
-    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus"
+    description: "Bacon description nes Vico. Salut adipiop unde vel qili temporis possimus lequatur adipon Salut ndo quisquam tempora possimus",
+    slug: "recent-osc-3"
   }
 ];
 

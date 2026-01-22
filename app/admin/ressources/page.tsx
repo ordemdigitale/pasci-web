@@ -28,7 +28,7 @@ const mockRessources = [
       "Guide complet pour aider les OSC à rédiger des propositions de projets convaincantes et bien structurées.",
     fichier: "guide-redaction-propositions.pdf",
     taille: "2.5 MB",
-    telechar gements: 456,
+    telechargements: 456,
     date_ajout: "2025-12-15",
     auteur: "Équipe Formation PASCI",
     tags: ["Guide", "Projets", "Rédaction"],
@@ -42,7 +42,7 @@ const mockRessources = [
       "Modèle standard pour la rédaction de rapports narratifs de projets à soumettre aux partenaires.",
     fichier: "modele-rapport-narratif.docx",
     taille: "156 KB",
-    telechar gements: 892,
+    telechargements: 892,
     date_ajout: "2025-11-20",
     auteur: "Service Monitoring",
     tags: ["Modèle", "Rapport", "Documentation"],
@@ -56,7 +56,7 @@ const mockRessources = [
       "Fiche détaillant les meilleures pratiques pour mobiliser les communautés dans les projets de développement.",
     fichier: "mobilisation-communautaire.pdf",
     taille: "1.8 MB",
-    telechar gements: 634,
+    telechargements: 634,
     date_ajout: "2025-10-10",
     auteur: "Experts PASCI",
     tags: ["Mobilisation", "Communauté", "Stratégie"],
@@ -70,7 +70,7 @@ const mockRessources = [
       "Checklist pratique pour le suivi et l'évaluation continue des activités de projet.",
     fichier: "checklist-suivi-projet.xlsx",
     taille: "89 KB",
-    telechar gements: 1203,
+    telechargements: 1203,
     date_ajout: "2025-09-25",
     auteur: "Service Monitoring",
     tags: ["Checklist", "Suivi", "Évaluation"],
@@ -84,7 +84,7 @@ const mockRessources = [
       "Manuel complet sur la gestion financière adaptée aux besoins spécifiques des organisations de la société civile.",
     fichier: "manuel-gestion-financiere.pdf",
     taille: "5.2 MB",
-    telechar gements: 2341,
+    telechargements: 2341,
     date_ajout: "2025-08-15",
     auteur: "Direction Financière PASCI",
     tags: ["Finance", "Manuel", "Gestion"],
@@ -132,12 +132,12 @@ export default function RessourcesPage() {
   };
 
   const totalTelechargements = ressources.reduce(
-    (sum, r) => sum + r.telechar gements,
+    (sum, r) => sum + r.telechargements,
     0
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 font-poppins p-8">
+    <div className="p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -309,7 +309,7 @@ export default function RessourcesPage() {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Download className="w-4 h-4 text-gray-400" />
-                    <span>{ressource.telechar gements} téléchargements</span>
+                    <span>{ressource.telechargements} téléchargements</span>
                   </div>
                 </div>
 
@@ -395,7 +395,7 @@ export default function RessourcesPage() {
                   <div className="flex items-center justify-center gap-2">
                     <Download className="w-6 h-6 text-green-600" />
                     <span className="font-bold text-3xl text-green-600">
-                      {selectedRessource.telechar gements}
+                      {selectedRessource.telechargements}
                     </span>
                     <span className="text-gray-700">téléchargements</span>
                   </div>
