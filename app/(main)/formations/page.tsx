@@ -221,10 +221,10 @@ export default function FormationsPage() {
               {/* Load More Buttons */}
               <div className="flex flex-wrap gap-3 justify-end">
                 {visiblePrograms < programs.length && (
-                  <>
+                  <>{/* 
                     <button className="px-6 py-2 border border-[#E05107] text-[#E05107] rounded-lg transition-colors">
                       Sélectionner un thème
-                    </button>
+                    </button> */}
                     <button
                       onClick={loadMorePrograms}
                       className="px-6 py-2 border border-[#E05107] text-[#E05107] rounded-lg transition-colors"
@@ -243,9 +243,11 @@ export default function FormationsPage() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 bg-[#E05017] rounded-lg py-8 space-y-6 text-center text-white">
             <p className="font-bold text-4xl">Prêt à se faire accompagner ?</p>
             <p className="max-w-2xl mx-auto">Contactez-nous dès aujourd'hui pour discuter de vos besoins et découvrir comment nous pouvons vous aider à atteindre vos objectifs.</p>
-            <Button className="border border-transparent hover:border-white text-[#E05017] hover:text-white bg-white hover:bg-transparent rounded-lg px-6">
+            <Link
+              href="/contact"
+              className="border border-transparent hover:border-white text-[#E05017] hover:text-white bg-white hover:bg-transparent rounded-lg px-6 py-2">
               Prendre Contact
-            </Button>
+            </Link>
           </div>
         </div>
       </div>

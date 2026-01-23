@@ -1,6 +1,15 @@
 Modification à apporter au frontend
+- Navigation menu for mobile:
+  Ressources et Espace collaboratif partagent les mêmes sous menus.
+
+- Ressources/Fiche informative: reproduire le même effet sur les cartes que celui de Ressources/Documentation.
+
+- Retirer filtres sur les pages et remplacer par bar de recherche.
+
+- Pole de concertation: Forum de discussion.
+  - Le bouton rejoindre renvois sur la 2ième page du lien stictch: https://stitch.withgoogle.com/projects/16049106965170092425
+
 - Page accueil:
-  - Section stats: voir visily
   - Ajouter carousel de 3 images - à voir...
 
 - Page pole de concertation:

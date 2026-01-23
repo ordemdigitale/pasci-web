@@ -96,21 +96,21 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
       <main className="max-w-[840px] mx-auto px-6 py-12">
         {/* Job Header Card */}
         <div className="bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-8 mb-10 overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-4">
+          <div className="absolute -top-3 left-3 p-4">
             <span className="bg-[#E05017]/10 text-[#E05017] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-              {jobData.type} • Temps Plein
+              {jobData.type}
             </span>
           </div>
 
           <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
-            <div className="size-24 rounded-2xl bg-[#E05017] flex items-center justify-center text-white shrink-0 shadow-lg shadow-[#E05017]/20">
+            {/* <div className="size-24 rounded-2xl bg-[#E05017] flex items-center justify-center text-white shrink-0 shadow-lg shadow-[#E05017]/20">
               <Rocket className="w-10 h-10" />
-            </div>
+            </div> */}
 
             <div className="flex-1">
-              <p className="text-[#E05017] text-sm font-bold mb-1 uppercase tracking-widest">
+              {/* <p className="text-[#E05017] text-sm font-bold mb-1 uppercase tracking-widest">
                 {jobData.employer}
-              </p>
+              </p> */}
               <h1 className="text-3xl md:text-4xl font-extrabold leading-tight text-[#121714] mb-2">
                 {jobData.title}
               </h1>
@@ -128,7 +128,7 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-gray-100 flex flex-wrap items-center justify-center gap-2">
+          {/* <div className="mt-8 pt-8 border-t border-gray-100 flex flex-wrap items-center justify-center gap-2">
             <button className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
               <div className="bg-[#E05017]/10 p-2 rounded-full text-[#E05017]">
                 <Share2 className="w-5 h-5" />
@@ -151,7 +151,7 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
               </div>
               <span className="text-[10px] font-bold text-gray-500 uppercase">Lien</span>
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Content Sections */}
@@ -251,7 +251,7 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
           </section>
 
           {/* Benefits */}
-          <section>
+          {/* <section>
             <div className="flex items-center gap-3 mb-6">
               <div className="size-10 rounded-lg bg-[#E05017]/10 text-[#E05017] flex items-center justify-center">
                 <Gift className="w-5 h-5" />
@@ -299,7 +299,7 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
                 </div>
               </div>
             </div>
-          </section>
+          </section> */}
 
           {/* Final CTA */}
           <section className="bg-[#E05017]/5 rounded-2xl p-8 md:p-12 text-center border border-[#E05017]/10">
@@ -318,13 +318,13 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
         </div>
 
         {/* Similar Offers */}
-        <div className="mt-24">
+        {/* <div className="mt-24">
           <h3 className="text-xl font-extrabold mb-8 flex items-center gap-3">
             <Sparkles className="w-6 h-6 text-[#E05017]" />
             Offres similaires
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Similar Offer Card 1 */}
+            
             <Link href="/espace-collaboratif/offres-emploi/analyste-donnees">
               <div className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl transition-all border border-gray-100 cursor-pointer">
                 <div className="flex justify-between items-start mb-4">
@@ -344,7 +344,6 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
               </div>
             </Link>
 
-            {/* Similar Offer Card 2 */}
             <Link href="/espace-collaboratif/offres-emploi/coordonnateur-rse">
               <div className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl transition-all border border-gray-100 cursor-pointer">
                 <div className="flex justify-between items-start mb-4">
@@ -364,7 +363,7 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
               </div>
             </Link>
           </div>
-        </div>
+        </div> */}
       </main>
     </div>
   );
