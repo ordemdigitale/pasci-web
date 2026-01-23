@@ -253,15 +253,15 @@ export default function OSCDetailPage() {
             )}
 
             {/* Vision */}
-            {oscData.vision && (
+           {/*  {oscData.vision && (
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Vision</h2>
                 <p className="text-gray-700">{oscData.vision}</p>
               </div>
-            )}
+            )} */}
 
             {/* Objectifs */}
-            {oscData.objectifs && oscData.objectifs.length > 0 && (
+            {/* {oscData.objectifs && oscData.objectifs.length > 0 && (
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Objectifs</h2>
                 <ul className="space-y-3">
@@ -275,7 +275,7 @@ export default function OSCDetailPage() {
                   ))}
                 </ul>
               </div>
-            )}
+            )} */}
 
             {/* Réalisations */}
             {oscData.realisations && oscData.realisations.length > 0 && (
@@ -364,7 +364,7 @@ export default function OSCDetailPage() {
               </div>
 
               {/* Social Media Links */}
-              {(oscData.facebook || oscData.linkedin) && (
+              {/* {(oscData.facebook || oscData.linkedin) && (
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <p className="text-sm font-semibold text-gray-700 mb-3">Suivez-nous</p>
                   <div className="flex gap-3">
@@ -390,17 +390,17 @@ export default function OSCDetailPage() {
                     )}
                   </div>
                 </div>
-              )}
+              )} */}
 
               {/* Contact Button */}
-              <div className="mt-6">
+              {/* <div className="mt-6">
                 <Link
                   href={`/contact?osc=${oscData.name}`}
                   className="block w-full text-center px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-semibold"
                 >
                   Contacter l'OSC
                 </Link>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

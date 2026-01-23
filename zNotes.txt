@@ -43,6 +43,10 @@ Modification à apporter au frontend
 
 - Page ptfSlug: retirer le corps et remplacer par description
 
+- Page creation d'une OSC:
+  - Ajouter au formulaire:
+    - Date de creation, email, adresse
+
 Les régions de la CIV:
 Abidjan
 District Autonome de Yamoussoukro
