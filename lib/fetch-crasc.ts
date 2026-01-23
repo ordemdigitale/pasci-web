@@ -83,9 +83,9 @@ export async function fetchAllOsc(): Promise<IOsc[]> {
   return response.json();
 }
 
-// Fetch all News from API
+// Fetch all News from API - Now using dedicated /news endpoint
 export async function fetchAllNews(): Promise<INews[]> {
-  const response = await fetch("http://localhost:8000/api/v1/crasc/news?skip=0&limit=100", {
+  const response = await fetch("http://localhost:8000/api/v1/news?skip=0&limit=100", {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -98,21 +98,21 @@ export async function fetchAllNews(): Promise<INews[]> {
   return response.json();
 }
 
-// Fetch spotlight news: single (latest) news per crasc
+// Fetch spotlight news: single (latest) news per crasc - Updated to use /news/spotlight
 export async function fetchSpotlightNews(): Promise<SpotlightNews[]> {
   try {
-    const response = await fetch("http://localhost:8000/api/v1/crasc/news-spotlight-crasc", { 
+    const response = await fetch("http://localhost:8000/api/v1/news/spotlight", {
         next: { revalidate: 3600 }, // Revalidate every hour for SSG/ISR
         method: "GET",
         headers: {
           "Content-Type": "application/json"
         }
       });
-    
+
     if (!response.ok) {
       throw new Error("Échec du chargement des actualités à partir de l'API");
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error("Échec du chargement des actualités à partir de l'API: ", error);

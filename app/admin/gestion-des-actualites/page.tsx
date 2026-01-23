@@ -2,70 +2,82 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Edit, Trash2, Eye, Search } from 'lucide-react';
-
-interface IArticle {
-  id: number;
-  title: string;
-  slug: string;
-  excerpt: string;
-  author: string;
-  status: 'published' | 'draft';
-  createdAt: string;
-  views: number;
-}
-
-// Mock data - À remplacer par un vrai fetch API
-const mockArticles: IArticle[] = [
-  {
-    id: 1,
-    title: "Lancement du nouveau programme de formation",
-    slug: "nouveau-programme-formation",
-    excerpt: "Le CRASC annonce le lancement d'un nouveau programme...",
-    author: "Admin",
-    status: "published",
-    createdAt: "2025-01-15",
-    views: 245
-  },
-  {
-    id: 2,
-    title: "Atelier de renforcement des capacités",
-    slug: "atelier-renforcement-capacites",
-    excerpt: "Un atelier de 3 jours pour les OSC membres...",
-    author: "Admin",
-    status: "published",
-    createdAt: "2025-01-10",
-    views: 182
-  },
-  {
-    id: 3,
-    title: "Assemblée générale 2025",
-    slug: "assemblee-generale-2025",
-    excerpt: "Convocation à l'assemblée générale ordinaire...",
-    author: "Admin",
-    status: "draft",
-    createdAt: "2025-01-08",
-    views: 0
-  }
-];
+import { Plus, Edit, Trash2, Eye, Search, AlertCircle } from 'lucide-react';
+import newsService, { INews } from '@/lib/services/news.service';
+import { toast } from 'sonner';
 
 export default function GestionActualitesPage() {
-  const [articles, setArticles] = useState<IArticle[]>(mockArticles);
+  const [articles, setArticles] = useState<INews[]>([]);
+  const [filteredArticles, setFilteredArticles] = useState<INews[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'published' | 'draft'>('all');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredArticles = articles.filter(article => {
-    const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || article.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
+  // Fetch articles from API
+  useEffect(() => {
+    fetchArticles();
+  }, []);
 
-  const handleDelete = (id: number) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette actualité ?')) {
-      setArticles(articles.filter(a => a.id !== id));
+  const fetchArticles = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const data = await newsService.getAll({ limit: 100 });
+      setArticles(data);
+      setFilteredArticles(data);
+    } catch (err: any) {
+      console.error("Erreur lors du chargement des actualités:", err);
+      setError(err.message || "Impossible de charger les actualités");
+      toast.error("Erreur lors du chargement des actualités");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Filter articles based on search query
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredArticles(articles);
+    } else {
+      const query = searchQuery.toLowerCase();
+      const filtered = articles.filter(article =>
+        article.title.toLowerCase().includes(query) ||
+        article.content.toLowerCase().includes(query) ||
+        article.crasc?.name.toLowerCase().includes(query) ||
+        article.osc?.name.toLowerCase().includes(query)
+      );
+      setFilteredArticles(filtered);
+    }
+  }, [searchQuery, articles]);
+
+  const handleDelete = async (slug: string, title: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer l'actualité "${title}" ?`)) {
+      return;
+    }
+
+    try {
+      await newsService.delete(slug);
+      toast.success("Actualité supprimée avec succès");
+      // Refresh list
+      fetchArticles();
+    } catch (err: any) {
+      console.error("Erreur lors de la suppression:", err);
+      toast.error(err.message || "Erreur lors de la suppression");
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const truncateContent = (html: string, maxLength: number = 100) => {
+    const text = html.replace(/<[^>]*>/g, ''); // Remove HTML tags
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
   return (
@@ -106,9 +118,9 @@ export default function GestionActualitesPage() {
           <div className="bg-white rounded-lg p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Publiés</p>
+                <p className="text-sm text-gray-600 mb-1">Par CRASC</p>
                 <p className="text-3xl font-bold text-green-600">
-                  {articles.filter(a => a.status === 'published').length}
+                  {articles.filter(a => a.crasc_id).length}
                 </p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -120,9 +132,9 @@ export default function GestionActualitesPage() {
           <div className="bg-white rounded-lg p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Brouillons</p>
+                <p className="text-sm text-gray-600 mb-1">Par OSC</p>
                 <p className="text-3xl font-bold text-yellow-600">
-                  {articles.filter(a => a.status === 'draft').length}
+                  {articles.filter(a => a.osc_id).length}
                 </p>
               </div>
               <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -132,127 +144,155 @@ export default function GestionActualitesPage() {
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg p-6 border border-gray-200 mb-6">
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Rechercher une actualité..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
-              />
-            </div>
-
-            {/* Status Filter */}
+        {/* Error State */}
+        {error && !loading && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
             <div>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value as any)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
+              <h3 className="text-red-800 font-semibold mb-1">Erreur de chargement</h3>
+              <p className="text-red-700 text-sm">{error}</p>
+              <button
+                onClick={fetchArticles}
+                className="mt-2 text-sm text-red-700 underline hover:text-red-900"
               >
-                <option value="all">Tous les statuts</option>
-                <option value="published">Publiés</option>
-                <option value="draft">Brouillons</option>
-              </select>
+                Réessayer
+              </button>
             </div>
           </div>
+        )}
+
+        {/* Search */}
+        <div className="bg-white rounded-lg p-6 border border-gray-200 mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Rechercher une actualité par titre, contenu, CRASC ou OSC..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
+            />
+          </div>
         </div>
+
+        {/* Loading State */}
+        {loading && (
+          <div className="bg-white rounded-lg p-12 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E05017] mx-auto mb-4"></div>
+            <p className="text-gray-600">Chargement des actualités...</p>
+          </div>
+        )}
 
         {/* Articles List */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Titre
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Auteur
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Statut
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Vues
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredArticles.length === 0 ? (
+        {!loading && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center">
-                      <p className="text-gray-500">Aucune actualité trouvée</p>
-                    </td>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Titre
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      CRASC / OSC
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Date de création
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
-                ) : (
-                  filteredArticles.map((article) => (
-                    <tr key={article.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div>
-                          <p className="font-semibold text-gray-900">{article.title}</p>
-                          <p className="text-sm text-gray-500 line-clamp-1">{article.excerpt}</p>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{article.author}</td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                          article.status === 'published'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {article.status === 'published' ? 'Publié' : 'Brouillon'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {new Date(article.createdAt).toLocaleDateString('fr-FR')}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{article.views}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link
-                            href={`/actualites/${article.slug}`}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Voir"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Link>
-                          <Link
-                            href={`/admin/gestion-des-actualites/${article.id}/modifier`}
-                            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                            title="Modifier"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(article.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Supprimer"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredArticles.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-12 text-center">
+                        <p className="text-gray-500">
+                          {searchQuery ? "Aucune actualité ne correspond à votre recherche" : "Aucune actualité disponible"}
+                        </p>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    filteredArticles.map((article) => (
+                      <tr key={article.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4">
+                          <div>
+                            <p className="font-semibold text-gray-900 mb-1">{article.title}</p>
+                            <p className="text-sm text-gray-500 line-clamp-2">
+                              {truncateContent(article.content, 120)}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {article.crasc && (
+                            <div className="mb-1">
+                              <span className="inline-flex px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs">
+                                {article.crasc.name}
+                              </span>
+                            </div>
+                          )}
+                          {article.osc && (
+                            <div>
+                              <span className="inline-flex px-2 py-1 rounded bg-green-100 text-green-800 text-xs">
+                                {article.osc.name}
+                              </span>
+                            </div>
+                          )}
+                          {!article.crasc && !article.osc && (
+                            <span className="text-gray-400 text-xs">Non catégorisé</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {formatDate(article.created_at)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-end gap-2">
+                            <Link
+                              href={`/actualites/${article.slug}`}
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              title="Voir"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Link>
+                            <Link
+                              href={`/admin/gestion-des-actualites/${article.slug}/modifier`}
+                              className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                              title="Modifier"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Link>
+                            <button
+                              onClick={() => handleDelete(article.slug, article.title)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Supprimer"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Results Count */}
+        {!loading && filteredArticles.length > 0 && (
+          <div className="mt-4 text-sm text-gray-600 text-center">
+            {searchQuery && filteredArticles.length !== articles.length && (
+              <p>
+                Affichage de {filteredArticles.length} résultat{filteredArticles.length > 1 ? 's' : ''} sur {articles.length} total
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Back Link */}
-        <div className="mt-6">
+        <div className="mt-8">
           <Link
             href="/admin"
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"

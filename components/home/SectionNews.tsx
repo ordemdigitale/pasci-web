@@ -89,7 +89,8 @@ export default function SectionNews() {
       setError(null);
 
       try {
-        const response = await fetch("http://localhost:8000/api/v1/crasc/news-spotlight-crasc");
+        // Updated to use dedicated /news/spotlight endpoint
+        const response = await fetch("http://localhost:8000/api/v1/news/spotlight");
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`)
         }
