@@ -37,7 +37,11 @@ Modification à apporter au frontend
 - Page detail PTF
   - child: appel à projet: Nom
 
+- Page http://localhost:3000/annuaire/annuaire-des-crasc: ajouter liens de chaque crasc a la légende
 
+- Page http://localhost:3000/annuaire/annuaire-des-partenaires-techniques-et-financiers: ajouter barre de recherche
+
+- Page ptfSlug: retirer le corps et remplacer par description
 
 Les régions de la CIV:
 Abidjan

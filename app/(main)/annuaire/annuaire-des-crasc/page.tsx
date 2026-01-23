@@ -318,7 +318,7 @@ export default function PageAnnuaireCrasc() {
                   <div className="w-8 h-8 rounded bg-green-300 border-2 border-green-400"></div>
                   <div>
                     <p className="font-bold text-green-900">CRASC CENTRE</p>
-                    <p className="text-xs text-green-700">Yamoussoukro, Bouaké</p>
+                    <p className="text-xs text-green-700">Yamoussoukro, Bouaké, Dimbokro</p>
                   </div>
                 </div>
 
