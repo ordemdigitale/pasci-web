@@ -105,3 +105,36 @@ export interface IProjet {
   name?: string;
   ptf?: IPTF[]
 }
+
+// Authentication types
+export interface IUser {
+  id: string;
+  email: string;
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  is_active: boolean;
+  is_staff: boolean;
+  is_superuser: boolean;
+  avatar?: string;
+  bio?: string;
+  date_joined?: string;
+}
+
+export interface ILoginRequest {
+  username: string; // Can be email or username
+  password: string;
+}
+
+export interface ILoginResponse {
+  access_token: string;
+  token_type: string;
+}
+
+export interface IRegisterRequest {
+  email: string;
+  username?: string;
+  password: string;
+  first_name?: string;
+  last_name?: string;
+}

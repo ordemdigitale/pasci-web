@@ -1,124 +1,111 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   User,
   Mail,
-  Phone,
-  Building2,
-  Shield,
   Search,
-  Filter,
   Plus,
   Edit,
   Trash2,
   Lock,
   Unlock,
   Eye,
-  ChevronDown,
   X,
-  MapPin,
   Calendar,
   CheckCircle,
   XCircle,
+  Shield,
+  Loader2,
 } from "lucide-react";
-
-// Mock data
-const mockUsers = [
-  {
-    id: 1,
-    firstName: "Marie",
-    lastName: "KOUASSI",
-    email: "marie.kouassi@exemple.com",
-    phone: "+225 07 12 34 56 78",
-    organization: "Initiative Eau Claire",
-    organizationType: "OSC",
-    city: "Abidjan",
-    role: "Membre",
-    status: "Actif",
-    joinDate: "2024-01-15",
-  },
-  {
-    id: 2,
-    firstName: "Jean",
-    lastName: "KONÉ",
-    email: "jean.kone@exemple.com",
-    phone: "+225 05 23 45 67 89",
-    organization: "CRASC Sud",
-    organizationType: "CRASC",
-    city: "San-Pédro",
-    role: "Admin CRASC",
-    status: "Actif",
-    joinDate: "2023-11-20",
-  },
-  {
-    id: 3,
-    firstName: "Awa",
-    lastName: "TRAORÉ",
-    email: "awa.traore@exemple.com",
-    phone: "+225 07 98 76 54 32",
-    organization: "Jeunesse Active CI",
-    organizationType: "OSC",
-    city: "Bouaké",
-    role: "Membre",
-    status: "Inactif",
-    joinDate: "2024-03-10",
-  },
-  {
-    id: 4,
-    firstName: "Kouadio",
-    lastName: "YAO",
-    email: "kouadio.yao@pasci.ci",
-    phone: "+225 07 11 22 33 44",
-    organization: "PASCI",
-    organizationType: "Administration",
-    city: "Abidjan",
-    role: "Super Admin",
-    status: "Actif",
-    joinDate: "2023-01-05",
-  },
-];
+import { userService } from "@/lib/services/user.service";
+import { IUser } from "@/types/api.types";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import AddUserModal from "@/components/admin/AddUserModal";
+import EditUserModal from "@/components/admin/EditUserModal";
 
 export default function UtilisateursPage() {
-  const [users, setUsers] = useState(mockUsers);
+  const { user: currentUser } = useAuth();
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedRole, setSelectedRole] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // Filtrage
+  // Fetch users
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const data = await userService.getAllUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast.error("Erreur lors du chargement des utilisateurs");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // Filter users
   const filteredUsers = users.filter((user) => {
+    const searchLower = searchQuery.toLowerCase();
     const matchSearch =
-      user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.organization.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchRole = !selectedRole || user.role === selectedRole;
-    const matchStatus = !selectedStatus || user.status === selectedStatus;
-    return matchSearch && matchRole && matchStatus;
+      user.email.toLowerCase().includes(searchLower) ||
+      user.username?.toLowerCase().includes(searchLower) ||
+      user.first_name?.toLowerCase().includes(searchLower) ||
+      user.last_name?.toLowerCase().includes(searchLower);
+
+    const matchStatus = !selectedStatus ||
+      (selectedStatus === "active" && user.is_active) ||
+      (selectedStatus === "inactive" && !user.is_active);
+
+    return matchSearch && matchStatus;
   });
 
-  const handleViewUser = (user: any) => {
+  const handleViewUser = (user: IUser) => {
     setSelectedUser(user);
     setIsModalOpen(true);
   };
 
-  const handleDeleteUser = (userId: number) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
-      setUsers(users.filter((u) => u.id !== userId));
+  const handleEditUser = (user: IUser) => {
+    setSelectedUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
+      return;
+    }
+
+    try {
+      await userService.deleteUser(userId);
+      toast.success("Utilisateur supprimé avec succès");
+      fetchUsers();
+    } catch (error: any) {
+      toast.error(error.message || "Erreur lors de la suppression");
     }
   };
 
-  const handleToggleStatus = (userId: number) => {
-    setUsers(
-      users.map((u) =>
-        u.id === userId
-          ? { ...u, status: u.status === "Actif" ? "Inactif" : "Actif" }
-          : u
-      )
-    );
+  const handleToggleStatus = async (user: IUser) => {
+    try {
+      await userService.updateUser(user.id, {
+        is_active: !user.is_active,
+      });
+      toast.success(
+        user.is_active ? "Utilisateur désactivé" : "Utilisateur activé"
+      );
+      fetchUsers();
+    } catch (error: any) {
+      toast.error(error.message || "Erreur lors de la mise à jour");
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -129,6 +116,31 @@ export default function UtilisateursPage() {
       year: "numeric",
     });
   };
+
+  const getUserInitials = (user: IUser) => {
+    if (user.first_name && user.last_name) {
+      return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
+    }
+    if (user.username) {
+      return user.username.substring(0, 2).toUpperCase();
+    }
+    return user.email.substring(0, 2).toUpperCase();
+  };
+
+  const getUserFullName = (user: IUser) => {
+    if (user.first_name && user.last_name) {
+      return `${user.first_name} ${user.last_name}`;
+    }
+    return user.username || user.email;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-[#2a591d]" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -151,8 +163,8 @@ export default function UtilisateursPage() {
                 <p className="text-sm text-gray-500 mb-1">Total Utilisateurs</p>
                 <p className="text-3xl font-bold text-gray-900">{users.length}</p>
               </div>
-              <div className="bg-[#E05017]/10 p-3 rounded-lg">
-                <User className="w-6 h-6 text-[#E05017]" />
+              <div className="bg-[#2a591d]/10 p-3 rounded-lg">
+                <User className="w-6 h-6 text-[#2a591d]" />
               </div>
             </div>
           </div>
@@ -162,7 +174,7 @@ export default function UtilisateursPage() {
               <div>
                 <p className="text-sm text-gray-500 mb-1">Utilisateurs Actifs</p>
                 <p className="text-3xl font-bold text-green-600">
-                  {users.filter((u) => u.status === "Actif").length}
+                  {users.filter((u) => u.is_active).length}
                 </p>
               </div>
               <div className="bg-green-100 p-3 rounded-lg">
@@ -176,7 +188,7 @@ export default function UtilisateursPage() {
               <div>
                 <p className="text-sm text-gray-500 mb-1">Utilisateurs Inactifs</p>
                 <p className="text-3xl font-bold text-orange-600">
-                  {users.filter((u) => u.status === "Inactif").length}
+                  {users.filter((u) => !u.is_active).length}
                 </p>
               </div>
               <div className="bg-orange-100 p-3 rounded-lg">
@@ -190,7 +202,7 @@ export default function UtilisateursPage() {
               <div>
                 <p className="text-sm text-gray-500 mb-1">Administrateurs</p>
                 <p className="text-3xl font-bold text-blue-600">
-                  {users.filter((u) => u.role.includes("Admin")).length}
+                  {users.filter((u) => u.is_staff || u.is_superuser).length}
                 </p>
               </div>
               <div className="bg-blue-100 p-3 rounded-lg">
@@ -202,33 +214,19 @@ export default function UtilisateursPage() {
 
         {/* Filters & Actions */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="md:col-span-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Rechercher par nom, email, organisation..."
+                  placeholder="Rechercher par nom, email, username..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2a591d] focus:border-[#2a591d]"
                 />
               </div>
-            </div>
-
-            {/* Filter by Role */}
-            <div>
-              <select
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
-              >
-                <option value="">Tous les rôles</option>
-                <option value="Super Admin">Super Admin</option>
-                <option value="Admin CRASC">Admin CRASC</option>
-                <option value="Membre">Membre</option>
-              </select>
             </div>
 
             {/* Filter by Status */}
@@ -236,24 +234,26 @@ export default function UtilisateursPage() {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2a591d] focus:border-[#2a591d]"
               >
                 <option value="">Tous les statuts</option>
-                <option value="Actif">Actif</option>
-                <option value="Inactif">Inactif</option>
+                <option value="active">Actifs</option>
+                <option value="inactive">Inactifs</option>
               </select>
             </div>
           </div>
 
-          <div className="mt-4 flex justify-end">
-            <button
-              onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold"
-            >
-              <Plus className="w-5 h-5" />
-              Ajouter un utilisateur
-            </button>
-          </div>
+          {currentUser?.is_staff && (
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-[#2a591d] text-white rounded-lg hover:bg-green-700 transition-colors font-bold"
+              >
+                <Plus className="w-5 h-5" />
+                Ajouter un utilisateur
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Users Table */}
@@ -264,9 +264,6 @@ export default function UtilisateursPage() {
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Utilisateur
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Organisation
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Rôle
@@ -287,57 +284,54 @@ export default function UtilisateursPage() {
                   <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#E05017] rounded-full flex items-center justify-center text-white font-bold">
-                          {user.firstName[0]}
-                          {user.lastName[0]}
+                        <div className="w-10 h-10 bg-[#2a591d] rounded-full flex items-center justify-center text-white font-bold">
+                          {getUserInitials(user)}
                         </div>
                         <div>
                           <p className="font-semibold text-gray-900">
-                            {user.firstName} {user.lastName}
+                            {getUserFullName(user)}
                           </p>
                           <p className="text-sm text-gray-500">{user.email}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="font-medium text-gray-900">
-                        {user.organization}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {user.organizationType}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${
-                          user.role === "Super Admin"
-                            ? "bg-purple-100 text-purple-700"
-                            : user.role === "Admin CRASC"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-gray-100 text-gray-700"
-                        }`}
-                      >
-                        {user.role}
-                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {user.is_superuser && (
+                          <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700">
+                            Superuser
+                          </span>
+                        )}
+                        {user.is_staff && !user.is_superuser && (
+                          <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">
+                            Staff
+                          </span>
+                        )}
+                        {!user.is_staff && !user.is_superuser && (
+                          <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+                            Utilisateur
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
-                          user.status === "Actif"
+                          user.is_active
                             ? "bg-green-100 text-green-700"
                             : "bg-orange-100 text-orange-700"
                         }`}
                       >
-                        {user.status === "Actif" ? (
+                        {user.is_active ? (
                           <CheckCircle className="w-3 h-3" />
                         ) : (
                           <XCircle className="w-3 h-3" />
                         )}
-                        {user.status}
+                        {user.is_active ? "Actif" : "Inactif"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {formatDate(user.joinDate)}
+                      {formatDate(user.date_joined)}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
@@ -348,30 +342,39 @@ export default function UtilisateursPage() {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button
-                          onClick={() => handleToggleStatus(user.id)}
-                          className={`p-2 hover:bg-gray-100 rounded-lg transition-colors ${
-                            user.status === "Actif"
-                              ? "text-orange-600"
-                              : "text-green-600"
-                          }`}
-                          title={
-                            user.status === "Actif" ? "Désactiver" : "Activer"
-                          }
-                        >
-                          {user.status === "Actif" ? (
-                            <Lock className="w-4 h-4" />
-                          ) : (
-                            <Unlock className="w-4 h-4" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => handleDeleteUser(user.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Supprimer"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {currentUser?.is_staff && (
+                          <>
+                            <button
+                              onClick={() => handleEditUser(user)}
+                              className="p-2 text-[#2a591d] hover:bg-green-50 rounded-lg transition-colors"
+                              title="Modifier"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleToggleStatus(user)}
+                              className={`p-2 hover:bg-gray-100 rounded-lg transition-colors ${
+                                user.is_active ? "text-orange-600" : "text-green-600"
+                              }`}
+                              title={user.is_active ? "Désactiver" : "Activer"}
+                            >
+                              {user.is_active ? (
+                                <Lock className="w-4 h-4" />
+                              ) : (
+                                <Unlock className="w-4 h-4" />
+                              )}
+                            </button>
+                          </>
+                        )}
+                        {currentUser?.is_superuser && user.id !== currentUser.id && (
+                          <button
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Supprimer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -412,112 +415,132 @@ export default function UtilisateursPage() {
               <div className="p-6 space-y-6">
                 {/* Avatar & Name */}
                 <div className="text-center">
-                  <div className="w-24 h-24 bg-[#E05017] rounded-full flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4">
-                    {selectedUser.firstName[0]}
-                    {selectedUser.lastName[0]}
+                  <div className="w-24 h-24 bg-[#2a591d] rounded-full flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4">
+                    {getUserInitials(selectedUser)}
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900">
-                    {selectedUser.firstName} {selectedUser.lastName}
+                    {getUserFullName(selectedUser)}
                   </h3>
-                  <p className="text-gray-600 mt-1">{selectedUser.role}</p>
+                  <p className="text-gray-600 mt-1">
+                    {selectedUser.is_superuser
+                      ? "Superuser"
+                      : selectedUser.is_staff
+                      ? "Staff"
+                      : "Utilisateur"}
+                  </p>
                 </div>
 
                 {/* Information Sections */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Mail className="w-5 h-5 text-[#E05017] mt-0.5" />
+                    <Mail className="w-5 h-5 text-[#2a591d] mt-0.5" />
                     <div>
-                      <p className="text-sm font-semibold text-gray-700">
-                        Email
-                      </p>
+                      <p className="text-sm font-semibold text-gray-700">Email</p>
                       <p className="text-gray-900">{selectedUser.email}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Phone className="w-5 h-5 text-[#E05017] mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-gray-700">
-                        Téléphone
-                      </p>
-                      <p className="text-gray-900">{selectedUser.phone}</p>
+                  {selectedUser.username && (
+                    <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                      <User className="w-5 h-5 text-[#2a591d] mt-0.5" />
+                      <div>
+                        <p className="text-sm font-semibold text-gray-700">
+                          Username
+                        </p>
+                        <p className="text-gray-900">{selectedUser.username}</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Building2 className="w-5 h-5 text-[#E05017] mt-0.5" />
+                    <Shield className="w-5 h-5 text-[#2a591d] mt-0.5" />
                     <div>
-                      <p className="text-sm font-semibold text-gray-700">
-                        Organisation
-                      </p>
+                      <p className="text-sm font-semibold text-gray-700">Statut</p>
                       <p className="text-gray-900">
-                        {selectedUser.organization}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {selectedUser.organizationType}
+                        {selectedUser.is_active ? "Actif" : "Inactif"}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                    <MapPin className="w-5 h-5 text-[#E05017] mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-gray-700">
-                        Ville
-                      </p>
-                      <p className="text-gray-900">{selectedUser.city}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Shield className="w-5 h-5 text-[#E05017] mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-gray-700">
-                        Rôle
-                      </p>
-                      <p className="text-gray-900">{selectedUser.role}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Calendar className="w-5 h-5 text-[#E05017] mt-0.5" />
+                    <Calendar className="w-5 h-5 text-[#2a591d] mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">
                         Date d'inscription
                       </p>
                       <p className="text-gray-900">
-                        {formatDate(selectedUser.joinDate)}
+                        {formatDate(selectedUser.date_joined)}
                       </p>
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-3 pt-4 border-t border-gray-200">
-                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold">
-                    <Edit className="w-5 h-5" />
-                    Modifier
-                  </button>
-                  <button
-                    onClick={() => handleToggleStatus(selectedUser.id)}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-bold"
-                  >
-                    {selectedUser.status === "Actif" ? (
-                      <>
-                        <Lock className="w-5 h-5" />
-                        Désactiver
-                      </>
-                    ) : (
-                      <>
-                        <Unlock className="w-5 h-5" />
-                        Activer
-                      </>
-                    )}
-                  </button>
-                </div>
+                {currentUser?.is_staff && (
+                  <div className="flex gap-3 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        handleEditUser(selectedUser);
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#2a591d] text-white rounded-lg hover:bg-green-700 transition-colors font-bold"
+                    >
+                      <Edit className="w-5 h-5" />
+                      Modifier
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleToggleStatus(selectedUser);
+                        setIsModalOpen(false);
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-bold"
+                    >
+                      {selectedUser.is_active ? (
+                        <>
+                          <Lock className="w-5 h-5" />
+                          Désactiver
+                        </>
+                      ) : (
+                        <>
+                          <Unlock className="w-5 h-5" />
+                          Activer
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
+        )}
+
+        {/* Add User Modal */}
+        {isAddModalOpen && (
+          <AddUserModal
+            isOpen={isAddModalOpen}
+            onClose={() => setIsAddModalOpen(false)}
+            onSuccess={() => {
+              fetchUsers();
+              setIsAddModalOpen(false);
+            }}
+          />
+        )}
+
+        {/* Edit User Modal */}
+        {isEditModalOpen && selectedUser && (
+          <EditUserModal
+            isOpen={isEditModalOpen}
+            user={selectedUser}
+            onClose={() => {
+              setIsEditModalOpen(false);
+              setSelectedUser(null);
+            }}
+            onSuccess={() => {
+              fetchUsers();
+              setIsEditModalOpen(false);
+              setSelectedUser(null);
+            }}
+          />
         )}
       </div>
     </div>

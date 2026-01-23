@@ -4,16 +4,17 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Lock, Mail, Eye, EyeOff, AlertCircle, Shield, ArrowLeft } from 'lucide-react';
-import Image from 'next/image';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   });
 
@@ -22,16 +23,15 @@ export default function AdminLoginPage() {
     setError('');
     setLoading(true);
 
-    // Simulation de l'authentification (à remplacer par votre API)
-    setTimeout(() => {
-      if (formData.email && formData.password) {
-        // Redirection vers le tableau de bord admin
-        router.push('/admin');
-      } else {
-        setError('Veuillez remplir tous les champs');
-        setLoading(false);
-      }
-    }, 1000);
+    try {
+      await login(formData);
+      // Redirect to admin dashboard on success
+      router.push('/admin');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur de connexion');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,20 +79,20 @@ export default function AdminLoginPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Email Field */}
+              {/* Username/Email Field */}
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Adresse email
+                <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Nom d'utilisateur ou Email
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
+                    type="text"
+                    id="username"
+                    name="username"
+                    value={formData.username}
                     onChange={handleChange}
-                    placeholder="admin@pasci.ci"
+                    placeholder="admin ou admin@pasci.dz"
                     className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2a591d] focus:border-transparent transition-all"
                     required
                   />
@@ -175,6 +175,9 @@ export default function AdminLoginPage() {
                 Accès réservé aux administrateurs PASCI
               </p>
               <p className="text-xs text-gray-500 mt-2">
+                Identifiants par défaut: admin / admin123
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
                 Pour toute assistance, contactez le support technique
               </p>
             </div>
