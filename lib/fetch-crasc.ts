@@ -98,16 +98,17 @@ export async function fetchAllNews(): Promise<INews[]> {
   return response.json();
 }
 
+
 // Fetch spotlight news: single (latest) news per crasc - Updated to use /news/spotlight
 export async function fetchSpotlightNews(): Promise<SpotlightNews[]> {
   try {
     const response = await fetch("http://localhost:8000/api/v1/news/spotlight", {
-        next: { revalidate: 3600 }, // Revalidate every hour for SSG/ISR
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
+      next: { revalidate: 3600 }, // Revalidate every hour for SSG/ISR
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
 
     if (!response.ok) {
       throw new Error("Échec du chargement des actualités à partir de l'API");
@@ -117,5 +118,38 @@ export async function fetchSpotlightNews(): Promise<SpotlightNews[]> {
   } catch (error) {
     console.error("Échec du chargement des actualités à partir de l'API: ", error);
     return [];
+  }
+}
+
+// Update CRASC by slug
+export async function updateCrasc(
+  slug: string,
+  data: { name?: string; description?: string; osc_count?: number }
+): Promise<ICrasc> {
+  const response = await fetch(`http://localhost:8000/api/v1/crasc/crasc/${slug}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Échec de la mise à jour du CRASC");
+  }
+
+  return response.json();
+}
+
+// Delete CRASC by slug
+export async function deleteCrasc(slug: string): Promise<void> {
+  const response = await fetch(`http://localhost:8000/api/v1/crasc/crasc/${slug}`, {
+    method: "DELETE"
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Échec de la suppression du CRASC");
   }
 }

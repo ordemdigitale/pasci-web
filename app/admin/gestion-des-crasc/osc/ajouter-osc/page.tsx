@@ -12,14 +12,26 @@ import {
   fetchAllOscType
 } from "@/lib/fetch-crasc";
 import Image from "next/image";
+import {
+  ArrowLeft,
+  Building2,
+  FileText,
+  Upload,
+  X,
+  Check,
+  Loader2,
+  AlertCircle,
+  ChevronDown,
+  Image as ImageIcon
+} from 'lucide-react';
 
-// Schema de validation pour le formulaire d'ajout de région CIV
+// Schema de validation pour le formulaire d'ajout d'OSC
 const oscSchema = z.object({
   name: z.string().min(4, "Le nom de l'OSC doit contenir au moins 4 caractères."),
   description: z.string().optional(),
-  region_id: z.string().min(1, "Veuillez sélectionner un CRASC."),
-  type_id: z.string().min(1, "Veuillez sélectionner un type de OSC."),
-  thumbnail_path: z
+  crasc_id: z.string().min(1, "Veuillez sélectionner un CRASC."),
+  type_id: z.string().min(1, "Veuillez sélectionner un type d'OSC."),
+  thumbnail: z
     .instanceof(File)
     .optional()
     .refine(
@@ -28,7 +40,7 @@ const oscSchema = z.object({
     )
     .refine(
       (file) => !file || ["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.type),
-      { message: "Format d'image non supporté. Utilisez le format JPG, PNG ou WebP" }
+      { message: "Format d'image non supporté. Utilisez JPG, PNG ou WebP" }
     ),
 });
 
@@ -40,26 +52,31 @@ export default function AdminAjoutOsc() {
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  // Récupérer les régions CRASC depuis l'API lors du montage du composant
+
+  // Récupérer les régions CRASC depuis l'API
   useEffect(() => {
     fetchAllCrasc()
       .then(data => setCrascRegions(data))
-      .catch(error => console.error("Erreur lors de la récupération des données relatives aux régions CRASC: ", error));
+      .catch(error => console.error("Erreur lors de la récupération des CRASC: ", error));
   }, []);
-  // Récupérer les types de OSC depuis l'API lors du montage du composant
+
+  // Récupérer les types d'OSC depuis l'API
   useEffect(() => {
     fetchAllOscType()
       .then(data => setOscType(data))
-      .catch(error => console.error("Erreur lors de la récupération des données relatives aux types de OSC: ", error));
+      .catch(error => console.error("Erreur lors de la récupération des types d'OSC: ", error));
   }, []);
 
   const { control, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<OscForm>({
     resolver: zodResolver(oscSchema),
-    defaultValues: { name: "", description: "", region_id: "", type_id: "" },
+    defaultValues: { name: "", description: "", crasc_id: "", type_id: "" },
   });
-  const thumbnailFile = watch("thumbnail_path");
+
+  const thumbnailFile = watch("thumbnail");
 
   // Gestion du preview de l'image
   useEffect(() => {
@@ -72,19 +89,19 @@ export default function AdminAjoutOsc() {
     } else {
       setPreviewImage(null);
     }
-  }, [thumbnailFile])
+  }, [thumbnailFile]);
 
   // Gestion du changement de fichier
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setValue("thumbnail_path", file);
+      setValue("thumbnail", file);
     }
   };
 
-  // Supprimer l'image selectionnée
+  // Supprimer l'image sélectionnée
   const handleRemoveImage = () => {
-    setValue("thumbnail_path", undefined);
+    setValue("thumbnail", undefined);
     setPreviewImage(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -95,29 +112,29 @@ export default function AdminAjoutOsc() {
   const onSubmit = async (values: OscForm) => {
     setLoading(true);
     setUploadProgress(0);
-    
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
     try {
-      // Créer FormData pour envoyer l'image
       const formData = new FormData();
       formData.append("name", values.name);
 
       if (values.description && values.description.trim() !== "") {
         formData.append("description", values.description);
       }
-      if (values.region_id) {
-        formData.append("region_id", values.region_id);
+      if (values.crasc_id) {
+        formData.append("crasc_id", values.crasc_id);
       }
       if (values.type_id) {
         formData.append("type_id", values.type_id);
       }
-      
-      if (values.thumbnail_path) {
-        formData.append("thumbnail_path", values.thumbnail_path);
+
+      if (values.thumbnail) {
+        formData.append("thumbnail", values.thumbnail);
       }
 
-      // Créer une requête XMLHttpRequest pour suivre la progression
       const xhr = new XMLHttpRequest();
-      
+
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
           const progress = Math.round((event.loaded / event.total) * 100);
@@ -127,183 +144,255 @@ export default function AdminAjoutOsc() {
 
       xhr.onload = () => {
         if (xhr.status === 201) {
-          // Rediriger ou afficher un message de succès
+          setSuccessMessage("OSC créée avec succès!");
           reset();
           setPreviewImage(null);
-          router.push("/admin/gestion-des-crasc");
+
+          // Rediriger après 2 secondes
+          setTimeout(() => {
+            router.push("/admin/gestion-des-crasc");
+          }, 2000);
         } else {
-          // Parse error response
-          let errorMessage = "Une erreur est survenue lors de la création de l'OSC.";
-          let fieldErrors: Record<string, string> = {};
+          let errorMsg = "Une erreur est survenue lors de la création de l'OSC.";
 
           try {
             const response = JSON.parse(xhr.responseText);
-
-            if(response.detail) {
-              // Handle structured error response
+            if (response.detail) {
               if (typeof response.detail === 'string') {
-                errorMessage = response.detail;
+                errorMsg = response.detail;
               } else if (response.detail.type === 'duplicate_error' && response.detail.errors) {
-                // Handle duplicate title error
                 response.detail.errors.forEach((error: any) => {
-                  if (error.field === 'title') {
-                    errorMessage = error.message;
-                    fieldErrors.title = error.message;
+                  if (error.field === 'name') {
+                    errorMsg = error.message;
                   }
                 });
               } else if (response.detail.type === 'validation_error' && response.detail.errors) {
-                // Handle validation errors
                 response.detail.errors.forEach((error: any) => {
-                  fieldErrors[error.field] = error.message;
                   if (error.field === 'thumbnail') {
-                    errorMessage = error.message;
+                    errorMsg = error.message;
                   }
                 });
               }
             }
           } catch (e) {
-            // Response is not JSON or parsing failed
-            errorMessage = `Erreur ${xhr.status}: ${xhr.statusText}`;
+            errorMsg = `Erreur ${xhr.status}: ${xhr.statusText}`;
           }
-          // Show error message
-          alert(errorMessage);
-          // If we have field-specific errors, we could set them in form state
-          // For now, we just log them
-          if (Object.keys(fieldErrors).length > 0) {
-            console.log("Field errors:", fieldErrors);
-          }
+
+          setErrorMessage(errorMsg);
         }
         setLoading(false);
         setUploadProgress(null);
       };
 
       xhr.onerror = () => {
-        console.error("Erreur réseau lors de l'envoi du formulaire");
-        alert("Erreur réseau. Vérifiez votre connexion et que l'API est en cours d'exécution.");
+        setErrorMessage("Erreur réseau. Vérifiez votre connexion et que l'API est en cours d'exécution.");
         setLoading(false);
         setUploadProgress(null);
       };
 
       xhr.open("POST", "http://localhost:8000/api/v1/crasc/osc");
       xhr.send(formData);
-      
+
     } catch (error) {
-      console.error("Erreur lors de la création de l'Osc: ", error);
-      alert("Une erreur inattendue est survenue. Veuillez réessayer.");
+      console.error("Erreur lors de la création de l'OSC: ", error);
+      setErrorMessage("Une erreur inattendue est survenue. Veuillez réessayer.");
       setLoading(false);
       setUploadProgress(null);
     }
   };
 
   return (
-    <section className="max-w-5xl mx-auto font-poppins bg-slate-50">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Ajouter une OSC</h2>
-        <Link href="/admin/gestion-des-crasc" className="underline mt-4 text-sm text-blue-600">
-          ← Retour à la page de gestion des CRASC
+    <section className="max-w-5xl mx-auto font-poppins bg-slate-50 py-8 px-4">
+      {/* Header */}
+      <div className="mb-8">
+        <Link
+          href="/admin/gestion-des-crasc"
+          className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Retour à la gestion des CRASC
         </Link>
+        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+          <Building2 className="w-8 h-8 text-[#2A591D]" />
+          Ajouter une OSC
+        </h1>
+        <p className="text-gray-600 mt-2">Remplissez les informations ci-dessous pour créer une nouvelle organisation</p>
       </div>
 
-      {/* Le formulaire */}
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 bg-white rounded-lg p-6 border border-gray-200">
-        <div className="grid grid-cols-2 gap-12">
-          <div className="mb-4">
-            <label htmlFor="name" className="block text-gray-700 font-medium mb-2">Nom de l&apos;OSC</label>
-            <input
-              id="name"
-              type="text"
-              {...control.register("name")}
-              className="w-full p-2 border border-gray-300 rounded-lg"
-            />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+      {/* Success Message */}
+      {successMessage && (
+        <div className="mb-6 p-4 bg-green-50 border-2 border-green-200 rounded-xl flex items-center gap-3">
+          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <Check className="w-5 h-5 text-green-600" />
           </div>
-          <div className="mb-4">
-            <label htmlFor="description" className="block text-gray-700 font-medium mb-2">Description</label>
-            <input
-              id="description"
-              type="text"
-              {...control.register("description")}
-              className="w-full p-2 border border-gray-300 rounded-lg"
-            />
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
+          <div className="flex-1">
+            <p className="text-green-800 font-semibold">{successMessage}</p>
+            <p className="text-green-600 text-sm">Redirection en cours...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {errorMessage && (
+        <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+          <p className="text-red-800">{errorMessage}</p>
+        </div>
+      )}
+
+      {/* Formulaire */}
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-2xl border-2 border-gray-200 p-8 shadow-sm">
+        {/* Informations de base */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-[#2A591D]" />
+            Informations de base
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Nom */}
+            <div>
+              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                Nom de l'OSC <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="name"
+                type="text"
+                {...control.register("name")}
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all ${errors.name ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-[#2A591D]'
+                  }`}
+                placeholder="Ex: Association pour le développement"
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+
+            {/* Description */}
+            <div>
+              <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                id="description"
+                {...control.register("description")}
+                rows={3}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all resize-none"
+                placeholder="Décrivez brièvement l'organisation..."
+              />
+              {errors.description && (
+                <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-12">
-          <div className="mb-4">
-            <label htmlFor="crasc_region_id" className="block text-gray-700 font-medium mb-2">CRASC associé</label>
-            <Controller
-              name="region_id"
-              control={control}
-              render={({ field }) => (
-                <Select.Root onValueChange={field.onChange} value={field.value}>
-                  <Select.Trigger className="w-full p-2 border border-gray-300 rounded-lg text-left">
-                    <Select.Value placeholder="Sélectionnez une région CRASC" />
-                    <Select.Icon className="ml-2">▼</Select.Icon>
-                  </Select.Trigger>
-                  <Select.Content className="bg-white border border-gray-300 rounded-lg mt-1">
-                    <Select.ScrollUpButton className="text-center p-2 cursor-pointer">▲</Select.ScrollUpButton>
-                    <Select.Viewport>
-                      {crascRegions.map((region) => (
-                        <Select.Item
-                          key={region.id}
-                          value={region.id.toString()}
-                          className="p-2 hover:bg-gray-100 cursor-pointer"
-                        >
-                          <Select.ItemText>{region.name}</Select.ItemText>
-                        </Select.Item>
-                      ))}
-                    </Select.Viewport>
-                    <Select.ScrollDownButton className="text-center p-2 cursor-pointer">▼</Select.ScrollDownButton>
-                  </Select.Content>
-                </Select.Root>
+        {/* Associations */}
+        <div className="mb-8 pb-8 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Building2 className="w-5 h-5 text-[#2A591D]" />
+            Associations
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* CRASC */}
+            <div>
+              <label htmlFor="crasc_id" className="block text-sm font-semibold text-gray-700 mb-2">
+                CRASC associé <span className="text-red-500">*</span>
+              </label>
+              <Controller
+                name="crasc_id"
+                control={control}
+                render={({ field }) => (
+                  <Select.Root onValueChange={field.onChange} value={field.value}>
+                    <Select.Trigger className={`w-full px-4 py-3 border-2 rounded-lg text-left flex items-center justify-between transition-all ${errors.crasc_id ? 'border-red-300' : 'border-gray-200 hover:border-[#2A591D]'
+                      }`}>
+                      <Select.Value placeholder="Sélectionnez un CRASC" />
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    </Select.Trigger>
+                    <Select.Content className="bg-white border-2 border-gray-200 rounded-lg shadow-lg mt-1 overflow-hidden z-50">
+                      <Select.Viewport className="p-1">
+                        {crascRegions.map((region) => (
+                          <Select.Item
+                            key={region.id}
+                            value={region.id.toString()}
+                            className="px-4 py-2 hover:bg-[#2A591D]/10 cursor-pointer rounded transition-colors outline-none"
+                          >
+                            <Select.ItemText>{region.name}</Select.ItemText>
+                          </Select.Item>
+                        ))}
+                      </Select.Viewport>
+                    </Select.Content>
+                  </Select.Root>
+                )}
+              />
+              {errors.crasc_id && (
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.crasc_id.message}
+                </p>
               )}
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="type_id" className="block text-gray-700 font-medium mb-2">Type de OSC</label>
-            <Controller
-              name="type_id"
-              control={control}
-              render={({ field }) => (
-                <Select.Root onValueChange={field.onChange} value={field.value}>
-                  <Select.Trigger className="w-full p-2 border border-gray-300 rounded-lg text-left">
-                    <Select.Value placeholder="Sélectionnez un type de OSC" />
-                    <Select.Icon className="ml-2">▼</Select.Icon>
-                  </Select.Trigger>
-                  <Select.Content className="bg-white border border-gray-300 rounded-lg mt-1">
-                    <Select.ScrollUpButton className="text-center p-2 cursor-pointer">▲</Select.ScrollUpButton>
-                    <Select.Viewport>
-                      {oscType.map((type) => (
-                        <Select.Item
-                          key={type.id}
-                          value={type.id.toString()}
-                          className="p-2 hover:bg-gray-100 cursor-pointer"
-                        >
-                          <Select.ItemText>{type.name}</Select.ItemText>
-                        </Select.Item>
-                      ))}
-                    </Select.Viewport>
-                    <Select.ScrollDownButton className="text-center p-2 cursor-pointer">▼</Select.ScrollDownButton>
-                  </Select.Content>
-                </Select.Root>
+            </div>
+
+            {/* Type d'OSC */}
+            <div>
+              <label htmlFor="type_id" className="block text-sm font-semibold text-gray-700 mb-2">
+                Type d'OSC <span className="text-red-500">*</span>
+              </label>
+              <Controller
+                name="type_id"
+                control={control}
+                render={({ field }) => (
+                  <Select.Root onValueChange={field.onChange} value={field.value}>
+                    <Select.Trigger className={`w-full px-4 py-3 border-2 rounded-lg text-left flex items-center justify-between transition-all ${errors.type_id ? 'border-red-300' : 'border-gray-200 hover:border-[#2A591D]'
+                      }`}>
+                      <Select.Value placeholder="Sélectionnez un type" />
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    </Select.Trigger>
+                    <Select.Content className="bg-white border-2 border-gray-200 rounded-lg shadow-lg mt-1 overflow-hidden z-50">
+                      <Select.Viewport className="p-1">
+                        {oscType.map((type) => (
+                          <Select.Item
+                            key={type.id}
+                            value={type.id.toString()}
+                            className="px-4 py-2 hover:bg-[#2A591D]/10 cursor-pointer rounded transition-colors outline-none"
+                          >
+                            <Select.ItemText>{type.name}</Select.ItemText>
+                          </Select.Item>
+                        ))}
+                      </Select.Viewport>
+                    </Select.Content>
+                  </Select.Root>
+                )}
+              />
+              {errors.type_id && (
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.type_id.message}
+                </p>
               )}
-            />
+            </div>
           </div>
         </div>
 
         {/* Upload d'image */}
-        <div className="mb-6">
-          <label className="block text-gray-700 font-medium mb-2">
-            Image de couverture (optionnel)
-          </label>
-          
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <ImageIcon className="w-5 h-5 text-[#2A591D]" />
+            Image de couverture
+          </h2>
+
           <div className="space-y-4">
-            {/* Zone de drag & drop / sélection de fichier */}
-            <div 
-              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                errors.thumbnail_path ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
-              }`}
+            <div
+              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${errors.thumbnail
+                  ? "border-red-300 bg-red-50"
+                  : previewImage
+                    ? "border-[#2A591D] bg-[#2A591D]/5"
+                    : "border-gray-300 hover:border-[#2A591D] hover:bg-[#2A591D]/5"
+                }`}
               onClick={() => fileInputRef.current?.click()}
             >
               <input
@@ -314,15 +403,15 @@ export default function AdminAjoutOsc() {
                 className="hidden"
                 id="thumbnail"
               />
-              
+
               {previewImage ? (
                 <div className="flex flex-col items-center">
-                  <div className="relative w-48 h-48 mb-4">
+                  <div className="relative w-64 h-64 mb-4 rounded-lg overflow-hidden">
                     <Image
                       src={previewImage}
                       alt="Aperçu de l'image"
                       fill
-                      className="object-cover rounded-lg"
+                      className="object-cover"
                     />
                   </div>
                   <button
@@ -331,65 +420,70 @@ export default function AdminAjoutOsc() {
                       e.stopPropagation();
                       handleRemoveImage();
                     }}
-                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
+                    <X className="w-4 h-4" />
                     Supprimer l'image
                   </button>
                 </div>
               ) : (
                 <>
-                  <div className="text-gray-400 mb-2">
-                    <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <p className="text-gray-600">
-                    Cliquez pour sélectionner une image ou glissez-déposez
+                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-700 font-medium mb-1">
+                    Cliquez pour sélectionner une image
                   </p>
-                  <p className="text-gray-400 text-sm mt-1">
-                    Formats supportés: JPG, PNG, WebP (max 5MB)
+                  <p className="text-gray-500 text-sm">
+                    Formats: JPG, PNG, WebP • Taille max: 5MB
                   </p>
                 </>
               )}
             </div>
-            
-            {errors.thumbnail_path && (
-              <p className="text-red-500 text-sm">{errors.thumbnail_path.message}</p>
+
+            {errors.thumbnail && (
+              <p className="text-red-500 text-sm flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
+                {errors.thumbnail.message}
+              </p>
             )}
-            
+
             {/* Barre de progression */}
             {uploadProgress !== null && (
               <div className="space-y-2">
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div 
-                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="bg-[#2A591D] h-3 rounded-full transition-all duration-300 flex items-center justify-center"
                     style={{ width: `${uploadProgress}%` }}
-                  ></div>
+                  >
+                    {uploadProgress > 10 && (
+                      <span className="text-xs text-white font-semibold">{uploadProgress}%</span>
+                    )}
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600 text-center">
-                  Téléchargement: {uploadProgress}%
+                <p className="text-sm text-gray-600 text-center font-medium">
+                  Téléchargement en cours...
                 </p>
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+        {/* Boutons d'action */}
+        <div className="flex items-center gap-4 pt-6 border-t border-gray-200">
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-3 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+            className="flex-1 px-6 py-3 bg-gradient-to-r from-[#2A591D] to-[#1f4416] text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
-                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                Ajout en cours...
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Création en cours...
               </>
             ) : (
-              "Valider"
+              <>
+                <Check className="w-5 h-5" />
+                Créer l'OSC
+              </>
             )}
           </button>
 
@@ -398,14 +492,16 @@ export default function AdminAjoutOsc() {
             onClick={() => {
               reset();
               setPreviewImage(null);
+              setErrorMessage(null);
+              setSuccessMessage(null);
               if (fileInputRef.current) {
                 fileInputRef.current.value = "";
               }
             }}
-            className="px-6 py-3 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium cursor-pointer"
+            className="px-6 py-3 text-gray-700 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
             disabled={loading}
           >
-            Annuler
+            Réinitialiser
           </button>
         </div>
       </form>

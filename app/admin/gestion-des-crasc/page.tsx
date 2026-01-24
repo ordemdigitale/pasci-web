@@ -5,198 +5,362 @@ import {
 	fetchAllOsc,
 	fetchAllNews
 } from "@/lib/fetch-crasc";
-import { SquarePen } from "lucide-react";
 import Link from "next/link";
+import {
+	Building2,
+	Users,
+	MapPin,
+	Tag,
+	Newspaper,
+	Plus,
+	ArrowRight,
+	Home,
+	ExternalLink
+} from 'lucide-react';
 
 export default async function AdminCrascPage() {
-  const allCrasc = await fetchAllCrasc();
+	const allCrasc = await fetchAllCrasc();
 	const allRegion = await fetchAllRegion();
 	const allOscType = await fetchAllOscType();
 	const allOsc = await fetchAllOsc();
 	const allNews = await fetchAllNews();
 
-  return (
-    <section className="max-w-5xl mx-auto font-poppins bg-slate-50 py-4">
-			<div className="flex items-center justify-between">
-				<h2 className="text-2xl font-bold text-gray-900">Gestion des CRASC, leurs OSC et Régions.</h2>
-				<Link href="/admin" className="underline mt-4 text-sm text-blue-600">
-					← Aller au tableau de bord
-				</Link>
+	return (
+		<section className="max-w-7xl mx-auto font-poppins bg-slate-50 py-8 px-4">
+			{/* Header */}
+			<div className="mb-8">
+				<div className="flex items-center justify-between mb-4">
+					<div>
+						<h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+							<Building2 className="w-8 h-8 text-[#2A591D]" />
+							Gestion des CRASC
+						</h1>
+						<p className="text-gray-600 mt-2">Gérez les CRASC, leurs OSC, régions et actualités</p>
+					</div>
+					<Link
+						href="/admin"
+						className="inline-flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-800 transition-colors"
+					>
+						<Home className="w-4 h-4" />
+						Tableau de bord
+					</Link>
+				</div>
+
+				{/* Quick Stats */}
+				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+					<div className="bg-white rounded-xl border-2 border-gray-200 p-4">
+						<div className="flex items-center gap-3 mb-2">
+							<div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+								<Building2 className="w-5 h-5 text-blue-600" />
+							</div>
+							<div>
+								<p className="text-sm text-gray-600 font-medium">CRASC</p>
+								<p className="text-2xl font-bold text-gray-900">{allCrasc.length}</p>
+							</div>
+						</div>
+					</div>
+
+					<div className="bg-white rounded-xl border-2 border-gray-200 p-4">
+						<div className="flex items-center gap-3 mb-2">
+							<div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+								<Users className="w-5 h-5 text-green-600" />
+							</div>
+							<div>
+								<p className="text-sm text-gray-600 font-medium">OSC</p>
+								<p className="text-2xl font-bold text-gray-900">{allOsc.length}</p>
+							</div>
+						</div>
+					</div>
+
+					<div className="bg-white rounded-xl border-2 border-gray-200 p-4">
+						<div className="flex items-center gap-3 mb-2">
+							<div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+								<MapPin className="w-5 h-5 text-purple-600" />
+							</div>
+							<div>
+								<p className="text-sm text-gray-600 font-medium">Régions</p>
+								<p className="text-2xl font-bold text-gray-900">{allRegion.length}</p>
+							</div>
+						</div>
+					</div>
+
+					<div className="bg-white rounded-xl border-2 border-gray-200 p-4">
+						<div className="flex items-center gap-3 mb-2">
+							<div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+								<Newspaper className="w-5 h-5 text-orange-600" />
+							</div>
+							<div>
+								<p className="text-sm text-gray-600 font-medium">Actualités</p>
+								<p className="text-2xl font-bold text-gray-900">{allNews.length}</p>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 
-			{/* Liste des CRASC */}
-			<div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
-				<div className="flex items-center justify-between mb-4">
-					<h3 className="text-lg font-medium">
-						Les CRASC
-					</h3>
-{/* 					<Link href="/admin/gestion-des-crasc/ajouter-crasc" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
-						Ajouter un CRASC
-					</Link> */}
-				</div>
-				<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-					{allCrasc.map((crasc) => (
-						<div key={crasc.id} className="p-4 border border-gray-200 rounded-lg hover:border-[#2A591D] transition-colors">
-							<div className="flex items-center gap-2 mb-2">
-								<p className="text-gray-800 font-bold hover:cursor-pointer">
-									<Link href={`/admin/gestion-des-crasc/${crasc.slug}`} className="hover:text-[#2A591D]">
-										{crasc.name}
-									</Link>
-								</p>
-							</div>
-							<p className="text-gray-600 text-sm">Nombre de OSC: {crasc.osc_count}</p>
+			{/* CRASC Section */}
+			<div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm mb-6">
+				<div className="flex items-center justify-between mb-6">
+					<div className="flex items-center gap-3">
+						<div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+							<Building2 className="w-5 h-5 text-blue-600" />
 						</div>
+						<div>
+							<h2 className="text-xl font-bold text-gray-900">Les CRASC</h2>
+							<p className="text-sm text-gray-600">Centres régionaux d'appui</p>
+						</div>
+					</div>
+				</div>
+
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+					{allCrasc.map((crasc) => (
+						<Link
+							key={crasc.id}
+							href={`/admin/gestion-des-crasc/${crasc.slug}`}
+							className="group p-4 bg-gradient-to-br from-blue-50 to-white border-2 border-blue-100 rounded-xl hover:border-blue-300 hover:shadow-md transition-all"
+						>
+							<div className="flex items-start justify-between mb-3">
+								<Building2 className="w-5 h-5 text-blue-600" />
+								<ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+							</div>
+							<h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-2 line-clamp-2">
+								{crasc.name}
+							</h3>
+							<div className="flex items-center gap-1 text-sm text-gray-600">
+								<Users className="w-3 h-3" />
+								<span>{crasc.osc_count} OSC</span>
+							</div>
+						</Link>
 					))}
 				</div>
 			</div>
 
-			{/* Liste des OSCs */}
-			<div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
-				<div className="flex items-center justify-between">
-					<h3 className="text-lg font-medium mb-4">
-						Les Organisations de la Société Civile
-						<p className="mt-1.5 text-sm font-normal text-body">OSCs récemment ajoutées.</p>
-					</h3>
-					<Link href="/admin/gestion-des-crasc/osc/ajouter-osc" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
+			{/* OSC Section */}
+			<div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm mb-6">
+				<div className="flex items-center justify-between mb-6">
+					<div className="flex items-center gap-3">
+						<div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+							<Users className="w-5 h-5 text-green-600" />
+						</div>
+						<div>
+							<h2 className="text-xl font-bold text-gray-900">Les OSC</h2>
+							<p className="text-sm text-gray-600">Organisations récemment ajoutées</p>
+						</div>
+					</div>
+					<Link
+						href="/admin/gestion-des-crasc/osc/ajouter-osc"
+						className="inline-flex items-center gap-2 px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors"
+					>
+						<Plus className="w-4 h-4" />
 						Ajouter une OSC
 					</Link>
 				</div>
-				{/* list */}
+
 				<div className="overflow-x-auto">
 					<table className="min-w-full divide-y divide-gray-200">
 						<thead className="bg-gray-50">
 							<tr>
-								<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OSC</th>
-								<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TYPE DE OSC</th>
-								<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CRASC</th>
+								<th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+									OSC
+								</th>
+								<th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+									Type
+								</th>
+								<th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+									CRASC
+								</th>
+								<th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+									Action
+								</th>
 							</tr>
 						</thead>
 						<tbody className="bg-white divide-y divide-gray-200">
-							{/* Liste des OSC */}
-							{allOsc.map((osc) => (
-								<tr key={osc.id}>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{osc.name}</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{osc.type?.name}</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{osc.crasc?.name}</td>
+							{allOsc.slice(0, 10).map((osc) => (
+								<tr key={osc.id} className="hover:bg-gray-50 transition-colors">
+									<td className="px-6 py-4 whitespace-nowrap">
+										<div className="flex items-center gap-2">
+											<Users className="w-4 h-4 text-gray-400" />
+											<span className="text-sm font-semibold text-gray-900">{osc.name}</span>
+										</div>
+									</td>
+									<td className="px-6 py-4 whitespace-nowrap">
+										<span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+											<Tag className="w-3 h-3" />
+											{osc.type?.name || '-'}
+										</span>
+									</td>
+									<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+										{osc.crasc?.name || '-'}
+									</td>
+									<td className="px-6 py-4 whitespace-nowrap text-sm">
+										<button className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1">
+											Voir
+											<ExternalLink className="w-3 h-3" />
+										</button>
+									</td>
 								</tr>
 							))}
 						</tbody>
 					</table>
+					{allOsc.length > 10 && (
+						<div className="mt-4 text-center">
+							<p className="text-sm text-gray-600">
+								Affichage de 10 sur {allOsc.length} OSC
+							</p>
+						</div>
+					)}
 				</div>
 			</div>
 
-			{/* Liste des actualités */}
-			<div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
-				<div className="flex items-center justify-between">
-					<h3 className="text-lg font-medium mb-4">
-						Les Actualités
-						<p className="mt-1.5 text-sm font-normal text-body">Actualités récemment ajoutées.</p>
-					</h3>
-					<Link href="/admin/gestion-des-crasc/articles/ajouter-article" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
+			{/* Actualités Section */}
+			<div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm mb-6">
+				<div className="flex items-center justify-between mb-6">
+					<div className="flex items-center gap-3">
+						<div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+							<Newspaper className="w-5 h-5 text-orange-600" />
+						</div>
+						<div>
+							<h2 className="text-xl font-bold text-gray-900">Les Actualités</h2>
+							<p className="text-sm text-gray-600">Actualités récemment ajoutées</p>
+						</div>
+					</div>
+					<Link
+						href="/admin/gestion-des-crasc/articles/ajouter-article"
+						className="inline-flex items-center gap-2 px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors"
+					>
+						<Plus className="w-4 h-4" />
 						Ajouter une actualité
 					</Link>
 				</div>
-				{/* list */}
+
 				<div className="overflow-x-auto">
 					<table className="min-w-full divide-y divide-gray-200">
 						<thead className="bg-gray-50">
 							<tr>
-								<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TITRE</th>
-								<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CRASC</th>
-								<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OSC</th>
+								<th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+									Titre
+								</th>
+								<th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+									CRASC
+								</th>
+								<th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+									OSC
+								</th>
+								<th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+									Action
+								</th>
 							</tr>
 						</thead>
 						<tbody className="bg-white divide-y divide-gray-200">
-							{/* Les actualités */}
-							{allNews.map((news) => (
-								<tr key={news.id}>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{news.title}</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{news.crasc?.name || '-'}</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{news.osc?.name || '-'}</td>
+							{allNews.slice(0, 10).map((news) => (
+								<tr key={news.id} className="hover:bg-gray-50 transition-colors">
+									<td className="px-6 py-4">
+										<div className="flex items-center gap-2">
+											<Newspaper className="w-4 h-4 text-gray-400 flex-shrink-0" />
+											<span className="text-sm font-semibold text-gray-900 line-clamp-1">{news.title}</span>
+										</div>
+									</td>
+									<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+										{news.crasc?.name || '-'}
+									</td>
+									<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+										{news.osc?.name || '-'}
+									</td>
+									<td className="px-6 py-4 whitespace-nowrap text-sm">
+										<button className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1">
+											Voir
+											<ExternalLink className="w-3 h-3" />
+										</button>
+									</td>
 								</tr>
 							))}
 						</tbody>
 					</table>
+					{allNews.length > 10 && (
+						<div className="mt-4 text-center">
+							<p className="text-sm text-gray-600">
+								Affichage de 10 sur {allNews.length} actualités
+							</p>
+						</div>
+					)}
 				</div>
 			</div>
 
-			<div className="grid grid-cols-2 gap-2">
-				{/* Liste des Types de Oscs */}
-				<div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
-					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-medium mb-4">
-							<Link href="/admin/gestion-des-crasc/type-de-osc">
-								Les Types de OSC
-							</Link>
-						</h3>
-						<Link href="/admin/gestion-des-crasc/type-de-osc/ajouter-type-de-osc" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
-							Ajouter un type de OSC
+			{/* Secondary Sections Grid */}
+			<div className="grid md:grid-cols-2 gap-6">
+				{/* Types de OSC */}
+				<div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+					<div className="flex items-center justify-between mb-6">
+						<div className="flex items-center gap-3">
+							<div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+								<Tag className="w-5 h-5 text-purple-600" />
+							</div>
+							<div>
+								<h3 className="text-lg font-bold text-gray-900">
+									<Link href="/admin/gestion-des-crasc/type-de-osc" className="hover:text-purple-600 transition-colors">
+										Types de OSC
+									</Link>
+								</h3>
+								<p className="text-sm text-gray-600">{allOscType.length} types</p>
+							</div>
+						</div>
+						<Link
+							href="/admin/gestion-des-crasc/type-de-osc/ajouter-type-de-osc"
+							className="inline-flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm font-medium"
+						>
+							<Plus className="w-4 h-4" />
+							Ajouter
 						</Link>
 					</div>
-					{/* list  */}
-					<div className="overflow-x-auto">
-						<table className="min-w-full divide-y divide-gray-200">
-							<thead className="bg-gray-50">
-								<tr>
-									<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TYPE</th>
-									<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ACTION</th>
-								</tr>
-							</thead>
-							<tbody className="bg-white divide-y divide-gray-200">
-							{allOscType.map((osctype) => (
-								<tr key={osctype.id}>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-										<Link href={`/admin/gestion-des-crasc/type-de-osc/${osctype.slug}`}>
-											{osctype.name}
-										</Link>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-										<Link
-                    href={`/admin/gestion-des-crasc/type-de-osc/${osctype.slug}`}
-                    className="text-gray-600 hover:text-gray-900"
-                  >
-                    Voir
-                  </Link>
-									</td>
-								</tr>
-							))}
-							</tbody>
-						</table>
+
+					<div className="space-y-2">
+						{allOscType.slice(0, 5).map((osctype) => (
+							<Link
+								key={osctype.id}
+								href={`/admin/gestion-des-crasc/type-de-osc/${osctype.slug}`}
+								className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-purple-50 hover:border-purple-200 border border-transparent transition-all group"
+							>
+								<span className="text-sm font-semibold text-gray-900 group-hover:text-purple-700">
+									{osctype.name}
+								</span>
+								<ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
+							</Link>
+						))}
 					</div>
 				</div>
 
-				{/* Liste des Régions CIV */}
-				<div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
-					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-medium mb-4">
-							Les Régions de la Côte d'Ivoire
-						</h3>
-{/* 						<Link href="/admin/gestion-des-crasc/ajouter-region" className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors">
-							Ajouter une région
-						</Link> */}
+				{/* Régions */}
+				<div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+					<div className="flex items-center justify-between mb-6">
+						<div className="flex items-center gap-3">
+							<div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+								<MapPin className="w-5 h-5 text-green-600" />
+							</div>
+							<div>
+								<h3 className="text-lg font-bold text-gray-900">Régions de Côte d'Ivoire</h3>
+								<p className="text-sm text-gray-600">{allRegion.length} régions</p>
+							</div>
+						</div>
 					</div>
-					{/* list regions with their respective CRASC */}
-					<div className="overflow-x-auto">
-						<table className="min-w-full divide-y divide-gray-200">
-							<thead className="bg-gray-50">
-								<tr>
-									<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Région</th>
-									<th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CRASC</th>
-								</tr>
-							</thead>
-							<tbody className="bg-white divide-y divide-gray-200">
-								{allRegion.map((region) => (
-									<tr key={region.id}>
-										<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{region.name}</td>
-										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{region.crasc_region?.name || '-'}</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
+
+					<div className="space-y-2 max-h-64 overflow-y-auto">
+						{allRegion.map((region) => (
+							<div
+								key={region.id}
+								className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+							>
+								<div className="flex items-center gap-2">
+									<MapPin className="w-4 h-4 text-green-600" />
+									<span className="text-sm font-semibold text-gray-900">{region.name}</span>
+								</div>
+								<span className="text-xs text-gray-600 bg-white px-2 py-1 rounded">
+									{region.crasc_region?.name || 'Non assigné'}
+								</span>
+							</div>
+						))}
 					</div>
-					{/* Place regions civ in a table data with pagination */}
 				</div>
-			</div>			
-    </section>
-  )
+			</div>
+		</section>
+	)
 }

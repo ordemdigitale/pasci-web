@@ -3,7 +3,7 @@ export interface ICrasc {
   name: string;
   slug: string;
   osc_count: number;
-  
+
   //description
   //oscs
   //regions
@@ -31,6 +31,7 @@ export interface ICrascDetail {
   id: string;
   name: string;
   slug: string;
+  description?: string;
   osc_count?: number;
   oscs?: IOsc[];
   regions?: IRegionCiv[];
