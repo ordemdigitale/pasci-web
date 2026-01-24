@@ -49,23 +49,29 @@ export interface IOscType {
 
 // Interface for News
 export interface INews {
-  id: string;
+  id: number;
   title: string;
   slug: string;
   content?: string;
+  thumbnail_path?: string;
   thumbnail_url?: string;
   created_at?: string;
+  updated_at?: string;
+  crasc_id?: number | null;
+  osc_id?: number | null;
   tags?: string[];
   crasc?: ICrasc;
-  osc?: IOsc
+  osc?: IOsc;
 }
 // Interface for Spotlight News 
 export interface SpotlightNews {
-  id: string;
+  id: number;
   title: string;
   slug: string;
   content?: string;
-  thumbnail_url: string;
+  thumbnail_path?: string;
+  thumbnail_url?: string;
+  created_at?: string;
   crasc?: ICrasc;
   osc?: IOsc;
 }

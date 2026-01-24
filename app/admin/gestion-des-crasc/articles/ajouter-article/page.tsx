@@ -9,25 +9,40 @@ import * as z from "zod";
 import * as Select from "@radix-ui/react-select";
 import { ICrasc, IOsc } from "@/types/api.types";
 import { fetchAllCrasc, fetchAllOsc } from "@/lib/fetch-crasc";
+import { newsService } from "@/lib/services/news.service";
 import Image from "next/image";
 import ClientTextEditor from "@/components/ui/ClientTextEditor";
+import {
+  ArrowLeft,
+  Newspaper,
+  FileText,
+  Upload,
+  X,
+  Check,
+  Loader2,
+  AlertCircle,
+  ChevronDown,
+  Image as ImageIcon,
+  Building2,
+  Users
+} from 'lucide-react';
 
-// Schema de validation pour le formulaire d'ajout d'actualité
+// Schema de validation
 const newsSchema = z.object({
-  title: z.string().min(4, "Le titre de l'actualité doit contenir au moins 8 caractères."),
+  title: z.string().min(8, "Le titre doit contenir au moins 8 caractères."),
   content: z.string().optional(),
   crasc_id: z.string().optional(),
   osc_id: z.string().optional(),
-  thumbnail_path: z
+  thumbnail: z
     .instanceof(File)
     .optional()
     .refine(
-      (file) => !file || file.size <= 5 * 1024 * 1024, // 5MB max
+      (file) => !file || file.size <= 5 * 1024 * 1024,
       { message: "L'image doit être inférieure à 5MB" }
     )
     .refine(
       (file) => !file || ["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.type),
-      { message: "Format d'image non supporté. Utilisez le format JPG, PNG ou WebP" }
+      { message: "Format non supporté. Utilisez JPG, PNG ou WebP" }
     ),
 });
 
@@ -35,225 +50,261 @@ type NewsForm = z.infer<typeof newsSchema>;
 
 export default function AdminAjoutArticle() {
   const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
-  const [Osc, setOsc] = useState<IOsc[]>([]);
+  const [oscs, setOscs] = useState<IOsc[]>([]);
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  // Récupérer les régions CRASC depuis l'API lors du montage du composant
+
+  // Récupérer les CRASC et OSC
   useEffect(() => {
     fetchAllCrasc()
       .then(data => setCrascRegions(data))
-      .catch(error => console.error("Erreur lors de la récupération des données relatives aux régions CRASC: ", error));
-  }, []);
-  // Récupérer les OSC depuis l'API lors du montage du composant
-  useEffect(() => {
+      .catch(error => console.error("Erreur CRASC:", error));
+
     fetchAllOsc()
-      .then(data => setOsc(data))
-      .catch(error => console.error("Erreur lors de la récupération des données relatives aux OSC: ", error));
+      .then(data => setOscs(data))
+      .catch(error => console.error("Erreur OSC:", error));
   }, []);
 
   const { control, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<NewsForm>({
     resolver: zodResolver(newsSchema),
     defaultValues: { title: "", content: "", crasc_id: "", osc_id: "" },
   });
-  const thumbnailFile = watch("thumbnail_path");
-  
-  // Gestion du preview de l'image
+
+  const thumbnailFile = watch("thumbnail");
+
+  // Preview de l'image
   useEffect(() => {
     if (thumbnailFile) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-      };
+      reader.onloadend = () => setPreviewImage(reader.result as string);
       reader.readAsDataURL(thumbnailFile);
     } else {
       setPreviewImage(null);
     }
-  }, [thumbnailFile])
+  }, [thumbnailFile]);
 
-  // Gestion du changement de fichier
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setValue("thumbnail_path", file);
-    }
+    if (file) setValue("thumbnail", file);
   };
 
-  // Supprimer l'image selectionnée
   const handleRemoveImage = () => {
-    setValue("thumbnail_path", undefined);
+    setValue("thumbnail", undefined);
     setPreviewImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // Gestion de la soumission du formulaire
+  // Soumission du formulaire avec newsService
   const onSubmit = async (values: NewsForm) => {
     setLoading(true);
-    setUploadProgress(0);
-    
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
     try {
-      // Créer FormData pour envoyer l'image
-      const formData = new FormData();
-      formData.append("title", values.title);
+      await newsService.create({
+        title: values.title,
+        content: values.content || "",
+        thumbnail: values.thumbnail,
+        crasc_id: values.crasc_id ? parseInt(values.crasc_id) : undefined,
+        osc_id: values.osc_id ? parseInt(values.osc_id) : undefined,
+      });
 
-      if (values.content && values.content.trim() !== "") {
-        formData.append("content", values.content);
-      }
-      
-      if (values.crasc_id) {
-        formData.append("crasc_id", values.crasc_id);
-      }
-      if (values.osc_id) {
-        formData.append("osc_id", values.osc_id);
-      }
-      if (values.thumbnail_path) {
-        formData.append("thumbnail_path", values.thumbnail_path);
-      }
+      setSuccessMessage("✅ Actualité publiée avec succès!");
+      reset();
+      setPreviewImage(null);
 
-      // Créer une requête XMLHttpRequest pour suivre la progression
-      const xhr = new XMLHttpRequest();
-      
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const progress = Math.round((event.loaded / event.total) * 100);
-          setUploadProgress(progress);
-        }
-      };
-      
-      xhr.onload = () => {
-        if (xhr.status === 201) {
-          // Rediriger ou afficher un message de succès
-          reset();
-          setPreviewImage(null);
-          router.push("/admin/gestion-des-crasc");
-        } else {
-          // Parse error response
-          let errorMessage = "Une erreur est survenue lors de l'ajout de l'actualité.";
-          let fieldErrors: Record<string, string> = {};
-
-          try {
-            const response = JSON.parse(xhr.responseText);
-
-            if(response.detail) {
-              // Handle structured error response
-              if (typeof response.detail === 'string') {
-                errorMessage = response.detail;
-              } else if (response.detail.type === 'duplicate_error' && response.detail.errors) {
-                // Handle duplicate title error
-                response.detail.errors.forEach((error: any) => {
-                  if (error.field === 'title') {
-                    errorMessage = error.message;
-                    fieldErrors.title = error.message;
-                  }
-                });
-              } else if (response.detail.type === 'validation_error' && response.detail.errors) {
-                // Handle validation errors
-                response.detail.errors.forEach((error: any) => {
-                  fieldErrors[error.field] = error.message;
-                  if (error.field === 'thumbnail') {
-                    errorMessage = error.message;
-                  }
-                });
-              }
-            }
-          } catch (e) {
-            // Response is not JSON or parsing failed
-            errorMessage = `Erreur ${xhr.status}: ${xhr.statusText}`;
-          }
-          // Show error message
-          alert(errorMessage);
-          // If we have field-specific errors, we could set them in form state
-          // For now, we just log them
-          if (Object.keys(fieldErrors).length > 0) {
-            console.log("Field errors:", fieldErrors);
-          }
-        }
-        setLoading(false);
-        setUploadProgress(null);
-      };
-      
-      xhr.onerror = () => {
-        console.error("Erreur réseau lors de l'envoi du formulaire");
-        alert("Erreur réseau. Vérifiez votre connexion et que l'API est en cours d'exécution.");
-        setLoading(false);
-        setUploadProgress(null);
-      };
-      
-      xhr.open("POST", "http://localhost:8000/api/v1/crasc/news");
-      xhr.send(formData);
-      
-    } catch (error) {
-      console.error("Erreur lors de l'ajout d'une actualité: ", error);
-      alert("Une erreur inattendue est survenue. Veuillez réessayer.");
+      setTimeout(() => {
+        router.push("/admin/gestion-des-actualites");
+      }, 2000);
+    } catch (error: any) {
+      setErrorMessage(error.message || "Une erreur est survenue.");
+    } finally {
       setLoading(false);
-      setUploadProgress(null);
     }
   };
 
   return (
-    <section className="max-w-5xl mx-auto font-poppins bg-slate-50">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Ajouter l&apos;actualité</h2>
-        <Link href="/admin/gestion-des-crasc" className="underline mt-4 text-sm text-blue-600">
-          ← Retour à la page de gestion des CRASC
-        </Link>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 font-poppins">
+      <div className="max-w-4xl mx-auto">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-[#2A591D] to-[#3d7a28] rounded-2xl p-8 mb-8 text-white shadow-xl">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+              <Newspaper className="w-8 h-8" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">Publier une Actualité</h1>
+              <p className="text-white/80 mt-1">Créez et partagez une nouvelle actualité</p>
+            </div>
+          </div>
+          <Link
+            href="/admin/gestion-des-actualites"
+            className="inline-flex items-center gap-2 text-sm text-white/90 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Retour à la gestion des actualités
+          </Link>
+        </div>
 
-      {/* Le formulaire */}
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 bg-white rounded-lg p-6 border border-gray-200">
-        {/* Titre */}
-        <div className="mb-4">
-          <label htmlFor="name" className="block text-gray-700 font-medium mb-2">Titre de l&apos;actualité</label>
-          <input
-            id="title"
-            type="text"
-            {...control.register("title")}
-            className="w-full p-2 border border-gray-300 rounded-lg"
-            placeholder="Tournées d'information"
-          />
-          {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
-        </div>
-        {/* Editeur */}
-        <div className="mb-6">
-          <label htmlFor="" className="block text-gray-700 font-medium mb-2">
-            Contenu de l&apos;actualité
-          </label>
-          <Controller
-            name="content"
-            control={control}
-            render={({ field }) => (
-              <ClientTextEditor
-                value={field.value || ""}
-                onChange={field.onChange}
-                placeholder="Écrivez le contenu de l'actualité..."
-                error={!!errors.content}
-                name="content"
+        {/* Messages de succès/erreur */}
+        {successMessage && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+            <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+            <p className="text-green-800 font-medium">{successMessage}</p>
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            <p className="text-red-800 font-medium">{errorMessage}</p>
+          </div>
+        )}
+
+        {/* Formulaire */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Section: Informations de base */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+              <FileText className="w-5 h-5 text-[#2A591D]" />
+              <h2 className="text-xl font-bold text-gray-900">Informations de base</h2>
+            </div>
+
+            {/* Titre */}
+            <div className="mb-6">
+              <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-2">
+                Titre de l'actualité <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="title"
+                type="text"
+                {...control.register("title")}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all ${errors.title ? "border-red-500" : "border-gray-300"
+                  }`}
+                placeholder="Ex: Lancement du nouveau programme de formation"
               />
-            )}
-          />
-          {errors.content && (
-            <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>
-          )}
-          <p className="text-gray-500 text-sm mt-2">
-            Utilisez l'éditeur pour formater votre texte. Le contenu sera sauvegardé au format HTML.
-          </p>
-        </div>
-        {/* Upload d'image */}
-        <div className="mb-6">
-          <label className="block text-gray-700 font-medium mb-2">
-            Image de couverture (optionnel)
-          </label>
-          
-          <div className="space-y-4">
-            {/* Zone de drag & drop / sélection de fichier */}
-            <div 
-              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                errors.thumbnail_path ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
-              }`}
+              {errors.title && (
+                <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.title.message}
+                </p>
+              )}
+            </div>
+
+            {/* Contenu */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Contenu de l'actualité
+              </label>
+              <Controller
+                name="content"
+                control={control}
+                render={({ field }) => (
+                  <ClientTextEditor
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    placeholder="Rédigez le contenu de l'actualité..."
+                    error={!!errors.content}
+                    name="content"
+                  />
+                )}
+              />
+              {errors.content && (
+                <p className="text-red-500 text-sm mt-2">{errors.content.message}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Section: Associations */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+              <Building2 className="w-5 h-5 text-[#2A591D]" />
+              <h2 className="text-xl font-bold text-gray-900">Associations</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* CRASC */}
+              <div>
+                <label htmlFor="crasc_id" className="block text-sm font-semibold text-gray-700 mb-2">
+                  CRASC associé
+                </label>
+                <Controller
+                  name="crasc_id"
+                  control={control}
+                  render={({ field }) => (
+                    <Select.Root onValueChange={field.onChange} value={field.value}>
+                      <Select.Trigger className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between">
+                        <Select.Value placeholder="Sélectionnez un CRASC" />
+                        <ChevronDown className="w-4 h-4 text-gray-500" />
+                      </Select.Trigger>
+                      <Select.Content className="bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-auto z-50">
+                        <Select.Viewport>
+                          {crascRegions.map((region) => (
+                            <Select.Item
+                              key={region.id}
+                              value={region.id.toString()}
+                              className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
+                            >
+                              <Select.ItemText>{region.name}</Select.ItemText>
+                            </Select.Item>
+                          ))}
+                        </Select.Viewport>
+                      </Select.Content>
+                    </Select.Root>
+                  )}
+                />
+              </div>
+
+              {/* OSC */}
+              <div>
+                <label htmlFor="osc_id" className="block text-sm font-semibold text-gray-700 mb-2">
+                  OSC associée
+                </label>
+                <Controller
+                  name="osc_id"
+                  control={control}
+                  render={({ field }) => (
+                    <Select.Root onValueChange={field.onChange} value={field.value}>
+                      <Select.Trigger className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between">
+                        <Select.Value placeholder="Sélectionnez une OSC" />
+                        <ChevronDown className="w-4 h-4 text-gray-500" />
+                      </Select.Trigger>
+                      <Select.Content className="bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-auto z-50">
+                        <Select.Viewport>
+                          {oscs.map((osc) => (
+                            <Select.Item
+                              key={osc.id}
+                              value={osc.id.toString()}
+                              className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
+                            >
+                              <Select.ItemText>{osc.name}</Select.ItemText>
+                            </Select.Item>
+                          ))}
+                        </Select.Viewport>
+                      </Select.Content>
+                    </Select.Root>
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Image de couverture */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+              <ImageIcon className="w-5 h-5 text-[#2A591D]" />
+              <h2 className="text-xl font-bold text-gray-900">Image de couverture</h2>
+            </div>
+
+            <div
+              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${errors.thumbnail
+                  ? "border-red-500 bg-red-50"
+                  : "border-gray-300 hover:border-[#2A591D] hover:bg-gray-50"
+                }`}
               onClick={() => fileInputRef.current?.click()}
             >
               <input
@@ -262,17 +313,16 @@ export default function AdminAjoutArticle() {
                 accept="image/jpeg, image/jpg, image/png, image/webp"
                 onChange={handleFileChange}
                 className="hidden"
-                id="thumbnail"
               />
-              
+
               {previewImage ? (
                 <div className="flex flex-col items-center">
-                  <div className="relative w-48 h-48 mb-4">
+                  <div className="relative w-64 h-48 mb-4 rounded-lg overflow-hidden">
                     <Image
                       src={previewImage}
-                      alt="Aperçu de l'image"
+                      alt="Aperçu"
                       fill
-                      className="object-cover rounded-lg"
+                      className="object-cover"
                     />
                   </div>
                   <button
@@ -281,146 +331,67 @@ export default function AdminAjoutArticle() {
                       e.stopPropagation();
                       handleRemoveImage();
                     }}
-                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
+                    <X className="w-4 h-4" />
                     Supprimer l'image
                   </button>
                 </div>
               ) : (
                 <>
-                  <div className="text-gray-400 mb-2">
-                    <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <p className="text-gray-600">
-                    Cliquez pour sélectionner une image ou glissez-déposez
+                  <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                  <p className="text-gray-700 font-medium mb-1">
+                    Cliquez pour sélectionner une image
                   </p>
-                  <p className="text-gray-400 text-sm mt-1">
-                    Formats supportés: JPG, PNG, WebP (max 5MB)
+                  <p className="text-gray-500 text-sm">
+                    JPG, PNG ou WebP • Max 5MB
                   </p>
                 </>
               )}
             </div>
-            
-            {errors.thumbnail_path && (
-              <p className="text-red-500 text-sm">{errors.thumbnail_path.message}</p>
-            )}
-            
-            {/* Barre de progression */}
-            {uploadProgress !== null && (
-              <div className="space-y-2">
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div 
-                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
-                  ></div>
-                </div>
-                <p className="text-sm text-gray-600 text-center">
-                  Téléchargement: {uploadProgress}%
-                </p>
-              </div>
+
+            {errors.thumbnail && (
+              <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" />
+                {errors.thumbnail.message}
+              </p>
             )}
           </div>
-        </div>
 
-        <div className="mb-4">
-          <label htmlFor="crasc_id" className="block text-gray-700 font-medium mb-2">CRASC associé</label>
-          <Controller
-            name="crasc_id"
-            control={control}
-            render={({ field }) => (
-              <Select.Root onValueChange={field.onChange} value={field.value}>
-                <Select.Trigger className={`w-full p-3 border rounded-lg text-left focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors ${
-                  errors.crasc_id ? "border-red-500" : "border-gray-300"
-                }`}>
-                  <Select.Value placeholder="Sélectionnez un CRASC" />
-                  <Select.Icon className="ml-2">▼</Select.Icon>
-                </Select.Trigger>
-                <Select.Content className="bg-white border border-gray-300 rounded-lg mt-1">
-                  <Select.ScrollUpButton className="text-center p-2 cursor-pointer">▲</Select.ScrollUpButton>
-                  <Select.Viewport>
-                    {crascRegions.map((region) => (
-                      <Select.Item
-                        key={region.id}
-                        value={region.id.toString()}
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                      >
-                        <Select.ItemText>{region.name}</Select.ItemText>
-                      </Select.Item>
-                    ))}
-                  </Select.Viewport>
-                  <Select.ScrollDownButton className="text-center p-2 cursor-pointer">▼</Select.ScrollDownButton>
-                </Select.Content>
-              </Select.Root>
-            )}
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="osc_id" className="block text-gray-700 font-medium mb-2">OSC associée</label>
-          <Controller
-            name="osc_id"
-            control={control}
-            render={({ field }) => (
-              <Select.Root onValueChange={field.onChange} value={field.value}>
-                <Select.Trigger className="w-full p-2 border border-gray-300 rounded-lg text-left">
-                  <Select.Value placeholder="Sélectionnez une OSC" />
-                  <Select.Icon className="ml-2">▼</Select.Icon>
-                </Select.Trigger>
-                <Select.Content className="bg-white border border-gray-300 rounded-lg mt-1">
-                  <Select.ScrollUpButton className="text-center p-2 cursor-pointer">▲</Select.ScrollUpButton>
-                  <Select.Viewport>
-                    {Osc.map((osc) => (
-                      <Select.Item
-                        key={osc.id}
-                        value={osc.id.toString()}
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                      >
-                        <Select.ItemText>{osc.name}</Select.ItemText>
-                      </Select.Item>
-                    ))}
-                  </Select.Viewport>
-                  <Select.ScrollDownButton className="text-center p-2 cursor-pointer">▼</Select.ScrollDownButton>
-                </Select.Content>
-              </Select.Root>
-            )}
-          />
-        </div>
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-6 py-3 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
-          >
-            {loading ? (
-              <>
-                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                Ajout en cours...
-              </>
-            ) : (
-              "Publier l'actualité"
-            )}
-          </button>
+          {/* Boutons d'action */}
+          <div className="flex items-center justify-between gap-4 pt-4">
+            <button
+              type="button"
+              onClick={() => {
+                reset();
+                setPreviewImage(null);
+              }}
+              disabled={loading}
+              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
+            >
+              Réinitialiser
+            </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              reset();
-              setPreviewImage(null);
-              if (fileInputRef.current) {
-                fileInputRef.current.value = "";
-              }
-            }}
-            className="px-6 py-3 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium cursor-pointer"
-            disabled={loading}
-          >
-            Annuler
-          </button>
-        </div>
-      </form>
-    </section>
-  )
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-8 py-3 bg-gradient-to-r from-[#2A591D] to-[#3d7a28] text-white rounded-lg hover:shadow-lg transition-all font-semibold disabled:opacity-50 flex items-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Publication en cours...
+                </>
+              ) : (
+                <>
+                  <Check className="w-5 h-5" />
+                  Publier l'actualité
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
