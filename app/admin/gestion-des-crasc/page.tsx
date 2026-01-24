@@ -15,7 +15,9 @@ import {
 	Plus,
 	ArrowRight,
 	Home,
-	ExternalLink
+	ExternalLink,
+	Edit3,
+	Eye
 } from 'lucide-react';
 
 export default async function AdminCrascPage() {
@@ -193,10 +195,13 @@ export default async function AdminCrascPage() {
 										{osc.crasc?.name || '-'}
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap text-sm">
-										<button className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1">
+										<Link
+											href={`/osc/${osc.slug}`}
+											className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1"
+										>
 											Voir
 											<ExternalLink className="w-3 h-3" />
-										</button>
+										</Link>
 									</td>
 								</tr>
 							))}
@@ -267,11 +272,25 @@ export default async function AdminCrascPage() {
 										{news.osc?.name || '-'}
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap text-sm">
-										<button className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1">
-											Voir
-											<ExternalLink className="w-3 h-3" />
-										</button>
-									</td>
+							<div className="flex items-center gap-2">
+								<Link
+									href={`/actualites/${news.slug}`}
+									className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium"
+									title="Voir l'actualité"
+								>
+									<Eye className="w-3.5 h-3.5" />
+									Voir
+								</Link>
+								<Link
+									href={`/admin/gestion-des-crasc/articles/${news.slug}/modifier`}
+									className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-medium"
+									title="Modifier l'actualité"
+								>
+									<Edit3 className="w-3.5 h-3.5" />
+									Modifier
+								</Link>
+							</div>
+						</td>
 								</tr>
 							))}
 						</tbody>

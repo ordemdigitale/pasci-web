@@ -182,7 +182,9 @@ export async function fetchWithAuth(
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
-  if (!headers.has("Content-Type")) {
+
+  // Don't set Content-Type for FormData - browser will set it automatically with boundary
+  if (!headers.has("Content-Type") && !(options.body instanceof FormData)) {
     headers.set("Content-Type", "application/json");
   }
 

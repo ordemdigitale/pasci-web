@@ -154,20 +154,18 @@ export const newsService = {
    */
   async create(data: CreateNewsData): Promise<INews> {
     const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("content", data.content);
+
+    // Ensure title and content are never undefined
+    formData.append("title", data.title || "");
+    formData.append("content", data.content || "");
 
     if (data.thumbnail) {
       formData.append("thumbnail", data.thumbnail);
     }
 
-    if (data.crasc_id !== undefined) {
-      formData.append("crasc_id", data.crasc_id.toString());
-    }
-
-    if (data.osc_id !== undefined) {
-      formData.append("osc_id", data.osc_id.toString());
-    }
+    // Always send crasc_id and osc_id (even if empty) to match backend expectations
+    formData.append("crasc_id", data.crasc_id !== undefined ? data.crasc_id.toString() : "");
+    formData.append("osc_id", data.osc_id !== undefined ? data.osc_id.toString() : "");
 
     const response = await fetchWithAuth(`${API_URL}/news`, {
       method: "POST",
@@ -190,11 +188,11 @@ export const newsService = {
   async update(slug: string, data: UpdateNewsData): Promise<INews> {
     const formData = new FormData();
 
-    if (data.title) {
+    if (data.title !== undefined) {
       formData.append("title", data.title);
     }
 
-    if (data.content) {
+    if (data.content !== undefined) {
       formData.append("content", data.content);
     }
 
@@ -202,13 +200,9 @@ export const newsService = {
       formData.append("thumbnail", data.thumbnail);
     }
 
-    if (data.crasc_id !== undefined) {
-      formData.append("crasc_id", data.crasc_id.toString());
-    }
-
-    if (data.osc_id !== undefined) {
-      formData.append("osc_id", data.osc_id.toString());
-    }
+    // Always send crasc_id and osc_id (even if empty) to match backend expectations
+    formData.append("crasc_id", data.crasc_id !== undefined ? data.crasc_id.toString() : "");
+    formData.append("osc_id", data.osc_id !== undefined ? data.osc_id.toString() : "");
 
     const response = await fetchWithAuth(`${API_URL}/news/${slug}`, {
       method: "PATCH",
