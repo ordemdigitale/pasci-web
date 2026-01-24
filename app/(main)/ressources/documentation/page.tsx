@@ -155,30 +155,31 @@ export default function PageDocumentation() {
 
   return (
     <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
-      <div className="max-w-5xl mx-auto sm:px-6 lg:px-8 p-8 mb-10 grid lg:grid-cols-2 gap-12">
-        
-        {/* Left content */}
-        <div className="">
-          <h2 className="font-bold text-5xl text-[#2a591d] uppercase">Documentation</h2>
-          <p className="font-bold text-xl max-w-sm mt-6">
-            Profitez de la Base de Données Documentaire des CRASC
-          </p>
-          <p className="text-gray-600 text-md max-w-xl mt-2">
-            Accédez à une collection complète de rapports, études, guides et ressources clés du projet PASCI. Filtrez et recherchez pour trouver rapidement l'information dont vous avez besoin.
-          </p>
-        </div>
-
-        {/* Right content */}
-        <div className="space-y-12">
+      
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
+          
+          {/* Left content */}
           <div className="">
-            <ImageWithFallback
-              src="/images/3a510ba6881dd3274d3f509019311d42ace72cf51c823f60c5e5fe2e112ff892.png"
-              alt="image"
-              className="w-full h-[300px] object-cover rounded-lg"
-            />
+            <h2 className="font-bold text-4xl text-[#2a591d] leading-tight">Documentation</h2>
+            <p className="font-bold text-xl max-w-sm mt-6">
+              Profitez de la Base de Données Documentaire des CRASC
+            </p>
+            <p className="text-gray-600 text-md max-w-xl mt-2">
+              Accédez à une collection complète de rapports, études, guides et ressources clés du projet PASCI. Filtrez et recherchez pour trouver rapidement l'information dont vous avez besoin.
+            </p>
+          </div>
+
+          {/* Right content */}
+          <div className="space-y-12">
+            <div className="">
+              <ImageWithFallback
+                src="/images/3a510ba6881dd3274d3f509019311d42ace72cf51c823f60c5e5fe2e112ff892.png"
+                alt="image"
+                className="w-full h-[300px] object-cover rounded-lg"
+              />
+            </div>
           </div>
         </div>
-      </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         {/* Search bar + filters area*/}
@@ -377,7 +378,7 @@ export default function PageDocumentation() {
         {/* End pagination */}
 
       </div>
-
+      
     </section>
   )
 }

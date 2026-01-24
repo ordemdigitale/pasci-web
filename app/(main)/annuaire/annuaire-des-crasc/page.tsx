@@ -8,6 +8,8 @@ import { ICrasc, IKeyStats, SpotlightNews } from "@/types/api.types";
 import { Users, Building2, Target, ArrowRight, MapPin, Calendar } from "lucide-react";
 import Link from "next/link";
 import DOMPurify from 'dompurify';
+import { CrascMapSvg } from '@/components/ui/CrascMapSvg';
+import { useRouter } from 'next/navigation';
 
 interface IActivityCard {
   id: number;
@@ -189,6 +191,7 @@ export default function PageAnnuaireCrasc() {
   const [spotlightNewsData, setSpotlightNewsData] = useState<SpotlightNews[]>(mockNews);
   const [newsLoading, setNewsLoading] = useState(true);
   const [newsError, setNewsError] = useState<string | null>(null);
+  const router = useRouter();
 
   // Fetch CRASC data on component mount
    useEffect(() => {
@@ -282,75 +285,13 @@ export default function PageAnnuaireCrasc() {
 
           <div className="grid md:grid-cols-2 gap-8 items-center">
             {/* Map Container */}
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
-              <div className="relative w-full" style={{ paddingBottom: '120%' }}>
-                {/* Simplified Map of Côte d'Ivoire with 5 regions */}
-                <svg
-                  viewBox="0 0 300 360"
-                  className="absolute inset-0 w-full h-full"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  {/* CRASC NORD - Top region */}
-                  <path
-                    d="M 50 20 L 250 20 L 250 100 L 150 120 L 50 100 Z"
-                    className="fill-blue-200 stroke-blue-400 stroke-2 hover:fill-blue-300 cursor-pointer transition-all duration-300"
-                    onClick={() => console.log('CRASC NORD')}
-                  />
-                  <text x="150" y="70" textAnchor="middle" className="text-xs font-bold fill-blue-700 pointer-events-none">
-                    CRASC NORD
-                  </text>
-
-                  {/* CRASC OUEST - Left region */}
-                  <path
-                    d="M 20 120 L 120 120 L 130 200 L 100 260 L 20 240 Z"
-                    className="fill-orange-200 stroke-orange-400 stroke-2 hover:fill-orange-300 cursor-pointer transition-all duration-300"
-                    onClick={() => console.log('CRASC OUEST')}
-                  />
-                  <text x="75" y="190" textAnchor="middle" className="text-xs font-bold fill-orange-700 pointer-events-none">
-                    CRASC
-                  </text>
-                  <text x="75" y="205" textAnchor="middle" className="text-xs font-bold fill-orange-700 pointer-events-none">
-                    OUEST
-                  </text>
-
-                  {/* CRASC CENTRE - Middle region */}
-                  <path
-                    d="M 120 120 L 220 120 L 230 180 L 210 220 L 130 200 Z"
-                    className="fill-green-200 stroke-green-400 stroke-2 hover:fill-green-300 cursor-pointer transition-all duration-300"
-                    onClick={() => console.log('CRASC CENTRE')}
-                  />
-                  <text x="175" y="165" textAnchor="middle" className="text-xs font-bold fill-green-700 pointer-events-none">
-                    CRASC
-                  </text>
-                  <text x="175" y="180" textAnchor="middle" className="text-xs font-bold fill-green-700 pointer-events-none">
-                    CENTRE
-                  </text>
-
-                  {/* CRASC EST - Right region */}
-                  <path
-                    d="M 220 120 L 280 130 L 280 240 L 230 250 L 210 220 L 230 180 Z"
-                    className="fill-purple-200 stroke-purple-400 stroke-2 hover:fill-purple-300 cursor-pointer transition-all duration-300"
-                    onClick={() => console.log('CRASC EST')}
-                  />
-                  <text x="250" y="190" textAnchor="middle" className="text-xs font-bold fill-purple-700 pointer-events-none">
-                    CRASC
-                  </text>
-                  <text x="250" y="205" textAnchor="middle" className="text-xs font-bold fill-purple-700 pointer-events-none">
-                    EST
-                  </text>
-
-                  {/* CRASC SUD - Bottom region */}
-                  <path
-                    d="M 100 260 L 230 250 L 250 310 L 200 340 L 100 340 L 50 310 Z"
-                    className="fill-red-200 stroke-red-400 stroke-2 hover:fill-red-300 cursor-pointer transition-all duration-300"
-                    onClick={() => console.log('CRASC SUD')}
-                  />
-                  <text x="150" y="300" textAnchor="middle" className="text-xs font-bold fill-red-700 pointer-events-none">
-                    CRASC SUD
-                  </text>
-                </svg>
-              </div>
-            </div>
+            <CrascMapSvg
+              interactive={true}
+              onRegionClick={(regionId, href) => {
+                console.log(regionId)
+                router.push(href)
+              }}
+            />
 
             {/* Legend */}
             <div className="space-y-4">
@@ -377,7 +318,7 @@ export default function PageAnnuaireCrasc() {
                   <div className="w-8 h-8 rounded bg-green-300 border-2 border-green-400"></div>
                   <div>
                     <p className="font-bold text-green-900">CRASC CENTRE</p>
-                    <p className="text-xs text-green-700">Yamoussoukro, Bouaké</p>
+                    <p className="text-xs text-green-700">Yamoussoukro, Bouaké, Dimbokro</p>
                   </div>
                 </div>
 
@@ -438,14 +379,14 @@ export default function PageAnnuaireCrasc() {
                 <Building2 className="w-10 h-10 text-[#E05017] group-hover:text-white transition-colors" strokeWidth={2} />
               </div>
               <h3 className="text-xs uppercase font-bold text-gray-600 group-hover:text-white/80 mb-2 transition-colors tracking-wider">
-                NOS CENTRES CRASC
+                NOS ZONES CRASC
               </h3>
               <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
                 {crascData.length > 0 ? (
                   <>
                     {crascData.map((crasc) => (
                       <div key={crasc.id} className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                        <MapPin className="w-3 h-3 flex-shrink-0" />
+                        {/* <MapPin className="w-3 h-3 flex-shrink-0" /> */}
                         <span className="truncate">{crasc.name}</span>
                       </div>
                     ))}
@@ -460,45 +401,26 @@ export default function PageAnnuaireCrasc() {
                 ) : (
                   <>
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      <MapPin className="w-3 h-3 flex-shrink-0" />
+                      
                       <span>CRASC Nord</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      <MapPin className="w-3 h-3 flex-shrink-0" />
+                      
                       <span>CRASC Sud</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      <MapPin className="w-3 h-3 flex-shrink-0" />
+                      
                       <span>CRASC Est</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      <MapPin className="w-3 h-3 flex-shrink-0" />
+                      
                       <span>CRASC Ouest</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      <MapPin className="w-3 h-3 flex-shrink-0" />
+                      
                       <span>CRASC Centre</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      <MapPin className="w-3 h-3 flex-shrink-0" />
-                      <span>CRASC 6</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      <MapPin className="w-3 h-3 flex-shrink-0" />
-                      <span>CRASC 7</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      <MapPin className="w-3 h-3 flex-shrink-0" />
-                      <span>CRASC 8</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      <MapPin className="w-3 h-3 flex-shrink-0" />
-                      <span>CRASC 9</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      <MapPin className="w-3 h-3 flex-shrink-0" />
-                      <span>CRASC 10</span>
-                    </div>
+                    
                   </>
                 )}
               </div>

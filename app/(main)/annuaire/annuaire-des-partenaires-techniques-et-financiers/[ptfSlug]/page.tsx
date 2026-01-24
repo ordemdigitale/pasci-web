@@ -4,7 +4,7 @@ import React, { use, useState, useEffect } from "react";
 import { IPTF } from '@/types/api.types';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from "next/link";
-import { MapPin, Mail, Phone, Globe, Building2, Calendar, Users, Target, ArrowRight, ExternalLink, FileText, Clock } from 'lucide-react';
+import { MapPin, Mail, Phone, Globe, Building2, Calendar, Users, Target, ArrowRight, ExternalLink, FileText, Clock, NotepadText } from 'lucide-react';
 
 // Mock data complet pour les PTF
 const mockPTFDetails: Record<string, any> = {
@@ -436,7 +436,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{ptfData.name}</h1>
               <p className="text-gray-600 mb-4">{ptfData.description}</p>
 
-              <div className="grid md:grid-cols-2 gap-3 text-sm">
+{/*               <div className="grid md:grid-cols-2 gap-3 text-sm">
                 {ptfData.pays && (
                   <div className="flex items-center gap-2 text-gray-600">
                     <MapPin className="w-4 h-4 text-[#E05017]" />
@@ -449,7 +449,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
                     <span><span className="font-semibold">Création:</span> {ptfData.date_creation}</span>
                   </div>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -460,7 +460,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
           <div className="md:col-span-2 space-y-8">
 
             {/* Mission */}
-            {ptfData.mission && (
+            {/* {ptfData.mission && (
               <div className="bg-[#f0f9ff] border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4 flex items-center gap-2">
                   <Target className="w-6 h-6 text-[#E05017]" />
@@ -468,18 +468,18 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
                 </h2>
                 <p className="text-gray-700">{ptfData.mission}</p>
               </div>
-            )}
+            )} */}
 
             {/* Vision */}
-            {ptfData.vision && (
+            {/* {ptfData.vision && (
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Vision</h2>
                 <p className="text-gray-700">{ptfData.vision}</p>
               </div>
-            )}
+            )} */}
 
             {/* Domaines d'intervention */}
-            {ptfData.domaines && ptfData.domaines.length > 0 && (
+            {/* {ptfData.domaines && ptfData.domaines.length > 0 && (
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Domaines d'intervention</h2>
                 <div className="grid md:grid-cols-2 gap-3">
@@ -493,14 +493,14 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Appels à propositions */}
             {ptfData.appels_propositions && ptfData.appels_propositions.length > 0 && (
               <div className="bg-[#f0f9ff] border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4 flex items-center gap-2">
                   <FileText className="w-6 h-6 text-[#E05017]" />
-                  Appels à propositions
+                  Appels à projets
                 </h2>
                 <div className="space-y-4">
                   {ptfData.appels_propositions.map((appel: any) => (
@@ -595,17 +595,25 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
                     </div>
                   </div>
                 )}
+                <div className="flex items-start gap-3">
+                    <NotepadText className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-gray-700">Domaine d'intervention</p>
+                      <p className="text-sm text-gray-600">Sécurité alimentaire</p>
+                      
+                    </div>
+                  </div>
               </div>
 
               {/* Contact Button */}
-              <div className="mt-6">
+              {/* <div className="mt-6">
                 <Link
                   href={`/contact?ptf=${ptfData.name}`}
                   className="block w-full text-center px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-semibold"
                 >
                   Contacter le PTF
                 </Link>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

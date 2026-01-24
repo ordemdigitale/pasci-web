@@ -92,7 +92,7 @@ export default function PageFichesInformatives() {
           
           {/* Left content */}
           <div className="">
-            <h2 className="font-bold text-5xl text-[#2a591d]">Fiches informatives</h2>
+            <h2 className="font-bold text-4xl text-[#2a591d]">Fiches informatives</h2>
             <p className="font-bold text-xl max-w-sm mt-6">
               L&apos;information plus simple, plus rapide à lire et plus facile à utiliser
             </p>

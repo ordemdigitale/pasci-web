@@ -154,7 +154,7 @@ export default function PageDetailOffreProjet({
           {/* Colonne principale */}
           <div className="lg:col-span-2 space-y-8">
             {/* Objectif */}
-            <section className="bg-gradient-to-br from-[#E05017] to-[#c44315] rounded-xl p-6 text-white">
+            {/* <section className="bg-gradient-to-br from-[#E05017] to-[#c44315] rounded-xl p-6 text-white">
               <div className="flex items-center gap-3 mb-4">
                 <Target className="w-6 h-6" />
                 <h2 className="text-2xl font-bold">Objectif du projet</h2>
@@ -162,7 +162,7 @@ export default function PageDetailOffreProjet({
               <p className="text-white/90 text-lg leading-relaxed">
                 {projet.objectif}
               </p>
-            </section>
+            </section> */}
 
             {/* Description */}
             {projet.description && (
@@ -180,7 +180,7 @@ export default function PageDetailOffreProjet({
             )}
 
             {/* Contexte */}
-            {projet.contexte && (
+            {/* {projet.contexte && (
               <section className="bg-white rounded-xl p-6 border border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <Lightbulb className="w-6 h-6 text-[#E05017]" />
@@ -188,7 +188,7 @@ export default function PageDetailOffreProjet({
                 </div>
                 <p className="text-gray-700 leading-relaxed">{projet.contexte}</p>
               </section>
-            )}
+            )} */}
 
             {/* Bénéficiaires */}
             {projet.beneficiaires && (
@@ -226,7 +226,7 @@ export default function PageDetailOffreProjet({
             )}
 
             {/* Partenaires */}
-            {projet.partenaires && projet.partenaires.length > 0 && (
+            {/* {projet.partenaires && projet.partenaires.length > 0 && (
               <section className="bg-white rounded-xl p-6 border border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <Award className="w-6 h-6 text-[#E05017]" />
@@ -245,7 +245,7 @@ export default function PageDetailOffreProjet({
                   ))}
                 </div>
               </section>
-            )}
+            )} */}
           </div>
 
           {/* Sidebar */}
@@ -294,10 +294,10 @@ export default function PageDetailOffreProjet({
 
               {/* Boutons d'action */}
               <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
-                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold">
+                {/* <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold">
                   <Share2 className="w-5 h-5" />
                   Partager le projet
-                </button>
+                </button> */}
 
                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-[#E05017] text-[#E05017] rounded-lg hover:bg-[#E05017]/5 transition-colors font-bold">
                   <FileText className="w-5 h-5" />
@@ -307,7 +307,7 @@ export default function PageDetailOffreProjet({
             </div>
 
             {/* Contact */}
-            <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 text-white">
+            {/* <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 text-white">
               <h3 className="text-xl font-bold mb-3">Intéressé par ce projet ?</h3>
               <p className="text-white/90 text-sm mb-4">
                 Contactez l'OSC porteuse pour plus d'informations ou pour explorer des opportunités de partenariat.
@@ -318,12 +318,12 @@ export default function PageDetailOffreProjet({
               >
                 Contacter l'OSC
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
 
         {/* Projets similaires */}
-        <div className="mt-16">
+        {/* <div className="mt-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Projets similaires
           </h2>
@@ -365,7 +365,7 @@ export default function PageDetailOffreProjet({
                 </Link>
               ))}
           </div>
-        </div>
+        </div> */}
       </main>
     </div>
   );

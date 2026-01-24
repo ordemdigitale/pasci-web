@@ -95,7 +95,7 @@ export default function Partners() {
                 )}
 
                 {/* External Link Icon - visible on hover */}
-                {partner.website && (
+                {/* {partner.website && (
                   <Link
                     href={partner.website}
                     className={`flex items-center gap-1 text-xs font-semibold text-[#E05017] transition-all duration-300 ${
@@ -105,7 +105,7 @@ export default function Partners() {
                     <span>Visiter</span>
                     <ExternalLink className="w-3 h-3" />
                   </Link>
-                )}
+                )} */}
               </div>
 
               {/* Decorative corner */}
