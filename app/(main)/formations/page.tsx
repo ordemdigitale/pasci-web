@@ -1,105 +1,12 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Clock } from 'lucide-react';
+import { Search, Clock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 import { ImageWithFallback } from "@/lib/imageWithFallback"
 import illustrationImage from 'figma:asset/e64e574db940281630010d12290bbd99ac5f9f9e.png';
-
-interface Program {
-  id: number;
-  image: string;
-  title: string;
-  description: string;
-  duration?: string;
-  type: 'formation' | 'tutorial' | 'webinar' | 'interview' | 'podcast' | 'conference' | 'meditation';
-  slug: string;
-}
-
-const programs: Program[] = [
-  {
-    id: 1,
-    image: "/images/page-formation/423dccc165037227487e63cd4a3c3daac3c77689b23dab692da976de13b1cc9f.png",
-    title: 'Notions essentielles de comptabilité financière',
-    description: 'Découvrez les principes fondamentaux et les méthodologies Agile pour optimiser la gestion de vos projets et améliorer la collaboration en équipe.',
-    duration: '6 semaines',
-    type: 'formation',
-    slug: 'comptabilite-financiere'
-  },
-  {
-    id: 2,
-    image: '/images/page-formation/325089b925013d8e1c19e49d60c060af5b15d40202bdaef5187ed1e44c67cedc.png',
-    title: 'Pilotage efficace des ressources humaines',
-    description: 'Au-delà des aspects administratifs, les ressources humaines jouent un rôle stratégique dans la performance et la pérennité des organisations.',
-    duration: '4 semaines',
-    type: 'formation',
-    slug: 'ressources-humaines'
-  },
-  {
-    id: 3,
-    image: '/images/page-formation/941bc7751a5e05e80271f1fdd72f88921040ea5d290167224c8cc6a973ab760d.png',
-    title: 'Gestion juridique et administrative',
-    description: 'Au-delà de la conformité, cette fonction joue un rôle clé dans la structuration et la pérennité des organisations. Elle facilite la prise de décision.',
-    duration: '5 semaines',
-    type: 'formation',
-    slug: 'gestion-juridique'
-  },
-  {
-    id: 4,
-    image: '/images/page-formation/325089b925013d8e1c19e49d60c060af5b15d40202bdaef5187ed1e44c67cedc.png',
-    title: 'Tutoriel Vidéo: Créer un Portfolio Professionnel',
-    description: 'Suivez ce tutoriel détaillé pour construire votre portfolio professionnel en ligne et présenter efficacement vos compétences.',
-    duration: '45 min',
-    type: 'tutorial',
-    slug: 'portfolio-professionnel'
-  },
-  {
-    id: 5,
-    image: "/images/page-formation/0b84a30a040801f8886da2a298f7333b7d390fa11d6ff0950895cc6356a72b41.png",
-    title: 'Webinaire: Les Tendances IA en 2024',
-    description: "Explorez les dernières avancées et les prévisions pour l'intelligence artificielle en 2024, avec des experts du domaine.",
-    duration: '1h 30min',
-    type: 'webinar',
-    slug: 'tendances-ia-2024'
-  },
-  {
-    id: 6,
-    image: "/images/page-formation/f8ee35757b6c218aa4724bfdee2fa16fd2ec88a459ab7a9fc9de5402ade555eb.png",
-    title: 'Interview: Le Futur du Travail à Distance',
-    description: "Écoutez des leaders d'opinion discuter des défis et des opportunités du travail à distance dans le monde post-pandémique.",
-    duration: '30 min',
-    type: 'interview',
-    slug: 'travail-a-distance'
-  },
-  {
-    id: 7,
-    image: "/images/page-formation/595dfe83bf5a4b4ad09f8085f8ca47cad6958a0c0b343a4a071badac87db203f.png",
-    title: 'Podcast: Gérer le Stress au Travail',
-    description: 'Des techniques et des conseils pratiques pour identifier, prévenir et gérer le stress en milieu professionnel.',
-    duration: '25 min',
-    type: 'podcast',
-    slug: 'gerer-stress-travail'
-  },
-  {
-    id: 8,
-    image: "/images/page-formation/387d668c67b16d2201d39b5519f434cd019a4cdab4c7fd9f99c3456c0d6d40ec.png",
-    title: 'Conférence Audio: Leadership et Motivation',
-    description: "Écoutez une conférence inspirante sur les qualités d'un bon leader et les stratégies pour motiver son équipe.",
-    duration: '1h',
-    type: 'conference',
-    slug: 'leadership-motivation'
-  },
-  {
-    id: 9,
-    image: "/images/page-formation/506ee6b1647fb568e2b4112507471561d4c817eec4dd9fb76a49a7473b19b4f5.png",
-    title: 'Méditation Guidée pour la Concentration',
-    description: "Une séance de méditation guidée pour améliorer votre concentration et votre clarté mentale.",
-    duration: '15 min',
-    type: 'meditation',
-    slug: 'meditation-concentration'
-  }
-];
+import { fetchAllFormations, IFormation } from '@/lib/fetch-formations';
 
 const sidebarItems = [
   { id: 1, label: 'Santé', active: true },
@@ -114,9 +21,38 @@ export default function FormationsPage() {
   const [activeCategory, setActiveCategory] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [visiblePrograms, setVisiblePrograms] = useState(5);
+  const [formations, setFormations] = useState<IFormation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadFormations = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchAllFormations({
+          published_only: true,
+          limit: 100
+        });
+        setFormations(data);
+      } catch (err) {
+        console.error("Erreur lors du chargement des formations:", err);
+        setError("Erreur lors du chargement des formations. Veuillez réessayer plus tard.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadFormations();
+  }, []);
+
+  // Filter formations based on search query
+  const filteredFormations = formations.filter(formation =>
+    formation.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (formation.description && formation.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   const loadMorePrograms = () => {
-    setVisiblePrograms(prev => Math.min(prev + 5, programs.length));
+    setVisiblePrograms(prev => Math.min(prev + 5, filteredFormations.length));
   };
 
   return (
@@ -185,55 +121,81 @@ export default function FormationsPage() {
             {/* Programs Section */}
             <div className="mb-8">
               <h3 className="text-gray-800 text-3xl font-bold my-6">Programmes de Formations</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                {programs.slice(0, visiblePrograms).map((program) => (
-                  <div
-                    key={program.id}
-                    className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-                  >
-                    <div className="relative h-48">
-                      <ImageWithFallback
-                        src={program.image}
-                        alt={program.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-5">
-                      <h4 className="text-gray-800 text-xl font-semibold mb-3">{program.title}</h4>
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                        {program.description}
-                      </p>
 
-                      <Link href={`/formations/${program.slug}`}>
-                        <button
-                          className="px-4 py-2 text-white rounded-full text-sm hover:bg-[#c44315] transition-colors"
-                          style={{ backgroundColor: '#E05107' }}
-                        >
-                          Voir plus
-                        </button>
-                      </Link>
-                    </div>
+              {/* Loading State */}
+              {loading && (
+                <div className="flex justify-center items-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-[#E05107]" />
+                  <span className="ml-3 text-gray-600">Chargement des formations...</span>
+                </div>
+              )}
+
+              {/* Error State */}
+              {error && !loading && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+                  {error}
+                </div>
+              )}
+
+              {/* Empty State */}
+              {!loading && !error && filteredFormations.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-600 text-lg">
+                    {searchQuery
+                      ? "Aucune formation ne correspond à votre recherche."
+                      : "Aucune formation disponible pour le moment."}
+                  </p>
+                </div>
+              )}
+
+              {/* Formations Grid */}
+              {!loading && !error && filteredFormations.length > 0 && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    {filteredFormations.slice(0, visiblePrograms).map((formation) => (
+                      <div
+                        key={formation.id}
+                        className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                      >
+                        <div className="relative h-48">
+                          <ImageWithFallback
+                            src={formation.thumbnail_url}
+                            alt={formation.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="p-5">
+                          <h4 className="text-gray-800 text-xl font-semibold mb-3">{formation.title}</h4>
+                          <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                            {formation.description || "Aucune description disponible."}
+                          </p>
+
+                          <Link href={`/formations/${formation.slug}`}>
+                            <button
+                              className="px-4 py-2 text-white rounded-full text-sm hover:bg-[#c44315] transition-colors"
+                              style={{ backgroundColor: '#E05107' }}
+                            >
+                              Voir plus
+                            </button>
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
 
-              {/* Load More Buttons */}
-              <div className="flex flex-wrap gap-3 justify-end">
-                {visiblePrograms < programs.length && (
-                  <>{/* 
-                    <button className="px-6 py-2 border border-[#E05107] text-[#E05107] rounded-lg transition-colors">
-                      Sélectionner un thème
-                    </button> */}
-                    <button
-                      onClick={loadMorePrograms}
-                      className="px-6 py-2 border border-[#E05107] text-[#E05107] rounded-lg transition-colors"
-                    >
-                      Voir plus
-                    </button>
-                  </>
-                )}
-              </div>
+                  {/* Load More Buttons */}
+                  <div className="flex flex-wrap gap-3 justify-end">
+                    {visiblePrograms < filteredFormations.length && (
+                      <button
+                        onClick={loadMorePrograms}
+                        className="px-6 py-2 border border-[#E05107] text-[#E05107] rounded-lg hover:bg-[#E05107] hover:text-white transition-colors"
+                      >
+                        Voir plus
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
