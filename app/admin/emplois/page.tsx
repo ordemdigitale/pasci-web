@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Briefcase,
   MapPin,
@@ -20,115 +22,40 @@ import {
   TrendingUp,
   X,
   Target,
+  Loader2,
 } from "lucide-react";
+import { IJobs } from "@/types/api.types";
 
-// Mock data basé sur les offres d'emploi existantes
-const mockJobs = [
-  {
-    id: "1",
-    title: "Chargé de Mission Innovation",
-    description:
-      "Rejoignez notre équipe dynamique pour piloter des initiatives stratégiques au sein de l'espace collaboratif PASCI.",
-    location: "Abidjan, Côte d'Ivoire",
-    type: "CDI",
-    slug: "charge-mission-innovation",
-    employer: "PASCI Côte d'Ivoire",
-    publication_date: new Date().toISOString(),
-    salaire: "Non spécifié",
-    experience: "3-5 ans",
-    candidatures: 45,
-    statut: "Publié",
-    date_limite: "2026-03-15",
-  },
-  {
-    id: "2",
-    title: "Responsable Communication Digitale",
-    description:
-      "Nous recherchons un(e) Responsable Communication Digitale passionné(e) pour développer et animer notre présence en ligne.",
-    location: "Dakar, Sénégal",
-    type: "CDD",
-    slug: "responsable-communication-digitale",
-    employer: "PASCI Sénégal",
-    publication_date: new Date(Date.now() - 86400000).toISOString(),
-    salaire: "500,000 - 700,000 FCFA",
-    experience: "2-4 ans",
-    candidatures: 32,
-    statut: "Publié",
-    date_limite: "2026-02-28",
-  },
-  {
-    id: "3",
-    title: "Chef de Projet Développement Durable",
-    description:
-      "Pilotez des projets d'envergure dans le domaine du développement durable et de la responsabilité sociétale.",
-    location: "Ouagadougou, Burkina Faso",
-    type: "CDI",
-    slug: "chef-projet-developpement-durable",
-    employer: "PASCI Burkina Faso",
-    publication_date: new Date(Date.now() - 172800000).toISOString(),
-    salaire: "800,000 - 1,200,000 FCFA",
-    experience: "5-7 ans",
-    candidatures: 28,
-    statut: "Publié",
-    date_limite: "2026-03-01",
-  },
-  {
-    id: "4",
-    title: "Analyste de Données Impact",
-    description:
-      "Transformez les données en insights stratégiques pour mesurer et optimiser l'impact de nos programmes.",
-    location: "Dakar, Sénégal",
-    type: "CDI",
-    slug: "analyste-donnees-impact",
-    employer: "PASCI Sénégal",
-    publication_date: new Date(Date.now() - 259200000).toISOString(),
-    salaire: "600,000 - 900,000 FCFA",
-    experience: "3-5 ans",
-    candidatures: 56,
-    statut: "Publié",
-    date_limite: "2026-02-20",
-  },
-  {
-    id: "5",
-    title: "Coordonnateur RSE Senior",
-    description:
-      "Accompagnez les entreprises dans leur démarche RSE et favorisez les partenariats stratégiques.",
-    location: "Abidjan, Côte d'Ivoire",
-    type: "CDI",
-    slug: "coordonnateur-rse-senior",
-    employer: "PASCI Côte d'Ivoire",
-    publication_date: new Date(Date.now() - 345600000).toISOString(),
-    salaire: "900,000 - 1,500,000 FCFA",
-    experience: "7-10 ans",
-    candidatures: 19,
-    statut: "Expiré",
-    date_limite: "2026-01-15",
-  },
-  {
-    id: "6",
-    title: "Assistant(e) de Direction",
-    description:
-      "Apportez votre soutien à l'équipe de direction dans la gestion quotidienne et la coordination des activités de PASCI.",
-    location: "Lomé, Togo",
-    type: "CDD",
-    slug: "assistant-direction",
-    employer: "PASCI Togo",
-    publication_date: new Date(Date.now() - 432000000).toISOString(),
-    salaire: "300,000 - 450,000 FCFA",
-    experience: "1-3 ans",
-    candidatures: 67,
-    statut: "Brouillon",
-    date_limite: "2026-04-01",
-  },
-];
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 export default function EmploisPage() {
-  const [jobs, setJobs] = useState(mockJobs);
+  const router = useRouter();
+  const [jobs, setJobs] = useState<IJobs[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [selectedStatut, setSelectedStatut] = useState("");
-  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [selectedJob, setSelectedJob] = useState<IJobs | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Load jobs from API
+  useEffect(() => {
+    const loadJobs = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/jobs`);
+        if (response.ok) {
+          const data = await response.json();
+          setJobs(data);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des offres d'emploi:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadJobs();
+  }, []);
 
   // Filtrage
   const filteredJobs = jobs.filter((job) => {
@@ -137,32 +64,70 @@ export default function EmploisPage() {
       job.employer.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.location.toLowerCase().includes(searchQuery.toLowerCase());
     const matchType = !selectedType || job.type === selectedType;
-    const matchStatut = !selectedStatut || job.statut === selectedStatut;
+
+    // Map statut filter to is_expired field
+    let matchStatut = true;
+    if (selectedStatut === "Publié") {
+      matchStatut = !job.is_expired;
+    } else if (selectedStatut === "Expiré") {
+      matchStatut = job.is_expired;
+    }
+
     return matchSearch && matchType && matchStatut;
   });
 
-  const handleViewJob = (job: any) => {
+  const handleViewJob = (job: IJobs) => {
     setSelectedJob(job);
     setIsModalOpen(true);
   };
 
-  const handleDeleteJob = (jobId: string) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer cette offre d'emploi ?")) {
-      setJobs(jobs.filter((j) => j.id !== jobId));
+  const handleDeleteJob = async (slug: string) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer cette offre d'emploi ?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/jobs/${slug}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setJobs(jobs.filter((j) => j.slug !== slug));
+        if (selectedJob?.slug === slug) {
+          setIsModalOpen(false);
+        }
+      } else {
+        alert("Erreur lors de la suppression de l'offre d'emploi");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression:", error);
+      alert("Erreur lors de la suppression de l'offre d'emploi");
     }
   };
 
-  const handleToggleStatus = (jobId: string) => {
-    setJobs(
-      jobs.map((j) =>
-        j.id === jobId
-          ? {
-              ...j,
-              statut: j.statut === "Publié" ? "Brouillon" : "Publié",
-            }
-          : j
-      )
-    );
+  const handleToggleExpired = async (slug: string, currentExpired: boolean) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/jobs/${slug}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ is_expired: !currentExpired }),
+      });
+
+      if (response.ok) {
+        const updatedJob = await response.json();
+        setJobs(jobs.map((j) => (j.slug === slug ? updatedJob : j)));
+        if (selectedJob?.slug === slug) {
+          setSelectedJob(updatedJob);
+        }
+      } else {
+        alert("Erreur lors de la mise à jour du statut");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour:", error);
+      alert("Erreur lors de la mise à jour du statut");
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -174,20 +139,23 @@ export default function EmploisPage() {
     });
   };
 
-  const getStatutColor = (statut: string) => {
-    switch (statut) {
-      case "Publié":
-        return "bg-green-100 text-green-700";
-      case "Brouillon":
-        return "bg-gray-100 text-gray-700";
-      case "Expiré":
-        return "bg-red-100 text-red-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
+  const getJobStatus = (job: IJobs) => {
+    return job.is_expired ? "Expiré" : "Publié";
   };
 
-  const totalCandidatures = jobs.reduce((sum, job) => sum + job.candidatures, 0);
+  const getStatutColor = (isExpired: boolean) => {
+    return isExpired
+      ? "bg-red-100 text-red-700"
+      : "bg-green-100 text-green-700";
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-[#E05017]" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -203,7 +171,7 @@ export default function EmploisPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -219,9 +187,9 @@ export default function EmploisPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Offres Publiées</p>
+                <p className="text-sm text-gray-500 mb-1">Offres Actives</p>
                 <p className="text-3xl font-bold text-green-600">
-                  {jobs.filter((j) => j.statut === "Publié").length}
+                  {jobs.filter((j) => !j.is_expired).length}
                 </p>
               </div>
               <div className="bg-green-100 p-3 rounded-lg">
@@ -233,23 +201,9 @@ export default function EmploisPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Total Candidatures</p>
-                <p className="text-3xl font-bold text-blue-600">
-                  {totalCandidatures}
-                </p>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between">
-              <div>
                 <p className="text-sm text-gray-500 mb-1">Offres Expirées</p>
                 <p className="text-3xl font-bold text-red-600">
-                  {jobs.filter((j) => j.statut === "Expiré").length}
+                  {jobs.filter((j) => j.is_expired).length}
                 </p>
               </div>
               <div className="bg-red-100 p-3 rounded-lg">
@@ -306,10 +260,13 @@ export default function EmploisPage() {
           </div>
 
           <div className="mt-4 flex justify-end">
-            <button className="flex items-center gap-2 px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold">
+            <Link
+              href="/admin/emplois/ajouter"
+              className="flex items-center gap-2 px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold"
+            >
               <Plus className="w-5 h-5" />
               Créer une offre d'emploi
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -326,10 +283,10 @@ export default function EmploisPage() {
                     <div className="flex items-center gap-2 mb-2">
                       <span
                         className={`text-xs font-bold px-3 py-1 rounded-full ${getStatutColor(
-                          job.statut
+                          job.is_expired
                         )}`}
                       >
-                        {job.statut}
+                        {getJobStatus(job)}
                       </span>
                       <span className="bg-[#E05017] text-white text-xs font-bold px-3 py-1 rounded-full">
                         {job.type}
@@ -355,13 +312,15 @@ export default function EmploisPage() {
                     <span>{job.location}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Users className="w-4 h-4 text-gray-400" />
-                    <span>{job.candidatures} candidatures</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Calendar className="w-4 h-4 text-gray-400" />
-                    <span>Expire le {formatDate(job.date_limite)}</span>
+                    <span>Publié le {formatDate(job.publication_date)}</span>
                   </div>
+                  {job.expiration_date && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <span>Expire le {formatDate(job.expiration_date)}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-200">
@@ -373,12 +332,17 @@ export default function EmploisPage() {
                     >
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                    <Link
+                      href={`/admin/emplois/${job.slug}/modifier`}
+                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      title="Modifier"
+                    >
                       <Edit className="w-4 h-4" />
-                    </button>
+                    </Link>
                     <button
-                      onClick={() => handleDeleteJob(job.id)}
+                      onClick={() => handleDeleteJob(job.slug)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Supprimer"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -423,10 +387,10 @@ export default function EmploisPage() {
                   <div className="flex items-center gap-3 mb-3">
                     <span
                       className={`text-sm font-bold px-3 py-1 rounded-full ${getStatutColor(
-                        selectedJob.statut
+                        selectedJob.is_expired
                       )}`}
                     >
-                      {selectedJob.statut}
+                      {getJobStatus(selectedJob)}
                     </span>
                     <span className="bg-[#E05017] text-white text-sm font-bold px-3 py-1 rounded-full">
                       {selectedJob.type}
@@ -435,20 +399,9 @@ export default function EmploisPage() {
                   <h3 className="text-3xl font-bold text-gray-900 mb-3">
                     {selectedJob.title}
                   </h3>
-                  <p className="text-gray-700 leading-relaxed">
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                     {selectedJob.description}
                   </p>
-                </div>
-
-                {/* Stats */}
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-blue-600" />
-                    <span className="font-bold text-2xl text-blue-600">
-                      {selectedJob.candidatures}
-                    </span>
-                    <span className="text-gray-700">candidatures reçues</span>
-                  </div>
                 </div>
 
                 {/* Info Grid */}
@@ -478,25 +431,13 @@ export default function EmploisPage() {
                   </div>
 
                   <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                    <DollarSign className="w-5 h-5 text-[#E05017] mt-0.5" />
+                    <Briefcase className="w-5 h-5 text-[#E05017] mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">
-                        Salaire
+                        Type de contrat
                       </p>
                       <p className="text-gray-900 font-bold">
-                        {selectedJob.salaire}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Target className="w-5 h-5 text-[#E05017] mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-gray-700">
-                        Expérience requise
-                      </p>
-                      <p className="text-gray-900 font-bold">
-                        {selectedJob.experience}
+                        {selectedJob.type}
                       </p>
                     </div>
                   </div>
@@ -513,14 +454,28 @@ export default function EmploisPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 p-4 bg-red-50 rounded-lg">
-                    <Calendar className="w-5 h-5 text-red-600 mt-0.5" />
+                  {selectedJob.expiration_date && (
+                    <div className="flex items-start gap-3 p-4 bg-red-50 rounded-lg">
+                      <Calendar className="w-5 h-5 text-red-600 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-semibold text-gray-700">
+                          Date d'expiration
+                        </p>
+                        <p className="text-red-600 font-bold">
+                          {formatDate(selectedJob.expiration_date)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                    <Clock className="w-5 h-5 text-[#E05017] mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">
-                        Date limite
+                        Créée le
                       </p>
-                      <p className="text-red-600 font-bold">
-                        {formatDate(selectedJob.date_limite)}
+                      <p className="text-gray-900">
+                        {formatDate(selectedJob.created_at)}
                       </p>
                     </div>
                   </div>
@@ -528,21 +483,20 @@ export default function EmploisPage() {
 
                 {/* Actions */}
                 <div className="flex gap-3 pt-4 border-t border-gray-200">
-                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold">
+                  <Link
+                    href={`/admin/emplois/${selectedJob.slug}/modifier`}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold"
+                  >
                     <Edit className="w-5 h-5" />
                     Modifier
-                  </button>
+                  </Link>
                   <button
-                    onClick={() => handleToggleStatus(selectedJob.id)}
+                    onClick={() => handleToggleExpired(selectedJob.slug, selectedJob.is_expired)}
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-bold"
                   >
-                    {selectedJob.statut === "Publié"
-                      ? "Mettre en brouillon"
-                      : "Publier"}
-                  </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-bold">
-                    <Users className="w-5 h-5" />
-                    Voir candidatures
+                    {selectedJob.is_expired
+                      ? "Marquer comme active"
+                      : "Marquer comme expirée"}
                   </button>
                 </div>
               </div>

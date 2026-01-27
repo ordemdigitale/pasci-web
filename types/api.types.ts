@@ -84,12 +84,11 @@ export interface IJobs {
   type: string;
   slug: string;
   employer: string;
-  publication_date: string,
-  /* 
-  "is_expired": false,
-  "created_at": "2026-01-15T06:23:07.506Z",
-  "updated_at":
-  */
+  publication_date: string;
+  expiration_date?: string;
+  is_expired: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface IKeyStats {
