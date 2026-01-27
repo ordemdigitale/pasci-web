@@ -460,30 +460,30 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
           <div className="md:col-span-2 space-y-8">
 
             {/* Mission */}
-            {/* {ptfData.mission && (
+            {ptfData.mission && (
               <div className="bg-[#f0f9ff] border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4 flex items-center gap-2">
                   <Target className="w-6 h-6 text-[#E05017]" />
                   Mission
                 </h2>
-                <p className="text-gray-700">{ptfData.mission}</p>
+                <p className="text-gray-700 whitespace-pre-wrap">{ptfData.mission}</p>
               </div>
-            )} */}
+            )}
 
             {/* Vision */}
-            {/* {ptfData.vision && (
+            {ptfData.vision && (
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Vision</h2>
-                <p className="text-gray-700">{ptfData.vision}</p>
+                <p className="text-gray-700 whitespace-pre-wrap">{ptfData.vision}</p>
               </div>
-            )} */}
+            )}
 
             {/* Domaines d'intervention */}
-            {/* {ptfData.domaines && ptfData.domaines.length > 0 && (
+            {((ptfData.domaines_list && ptfData.domaines_list.length > 0) || (ptfData.domaines && ptfData.domaines.length > 0)) && (
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Domaines d'intervention</h2>
                 <div className="grid md:grid-cols-2 gap-3">
-                  {ptfData.domaines.map((domaine: string, index: number) => (
+                  {(ptfData.domaines_list || ptfData.domaines).map((domaine: string, index: number) => (
                     <div key={index} className="flex items-start gap-3">
                       <span className="flex-shrink-0 w-6 h-6 bg-[#E05017] text-white rounded-full flex items-center justify-center text-xs font-semibold">
                         {index + 1}
@@ -493,7 +493,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
                   ))}
                 </div>
               </div>
-            )} */}
+            )}
 
             {/* Appels à propositions */}
             {ptfData.appels_propositions && ptfData.appels_propositions.length > 0 && (
@@ -595,14 +595,26 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
                     </div>
                   </div>
                 )}
-                <div className="flex items-start gap-3">
+                {((ptfData.domaines_list && ptfData.domaines_list.length > 0) || (ptfData.domaines && ptfData.domaines.length > 0)) && (
+                  <div className="flex items-start gap-3">
                     <NotepadText className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-semibold text-gray-700">Domaine d'intervention</p>
-                      <p className="text-sm text-gray-600">Sécurité alimentaire</p>
-                      
+                      <p className="text-sm font-semibold text-gray-700">Domaines d'intervention</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {(ptfData.domaines_list || ptfData.domaines).slice(0, 3).map((domaine: string, idx: number) => (
+                          <span key={idx} className="text-xs bg-[#E05017]/10 text-[#E05017] px-2 py-1 rounded font-semibold">
+                            {domaine}
+                          </span>
+                        ))}
+                        {(ptfData.domaines_list || ptfData.domaines).length > 3 && (
+                          <span className="text-xs text-gray-500">
+                            +{(ptfData.domaines_list || ptfData.domaines).length - 3}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
+                )}
               </div>
 
               {/* Contact Button */}

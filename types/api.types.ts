@@ -103,7 +103,32 @@ export interface IPTF {
   name: string;
   slug: string;
   description?: string;
+
+  // Descriptions
+  mission?: string;
+  vision?: string;
+
+  // Images
+  thumbnail_path?: string;
   thumbnail_url?: string;
+  cover_path?: string;
+  cover_url?: string;
+
+  // Contact information
+  website?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+
+  // General information
+  pays?: string;
+  date_creation?: string;
+
+  // Domaines (JSON string and parsed list)
+  domaines?: string;
+  domaines_list?: string[];
+
+  // Relations
   projets?: IProjet[]
 }
 
