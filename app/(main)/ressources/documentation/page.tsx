@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {
   Search,
   Calendar,
@@ -8,119 +8,92 @@ import {
   List,
   ChevronLeft,
   ChevronRight,
+  Download,
+  FileText,
 } from "lucide-react";
 import { ImageWithFallback } from '@/lib/imageWithFallback'
+import { 
+  fetchAllDocumentation, 
+  fetchDocumentationCategories,
+  type IDocumentation,
+  type DocumentationFilters 
+} from '@/lib/fetch-documentation'
 
 interface IDocument {
   id: number;
   title: string;
-  description: string;
-  category: string;
+  description: string | null;
+  category: string | null;
   date: string;
+  file_url: string | null;
+  thumbnail_url: string;
 }
 
 export default function PageDocumentation() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedType, setSelectedType] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">(
-    "grid",
-  );
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState(1);
+  const [documents, setDocuments] = useState<IDocumentation[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const itemsPerPage = 12;
 
-  const documents: IDocument[] = [
-    {
-      id: 1,
-      title: "Rapport Annuel PASCI 2023 : Progrès et Impacts",
-      description:
-        "Ce rapport détaille les réalisations du projet PASCI au cours de l'année 2023, en soulignant les avancées majeures et les",
-      category: "Rapport",
-      date: "15/01/2024",
-    },
-    {
-      id: 2,
-      title:
-        "Lignes Directrices pour la Participation Communautaire",
-      description:
-        "Document cadre présentant les méthodologies et les meilleures pratiques pour engager efficacement les",
-      category: "Guide",
-      date: "22/11/2023",
-    },
-    {
-      id: 3,
-      title:
-        "Étude de Faisabilité : Expansion du Projet PASCI en Région Sud",
-      description:
-        "Analyse approfondie de la viabilité et des défis potentiels d'une extension géographique du projet PASCI dans la",
-      category: "Étude",
-      date: "10/09/2023",
-    },
-    {
-      id: 4,
-      title: "Manuel de Formation pour les Agents de Terrain",
-      description:
-        "Un guide pratique pour les agents de terrain, couvrant les aspects essentiels de la mise en œuvre des activités de terrain et",
-      category: "Manuel",
-      date: "05/07/2023",
-    },
-    {
-      id: 5,
-      title:
-        "Procès-verbal de la Réunion du Comité de Pilotage (Mars 2023)",
-      description:
-        "Résumé des discussions et décisions clés prises lors de la réunion trimestrielle du comité de pilotage du projet PASCI.",
-      category: "PV",
-      date: "03/03/2023",
-    },
-    {
-      id: 6,
-      title:
-        "Infographie : Indicateurs de Performance du Projet PASCI",
-      description:
-        "Représentation visuelle des principaux indicateurs de performance, montrant les progrès réalisés et les objectifs atteints",
-      category: "Infographie",
-      date: "18/02/2023",
-    },
-    {
-      id: 7,
-      title:
-        "Politique de Protection des Données et Confidentialité",
-      description:
-        "Document officiel décrivant les principes et procédures mis en place par PASCI pour garantir la protection des données",
-      category: "Politique",
-      date: "01/01/2023",
-    },
-    {
-      id: 8,
-      title: "Témoignages de Bénéficiaires du Projet PASCI",
-      description:
-        "Compilation de récits et d'entretiens avec des bénéficiaires du projet, illustrant l'impact positif de PASCI sur leurs vies.",
-      category: "Récit",
-      date: "12/12/2022",
-    },
-    {
-      id: 9,
-      title: "Plan de Communication Stratégique 2022-2025",
-      description:
-        "Le plan global définissant les objectifs, les stratégies et les actions de communication pour le projet PASCI sur une période de",
-      category: "Plan",
-      date: "01/10/2022",
-    },
-  ];
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const cats = await fetchDocumentationCategories();
+        setCategories(cats);
+      } catch (err) {
+        console.error("Erreur lors du chargement des catégories:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
-  /* Categories data */
-  const categories = [
-    "Rapport",
-    "Guide",
-    "Étude",
-    "Manuel",
-    "PV",
-    "Infographie",
-    "Politique",
-    "Récit",
-    "Plan",
-  ];
+  // Fetch documents when filters change
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const filters: DocumentationFilters = {
+          skip: (currentPage - 1) * itemsPerPage,
+          limit: itemsPerPage,
+          sort_by: "created_at",
+          sort_order: "desc",
+        };
+
+        if (selectedCategory) {
+          filters.category = selectedCategory;
+        }
+
+        if (searchQuery) {
+          filters.search = searchQuery;
+        }
+
+        // Filter by year if selected
+        if (selectedDate) {
+          // We'll filter by year in the search or handle it separately
+          // For now, we'll use search to filter by year in created_at
+        }
+
+        const docs = await fetchAllDocumentation(filters);
+        setDocuments(docs);
+      } catch (err: any) {
+        console.error("Erreur lors du chargement des documents:", err);
+        setError("Impossible de charger les documents. Veuillez réessayer.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDocuments();
+  }, [currentPage, selectedCategory, searchQuery, selectedDate]);
 
   const getCategoryColor = (category: string) => {
     const colors: { [key: string]: string } = {
@@ -138,19 +111,34 @@ export default function PageDocumentation() {
   };
 
   const handleApplyFilters = () => {
-    // Filter logic would go here
-    console.log("Filters applied:", {
-      selectedCategory,
-      selectedType,
-      selectedDate,
-    });
+    // Filters are applied automatically via useEffect
+    setCurrentPage(1); // Reset to first page when filters change
   };
 
   const handleResetFilters = () => {
     setSelectedCategory("");
-    setSelectedType("");
     setSelectedDate("");
     setSearchQuery("");
+    setCurrentPage(1);
+  };
+
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const handleDownload = (fileUrl: string | null, title: string) => {
+    if (fileUrl) {
+      window.open(fileUrl, '_blank');
+    }
   };
 
   return (
@@ -191,7 +179,15 @@ export default function PageDocumentation() {
               type="text"
               placeholder="Rechercher des documents..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleApplyFilters();
+                }
+              }}
               className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
             />
           </div>
@@ -203,9 +199,10 @@ export default function PageDocumentation() {
               </label>
               <select
                 value={selectedCategory}
-                onChange={(e) =>
-                  setSelectedCategory(e.target.value)
-                }
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full text-xs px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
               >
                 <option value="">
@@ -221,37 +218,21 @@ export default function PageDocumentation() {
 
             <div>
               <label className="block text-sm text-gray-700 mb-2">
-                Type
-              </label>
-              <select
-                value={selectedType}
-                onChange={(e) =>
-                  setSelectedType(e.target.value)
-                }
-                className="w-full text-xs px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
-              >
-                <option value="">Sélectionner un type</option>
-                <option value="type1">Type 1</option>
-                <option value="type2">Type 2</option>
-                <option value="type3">Type 3</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm text-gray-700 mb-2">
-                Date
+                Année
               </label>
               <select
                 value={selectedDate}
-                onChange={(e) =>
-                  setSelectedDate(e.target.value)
-                }
+                onChange={(e) => {
+                  setSelectedDate(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full text-xs px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
               >
-                <option value="">Sélectionner une date</option>
+                <option value="">Toutes les années</option>
                 <option value="2024">2024</option>
                 <option value="2023">2023</option>
                 <option value="2022">2022</option>
+                <option value="2021">2021</option>
               </select>
             </div>
 
@@ -305,76 +286,98 @@ export default function PageDocumentation() {
         {/* End header with Title and View Toggle */}
 
         {/* Document cards grid */}
-        <div
-          className={
-            viewMode === "grid"
-              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
-              : "space-y-4 mb-8"
-          }
-        >
-          {documents.map((doc) => (
-            <div
-              key={doc.id}
-              className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer"
-            >
-              <h3 className="text-gray-900 mb-3">
-                {doc.title}
-              </h3>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                {doc.description}
-              </p>
-              <div className="flex items-center justify-between">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs ${getCategoryColor(doc.category)}`}
-                >
-                  {doc.category}
-                </span>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Calendar className="w-4 h-4" />
-                  <span>{doc.date}</span>
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="text-gray-500">Chargement des documents...</div>
+          </div>
+        ) : error ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="text-red-500">{error}</div>
+          </div>
+        ) : documents.length === 0 ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="text-gray-500">Aucun document trouvé.</div>
+          </div>
+        ) : (
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
+                : "space-y-4 mb-8"
+            }
+          >
+            {documents.map((doc) => (
+              <div
+                key={doc.id}
+                className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => doc.file_url && handleDownload(doc.file_url, doc.title)}
+              >
+                {viewMode === "grid" && doc.thumbnail_url && (
+                  <div className="mb-4">
+                    <ImageWithFallback
+                      src={doc.thumbnail_url}
+                      alt={doc.title}
+                      className="w-full h-40 object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+                <h3 className="text-gray-900 mb-3 font-semibold">
+                  {doc.title}
+                </h3>
+                {doc.description && (
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-3">
+                    {doc.description}
+                  </p>
+                )}
+                <div className="flex items-center justify-between">
+                  {doc.category && (
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs ${getCategoryColor(doc.category)}`}
+                    >
+                      {doc.category}
+                    </span>
+                  )}
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Calendar className="w-4 h-4" />
+                    <span>{formatDate(doc.created_at)}</span>
+                  </div>
                 </div>
+                {doc.file_url && (
+                  <div className="mt-4 flex items-center gap-2 text-sm text-[#E05017]">
+                    <Download className="w-4 h-4" />
+                    <span>Télécharger</span>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
         {/* End document cards grid */}
 
         {/* Pagination */}
-        <div className="flex items-center justify-center gap-2">
-          <button
-            onClick={() =>
-              setCurrentPage(Math.max(1, currentPage - 1))
-            }
-            disabled={currentPage === 1}
-            className="px-4 py-2 text-gray-700 hover:text-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            Précédent
-          </button>
-
-          {[1, 2, 3].map((page) => (
+        {!loading && documents.length > 0 && (
+          <div className="flex items-center justify-center gap-2">
             <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={`w-10 h-10 rounded-lg transition-colors ${
-                currentPage === page
-                  ? "bg-[#E05017] text-white"
-                  : "bg-white text-gray-700 hover:bg-gray-100"
-              }`}
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 text-gray-700 hover:text-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
             >
-              {page}
+              <ChevronLeft className="w-5 h-5" />
             </button>
-          ))}
 
-          <button
-            onClick={() =>
-              setCurrentPage(Math.min(3, currentPage + 1))
-            }
-            disabled={currentPage === 3}
-            className="px-4 py-2 text-gray-700 hover:text-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            Suivant
-          </button>
-        </div>
+            <span className="px-4 py-2 text-sm text-gray-700">
+              Page {currentPage}
+            </span>
+
+            <button
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={documents.length < itemsPerPage}
+              className="px-4 py-2 text-gray-700 hover:text-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
         {/* End pagination */}
 
       </div>
