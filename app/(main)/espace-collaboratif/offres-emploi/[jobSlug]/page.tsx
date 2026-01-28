@@ -18,6 +18,8 @@ import {
   Heart,
   TrendingUp,
   UtensilsCrossed,
+  GraduationCap,
+  Users,
   ArrowRight,
   Rocket,
   Sparkles,
@@ -172,134 +174,89 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
           </section>
 
           {/* Missions */}
-          <section>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="size-10 rounded-lg bg-[#E05017]/10 text-[#E05017] flex items-center justify-center">
-                <Target className="w-5 h-5" />
-              </div>
-              <h2 className="text-2xl font-bold tracking-tight">Missions & Responsabilités</h2>
-            </div>
-            <div className="grid gap-4">
-              <div className="flex gap-5 bg-white p-6 rounded-xl border border-transparent hover:border-[#E05017]/20 transition-all">
-                <span className="text-[#E05017] font-bold text-lg leading-none mt-1">01.</span>
-                <div>
-                  <p className="text-[#121714] font-bold mb-1 text-lg">Coordination de projets stratégiques</p>
-                  <p className="text-gray-600 leading-relaxed">
-                    Assurer le pilotage et le suivi opérationnel des initiatives au sein de l'espace collaboratif PASCI.
-                  </p>
+          {jobData.missions_list && jobData.missions_list.length > 0 && (
+            <section>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="size-10 rounded-lg bg-[#E05017]/10 text-[#E05017] flex items-center justify-center">
+                  <Target className="w-5 h-5" />
                 </div>
+                <h2 className="text-2xl font-bold tracking-tight">Missions & Responsabilités</h2>
               </div>
-
-              <div className="flex gap-5 bg-white p-6 rounded-xl border border-transparent hover:border-[#E05017]/20 transition-all">
-                <span className="text-[#E05017] font-bold text-lg leading-none mt-1">02.</span>
-                <div>
-                  <p className="text-[#121714] font-bold mb-1 text-lg">Animation de l'écosystème</p>
-                  <p className="text-gray-600 leading-relaxed">
-                    Fédérer les partenaires institutionnels et privés autour des problématiques de développement durable.
-                  </p>
-                </div>
+              <div className="grid gap-4">
+                {jobData.missions_list.map((mission, index) => (
+                  <div key={index} className="flex gap-5 bg-white p-6 rounded-xl border border-transparent hover:border-[#E05017]/20 transition-all">
+                    <span className="text-[#E05017] font-bold text-lg leading-none mt-1">
+                      {String(index + 1).padStart(2, '0')}.
+                    </span>
+                    <div>
+                      <p className="text-[#121714] font-bold mb-1 text-lg">{mission.title}</p>
+                      <p className="text-gray-600 leading-relaxed">{mission.description}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              <div className="flex gap-5 bg-white p-6 rounded-xl border border-transparent hover:border-[#E05017]/20 transition-all">
-                <span className="text-[#E05017] font-bold text-lg leading-none mt-1">03.</span>
-                <div>
-                  <p className="text-[#121714] font-bold mb-1 text-lg">Veille stratégique</p>
-                  <p className="text-gray-600 leading-relaxed">
-                    Identifier les tendances émergentes et proposer des solutions innovantes adaptées au contexte local.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
+            </section>
+          )}
 
           {/* Requirements */}
-          <section>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="size-10 rounded-lg bg-[#E05017]/10 text-[#E05017] flex items-center justify-center">
-                <Award className="w-5 h-5" />
+          {jobData.requirements_list && jobData.requirements_list.length > 0 && (
+            <section>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="size-10 rounded-lg bg-[#E05017]/10 text-[#E05017] flex items-center justify-center">
+                  <Award className="w-5 h-5" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight">Profil Recherché</h2>
               </div>
-              <h2 className="text-2xl font-bold tracking-tight">Profil Recherché</h2>
-            </div>
-            <div className="bg-white rounded-xl p-8 border border-dashed border-[#E05017]/30">
-              <ul className="space-y-4">
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#E05017] mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">
-                    Formation supérieure (Bac+5) en Management, Entrepreneuriat ou Développement durable
-                  </span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#E05017] mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">
-                    Minimum 3 ans d'expérience dans la gestion de projets multi-acteurs
-                  </span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#E05017] mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">
-                    Maîtrise parfaite du français et bon niveau en anglais
-                  </span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#E05017] mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">
-                    Excellente capacité de rédaction et d'aisance oratoire
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </section>
+              <div className="bg-white rounded-xl p-8 border border-dashed border-[#E05017]/30">
+                <ul className="space-y-4">
+                  {jobData.requirements_list.map((requirement, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-[#E05017] mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-700">{requirement}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          )}
 
           {/* Benefits */}
-          {/* <section>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="size-10 rounded-lg bg-[#E05017]/10 text-[#E05017] flex items-center justify-center">
-                <Gift className="w-5 h-5" />
-              </div>
-              <h2 className="text-2xl font-bold tracking-tight">Avantages & Culture</h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-white p-5 rounded-xl flex items-center gap-4">
-                <div className="bg-[#E05017]/20 text-[#E05017] p-3 rounded-full">
-                  <Home className="w-5 h-5" />
+          {jobData.benefits_list && jobData.benefits_list.length > 0 && (
+            <section>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="size-10 rounded-lg bg-[#E05017]/10 text-[#E05017] flex items-center justify-center">
+                  <Gift className="w-5 h-5" />
                 </div>
-                <div>
-                  <p className="font-bold text-sm">Télétravail hybride</p>
-                  <p className="text-xs text-gray-500">2 jours par semaine</p>
-                </div>
+                <h2 className="text-2xl font-bold tracking-tight">Avantages & Culture</h2>
               </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {jobData.benefits_list.map((benefit, index) => {
+                  // Map icon names to components
+                  const iconMap: any = {
+                    Home,
+                    Heart,
+                    TrendingUp,
+                    UtensilsCrossed,
+                    GraduationCap,
+                    Users,
+                  };
+                  const IconComponent = iconMap[benefit.icon] || Home;
 
-              <div className="bg-white p-5 rounded-xl flex items-center gap-4">
-                <div className="bg-[#E05017]/20 text-[#E05017] p-3 rounded-full">
-                  <Heart className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="font-bold text-sm">Couverture santé</p>
-                  <p className="text-xs text-gray-500">Prise en charge à 100%</p>
-                </div>
+                  return (
+                    <div key={index} className="bg-white p-5 rounded-xl flex items-center gap-4">
+                      <div className="bg-[#E05017]/20 text-[#E05017] p-3 rounded-full">
+                        <IconComponent className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm">{benefit.title}</p>
+                        <p className="text-xs text-gray-500">{benefit.description}</p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-
-              <div className="bg-white p-5 rounded-xl flex items-center gap-4">
-                <div className="bg-[#E05017]/20 text-[#E05017] p-3 rounded-full">
-                  <TrendingUp className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="font-bold text-sm">Plan de carrière</p>
-                  <p className="text-xs text-gray-500">Formation continue annuelle</p>
-                </div>
-              </div>
-
-              <div className="bg-white p-5 rounded-xl flex items-center gap-4">
-                <div className="bg-[#E05017]/20 text-[#E05017] p-3 rounded-full">
-                  <UtensilsCrossed className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="font-bold text-sm">Tickets Restaurant</p>
-                  <p className="text-xs text-gray-500">Réseau partenaire étendu</p>
-                </div>
-              </div>
-            </div>
-          </section> */}
+            </section>
+          )}
 
           {/* Final CTA */}
           <section className="bg-[#E05017]/5 rounded-2xl p-8 md:p-12 text-center border border-[#E05017]/10">

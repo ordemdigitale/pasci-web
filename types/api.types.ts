@@ -76,6 +76,17 @@ export interface SpotlightNews {
   osc?: IOsc;
 }
 
+export interface IMission {
+  title: string;
+  description: string;
+}
+
+export interface IBenefit {
+  icon: string;
+  title: string;
+  description: string;
+}
+
 export interface IJobs {
   id: string;
   title: string;
@@ -89,6 +100,12 @@ export interface IJobs {
   is_expired: boolean;
   created_at: string;
   updated_at: string;
+  missions?: string;
+  requirements?: string;
+  benefits?: string;
+  missions_list?: IMission[];
+  requirements_list?: string[];
+  benefits_list?: IBenefit[];
 }
 
 export interface IKeyStats {
@@ -168,4 +185,30 @@ export interface IRegisterRequest {
   password: string;
   first_name?: string;
   last_name?: string;
+}
+
+// Offre Projet types
+export interface IOffreProjet {
+  id: string;
+  nom: string;
+  slug: string;
+  osc: string;
+  domaine: string;
+  zone: string;
+  durée: string;
+  budget: string;
+  objectif?: string;
+  description?: string;
+  beneficiaires?: string;
+  statut: string;
+  progression: number;
+  resultats_attendus?: string;
+  partenaires?: string;
+  resultats_attendus_list?: string[];
+  partenaires_list?: string[];
+  image_path?: string;
+  image_url?: string;
+  date_publication: string;
+  created_at: string;
+  updated_at: string;
 }

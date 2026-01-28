@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useState, useEffect } from "react";
-import { offreProjet, IOffreProjet } from "@/localdata/offreProjetData";
+import { IOffreProjet } from "@/types/api.types";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from "next/link";
 import {
@@ -22,6 +22,8 @@ import {
   FileText
 } from "lucide-react";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+
 export default function PageDetailOffreProjet({
   params,
 }: {
@@ -33,10 +35,25 @@ export default function PageDetailOffreProjet({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Trouver le projet par slug
-    const foundProjet = offreProjet.find((p) => p.slug === projetSlug);
-    setProjet(foundProjet || null);
-    setLoading(false);
+    const loadProjet = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/api/v1/offre-projets/${projetSlug}`);
+        if (response.ok) {
+          const data = await response.json();
+          setProjet(data);
+        } else {
+          setProjet(null);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement du projet:", error);
+        setProjet(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProjet();
   }, [projetSlug]);
 
   if (loading) {
@@ -87,7 +104,7 @@ export default function PageDetailOffreProjet({
       {/* Header avec image de couverture */}
       <div className="relative h-80 overflow-hidden">
         <ImageWithFallback
-          src={projet.image || "/images/placeholder.jpg"}
+          src={projet.image_url || "/images/placeholder.jpg"}
           alt={projet.nom}
           className="w-full h-full object-cover"
         />
@@ -206,7 +223,7 @@ export default function PageDetailOffreProjet({
             )}
 
             {/* Résultats attendus */}
-            {projet.resultats_attendus && projet.resultats_attendus.length > 0 && (
+            {projet.resultats_attendus_list && projet.resultats_attendus_list.length > 0 && (
               <section className="bg-white rounded-xl p-6 border border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <TrendingUp className="w-6 h-6 text-[#E05017]" />
@@ -215,7 +232,7 @@ export default function PageDetailOffreProjet({
                   </h2>
                 </div>
                 <ul className="space-y-3">
-                  {projet.resultats_attendus.map((resultat, index) => (
+                  {projet.resultats_attendus_list.map((resultat, index) => (
                     <li key={index} className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-[#E05017] mt-0.5 flex-shrink-0" />
                       <span className="text-gray-700">{resultat}</span>

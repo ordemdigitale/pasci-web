@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import {
   CircleCheckBig,
@@ -12,10 +12,13 @@ import {
   Building2,
   Target,
   Calendar,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from 'lucide-react';
-import { offreProjet } from '@/localdata/offreProjetData';
 import Link from 'next/link';
+import { IOffreProjet } from '@/types/api.types';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 /* Categories data */
 const domaines = [
@@ -37,12 +40,36 @@ const zones = [
 ];
 
 export default function PageOffreProjet() {
+  const [projets, setProjets] = useState<IOffreProjet[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDomaine, setSelectedDomaine] = useState("");
   const [selectedZone, setSelectedZone] = useState("");
 
+  // Load projets from API
+  useEffect(() => {
+    const loadProjets = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`${API_BASE_URL}/api/v1/offre-projets/active`);
+        if (response.ok) {
+          const data = await response.json();
+          setProjets(data);
+        } else {
+          console.error("Erreur lors du chargement des projets:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des projets:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProjets();
+  }, []);
+
   // Filtrer les projets
-  const filteredProjets = offreProjet.filter((projet) => {
+  const filteredProjets = projets.filter((projet) => {
     const matchSearch = projet.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
                        projet.osc.toLowerCase().includes(searchQuery.toLowerCase());
     const matchDomaine = !selectedDomaine || projet.domaine === selectedDomaine;
@@ -150,7 +177,12 @@ export default function PageOffreProjet() {
           Projets disponibles
         </h2>
 
-        {filteredProjets.length === 0 ? (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-gray-200">
+            <Loader2 className="w-12 h-12 text-[#E05017] animate-spin mb-4" />
+            <p className="text-gray-500 font-semibold">Chargement des projets...</p>
+          </div>
+        ) : filteredProjets.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
             <Target className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">Aucun projet trouvé</p>
@@ -168,7 +200,7 @@ export default function PageOffreProjet() {
                   {/* Image */}
                   <div className="relative h-48 overflow-hidden">
                     <ImageWithFallback
-                      src={projet.image || '/images/placeholder.jpg'}
+                      src={projet.image_url || '/images/placeholder.jpg'}
                       alt={projet.nom}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />

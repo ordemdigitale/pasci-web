@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Home, Heart, TrendingUp, UtensilsCrossed, GraduationCap, Users } from "lucide-react";
 import Link from "next/link";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
@@ -23,10 +23,35 @@ const jobSchema = z.object({
 
 type JobFormData = z.infer<typeof jobSchema>;
 
+interface Mission {
+  title: string;
+  description: string;
+}
+
+interface Benefit {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+const iconOptions = [
+  { value: "Home", label: "Télétravail", icon: Home },
+  { value: "Heart", label: "Santé", icon: Heart },
+  { value: "TrendingUp", label: "Carrière", icon: TrendingUp },
+  { value: "UtensilsCrossed", label: "Restaurant", icon: UtensilsCrossed },
+  { value: "GraduationCap", label: "Formation", icon: GraduationCap },
+  { value: "Users", label: "Équipe", icon: Users },
+];
+
 export default function AddJobPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // États pour les listes dynamiques
+  const [missions, setMissions] = useState<Mission[]>([{ title: "", description: "" }]);
+  const [requirements, setRequirements] = useState<string[]>([""]);
+  const [benefits, setBenefits] = useState<Benefit[]>([{ icon: "Home", title: "", description: "" }]);
 
   const {
     register,
@@ -36,11 +61,61 @@ export default function AddJobPage() {
     resolver: zodResolver(jobSchema),
   });
 
+  // Fonctions pour gérer les missions
+  const addMission = () => {
+    setMissions([...missions, { title: "", description: "" }]);
+  };
+
+  const removeMission = (index: number) => {
+    setMissions(missions.filter((_, i) => i !== index));
+  };
+
+  const updateMission = (index: number, field: keyof Mission, value: string) => {
+    const newMissions = [...missions];
+    newMissions[index][field] = value;
+    setMissions(newMissions);
+  };
+
+  // Fonctions pour gérer les requirements
+  const addRequirement = () => {
+    setRequirements([...requirements, ""]);
+  };
+
+  const removeRequirement = (index: number) => {
+    setRequirements(requirements.filter((_, i) => i !== index));
+  };
+
+  const updateRequirement = (index: number, value: string) => {
+    const newRequirements = [...requirements];
+    newRequirements[index] = value;
+    setRequirements(newRequirements);
+  };
+
+  // Fonctions pour gérer les benefits
+  const addBenefit = () => {
+    setBenefits([...benefits, { icon: "Home", title: "", description: "" }]);
+  };
+
+  const removeBenefit = (index: number) => {
+    setBenefits(benefits.filter((_, i) => i !== index));
+  };
+
+  const updateBenefit = (index: number, field: keyof Benefit, value: string) => {
+    const newBenefits = [...benefits];
+    newBenefits[index][field] = value;
+    setBenefits(newBenefits);
+  };
+
   const onSubmit = async (data: JobFormData) => {
     setIsSubmitting(true);
     setError(null);
 
     try {
+      // Filtrer les missions, requirements et benefits vides
+      const filteredMissions = missions.filter(m => m.title.trim() && m.description.trim());
+      const filteredRequirements = requirements.filter(r => r.trim());
+      const filteredBenefits = benefits.filter(b => b.title.trim() && b.description.trim());
+
       // Préparer les données
       const payload: any = {
         title: data.title,
@@ -49,6 +124,9 @@ export default function AddJobPage() {
         location: data.location,
         type: data.type,
         is_expired: false,
+        missions: filteredMissions.length > 0 ? JSON.stringify(filteredMissions) : null,
+        requirements: filteredRequirements.length > 0 ? JSON.stringify(filteredRequirements) : null,
+        benefits: filteredBenefits.length > 0 ? JSON.stringify(filteredBenefits) : null,
       };
 
       // Ajouter les dates si fournies
@@ -234,6 +312,197 @@ export default function AddJobPage() {
                   Date limite de candidature
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* Missions & Responsabilités */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">
+                Missions & Responsabilités
+              </h2>
+              <button
+                type="button"
+                onClick={addMission}
+                className="flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors text-sm font-semibold"
+              >
+                <Plus className="w-4 h-4" />
+                Ajouter
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {missions.map((mission, index) => (
+                <div key={index} className="p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-start justify-between mb-3">
+                    <span className="text-[#E05017] font-bold text-lg">
+                      {String(index + 1).padStart(2, '0')}.
+                    </span>
+                    {missions.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeMission(index)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Titre de la mission
+                      </label>
+                      <input
+                        type="text"
+                        value={mission.title}
+                        onChange={(e) => updateMission(index, 'title', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                        placeholder="Ex: Coordination de projets stratégiques"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Description
+                      </label>
+                      <textarea
+                        value={mission.description}
+                        onChange={(e) => updateMission(index, 'description', e.target.value)}
+                        rows={3}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                        placeholder="Décrivez cette mission..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Profil Recherché */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">
+                Profil Recherché
+              </h2>
+              <button
+                type="button"
+                onClick={addRequirement}
+                className="flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors text-sm font-semibold"
+              >
+                <Plus className="w-4 h-4" />
+                Ajouter
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {requirements.map((requirement, index) => (
+                <div key={index} className="flex gap-3">
+                  <input
+                    type="text"
+                    value={requirement}
+                    onChange={(e) => updateRequirement(index, e.target.value)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                    placeholder="Ex: Formation supérieure (Bac+5)..."
+                  />
+                  {requirements.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeRequirement(index)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Avantages & Culture */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">
+                Avantages & Culture
+              </h2>
+              <button
+                type="button"
+                onClick={addBenefit}
+                className="flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors text-sm font-semibold"
+              >
+                <Plus className="w-4 h-4" />
+                Ajouter
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {benefits.map((benefit, index) => (
+                <div key={index} className="p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      {iconOptions.find(opt => opt.value === benefit.icon)?.icon && (
+                        <div className="bg-[#E05017]/10 text-[#E05017] p-2 rounded-lg">
+                          {(() => {
+                            const IconComponent = iconOptions.find(opt => opt.value === benefit.icon)?.icon;
+                            return IconComponent ? <IconComponent className="w-5 h-5" /> : null;
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                    {benefits.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeBenefit(index)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Icône
+                      </label>
+                      <select
+                        value={benefit.icon}
+                        onChange={(e) => updateBenefit(index, 'icon', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                      >
+                        {iconOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Titre
+                      </label>
+                      <input
+                        type="text"
+                        value={benefit.title}
+                        onChange={(e) => updateBenefit(index, 'title', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                        placeholder="Ex: Télétravail hybride"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Description
+                      </label>
+                      <input
+                        type="text"
+                        value={benefit.description}
+                        onChange={(e) => updateBenefit(index, 'description', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                        placeholder="Ex: 2 jours par semaine"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Target,
   Building2,
@@ -20,87 +22,43 @@ import {
   TrendingUp,
   X,
   Award,
+  Loader2,
 } from "lucide-react";
+import { IOffreProjet } from "@/types/api.types";
 
-// Mock data (utilisant les données de offreProjetData)
-const mockProjets = [
-  {
-    id: 1,
-    nom: "Projet Eau Potable pour Tous",
-    slug: "eau-potable-pour-tous",
-    osc: "Initiative Eau Claire",
-    domaine: "Eau & Assainissement",
-    zone: "Région du Nord",
-    durée: "24 mois",
-    budget: "250 millions FCFA",
-    objectif:
-      "Améliorer l'accès à l'eau potable dans 15 villages de la région Nord.",
-    statut: "En cours",
-    date_publication: "2025-11-15",
-    beneficiaires: "15,000 personnes",
-    partenaires: ["UNICEF", "GIZ", "Ministère de l'Hydraulique"],
-    progression: 65,
-  },
-  {
-    id: 2,
-    nom: "Alphabétisation des Femmes Rurales",
-    slug: "alphabetisation-femmes-rurales",
-    osc: "Femmes en Action CI",
-    domaine: "Éducation",
-    zone: "Région de l'Ouest",
-    durée: "18 mois",
-    budget: "120 millions FCFA",
-    objectif:
-      "Alphabétiser 500 femmes rurales et renforcer leur autonomisation économique.",
-    statut: "En cours",
-    date_publication: "2025-10-01",
-    beneficiaires: "500 femmes",
-    partenaires: ["UNESCO", "AFD"],
-    progression: 40,
-  },
-  {
-    id: 3,
-    nom: "Agriculture Durable et Bio",
-    slug: "agriculture-durable-bio",
-    osc: "Agro Développement CI",
-    domaine: "Agriculture",
-    zone: "Région du Centre",
-    durée: "36 mois",
-    budget: "400 millions FCFA",
-    objectif:
-      "Promouvoir l'agriculture biologique et durable auprès de 200 coopératives agricoles.",
-    statut: "En attente",
-    date_publication: "2026-01-10",
-    beneficiaires: "200 coopératives, 3000 agriculteurs",
-    partenaires: ["FAO", "Banque Mondiale"],
-    progression: 0,
-  },
-  {
-    id: 4,
-    nom: "Santé Maternelle et Infantile",
-    slug: "sante-maternelle-infantile",
-    osc: "Santé Pour Tous CI",
-    domaine: "Santé",
-    zone: "Région du Sud",
-    durée: "12 mois",
-    budget: "180 millions FCFA",
-    objectif:
-      "Réduire la mortalité maternelle et infantile dans 10 centres de santé.",
-    statut: "Terminé",
-    date_publication: "2024-05-20",
-    beneficiaires: "10,000 mères et enfants",
-    partenaires: ["OMS", "Médecins Sans Frontières"],
-    progression: 100,
-  },
-];
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 export default function ProjetsPage() {
-  const [projets, setProjets] = useState(mockProjets);
+  const router = useRouter();
+  const [projets, setProjets] = useState<IOffreProjet[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDomaine, setSelectedDomaine] = useState("");
   const [selectedStatut, setSelectedStatut] = useState("");
-  const [selectedProjet, setSelectedProjet] = useState<any>(null);
+  const [selectedProjet, setSelectedProjet] = useState<IOffreProjet | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Load projets from API
+  useEffect(() => {
+    const loadProjets = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`${API_BASE_URL}/api/v1/offre-projets`);
+        if (response.ok) {
+          const data = await response.json();
+          setProjets(data);
+        } else {
+          console.error("Erreur lors du chargement des projets:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des projets:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProjets();
+  }, []);
 
   // Filtrage
   const filteredProjets = projets.filter((projet) => {
@@ -114,14 +72,28 @@ export default function ProjetsPage() {
     return matchSearch && matchDomaine && matchStatut;
   });
 
-  const handleViewProjet = (projet: any) => {
+  const handleViewProjet = (projet: IOffreProjet) => {
     setSelectedProjet(projet);
     setIsModalOpen(true);
   };
 
-  const handleDeleteProjet = (projetId: number) => {
+  const handleDeleteProjet = async (projetSlug: string) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce projet ?")) {
-      setProjets(projets.filter((p) => p.id !== projetId));
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/offre-projets/${projetSlug}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          setProjets(projets.filter((p) => p.slug !== projetSlug));
+        } else {
+          console.error("Erreur lors de la suppression du projet:", response.statusText);
+          alert("Erreur lors de la suppression du projet");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la suppression du projet:", error);
+        alert("Erreur lors de la suppression du projet");
+      }
     }
   };
 
@@ -272,15 +244,24 @@ export default function ProjetsPage() {
           </div>
 
           <div className="mt-4 flex justify-end">
-            <button className="flex items-center gap-2 px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold">
+            <Link
+              href="/admin/projets/ajouter"
+              className="flex items-center gap-2 px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold"
+            >
               <Plus className="w-5 h-5" />
               Créer un projet
-            </button>
+            </Link>
           </div>
         </div>
 
         {/* Projets Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="w-12 h-12 text-[#E05017] animate-spin mb-4" />
+              <p className="text-gray-500 font-semibold">Chargement des projets...</p>
+            </div>
+          ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -374,12 +355,17 @@ export default function ProjetsPage() {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                        <Link
+                          href={`/admin/projets/${projet.slug}/modifier`}
+                          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                          title="Modifier"
+                        >
                           <Edit className="w-4 h-4" />
-                        </button>
+                        </Link>
                         <button
-                          onClick={() => handleDeleteProjet(projet.id)}
+                          onClick={() => handleDeleteProjet(projet.slug)}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Supprimer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -390,7 +376,7 @@ export default function ProjetsPage() {
               </tbody>
             </table>
 
-            {filteredProjets.length === 0 && (
+            {filteredProjets.length === 0 && !isLoading && (
               <div className="text-center py-12">
                 <Target className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-500 text-lg font-semibold">
@@ -402,6 +388,7 @@ export default function ProjetsPage() {
               </div>
             )}
           </div>
+          )}
         </div>
 
         {/* Projet Details Modal */}
@@ -540,8 +527,8 @@ export default function ProjetsPage() {
                 </div>
 
                 {/* Partenaires */}
-                {selectedProjet.partenaires &&
-                  selectedProjet.partenaires.length > 0 && (
+                {selectedProjet.partenaires_list &&
+                  selectedProjet.partenaires_list.length > 0 && (
                     <div>
                       <div className="flex items-center gap-2 mb-3">
                         <Award className="w-5 h-5 text-[#E05017]" />
@@ -550,7 +537,7 @@ export default function ProjetsPage() {
                         </h4>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {selectedProjet.partenaires.map(
+                        {selectedProjet.partenaires_list.map(
                           (partenaire: string, idx: number) => (
                             <span
                               key={idx}
@@ -566,14 +553,20 @@ export default function ProjetsPage() {
 
                 {/* Actions */}
                 <div className="flex gap-3 pt-4 border-t border-gray-200">
-                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold">
+                  <Link
+                    href={`/admin/projets/${selectedProjet.slug}/modifier`}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold"
+                  >
                     <Edit className="w-5 h-5" />
                     Modifier
-                  </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-bold">
+                  </Link>
+                  <Link
+                    href={`/offre-projets/${selectedProjet.slug}`}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-bold"
+                  >
                     <FileText className="w-5 h-5" />
                     Voir la page publique
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
