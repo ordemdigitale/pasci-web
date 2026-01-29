@@ -2,7 +2,8 @@
 
 import { use, useState, useEffect } from "react";
 import { newsService } from "@/lib/services/news.service";
-import { INews } from '@/types/api.types';
+//import { INews } from '@/types/api.types';
+import { INews } from "@/lib/services/news.service";
 import DOMPurify from 'dompurify';
 import Link from 'next/link';
 import { ImageWithFallback } from '@/lib/imageWithFallback';

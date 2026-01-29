@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { INews } from '@/types/api.types';
+//import { INews } from '@/types/api.types';
+import { INews } from '@/lib/services/news.service';
 import { ImageWithFallback } from '@/lib/imageWithFallback';
 import { Calendar, Edit, Trash2, ArrowRight } from 'lucide-react';
 import DOMPurify from 'dompurify';

@@ -14,6 +14,7 @@ export interface INews {
   crasc_id?: number | null;
   created_at: string;
   updated_at: string;
+  tags?: string[];
   osc?: {
     id: number;
     name: string;

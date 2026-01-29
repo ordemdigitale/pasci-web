@@ -1,9 +1,17 @@
 import { ImageWithFallback } from '@/lib/imageWithFallback'
+import {
+  Users,
+  FileText,
+  GraduationCap,
+  PenLine,
+  CalendarCheck,
+  Speech
+} from 'lucide-react';
 
 
 interface IService {
   id: number;
-  icon: string;
+  icon: React.ReactNode;
   name: string;
   content: string;
 }
@@ -11,37 +19,37 @@ interface IService {
 const services: IService[] = [
   {
     id: 1,
-    icon: "/icons/icon-appui-conseil.png",
+    icon: <Speech size={24} color="#E05017" />,
     name: "Appui-Conseil",
     content: "Des conseils stratégiques pour des décisions éclairées et une croissance durable."
   },
   {
     id: 2,
-    icon: "/icons/icon-accompagnement.png",
+    icon: <Users size={24} color="#E05017" />,
     name: "Accompagnement",
     content: "Un soutien personnalisé à chaque étape de la mise en œuvre de vos projets."
   },
   {
     id: 3,
-    icon: "/icons/icon-soutien-administratif.png",
+    icon: <FileText size={24} color="#E05017" />,
     name: "Soutien Administratif",
     content: "Formalisation et mise en conformité pour une structure solide et transparente."
   },
   {
     id: 4,
-    icon: "/icons/icon-redaction.png",
+    icon: <PenLine size={24} color="#E05017" />,
     name: "Rédaction",
     content: "Rédaction de documents professionnels : statuts, règlements, projets, manuels."
   },
   {
     id: 5,
-    icon: "/icons/icon-formation.png",
+    icon: <GraduationCap size={24} color="#E05017" />,
     name: "Formation",
     content: "un processus d'apprentissage structuré qui permet à un individu ou à un groupe d'acquérir des connaissances."
   },
   {
     id: 6,
-    icon: "/icons/icon-suivi-evaluation.png",
+    icon: <CalendarCheck size={24} color="#E05017" />,
     name: "Suivi-évaluation",
     content: "Mise en place d'outils et d'indicateurs de performance pour mesurer l’avancement et l’impact des actions menées."
   },
@@ -82,16 +90,9 @@ export default function ServicesPage() {
                 key={service.id}
                 className="border border-gray-200 rounded-lg overflow-hidden hover-shadow-lg transition-shadow bg-white py-4 px-5"
               >
-                {/* Image */}
-                <div className="">
-                  <ImageWithFallback
-                    src={service.icon}
-                    alt={service.name}
-                    className="w-15 h-15"
-                  />
-                </div>
+                {service.icon}
                 {/* Name and Role */}
-                <div className="pl-2">
+                <div>
                   <h3 className="text-lg font-semibold text-gray-900">{service.name}</h3>
                   <p className="text-sm font-medium text-gray-600 py-1 inline-block">{service.content}</p>
                 </div>

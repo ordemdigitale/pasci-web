@@ -36,7 +36,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
         const data = await getCrascBySlug(crascSlug);
         if (isCurrent) setCrascData(data);
       } catch (err: any) {
-        if (isCurrent) setError(err.message || "Impossible de charger les données du CRASC.");
+        if (isCurrent) setError("Impossible de charger les données du CRASC.");
       } finally {
         if (isCurrent) setLoading(false);
       }
