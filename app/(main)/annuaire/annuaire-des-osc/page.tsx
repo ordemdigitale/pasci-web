@@ -95,7 +95,7 @@ export default function AnnuaireOSCPage() {
       filtered = filtered.filter(osc =>
         osc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         osc.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        osc.ville.toLowerCase().includes(searchQuery.toLowerCase())
+        (osc.ville?.toLowerCase() || '').includes(searchQuery.toLowerCase())
       );
     }
 
