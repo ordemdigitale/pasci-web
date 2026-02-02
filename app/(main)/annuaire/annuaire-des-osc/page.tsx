@@ -5,147 +5,86 @@ import { Search, MapPin, Users2, Building, Filter, ArrowRight } from 'lucide-rea
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from 'next/link';
 
-interface IOSC {
+interface IOSCType {
   id: number;
   name: string;
-  logo?: string;
-  description: string;
-  domaine: string;
-  region: string;
-  ville: string;
-  email?: string;
-  phone?: string;
   slug: string;
 }
 
-// Mock data - À remplacer par un vrai fetch API
-const mockOSCs: IOSC[] = [
-  {
-    id: 1,
-    name: "Mouvement Pour Lutte contre l'injustice (MPLCI)",
-    logo: "/images/page-annuaire-crasc/mplci.jpg",
-    description: "Organisation engagée dans la promotion de la justice sociale et la défense des droits humains en Côte d'Ivoire.",
-    domaine: "Droits Humains",
-    region: "CRASC SUD",
-    ville: "Abidjan",
-    email: "contact@mplci.org",
-    phone: "+225 07 00 00 00",
-    slug: "mplci"
-  },
-  {
-    id: 2,
-    name: "Fédération des femmes d'Anyama et de Brofodoumé (FEFAB)",
-    logo: "/images/page-annuaire-crasc/fefab.jpg",
-    description: "Fédération qui œuvre pour l'autonomisation des femmes et le développement communautaire.",
-    domaine: "Genre et Développement",
-    region: "CRASC SUD",
-    ville: "Anyama",
-    email: "contact@fefab.org",
-    phone: "+225 07 11 11 11",
-    slug: "fefab"
-  },
-  {
-    id: 3,
-    name: "Fondation Vie",
-    logo: "/images/page-annuaire-crasc/fondation-vie.jpg",
-    description: "Organisation dédiée à l'amélioration des conditions de vie des communautés vulnérables.",
-    domaine: "Développement Communautaire",
-    region: "CRASC CENTRE",
-    ville: "Yamoussoukro",
-    email: "contact@fondationvie.org",
-    phone: "+225 07 22 22 22",
-    slug: "fondation-vie"
-  },
-  {
-    id: 4,
-    name: "Association des Femmes Soutra",
-    logo: "/images/page-annuaire-crasc/asso-femme-soutra.jpg",
-    description: "Association qui promeut l'entrepreneuriat féminin et l'éducation des jeunes filles.",
-    domaine: "Éducation et Entrepreneuriat",
-    region: "CRASC OUEST",
-    ville: "Daloa",
-    email: "contact@femmessoutra.org",
-    phone: "+225 07 33 33 33",
-    slug: "femmes-soutra"
-  },
-  {
-    id: 5,
-    name: "ONG Action pour l'Environnement",
-    logo: "/images/page-annuaire-crasc/5.jpg",
-    description: "Organisation spécialisée dans la protection de l'environnement et le développement durable.",
-    domaine: "Environnement",
-    region: "CRASC NORD",
-    ville: "Korhogo",
-    email: "contact@actionenv.org",
-    phone: "+225 07 44 44 44",
-    slug: "action-environnement"
-  },
-  {
-    id: 6,
-    name: "Association Jeunesse et Développement",
-    logo: "/images/page-annuaire-crasc/6.jpg",
-    description: "Accompagnement des jeunes dans leur insertion professionnelle et leur autonomisation.",
-    domaine: "Jeunesse",
-    region: "CRASC EST",
-    ville: "Abengourou",
-    email: "contact@jeunessedev.org",
-    phone: "+225 07 55 55 55",
-    slug: "jeunesse-developpement"
-  },
-  {
-    id: 7,
-    name: "Coalition Santé pour Tous",
-    logo: "/images/page-annuaire-crasc/mplci.jpg",
-    description: "Promotion de la santé communautaire et accès aux soins de santé primaires.",
-    domaine: "Santé",
-    region: "CRASC SUD",
-    ville: "San-Pédro",
-    email: "contact@santepourtrois.org",
-    phone: "+225 07 66 66 66",
-    slug: "sante-pour-tous"
-  },
-  {
-    id: 8,
-    name: "Réseau des Agriculteurs Solidaires",
-    logo: "/images/page-annuaire-crasc/fefab.jpg",
-    description: "Soutien aux petits agriculteurs et promotion de l'agriculture durable.",
-    domaine: "Agriculture",
-    region: "CRASC CENTRE",
-    ville: "Bouaké",
-    email: "contact@agrisolidaire.org",
-    phone: "+225 07 77 77 77",
-    slug: "agriculteurs-solidaires"
-  }
-];
+interface ICRASC {
+  id: number;
+  name: string;
+  slug: string;
+}
 
-const domaines = [
-  "Tous les domaines",
-  "Droits Humains",
-  "Genre et Développement",
-  "Développement Communautaire",
-  "Éducation et Entrepreneuriat",
-  "Environnement",
-  "Jeunesse",
-  "Santé",
-  "Agriculture"
-];
+interface IOSC {
+  id: number;
+  name: string;
+  thumbnail_url?: string;
+  thumbnail_path?: string;
+  description: string;
+  type?: IOSCType;
+  crasc?: ICRASC;
+  ville: string | null;
+  email?: string | null;
+  phone?: string | null;
+  slug: string;
+  // Computed properties for display
+  domaine?: string;
+  region?: string;
+  logo?: string;
+}
 
-const regions = [
-  "Toutes les régions",
-  "CRASC SUD",
-  "CRASC CENTRE",
-  "CRASC NORD",
-  "CRASC OUEST",
-  "CRASC EST"
-];
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 export default function AnnuaireOSCPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDomaine, setSelectedDomaine] = useState('Tous les domaines');
   const [selectedRegion, setSelectedRegion] = useState('Toutes les régions');
-  const [oscData, setOscData] = useState<IOSC[]>(mockOSCs);
-  const [filteredOSCs, setFilteredOSCs] = useState<IOSC[]>(mockOSCs);
+  const [oscData, setOscData] = useState<IOSC[]>([]);
+  const [filteredOSCs, setFilteredOSCs] = useState<IOSC[]>([]);
+  const [domaines, setDomaines] = useState<string[]>(["Tous les domaines"]);
+  const [regions, setRegions] = useState<string[]>(["Toutes les régions"]);
   const [visibleCount, setVisibleCount] = useState(6);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch OSC data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch OSCs
+        const oscResponse = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?limit=500`);
+        const oscRawData = await oscResponse.json();
+
+        // Transform API data to match component interface
+        const transformedOSCs: IOSC[] = oscRawData.map((osc: any) => ({
+          ...osc,
+          domaine: osc.type?.name || "Non spécifié",
+          region: osc.crasc?.name || "Non spécifié",
+          logo: osc.thumbnail_url,
+          ville: osc.ville || "Non spécifié"
+        }));
+
+        setOscData(transformedOSCs);
+        setFilteredOSCs(transformedOSCs);
+
+        // Extract unique domaines and regions
+        const uniqueDomaines = ["Tous les domaines", ...new Set(transformedOSCs.map(osc => osc.domaine || "Non spécifié"))];
+        const uniqueRegions = ["Toutes les régions", ...new Set(transformedOSCs.map(osc => osc.region || "Non spécifié"))];
+
+        setDomaines(uniqueDomaines);
+        setRegions(uniqueRegions);
+      } catch (error) {
+        console.error("Erreur lors du chargement des données:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Filter OSCs based on search and filters
   useEffect(() => {
@@ -305,7 +244,12 @@ export default function AnnuaireOSCPage() {
 
       {/* OSC Grid */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {filteredOSCs.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-20">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#E05017] mx-auto mb-4"></div>
+            <p className="text-gray-600 font-semibold">Chargement des OSC...</p>
+          </div>
+        ) : filteredOSCs.length === 0 ? (
           <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-12 text-center border-2 border-orange-100">
             <div className="max-w-2xl mx-auto">
               <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">

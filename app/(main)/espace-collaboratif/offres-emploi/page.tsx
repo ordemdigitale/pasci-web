@@ -31,7 +31,10 @@ const mockJobs: IJobs[] = [
     type: 'CDI',
     slug: 'charge-mission-innovation',
     employer: 'PASCI Côte d\'Ivoire',
-    publication_date: new Date().toISOString()
+    publication_date: new Date().toISOString(),
+    is_expired: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   },
   {
     id: "2",
@@ -41,7 +44,10 @@ const mockJobs: IJobs[] = [
     type: 'CDD',
     slug: 'responsable-communication-digitale',
     employer: 'PASCI Sénégal',
-    publication_date: new Date(Date.now() - 86400000).toISOString()
+    publication_date: new Date(Date.now() - 86400000).toISOString(),
+    is_expired: false,
+    created_at: new Date(Date.now() - 86400000).toISOString(),
+    updated_at: new Date(Date.now() - 86400000).toISOString()
   },
   {
     id: "3",
@@ -51,7 +57,10 @@ const mockJobs: IJobs[] = [
     type: 'CDI',
     slug: 'chef-projet-developpement-durable',
     employer: 'PASCI Burkina Faso',
-    publication_date: new Date(Date.now() - 172800000).toISOString()
+    publication_date: new Date(Date.now() - 172800000).toISOString(),
+    is_expired: false,
+    created_at: new Date(Date.now() - 172800000).toISOString(),
+    updated_at: new Date(Date.now() - 172800000).toISOString()
   },
   {
     id: "4",
@@ -61,7 +70,10 @@ const mockJobs: IJobs[] = [
     type: 'CDI',
     slug: 'analyste-donnees-impact',
     employer: 'PASCI Sénégal',
-    publication_date: new Date(Date.now() - 259200000).toISOString()
+    publication_date: new Date(Date.now() - 259200000).toISOString(),
+    is_expired: false,
+    created_at: new Date(Date.now() - 259200000).toISOString(),
+    updated_at: new Date(Date.now() - 259200000).toISOString()
   },
   {
     id: "5",
@@ -71,7 +83,10 @@ const mockJobs: IJobs[] = [
     type: 'CDI',
     slug: 'coordonnateur-rse-senior',
     employer: 'PASCI Côte d\'Ivoire',
-    publication_date: new Date(Date.now() - 345600000).toISOString()
+    publication_date: new Date(Date.now() - 345600000).toISOString(),
+    is_expired: false,
+    created_at: new Date(Date.now() - 345600000).toISOString(),
+    updated_at: new Date(Date.now() - 345600000).toISOString()
   },
   {
     id: "6",
@@ -81,7 +96,10 @@ const mockJobs: IJobs[] = [
     type: 'CDD',
     slug: 'assistant-direction',
     employer: 'PASCI Togo',
-    publication_date: new Date(Date.now() - 432000000).toISOString()
+    publication_date: new Date(Date.now() - 432000000).toISOString(),
+    is_expired: false,
+    created_at: new Date(Date.now() - 432000000).toISOString(),
+    updated_at: new Date(Date.now() - 432000000).toISOString()
   },
 ];
 

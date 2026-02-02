@@ -28,9 +28,16 @@ import {
 // Schema de validation pour le formulaire d'ajout d'OSC
 const oscSchema = z.object({
   name: z.string().min(4, "Le nom de l'OSC doit contenir au moins 4 caractères."),
-  description: z.string().optional(),
+  description: z.string().max(500, "La description ne peut pas dépasser 500 caractères.").optional(),
   crasc_id: z.string().min(1, "Veuillez sélectionner un CRASC."),
   type_id: z.string().min(1, "Veuillez sélectionner un type d'OSC."),
+  // Informations de contact
+  email: z.string().email("Email invalide").optional().or(z.literal("")),
+  phone: z.string().optional(),
+  ville: z.string().optional(),
+  address: z.string().optional(),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
   thumbnail: z
     .instanceof(File)
     .optional()
@@ -73,7 +80,18 @@ export default function AdminAjoutOsc() {
 
   const { control, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<OscForm>({
     resolver: zodResolver(oscSchema),
-    defaultValues: { name: "", description: "", crasc_id: "", type_id: "" },
+    defaultValues: {
+      name: "",
+      description: "",
+      crasc_id: "",
+      type_id: "",
+      email: "",
+      phone: "",
+      ville: "",
+      address: "",
+      latitude: "",
+      longitude: ""
+    },
   });
 
   const thumbnailFile = watch("thumbnail");
@@ -127,6 +145,26 @@ export default function AdminAjoutOsc() {
       }
       if (values.type_id) {
         formData.append("type_id", values.type_id);
+      }
+
+      // Informations de contact
+      if (values.email && values.email.trim() !== "") {
+        formData.append("email", values.email);
+      }
+      if (values.phone && values.phone.trim() !== "") {
+        formData.append("phone", values.phone);
+      }
+      if (values.ville && values.ville.trim() !== "") {
+        formData.append("ville", values.ville);
+      }
+      if (values.address && values.address.trim() !== "") {
+        formData.append("address", values.address);
+      }
+      if (values.latitude && values.latitude.trim() !== "") {
+        formData.append("latitude", values.latitude);
+      }
+      if (values.longitude && values.longitude.trim() !== "") {
+        formData.append("longitude", values.longitude);
       }
 
       if (values.thumbnail) {
@@ -274,12 +312,13 @@ export default function AdminAjoutOsc() {
             {/* Description */}
             <div>
               <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-2">
-                Description
+                Description <span className="text-gray-500 text-xs">(max 500 caractères)</span>
               </label>
               <textarea
                 id="description"
                 {...control.register("description")}
                 rows={3}
+                maxLength={500}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all resize-none"
                 placeholder="Décrivez brièvement l'organisation..."
               />
@@ -374,6 +413,108 @@ export default function AdminAjoutOsc() {
                   {errors.type_id.message}
                 </p>
               )}
+            </div>
+          </div>
+        </div>
+
+        {/* Informations de contact */}
+        <div className="mb-8 pb-8 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-[#2A591D]" />
+            Informations de contact
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                {...control.register("email")}
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all ${
+                  errors.email ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-[#2A591D]'
+                }`}
+                placeholder="contact@osc.org"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            {/* Téléphone */}
+            <div>
+              <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                Téléphone
+              </label>
+              <input
+                id="phone"
+                type="tel"
+                {...control.register("phone")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="+225 XX XX XX XX XX"
+              />
+            </div>
+
+            {/* Ville */}
+            <div>
+              <label htmlFor="ville" className="block text-sm font-semibold text-gray-700 mb-2">
+                Ville
+              </label>
+              <input
+                id="ville"
+                type="text"
+                {...control.register("ville")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="Abidjan"
+              />
+            </div>
+
+            {/* Adresse */}
+            <div>
+              <label htmlFor="address" className="block text-sm font-semibold text-gray-700 mb-2">
+                Adresse
+              </label>
+              <input
+                id="address"
+                type="text"
+                {...control.register("address")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="Cocody, Boulevard..."
+              />
+            </div>
+
+            {/* Latitude */}
+            <div>
+              <label htmlFor="latitude" className="block text-sm font-semibold text-gray-700 mb-2">
+                Latitude (optionnel)
+              </label>
+              <input
+                id="latitude"
+                type="text"
+                {...control.register("latitude")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="5.316667"
+              />
+            </div>
+
+            {/* Longitude */}
+            <div>
+              <label htmlFor="longitude" className="block text-sm font-semibold text-gray-700 mb-2">
+                Longitude (optionnel)
+              </label>
+              <input
+                id="longitude"
+                type="text"
+                {...control.register("longitude")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="-4.033333"
+              />
             </div>
           </div>
         </div>
