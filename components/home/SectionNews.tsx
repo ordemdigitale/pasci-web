@@ -11,7 +11,7 @@ import DOMPurify from 'dompurify';
 // Mock data de fallback si l'API ne répond pas
 const mockNews: SpotlightNews[] = [
   {
-    id: "1",
+    id: 1,
     title: "Lancement du nouveau programme de formation pour les OSC",
     slug: "nouveau-programme-formation-osc",
     content: "Le CRASC annonce le lancement d'un nouveau programme de formation destiné aux organisations de la société civile. Ce programme vise à renforcer les capacités en gestion de projets.",
@@ -24,7 +24,7 @@ const mockNews: SpotlightNews[] = [
     }
   },
   {
-    id: "2",
+    id: 2,
     title: "Atelier de renforcement des capacités organisationnelles",
     slug: "atelier-renforcement-capacites",
     content: "Un atelier de trois jours pour améliorer les compétences organisationnelles des membres des OSC. Formation sur la gouvernance, la planification stratégique et la mobilisation de ressources.",
@@ -37,7 +37,7 @@ const mockNews: SpotlightNews[] = [
     }
   },
   {
-    id: "3",
+    id: 3,
     title: "Assemblée générale annuelle 2025",
     slug: "assemblee-generale-2025",
     content: "Convocation à l'assemblée générale ordinaire pour faire le bilan des activités de l'année écoulée et définir les orientations stratégiques pour 2025.",
@@ -50,7 +50,7 @@ const mockNews: SpotlightNews[] = [
     }
   },
   {
-    id: "4",
+    id: 4,
     title: "Forum régional sur le développement durable",
     slug: "forum-regional-developpement-durable",
     content: "Le CRASC organise un forum régional réunissant les acteurs du développement durable pour échanger sur les bonnes pratiques et renforcer les synergies d'action.",
@@ -63,7 +63,7 @@ const mockNews: SpotlightNews[] = [
     }
   },
   {
-    id: "5",
+    id: 5,
     title: "Campagne de sensibilisation sur les droits humains",
     slug: "campagne-sensibilisation-droits-humains",
     content: "Lancement d'une vaste campagne de sensibilisation aux droits humains dans les communautés locales, avec l'appui des OSC membres du réseau CRASC.",

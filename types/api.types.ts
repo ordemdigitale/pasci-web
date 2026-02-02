@@ -24,6 +24,16 @@ export interface IOsc {
   crascRegionId: string;
   crasc: ICrasc;
   type: IOscType;
+  slug: string;
+  thumbnail_url?: string;
+  thumbnail_path?: string;
+  ville?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  website?: string | null;
+  address?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // Interface for Crasc region by slug with OSCs and Region CIVs

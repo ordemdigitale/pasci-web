@@ -286,7 +286,7 @@ export default function AdminAjoutDocument() {
                 name="category"
                 control={control}
                 render={({ field }) => (
-                  <Select.Root onValueChange={field.onChange} value={field.value}>
+                  <Select.Root onValueChange={field.onChange} value={field.value ?? undefined}>
                     <Select.Trigger className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between">
                       <Select.Value placeholder="Sélectionnez une catégorie" />
                       <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -327,7 +327,7 @@ export default function AdminAjoutDocument() {
                   name="crasc_id"
                   control={control}
                   render={({ field }) => (
-                    <Select.Root onValueChange={field.onChange} value={field.value}>
+                    <Select.Root onValueChange={field.onChange} value={field.value ?? undefined}>
                       <Select.Trigger className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between">
                         <Select.Value placeholder="Sélectionnez un CRASC" />
                         <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -359,7 +359,7 @@ export default function AdminAjoutDocument() {
                   name="osc_id"
                   control={control}
                   render={({ field }) => (
-                    <Select.Root onValueChange={field.onChange} value={field.value}>
+                    <Select.Root onValueChange={field.onChange} value={field.value ?? undefined}>
                       <Select.Trigger className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between">
                         <Select.Value placeholder="Sélectionnez une OSC" />
                         <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -435,10 +435,10 @@ export default function AdminAjoutDocument() {
               )}
             </div>
 
-            {errors.file && (
+            {errors.file?.message && (
               <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
                 <AlertCircle className="w-4 h-4" />
-                {errors.file.message}
+                {String(errors.file.message)}
               </p>
             )}
           </div>
