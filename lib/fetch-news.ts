@@ -1,4 +1,4 @@
-import { INews, INewsDetail } from "@/types/api.types";
+import { INews } from "@/types/api.types";
 
 const API_BASE_URL = "http://localhost:8000/api/v1/crasc";
 
@@ -39,7 +39,7 @@ export async function fetchAllNews(filters?: {
 }
 
 // Fetch single news by slug
-export async function getNewsBySlug(slug: string): Promise<INewsDetail | null> {
+export async function getNewsBySlug(slug: string): Promise<INews | null> {
     try {
         const response = await fetch(`${API_BASE_URL}/news/${slug}`, {
             next: { revalidate: 60 },
