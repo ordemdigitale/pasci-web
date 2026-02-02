@@ -148,7 +148,7 @@ export async function fetchCrascRegionBySlugWithOscsFromApi(slug: string): Promi
 // Mock news data for fallback
 const mockNewsData: INews[] = [
   {
-    id: "1",
+    id: 1,
     title: "Lancement du nouveau programme de formation pour les OSC",
     slug: "nouveau-programme-formation-osc",
     content: `
@@ -176,7 +176,7 @@ const mockNewsData: INews[] = [
     }
   },
   {
-    id: "2",
+    id: 2,
     title: "Atelier de renforcement des capacités organisationnelles",
     slug: "atelier-renforcement-capacites",
     content: `
@@ -211,7 +211,7 @@ const mockNewsData: INews[] = [
     }
   },
   {
-    id: "3",
+    id: 3,
     title: "Assemblée générale annuelle 2025",
     slug: "assemblee-generale-2025",
     content: `
