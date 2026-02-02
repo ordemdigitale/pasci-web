@@ -116,7 +116,7 @@ export const domainesIntervention = [
 // Mock data actualités (même que dans SectionNews)
 const mockNews: SpotlightNews[] = [
   {
-    id: "1",
+    id: 1,
     title: "Lancement du nouveau programme de formation pour les OSC",
     slug: "nouveau-programme-formation-osc",
     content: "Le CRASC annonce le lancement d'un nouveau programme de formation destiné aux organisations de la société civile. Ce programme vise à renforcer les capacités en gestion de projets.",
@@ -129,7 +129,7 @@ const mockNews: SpotlightNews[] = [
     }
   },
   {
-    id: "2",
+    id: 2,
     title: "Atelier de renforcement des capacités organisationnelles",
     slug: "atelier-renforcement-capacites",
     content: "Un atelier de trois jours pour améliorer les compétences organisationnelles des membres des OSC. Formation sur la gouvernance, la planification stratégique et la mobilisation de ressources.",
@@ -142,7 +142,7 @@ const mockNews: SpotlightNews[] = [
     }
   },
   {
-    id: "3",
+    id: 3,
     title: "Assemblée générale annuelle 2025",
     slug: "assemblee-generale-2025",
     content: "Convocation à l'assemblée générale ordinaire pour faire le bilan des activités de l'année écoulée et définir les orientations stratégiques pour 2025.",
@@ -155,7 +155,7 @@ const mockNews: SpotlightNews[] = [
     }
   },
   {
-    id: "4",
+    id: 4,
     title: "Forum régional sur le développement durable",
     slug: "forum-regional-developpement-durable",
     content: "Le CRASC organise un forum régional réunissant les acteurs du développement durable pour échanger sur les bonnes pratiques et renforcer les synergies d'action.",
@@ -168,7 +168,7 @@ const mockNews: SpotlightNews[] = [
     }
   },
   {
-    id: "5",
+    id: 5,
     title: "Campagne de sensibilisation sur les droits humains",
     slug: "campagne-sensibilisation-droits-humains",
     content: "Lancement d'une vaste campagne de sensibilisation aux droits humains dans les communautés locales, avec l'appui des OSC membres du réseau CRASC.",
@@ -296,24 +296,17 @@ export default function PageAnnuaireCrasc() {
             {/* Legend */}
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Légende des zones</h3>
-
+              
               <div className="space-y-3">
+                {/* Crasc Sud */}
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer">
                   <div className="w-8 h-8 rounded bg-blue-300 border-2 border-blue-400"></div>
                   <div>
-                    <p className="font-bold text-blue-900">CRASC NORD</p>
-                    <p className="text-xs text-blue-700">Korhogo, Ferkessédougou, Séguéla</p>
+                    <p className="font-bold text-blue-900">CRASC SUD</p>
+                    <p className="text-xs text-blue-700">Abidjan, San-Pédro, Gagnoa</p>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-orange-50 border border-orange-200 hover:bg-orange-100 transition-colors cursor-pointer">
-                  <div className="w-8 h-8 rounded bg-orange-300 border-2 border-orange-400"></div>
-                  <div>
-                    <p className="font-bold text-orange-900">CRASC OUEST</p>
-                    <p className="text-xs text-orange-700">Man, Daloa, Guiglo</p>
-                  </div>
-                </div>
-
+                {/* Crasc Centre */}
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200 hover:bg-green-100 transition-colors cursor-pointer">
                   <div className="w-8 h-8 rounded bg-green-300 border-2 border-green-400"></div>
                   <div>
@@ -321,29 +314,38 @@ export default function PageAnnuaireCrasc() {
                     <p className="text-xs text-green-700">Yamoussoukro, Bouaké, Dimbokro</p>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-purple-50 border border-purple-200 hover:bg-purple-100 transition-colors cursor-pointer">
-                  <div className="w-8 h-8 rounded bg-purple-300 border-2 border-purple-400"></div>
+                {/* Crasc Nord */}
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-orange-50 border border-orange-200 hover:bg-orange-100 transition-colors cursor-pointer">
+                  <div className="w-8 h-8 rounded bg-orange-300 border-2 border-orange-400"></div>
                   <div>
-                    <p className="font-bold text-purple-900">CRASC EST</p>
-                    <p className="text-xs text-purple-700">Abengourou, Bondoukou</p>
+                    <p className="font-bold text-orange-900">CRASC NORD</p>
+                    <p className="text-xs text-orange-700">Korhogo, Ferkessédougou, Séguéla</p>
+                  </div>
+                </div>
+                {/* Crasc Ouest */}
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-cyan-50 border border-cyan-200 hover:bg-cyan-100 transition-colors cursor-pointer">
+                  <div className="w-8 h-8 rounded bg-cyan-300 border-2 border-cyan-400"></div>
+                  <div>
+                    <p className="font-bold text-cyan-900">CRASC OUEST</p>
+                    <p className="text-xs text-cyan-700">Man, Daloa, Guiglo</p>
+                  </div>
+                </div>
+                {/* Crasc Est */}
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors cursor-pointer">
+                  <div className="w-8 h-8 rounded bg-rose-300 border-2 border-rose-400"></div>
+                  <div>
+                    <p className="font-bold text-rose-900">CRASC EST</p>
+                    <p className="text-xs text-rose-700">Abengourou, Bondoukou</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-red-50 border border-red-200 hover:bg-red-100 transition-colors cursor-pointer">
-                  <div className="w-8 h-8 rounded bg-red-300 border-2 border-red-400"></div>
-                  <div>
-                    <p className="font-bold text-red-900">CRASC SUD</p>
-                    <p className="text-xs text-red-700">Abidjan, San-Pédro, Gagnoa</p>
-                  </div>
-                </div>
               </div>
 
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              {/* {<div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-xs text-gray-600 text-center">
                   💡 <span className="font-semibold">Astuce :</span> Survolez les régions sur la carte pour voir les détails
                 </p>
-              </div>
+              </div>} */}
             </div>
           </div>
         </div>
@@ -402,15 +404,15 @@ export default function PageAnnuaireCrasc() {
                   <>
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
                       
-                      <span>CRASC Nord</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      
                       <span>CRASC Sud</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
                       
-                      <span>CRASC Est</span>
+                      <span>CRASC Centre</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
+                      
+                      <span>CRASC Nord</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
                       
@@ -418,7 +420,7 @@ export default function PageAnnuaireCrasc() {
                     </div>
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
                       
-                      <span>CRASC Centre</span>
+                      <span>CRASC Est</span>
                     </div>
                     
                   </>
@@ -455,7 +457,7 @@ export default function PageAnnuaireCrasc() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-3xl font-extrabold text-gray-900 mb-2">OSC membres</h2>
-            <p className="text-gray-600">Découvrez les organisations qui font partie de notre réseau</p>
+{/*             <p className="text-gray-600">Découvrez les organisations qui font partie de notre réseau</p> */}
           </div>
         </div>
 
@@ -506,7 +508,7 @@ export default function PageAnnuaireCrasc() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-3xl font-extrabold text-gray-900 mb-2">Nos actualités</h2>
-            <p className="text-gray-600">Restez informé des dernières nouvelles du réseau</p>
+{/*             <p className="text-gray-600">Restez informé des dernières nouvelles du réseau</p> */}
           </div>
           <Link
             href="/actualites"

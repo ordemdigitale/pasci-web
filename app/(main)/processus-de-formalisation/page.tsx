@@ -139,17 +139,9 @@ export default function PageProcessusFormalisation() {
                 key={item.id}
                 className="border border-gray-200 rounded-lg overflow-hidden hover-shadow-lg transition-shadow bg-white py-4 px-5"
               >
-                {/* Image */}
-                {/* <div className="">
-                  <ImageWithFallback
-                    
-                    alt={item.name}
-                    className="w-15 h-15"
-                  />
-                </div> */}
                 {item.icon}
                 {/* Name and Role */}
-                <div className="pl-2">
+                <div>
                   <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
                   <p className="text-sm font-medium text-gray-600 py-1 inline-block">{item.content}</p>
                 </div>

@@ -97,3 +97,17 @@ Coopérative
 Groupement
 Réseau
 Autre
+
+
+// Updates in Idrys repo:
+- modified INews import: imported INews from lib/services/news.service.ts
+  - This modification was done in files:
+    - app/(main)/actualites/[newsSlug]/page.tsx
+    - app/(main)/actualites/page.tsx
+    - components/ui/NewsCard.tsx
+
+- added `tags?: string[];` to INews of the file lib/services/news.service.ts
+
+- file app\(main)\annuaire\annuaire-des-crasc\page.tsx: changed id type of `mockNews` from string to number
+- updated pages tous les crasc: mise à jour couleur de la légende de la carte de civ
+- 

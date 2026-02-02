@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { newsService } from "@/lib/services/news.service";
-import { INews, ICrasc } from "@/types/api.types";
+import { newsService, INews } from "@/lib/services/news.service";
+import {
+  //INews,
+  ICrasc
+} from "@/types/api.types";
 import { fetchAllCrasc } from "@/lib/fetch-crasc";
 import NewsCard from "@/components/ui/NewsCard";
 import { ArrowRight, Search, Filter, Calendar, Loader2 } from "lucide-react";

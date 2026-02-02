@@ -9,11 +9,17 @@ import {
   List,
   ChevronLeft,
   ChevronRight,
+  Speech,
+  FileText,
+  Book,
+  Globe,
+  Settings,
+  Lightbulb,
 } from "lucide-react";
 
 interface IFicheInformatives {
   id: number;
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   description: string;
   tags: string[];
@@ -22,42 +28,42 @@ interface IFicheInformatives {
 const fichesInformatives: IFicheInformatives[] = [
   {
     id: 1,
-    icon: "/icons/fiche-info-page/1.png",
+    icon: <Book size={24} color="#E05017" />,
     title: "Guide complet pour l'optimisation des processus",
     description: "Ce guide détaille les étapes essentielles pour identifier, analyser et optimiser les processus métier de votre organisation.",
     tags: ["Guides", "Optimisation"],
   },
   {
     id: 2,
-    icon: "/icons/fiche-info-page/2.png",
+    icon: <FileText size={24} color="#E05017" />,
     title: "Rapport annuel sur les tendances du marché 2023",
     description: "Une analyse approfondie des tendances clés ayant marqué le marché en 2023 et leurs implications futures pour les entreprises.",
     tags: ["Rapports", "Tendances"],
   },
   {
     id: 3,
-    icon: "/icons/fiche-info-page/3.png",
+    icon: <Speech size={24} color="#E05017" />,
     title: "Politique de confidentialité des données PASCI",
     description: "Présentation de notre engagement envers la protection des données personnelles de nos utilisateurs, conforme aux réglementations en vigueur.",
     tags: ["Politiques", "Sécurité"],
   },
   {
     id: 4,
-    icon: "/icons/fiche-info-page/4.png",
+    icon: <Lightbulb size={24} color="#E05017" />,
     title: "10 astuces pour une stratégie de communication efficace",
     description: "Découvrez des conseils pratiques pour élaborer une stratégie de communication percutante et atteindre vos objectifs.",
     tags: ["Guides", "Marketing"],
   },
   {
     id: 5,
-    icon: "/icons/fiche-info-page/5.png",
+    icon: <Globe size={24} color="#E05017" />,
     title: "L'impact du numérique sur l'économie globale",
     description: "Étude des transformations numériques et de leur influence sur les dynamiques économiques à l'échelle mondiale.",
     tags: ["Analyses", "Économie"],
   },
   {
     id: 6,
-    icon: "/icons/fiche-info-page/6.png",
+    icon: <Settings size={24} color="#E05017" />,
     title: "Mise en œuvre des systèmes de gestion intégrés",
     description: "Un aperçu des meilleures pratiques pour l'implémentation réussie de systèmes de gestion intégrés dans diverses structures.",
     tags: ["Guides", "Technologie"],
@@ -118,70 +124,18 @@ export default function PageFichesInformatives() {
       {/* Search bar + filters area*/}
       <div className="border-b border-b-[#dee1e6] p-6 mb-6">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <div className="grid grid-cols-6 md:grid-cols-6 gap-4 items-end">
-            {/* search bar */}
-            <div className="relative col-span-3">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Rechercher des documents..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="text-sm w-full pl-12 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
-              />
-            </div>
-
-            {/* filters */}
-            <div>
-              <select
-                value={selectedCategory}
-                onChange={(e) =>
-                  setSelectedCategory(e.target.value)
-                }
-                className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
-              >
-                <option value="">
-                  Catégorie
-                </option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <select
-                value={selectedType}
-                onChange={(e) =>
-                  setSelectedType(e.target.value)
-                }
-                className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
-              >
-                <option value="">Type</option>
-                <option value="type1">Type 1</option>
-                <option value="type2">Type 2</option>
-                <option value="type3">Type 3</option>
-              </select>
-            </div>
-
-            <div>
-              <select
-                value={selectedDate}
-                onChange={(e) =>
-                  setSelectedDate(e.target.value)
-                }
-                className="text-xs w-full px-2 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
-              >
-                <option value="">Date</option>
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-              </select>
-            </div>
-
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Rechercher des documents..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            />
           </div>
+          
         </div>
       </div>
 
@@ -196,15 +150,10 @@ export default function PageFichesInformatives() {
             key={fiche.id}
             className="border border-gray-200 rounded-lg overflow-hidden hover-shadow-lg transition-shadow bg-white py-4 px-5 relative h-84"
           >
-            {/* Image */}
+            {/* Icone */}
             <div className="mb-4">
-              <ImageWithFallback
-                src={fiche.icon}
-                alt={fiche.title}
-                className="w-15 h-15 bg-[#f0f9ff] rounded-full"
-              />
+              {fiche.icon}
             </div>
-            
             <div className="mb-2">
               <h3 className="text-lg font-semibold text-gray-900">{fiche.title}</h3>
               <p className="text-sm text-gray-600 mt-3 inline-block">{fiche.description}</p>
