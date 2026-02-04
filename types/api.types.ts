@@ -13,8 +13,11 @@ export interface ICrasc {
 export interface IRegionCiv {
   id: string;
   name: string;
-  crasc_id: string;
-  crasc_region: ICrasc;
+  slug: string;
+  crasc_id?: string | null;
+  crasc_region?: ICrasc | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface IOsc {

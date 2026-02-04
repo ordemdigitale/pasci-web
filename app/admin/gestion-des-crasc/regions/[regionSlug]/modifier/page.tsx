@@ -7,7 +7,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import * as Select from "@radix-ui/react-select";
-import { ICrasc, IRegionCivWithCrascName } from "@/types/api.types";
+import { ICrasc, IRegionCiv } from "@/types/api.types";
 import { fetchAllCrasc, getRegionBySlug, updateRegion } from "@/lib/fetch-crasc";
 import { MapPin, Loader2, ArrowLeft, Save } from 'lucide-react';
 
@@ -23,7 +23,7 @@ export default function ModifierRegionPage({ params }: { params: Promise<{ regio
   const regionSlug = resolvedParams.regionSlug;
   const router = useRouter();
 
-  const [region, setRegion] = useState<IRegionCivWithCrascName | null>(null);
+  const [region, setRegion] = useState<IRegionCiv | null>(null);
   const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -45,8 +45,8 @@ export default function ModifierRegionPage({ params }: { params: Promise<{ regio
         setRegion(regionData);
         setCrascRegions(crascData);
         reset({
-          name: regionData.region_name,
-          crasc_id: regionData.crascRegionId?.toString() || ""
+          name: regionData.name,
+          crasc_id: regionData.crasc_id?.toString() || ""
         });
       } catch (err: any) {
         setError(err.message || "Erreur lors du chargement des données");
@@ -116,7 +116,7 @@ export default function ModifierRegionPage({ params }: { params: Promise<{ regio
           <MapPin className="w-8 h-8 text-green-600" />
           Modifier la région
         </h2>
-        <p className="text-gray-600 mt-2">Modifiez les informations de la région {region.region_name}</p>
+        <p className="text-gray-600 mt-2">Modifiez les informations de la région {region.name}</p>
       </div>
 
       {/* Form */}

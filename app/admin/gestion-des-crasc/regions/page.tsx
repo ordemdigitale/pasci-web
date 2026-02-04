@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { fetchAllRegion, deleteRegion } from "@/lib/fetch-crasc";
-import { IRegionCivWithCrascName } from "@/localdata/helper/data";
+import { IRegionCiv } from "@/types/api.types";
 import {
   MapPin,
   Plus,
@@ -16,10 +16,10 @@ import {
 } from 'lucide-react';
 
 export default function AdminRegionsPage() {
-  const [regions, setRegions] = useState<IRegionCivWithCrascName[]>([]);
+  const [regions, setRegions] = useState<IRegionCiv[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [deleteModal, setDeleteModal] = useState<{ show: boolean; region: IRegionCivWithCrascName | null }>({
+  const [deleteModal, setDeleteModal] = useState<{ show: boolean; region: IRegionCiv | null }>({
     show: false,
     region: null
   });
@@ -157,14 +157,14 @@ export default function AdminRegionsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <MapPin className="w-5 h-5 text-green-600" />
-                        <span className="text-sm font-semibold text-gray-900">{region.region_name}</span>
+                        <span className="text-sm font-semibold text-gray-900">{region.name}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {region.crasc_region_name ? (
+                      {region.crasc_region ? (
                         <div className="flex items-center gap-2">
                           <Building2 className="w-4 h-4 text-blue-600" />
-                          <span className="text-sm text-gray-900">{region.crasc_region_name}</span>
+                          <span className="text-sm text-gray-900">{region.crasc_region.name}</span>
                         </div>
                       ) : (
                         <span className="text-sm text-gray-500 italic">Non assigné</span>
@@ -214,7 +214,7 @@ export default function AdminRegionsPage() {
               <h3 className="text-xl font-bold text-gray-900">Confirmer la suppression</h3>
             </div>
             <p className="text-gray-600 mb-6">
-              Êtes-vous sûr de vouloir supprimer la région <strong>{deleteModal.region.region_name}</strong> ?
+              Êtes-vous sûr de vouloir supprimer la région <strong>{deleteModal.region.name}</strong> ?
               Cette action est irréversible.
             </p>
             <div className="flex gap-3">
