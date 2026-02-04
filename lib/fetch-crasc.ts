@@ -153,3 +153,53 @@ export async function deleteCrasc(slug: string): Promise<void> {
     throw new Error(errorData.detail || "Échec de la suppression du CRASC");
   }
 }
+
+// Get Region by slug
+export async function getRegionBySlug(slug: string): Promise<IRegionCiv> {
+  const response = await fetch(`http://localhost:8000/api/v1/crasc/region/${slug}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Région non trouvée");
+  }
+
+  return response.json();
+}
+
+// Update Region by slug
+export async function updateRegion(
+  slug: string,
+  data: { name?: string; crasc_id?: number }
+): Promise<IRegionCiv> {
+  const response = await fetch(`http://localhost:8000/api/v1/crasc/region/${slug}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Échec de la mise à jour de la région");
+  }
+
+  return response.json();
+}
+
+// Delete Region by slug
+export async function deleteRegion(slug: string): Promise<void> {
+  const response = await fetch(`http://localhost:8000/api/v1/crasc/region/${slug}`, {
+    method: "DELETE"
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Échec de la suppression de la région");
+  }
+}

@@ -112,6 +112,13 @@ export default async function AdminCrascPage() {
 							<p className="text-sm text-gray-600">Centres régionaux d'appui</p>
 						</div>
 					</div>
+					<Link
+						href="/admin/gestion-des-crasc/ajouter-crasc"
+						className="inline-flex items-center gap-2 px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors"
+					>
+						<Plus className="w-4 h-4" />
+						Ajouter un CRASC
+					</Link>
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
@@ -356,10 +363,21 @@ export default async function AdminCrascPage() {
 								<MapPin className="w-5 h-5 text-green-600" />
 							</div>
 							<div>
-								<h3 className="text-lg font-bold text-gray-900">Régions de Côte d'Ivoire</h3>
+								<h3 className="text-lg font-bold text-gray-900">
+									<Link href="/admin/gestion-des-crasc/regions" className="hover:text-green-600 transition-colors">
+										Régions de Côte d'Ivoire
+									</Link>
+								</h3>
 								<p className="text-sm text-gray-600">{allRegion.length} régions</p>
 							</div>
 						</div>
+						<Link
+							href="/admin/gestion-des-crasc/regions"
+							className="inline-flex items-center gap-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium"
+						>
+							<Plus className="w-4 h-4" />
+							Gérer
+						</Link>
 					</div>
 
 					<div className="space-y-2 max-h-64 overflow-y-auto">
