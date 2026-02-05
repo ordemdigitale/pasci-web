@@ -116,7 +116,7 @@ export default function PageAnnuairePTF() {
 
       {/* Hero Section - Titre principal */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-        <h1 className="text-[#2a591d] font-extrabold text-4xl md:text-5xl text-center">
+        <h1 className="text-[#2a591d] font-extrabold text-2xl md:text-4xl text-center">
           Annuaire des Partenaires Techniques<br />et Financiers (PTF)
         </h1>
       </div>
@@ -128,7 +128,7 @@ export default function PageAnnuairePTF() {
           {/* Left content - Text */}
           <div className="space-y-8">
             <div>
-              <h2 className="text-[#E05017] font-bold text-3xl md:text-4xl mb-6">
+              <h2 className="text-[#E05017] font-bold text-2xl md:text-3xl mb-6">
                 Ensemble, nous pouvons renforcer l'impact
               </h2>
               <p className="text-gray-600 text-base leading-relaxed">
