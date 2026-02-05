@@ -8,9 +8,12 @@ import {
   SpotlightNews
 } from "@/types/api.types";
 
+// Get API base URL from environment variable
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 // Fetch all Crasc
 export async function fetchAllCrasc(): Promise<ICrasc[]> {
-  const res = await fetch("http://localhost:8000/api/v1/crasc/crasc", {
+  const res = await fetch(`${API_BASE_URL}/api/v1/crasc/crasc`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -25,7 +28,7 @@ export async function fetchAllCrasc(): Promise<ICrasc[]> {
 
 // Fetch specific Crasc by slug with OSCs and Region CIVs from API
 export async function getCrascBySlug(crasc_slug: string): Promise<ICrascDetail> {
-  const response = await fetch(`http://localhost:8000/api/v1/crasc/crasc/${crasc_slug}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/crasc/${crasc_slug}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -40,7 +43,7 @@ export async function getCrascBySlug(crasc_slug: string): Promise<ICrascDetail> 
 
 // Fetch all RegionCIV from API
 export async function fetchAllRegion(): Promise<IRegionCiv[]> {
-  const response = await fetch("http://localhost:8000/api/v1/crasc/region", {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/region`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -55,7 +58,7 @@ export async function fetchAllRegion(): Promise<IRegionCiv[]> {
 
 // Fetch all OscType from API
 export async function fetchAllOscType(): Promise<IOscType[]> {
-  const res = await fetch("http://localhost:8000/api/v1/crasc/osc-type", {
+  const res = await fetch(`${API_BASE_URL}/api/v1/crasc/osc-type`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -70,7 +73,7 @@ export async function fetchAllOscType(): Promise<IOscType[]> {
 
 // Fetch all OSC from API
 export async function fetchAllOsc(): Promise<IOsc[]> {
-  const response = await fetch("http://localhost:8000/api/v1/crasc/osc?skip=0&limit=100", {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?skip=0&limit=100`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -85,7 +88,7 @@ export async function fetchAllOsc(): Promise<IOsc[]> {
 
 // Fetch all News from API - Now using dedicated /news endpoint
 export async function fetchAllNews(): Promise<INews[]> {
-  const response = await fetch("http://localhost:8000/api/v1/news?skip=0&limit=100", {
+  const response = await fetch(`${API_BASE_URL}/api/v1/news?skip=0&limit=100`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -102,7 +105,7 @@ export async function fetchAllNews(): Promise<INews[]> {
 // Fetch spotlight news: single (latest) news per crasc - Updated to use /news/spotlight
 export async function fetchSpotlightNews(): Promise<SpotlightNews[]> {
   try {
-    const response = await fetch("http://localhost:8000/api/v1/news/spotlight", {
+    const response = await fetch(`${API_BASE_URL}/api/v1/news/spotlight`, {
       next: { revalidate: 3600 }, // Revalidate every hour for SSG/ISR
       method: "GET",
       headers: {
@@ -126,7 +129,7 @@ export async function updateCrasc(
   slug: string,
   data: { name?: string; description?: string; osc_count?: number }
 ): Promise<ICrasc> {
-  const response = await fetch(`http://localhost:8000/api/v1/crasc/crasc/${slug}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/crasc/${slug}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json"
@@ -144,7 +147,7 @@ export async function updateCrasc(
 
 // Delete CRASC by slug
 export async function deleteCrasc(slug: string): Promise<void> {
-  const response = await fetch(`http://localhost:8000/api/v1/crasc/crasc/${slug}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/crasc/${slug}`, {
     method: "DELETE"
   });
 
@@ -156,7 +159,7 @@ export async function deleteCrasc(slug: string): Promise<void> {
 
 // Get Region by slug
 export async function getRegionBySlug(slug: string): Promise<IRegionCiv> {
-  const response = await fetch(`http://localhost:8000/api/v1/crasc/region/${slug}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/region/${slug}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -176,7 +179,7 @@ export async function updateRegion(
   slug: string,
   data: { name?: string; crasc_id?: number }
 ): Promise<IRegionCiv> {
-  const response = await fetch(`http://localhost:8000/api/v1/crasc/region/${slug}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/region/${slug}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json"
@@ -194,7 +197,7 @@ export async function updateRegion(
 
 // Delete Region by slug
 export async function deleteRegion(slug: string): Promise<void> {
-  const response = await fetch(`http://localhost:8000/api/v1/crasc/region/${slug}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/region/${slug}`, {
     method: "DELETE"
   });
 

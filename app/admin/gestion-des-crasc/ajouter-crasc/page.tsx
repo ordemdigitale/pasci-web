@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { API_ENDPOINTS } from "@/lib/api-config";
 
 // Schema de validation pour le formulaire d'ajout de région CIV
 const crascSchema = z.object({
