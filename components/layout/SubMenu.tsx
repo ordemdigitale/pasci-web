@@ -25,7 +25,7 @@ export default function SubMenu() {
                   Annuaire des CRASC
                 </a>
                 <a href="/annuaire/annuaire-des-partenaires-techniques-et-financiers" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Annuaire des Partenaires Techniques et Financiers
+                  Annuaire des PTF
                 </a>
                 {/* <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                   Option 3

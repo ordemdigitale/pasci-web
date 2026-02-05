@@ -116,7 +116,7 @@ export default function PageOffreProjet() {
       {/* Search & Filters */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="grid grid-cols-1 md:grid-cols-8 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
             {/* Search bar */}
             <div className="relative md:col-span-2">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
