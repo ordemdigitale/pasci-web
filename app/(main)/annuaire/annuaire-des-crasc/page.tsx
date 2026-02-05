@@ -365,7 +365,7 @@ export default function PageAnnuaireCrasc() {
                 OSC MEMBRES
               </h3>
               <div className="text-4xl font-extrabold text-[#E05017] group-hover:text-white transition-colors mb-1">
-                {firstKeyStat?.number || "850+"}
+                {firstKeyStat?.number || "3201"}
               </div>
               <p className="text-xs text-gray-500 group-hover:text-white/70 transition-colors">
                 Organisations actives
