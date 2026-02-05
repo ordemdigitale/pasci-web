@@ -1,6 +1,6 @@
 // lib/fetch-formations.ts | Functions to fetch formations from API
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export interface IFormation {
   id: number;

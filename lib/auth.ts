@@ -1,7 +1,9 @@
 // lib/auth.ts | Authentication service
 import { ILoginRequest, ILoginResponse, IUser, IRegisterRequest } from "@/types/api.types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+// Use the same env variable as other files for consistency
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = `${API_BASE_URL}/api/v1`;
 
 // Token management
 export const TOKEN_KEY = "pasci_access_token";
