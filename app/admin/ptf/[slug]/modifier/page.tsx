@@ -17,7 +17,7 @@ const ptfSchema = z.object({
   description: z.string().optional().nullable(),
   mission: z.string().optional().nullable(),
   vision: z.string().optional().nullable(),
-  website: z.string().url("URL invalide").optional().or(z.literal("")),
+  website: z.string().optional().or(z.literal("")),
   email: z.string().email("Email invalide").optional().or(z.literal("")),
   phone: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
@@ -406,7 +406,7 @@ export default function EditPTFPage() {
                 </label>
                 <input
                   {...register("website")}
-                  type="url"
+                  type="text"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
                   placeholder="https://example.com"
                 />

@@ -599,7 +599,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
                     <div>
                       <p className="text-sm font-semibold text-gray-700">Site Web</p>
                       <a
-                        href={`https://${ptfData.website}`}
+                        href={`${ptfData.website}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-[#E05017] hover:underline inline-flex items-center gap-1"
