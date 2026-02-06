@@ -49,7 +49,7 @@ export default function OscDetailPage() {
         setError(null);
 
         const response = await fetch(
-          `http://localhost:8000/api/v1/crasc/osc/${oscSlug}`,
+          `https://api.plateforme-osci.org/api/v1/crasc/osc/${oscSlug}`,
           { cache: "no-store" }
         );
 
@@ -88,7 +88,7 @@ export default function OscDetailPage() {
     try {
       setDeleting(true);
       const response = await fetch(
-        `http://localhost:8000/api/v1/crasc/osc/${oscSlug}`,
+        `https://api.plateforme-osci.org/api/v1/crasc/osc/${oscSlug}`,
         { method: "DELETE" }
       );
 

@@ -228,7 +228,7 @@ export default function AdminAjoutOsc() {
         setUploadProgress(null);
       };
 
-      xhr.open("POST", "http://localhost:8000/api/v1/crasc/osc");
+      xhr.open("POST", "https://api.plateforme-osci.org/api/v1/crasc/osc");
       xhr.send(formData);
 
     } catch (error) {
