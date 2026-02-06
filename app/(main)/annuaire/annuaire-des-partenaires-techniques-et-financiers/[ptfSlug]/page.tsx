@@ -4,7 +4,22 @@ import React, { use, useState, useEffect } from "react";
 import { IPTF } from '@/types/api.types';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from "next/link";
-import { MapPin, Mail, Phone, Globe, Building2, Calendar, Users, Target, ArrowRight, ExternalLink, FileText, Clock, NotepadText } from 'lucide-react';
+import {
+  MapPin,
+  Mail,
+  Phone,
+  Globe,
+  Building2,
+  Calendar,
+  Users,
+  Target,
+  ArrowRight,
+  ExternalLink,
+  FileText,
+  Clock,
+  NotepadText,
+  Loader2
+} from 'lucide-react';
 
 // Mock data complet pour les PTF
 const mockPTFDetails: Record<string, any> = {
@@ -371,7 +386,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
     return (
       <div className="min-h-screen flex items-center justify-center font-poppins">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#E05017] mx-auto mb-4"></div>
+          <Loader2 className="w-12 h-12 text-[#E05017] animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Chargement...</p>
         </div>
       </div>
@@ -398,7 +413,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
   }
 
   return (
-    <section className="py-10 font-poppins">
+    <section className="pb-10 font-poppins">
 
       {/* Cover Image */}
       {ptfData.cover_url && (
