@@ -173,7 +173,7 @@ export default function PageDocumentation() {
         {/* Search bar + filters area*/}
         <div className="bg-[#fafafb] rounded-lg shadow-sm p-6 mb-6">
           {/* search bar */}
-          <div className="relative mb-6">
+          <div className="relative mb-1">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
@@ -192,7 +192,7 @@ export default function PageDocumentation() {
             />
           </div>
           {/* filters */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          {/*<div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
               <label className="block text-sm text-gray-700 mb-2">
                 Catégorie
@@ -250,7 +250,7 @@ export default function PageDocumentation() {
                 Réinitialiser
               </button>
             </div>
-          </div>
+          </div>*/}
 
         </div>
         {/* End search bar + filters area */}

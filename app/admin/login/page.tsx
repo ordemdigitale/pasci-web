@@ -174,9 +174,9 @@ export default function AdminLoginPage() {
               <p className="text-sm text-gray-600">
                 Accès réservé aux administrateurs PASCI
               </p>
-              <p className="text-xs text-gray-500 mt-2">
+              {/*<p className="text-xs text-gray-500 mt-2">
                 Identifiants par défaut: admin / admin123
-              </p>
+              </p>*/}
               <p className="text-xs text-gray-500 mt-1">
                 Pour toute assistance, contactez le support technique
               </p>

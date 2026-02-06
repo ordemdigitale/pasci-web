@@ -51,7 +51,7 @@ export default function LoginPage() {
                 />
               </div>
               <h2 className="text-3xl font-bold text-[#2a591d] mb-4">
-                Bienvenue sur PASCI
+                Bienvenue à vous
               </h2>
               <p className="text-gray-700 mb-6">
                 Connectez-vous pour accéder à votre espace personnel et profiter de tous les services
@@ -91,7 +91,7 @@ export default function LoginPage() {
           <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Connexion</h1>
-              <p className="text-gray-600">Connectez-vous à votre compte PASCI</p>
+              <p className="text-gray-600">Connectez-vous à votre compte</p>
             </div>
 
             {error && (

@@ -51,9 +51,9 @@ export default function PolesAndOpportunities() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
               <h2 className="text-gray-900 font-bold text-3xl mb-2">PÔLES DE CONCERTATION</h2>
-              <p className="text-gray-600 text-sm">Nos dernières annonces de pole</p>
+              {/*<p className="text-gray-600 text-sm">Nos dernières annonces de pole</p>*/}
             </div>
-            <div className="flex gap-3 text-sm">
+            {/*<div className="flex gap-3 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-gray-600">Catégorie: Toutes</span>
                 <ChevronDown className="w-4 h-4 text-gray-600" />
@@ -66,7 +66,7 @@ export default function PolesAndOpportunities() {
                 <span className="text-gray-600">Zone: Toutes</span>
                 <ChevronDown className="w-4 h-4 text-gray-600" />
               </div>
-            </div>
+            </div>*/}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
