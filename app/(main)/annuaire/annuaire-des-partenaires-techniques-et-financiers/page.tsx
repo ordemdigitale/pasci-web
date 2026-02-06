@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { ImageWithFallback } from '@/lib/imageWithFallback'
 import { IPTF } from '@/types/api.types';
 import Link from 'next/link';
+import { 
+  Loader2
+} from 'lucide-react';
 
 // Mock data de fallback
 const mockPTFData: IPTF[] = [
@@ -104,7 +107,7 @@ export default function PageAnnuairePTF() {
     return (
       <div className="min-h-screen flex items-center justify-center font-poppins">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#2a591d] mx-auto mb-4"></div>
+          <Loader2 className="w-12 h-12 text-[#E05017] animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Chargement...</p>
         </div>
       </div>
