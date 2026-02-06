@@ -241,7 +241,7 @@ export default function PageOffreEmploi() {
       {/* Search bar + filters area*/}
       <div className="p-6 mb-6">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <div className="grid grid-cols-6 md:grid-cols-6 gap-4 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-4 items-end">
             {/* search bar */}
             <div className="relative col-span-3">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -255,7 +255,7 @@ export default function PageOffreEmploi() {
             </div>
 
             {/* filters */}
-            <div>
+            {/*<div>
               <select
                 value={selectedCategory}
                 onChange={(e) =>
@@ -272,9 +272,9 @@ export default function PageOffreEmploi() {
                   </option>
                 ))}
               </select>
-            </div>
+            </div>*/}
 
-            <div>
+            {/*<div>
               <select
                 value={selectedType}
                 onChange={(e) =>
@@ -288,9 +288,9 @@ export default function PageOffreEmploi() {
                 <option value="type3">CDD</option>
                 <option value="type4">Stage</option>
               </select>
-            </div>
+            </div>*/}
 
-            <div>
+            {/*<div>
               <select
                 value={selectedDate}
                 onChange={(e) =>
@@ -303,7 +303,7 @@ export default function PageOffreEmploi() {
                 <option value="2023">2023</option>
                 <option value="2022">2022</option>
               </select>
-            </div>
+            </div>*/}
 
           </div>
         </div>
