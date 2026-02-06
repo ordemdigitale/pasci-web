@@ -83,7 +83,7 @@ export default function PageAnnuairePTF() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/ptf');
+        const response = await fetch('https://api.plateforme-osci.org/api/v1/ptf');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
