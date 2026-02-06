@@ -353,7 +353,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
         setLoading(true);
 
         // Try to fetch from API
-        const response = await fetch(`http://localhost:8000/api/v1/ptf/${ptfSlug}`);
+        const response = await fetch(`https://api.plateforme-osci.org/api/v1/ptf/${ptfSlug}`);
         if (response.ok) {
           const data = await response.json();
           setPtfData(data);
@@ -434,11 +434,11 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8 -mt-20 relative z-10">
           <div className="flex flex-col md:flex-row gap-6 items-start">
             {/* Logo */}
-            {ptfData.logo_url && (
+            {ptfData.thumbnail_url && (
               <div className="flex-shrink-0">
                 <div className="w-32 h-32 rounded-lg overflow-hidden border-4 border-white shadow-lg bg-gray-50 flex items-center justify-center p-4">
                   <ImageWithFallback
-                    src={ptfData.logo_url}
+                    src={ptfData.thumbnail_url}
                     alt={ptfData.name}
                     className="w-full h-full object-contain"
                   />
