@@ -130,7 +130,7 @@ export default function PageOffreEmploi() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-        const response = await fetch('http://localhost:8000/api/v1/jobs', {
+        const response = await fetch('https://api.plateforme-osci.org/api/v1/jobs', {
           signal: controller.signal
         });
 
@@ -329,7 +329,7 @@ export default function PageOffreEmploi() {
                   </div>
                 </div>
                 <Link href={`/espace-collaboratif/offres-emploi/${job.slug}`}>
-                  <button className="px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017] transition-all">
+                  <button className="px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017] transition-all cursor-pointer">
                     Détails de l'offre
                   </button>
                 </Link>
