@@ -59,7 +59,7 @@ export default function EditOscTypePage() {
         setError(null);
         
         const response = await fetch(
-          `http://localhost:8000/api/v1/crasc/osc-type/${osctypeSlug}`,
+          `https://api.plateforme-osci.org/api/v1/crasc/osc-type/${osctypeSlug}`,
           {
             cache: "no-store",
           }
@@ -100,7 +100,7 @@ export default function EditOscTypePage() {
     
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/crasc/osc-type/${osctypeSlug}`,
+        `https://api.plateforme-osci.org/api/v1/crasc/osc-type/${osctypeSlug}`,
         {
           method: "PATCH",
           headers: {
