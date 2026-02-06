@@ -148,7 +148,7 @@ export default function EditOscTypePage() {
     
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/crasc/osc-type/${osctypeSlug}`,
+        `https://api.plateforme-osci.org/api/v1/crasc/osc-type/${osctypeSlug}`,
         {
           method: "DELETE",
         }

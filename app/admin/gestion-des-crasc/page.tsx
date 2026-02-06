@@ -327,7 +327,7 @@ export default async function AdminCrascPage() {
 										Types de OSC
 									</Link>
 								</h3>
-								<p className="text-sm text-gray-600">{allOscType.length} types</p>
+								<p className="text-sm text-gray-600">{allOscType.length} type(s)</p>
 							</div>
 						</div>
 						<Link
