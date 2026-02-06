@@ -31,7 +31,6 @@ export default function EditOscTypePage() {
   const [oscType, setOscType] = useState<IOscType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  console.log("osctype:", oscType)
 
   const {
     register,

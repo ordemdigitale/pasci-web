@@ -28,7 +28,7 @@ export default async function AdminCrascPage() {
 	const allNews = await fetchAllNews();
 
 	return (
-		<section className="max-w-7xl mx-auto font-poppins bg-slate-50 py-8 px-4">
+		<section className="max-w-7xl mx-auto font-poppins py-8 px-4">
 			{/* Header */}
 			<div className="mb-8">
 				<div className="flex items-center justify-between mb-4">
