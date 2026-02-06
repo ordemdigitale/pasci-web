@@ -85,7 +85,7 @@ export default function AdminAjoutTypeOsc() {
         setLoading(false);
       };
       
-      xhr.open("POST", "http://localhost:8000/api/v1/crasc/osc-type");
+      xhr.open("POST", "https://api.plateforme-osci.org/api/v1/crasc/osc-type");
       xhr.send(formData);
       
     } catch (error) {
