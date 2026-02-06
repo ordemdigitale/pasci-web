@@ -103,7 +103,7 @@ export default function Stats() {
 
   // Mock data de fallback si l'API ne répond pas
   const mockStats: IKeyStats[] = [
-    { id: 1, name: "osc", number: 850 },
+    { id: 1, name: "osc", number: 3201 },
     { id: 2, name: "crasc", number: 5 },
     { id: 3, name: "régions", number: 33 },
     { id: 4, name: "projets", number: 120 }

@@ -163,7 +163,7 @@ export default function ContactPage() {
                     href="mailto:contact@crasc-inades.org"
                     className="text-[#E05017] hover:underline"
                   >
-                    contact@crasc-inades.org
+                    contact@plateforme-crasci.org
                   </a>
                 </div>
               </div>

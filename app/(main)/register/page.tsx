@@ -130,7 +130,7 @@ export default function RegisterPage() {
             />
           </Link>
           <h1 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Créer votre compte PASCI
+            Créer votre compte
           </h1>
           <p className="mt-2 text-sm text-gray-600">
             Rejoignez notre réseau et accédez à toutes nos ressources
