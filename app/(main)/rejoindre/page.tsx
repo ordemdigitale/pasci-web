@@ -219,7 +219,7 @@ export default function PageRejoindre() {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="contact@organisation.cm"
+                      placeholder="contact@organisation.com"
                       className="border-gray-300"
                       {...field}
                     />

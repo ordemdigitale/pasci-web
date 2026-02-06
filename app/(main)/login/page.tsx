@@ -239,11 +239,11 @@ export default function LoginPage() {
               </p>
               <div className="grid grid-cols-2 gap-6 text-left">
                 <div>
-                  <div className="text-3xl font-bold mb-2">500+</div>
+                  <div className="text-3xl font-bold mb-2">3200+</div>
                   <div className="text-sm text-white/80">OSC membres</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold mb-2">150+</div>
+                  <div className="text-3xl font-bold mb-2">120+</div>
                   <div className="text-sm text-white/80">Projets financés</div>
                 </div>
                 <div>
@@ -251,7 +251,7 @@ export default function LoginPage() {
                   <div className="text-sm text-white/80">Formations</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold mb-2">12</div>
+                  <div className="text-3xl font-bold mb-2">5</div>
                   <div className="text-sm text-white/80">CRASC actifs</div>
                 </div>
               </div>

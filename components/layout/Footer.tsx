@@ -112,7 +112,7 @@ export default function Footer() {
 
               <p>
                 e-mail : <a href="mailto:contact@crasc.ivoire.org" className="text-white hover:underline">
-                  contact@crasc.ivoire.org
+                  contact@plateforme-crasci.org
                 </a>
               </p>
 
