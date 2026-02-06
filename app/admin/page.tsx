@@ -161,7 +161,7 @@ export default function Dashboard() {
             </div>
           </div>
           <p className="text-gray-600 text-sm mb-1">Total OSC</p>
-          <p className="text-3xl font-bold text-gray-900">3,176</p>
+          <p className="text-3xl font-bold text-gray-900">3,201</p>
           <Link href="/admin/gestion-des-crasc/osc" className="text-[#2a591d] text-xs font-semibold mt-2 inline-block hover:underline">
             Gérer les OSC →
           </Link>
