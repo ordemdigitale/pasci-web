@@ -129,7 +129,7 @@ export default function AnnuaireOSCPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <div className="text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
-            Annuaire des <span className="text-[#E05017]">OSC</span>
+            Annuaire des <span className="text-[#E05017]">CRASC</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Découvrez les Organisations de la Société Civile membres du réseau CRASC
