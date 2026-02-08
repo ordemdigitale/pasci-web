@@ -4,6 +4,7 @@ import {
   IRegionCiv,
   IOscType,
   IOsc,
+  IOscDetail,
   INews,
   SpotlightNews
 } from "@/types/api.types";
@@ -82,6 +83,21 @@ export async function fetchAllOsc(): Promise<IOsc[]> {
   });
   if (!response.ok) {
     throw new Error("Échec du chargement des types de OSC à partir de l'API");
+  }
+  return response.json();
+}
+
+// Fetch specific Osc by slug from API
+export async function getOscBySlug(osc_slug: string): Promise<IOscDetail> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/osc/${osc_slug}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    cache: "no-store"
+  });
+  if (!response.ok) {
+    throw new Error("Échec du chargement des détails de l'OSC à partir de l'API");
   }
   return response.json();
 }

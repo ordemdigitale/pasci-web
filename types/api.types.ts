@@ -39,6 +39,29 @@ export interface IOsc {
   updated_at?: string;
 }
 
+export interface IOscDetail {
+  id: number;
+  name: string;
+  description: string;
+  thumbnail_path?: string;
+  thumbnail_url?: string;
+  type_id: number;
+  crasc_id: number;
+  latitude: number;
+  longitude: number;
+  ville?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  website?: string | null;
+  address?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  slug: string;
+  type: IOscType;
+  crasc: ICrasc;
+  news_items?: INews[];
+}
+
 // Interface for Crasc region by slug with OSCs and Region CIVs
 export interface ICrascDetail {
   id: string;
