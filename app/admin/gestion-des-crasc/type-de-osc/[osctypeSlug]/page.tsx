@@ -31,7 +31,6 @@ export default function EditOscTypePage() {
   const [oscType, setOscType] = useState<IOscType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  console.log("osctype:", oscType)
 
   const {
     register,
@@ -59,7 +58,7 @@ export default function EditOscTypePage() {
         setError(null);
         
         const response = await fetch(
-          `http://localhost:8000/api/v1/crasc/osc-type/${osctypeSlug}`,
+          `https://api.plateforme-osci.org/api/v1/crasc/osc-type/${osctypeSlug}`,
           {
             cache: "no-store",
           }
@@ -100,7 +99,7 @@ export default function EditOscTypePage() {
     
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/crasc/osc-type/${osctypeSlug}`,
+        `https://api.plateforme-osci.org/api/v1/crasc/osc-type/${osctypeSlug}`,
         {
           method: "PATCH",
           headers: {
@@ -148,7 +147,7 @@ export default function EditOscTypePage() {
     
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/crasc/osc-type/${osctypeSlug}`,
+        `https://api.plateforme-osci.org/api/v1/crasc/osc-type/${osctypeSlug}`,
         {
           method: "DELETE",
         }

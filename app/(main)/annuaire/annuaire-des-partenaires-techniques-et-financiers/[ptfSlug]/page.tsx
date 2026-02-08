@@ -4,7 +4,22 @@ import React, { use, useState, useEffect } from "react";
 import { IPTF } from '@/types/api.types';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from "next/link";
-import { MapPin, Mail, Phone, Globe, Building2, Calendar, Users, Target, ArrowRight, ExternalLink, FileText, Clock, NotepadText } from 'lucide-react';
+import {
+  MapPin,
+  Mail,
+  Phone,
+  Globe,
+  Building2,
+  Calendar,
+  Users,
+  Target,
+  ArrowRight,
+  ExternalLink,
+  FileText,
+  Clock,
+  NotepadText,
+  Loader2
+} from 'lucide-react';
 
 // Mock data complet pour les PTF
 const mockPTFDetails: Record<string, any> = {
@@ -338,7 +353,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
         setLoading(true);
 
         // Try to fetch from API
-        const response = await fetch(`http://localhost:8000/api/v1/ptf/${ptfSlug}`);
+        const response = await fetch(`https://api.plateforme-osci.org/api/v1/ptf/${ptfSlug}`);
         if (response.ok) {
           const data = await response.json();
           setPtfData(data);
@@ -371,7 +386,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
     return (
       <div className="min-h-screen flex items-center justify-center font-poppins">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#E05017] mx-auto mb-4"></div>
+          <Loader2 className="w-12 h-12 text-[#E05017] animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Chargement...</p>
         </div>
       </div>
@@ -398,7 +413,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
   }
 
   return (
-    <section className="py-10 font-poppins">
+    <section className="pb-10 font-poppins">
 
       {/* Cover Image */}
       {ptfData.cover_url && (
@@ -419,11 +434,11 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8 -mt-20 relative z-10">
           <div className="flex flex-col md:flex-row gap-6 items-start">
             {/* Logo */}
-            {ptfData.logo_url && (
+            {ptfData.thumbnail_url && (
               <div className="flex-shrink-0">
                 <div className="w-32 h-32 rounded-lg overflow-hidden border-4 border-white shadow-lg bg-gray-50 flex items-center justify-center p-4">
                   <ImageWithFallback
-                    src={ptfData.logo_url}
+                    src={ptfData.thumbnail_url}
                     alt={ptfData.name}
                     className="w-full h-full object-contain"
                   />
@@ -584,7 +599,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
                     <div>
                       <p className="text-sm font-semibold text-gray-700">Site Web</p>
                       <a
-                        href={`https://${ptfData.website}`}
+                        href={`${ptfData.website}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-[#E05017] hover:underline inline-flex items-center gap-1"

@@ -28,7 +28,7 @@ export default async function AdminCrascPage() {
 	const allNews = await fetchAllNews();
 
 	return (
-		<section className="max-w-7xl mx-auto font-poppins bg-slate-50 py-8 px-4">
+		<section className="max-w-7xl mx-auto font-poppins py-8 px-4">
 			{/* Header */}
 			<div className="mb-8">
 				<div className="flex items-center justify-between mb-4">
@@ -327,7 +327,7 @@ export default async function AdminCrascPage() {
 										Types de OSC
 									</Link>
 								</h3>
-								<p className="text-sm text-gray-600">{allOscType.length} types</p>
+								<p className="text-sm text-gray-600">{allOscType.length} type(s)</p>
 							</div>
 						</div>
 						<Link
