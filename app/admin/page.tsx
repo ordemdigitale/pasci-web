@@ -34,7 +34,7 @@ export default function Dashboard() {
       setError(null);
 
       try {
-        const response = await fetch("http://localhost:8000/api/v1/crasc/crasc");
+        const response = await fetch("https://api.plateforme-osci.org/api/v1/crasc/crasc");
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`)
         }
@@ -55,7 +55,7 @@ export default function Dashboard() {
       setError(null);
 
       try {
-        const response = await fetch("http://localhost:8000/api/v1/jobs");
+        const response = await fetch("https://api.plateforme-osci.org/api/v1/jobs");
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`)
         }
@@ -197,7 +197,7 @@ export default function Dashboard() {
             </div>
           </div>
           <p className="text-gray-600 text-sm mb-1">Utilisateurs actifs</p>
-          <p className="text-3xl font-bold text-gray-900">1,245</p>
+          <p className="text-3xl font-bold text-gray-900">1</p>
           <Link href="/admin/utilisateurs" className="text-[#2a591d] text-xs font-semibold mt-2 inline-block hover:underline">
             Gérer les utilisateurs →
           </Link>
