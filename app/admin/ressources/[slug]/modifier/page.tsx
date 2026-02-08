@@ -30,9 +30,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const documentSchema = z.object({
   title: z.string().min(8, "Le titre doit contenir au moins 8 caractères."),
   description: z.string().optional().nullable(),
-  type: z.enum(["documentation", "fiche"], {
-    required_error: "Le type de ressource est requis",
-  }),
+  type: z.enum(["documentation", "fiche"]),
   category: z.string().optional().nullable(),
   crasc_id: z.string().optional().nullable(),
   osc_id: z.string().optional().nullable(),
@@ -190,8 +188,8 @@ export default function AdminModifierDocument() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData.detail?.errors?.[0]?.message ||
-                            errorData.detail ||
-                            `Erreur ${response.status}: ${response.statusText}`;
+          errorData.detail ||
+          `Erreur ${response.status}: ${response.statusText}`;
         throw new Error(errorMessage);
       }
 
@@ -276,9 +274,8 @@ export default function AdminModifierDocument() {
                 id="title"
                 type="text"
                 {...register("title")}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all ${
-                  errors.title ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all ${errors.title ? "border-red-500" : "border-gray-300"
+                  }`}
                 placeholder="Ex: Guide de rédaction de propositions de projets"
               />
               {errors.title && (
@@ -298,9 +295,8 @@ export default function AdminModifierDocument() {
                 id="description"
                 {...register("description")}
                 rows={4}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all ${
-                  errors.description ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all ${errors.description ? "border-red-500" : "border-gray-300"
+                  }`}
                 placeholder="Description du document..."
               />
               {errors.description && (
@@ -318,9 +314,8 @@ export default function AdminModifierDocument() {
                 control={control}
                 render={({ field }) => (
                   <Select.Root onValueChange={field.onChange} value={field.value}>
-                    <Select.Trigger className={`w-full px-4 py-3 border rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between ${
-                      errors.type ? "border-red-500" : "border-gray-300"
-                    }`}>
+                    <Select.Trigger className={`w-full px-4 py-3 border rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between ${errors.type ? "border-red-500" : "border-gray-300"
+                      }`}>
                       <Select.Value placeholder="Sélectionnez le type de ressource" />
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Trigger>
@@ -477,11 +472,10 @@ export default function AdminModifierDocument() {
             )}
 
             <div
-              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
-                errors.file
+              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${errors.file
                   ? "border-red-500 bg-red-50"
                   : "border-gray-300 hover:border-[#2A591D] hover:bg-gray-50"
-              }`}
+                }`}
               onClick={() => fileInputRef.current?.click()}
             >
               <input

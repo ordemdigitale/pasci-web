@@ -9,6 +9,16 @@ const nextConfig: NextConfig = {
         port: '8000',
         pathname: '/static/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.plateforme-osci.org',
+        pathname: '/static/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'api.plateforme-osci.org',
+        pathname: '/static/**',
+      },
     ],
   },
 };
