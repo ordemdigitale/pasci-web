@@ -115,12 +115,14 @@ export default function SectionNews() {
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
           <h2 className="text-gray-900 font-bold text-3xl">Actualités</h2>
-          {/* <Button 
-            variant="outline" 
+            <Link href="/actualites">
+         <Button 
+            variant="outline"
             className="border border-[#E05017] text-[#E05017] hover:bg-[#E05017] hover:text-white rounded-lg px-6"
           >
             Voir plus
-          </Button> */}
+          </Button>
+            </Link>
         </div>
 
         {/* Loading State */}
