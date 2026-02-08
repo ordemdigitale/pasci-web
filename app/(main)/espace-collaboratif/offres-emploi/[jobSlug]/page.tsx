@@ -23,7 +23,8 @@ import {
   ArrowRight,
   Rocket,
   Sparkles,
-  Target
+  Target,
+  Loader2
 } from "lucide-react";
 
 export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jobSlug: string }>; }) {
@@ -60,8 +61,8 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
     return (
       <div className="min-h-screen bg-[#f8f6f6] flex items-center justify-center font-poppins">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E05017] mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement de l'offre...</p>
+          <Loader2 className="w-12 h-12 text-[#E05017] animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Chargement...</p>
         </div>
       </div>
     );
