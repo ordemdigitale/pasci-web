@@ -492,7 +492,7 @@ export default function PageAnnuaireCrasc() {
                   {osc.name}
                 </h3>
                 <p className="text-gray-600 text-sm line-clamp-3">
-                  {osc.description}
+                  {osc?.description}
                 </p>
               </div>
             </Link>

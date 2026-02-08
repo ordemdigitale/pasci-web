@@ -129,10 +129,10 @@ export default function AnnuaireOSCPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <div className="text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
-            Annuaire des <span className="text-[#E05017]">CRASC</span>
+            Annuaire des <span className="text-[#E05017]">OSC</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Découvrez les Organisations de la Société Civile membres du réseau CRASC
+            Découvrez les Organisations de la Société Civile membres du CRASC
           </p>
           <div className="w-24 h-1 bg-gradient-to-r from-[#E05017] to-[#2a591d] mx-auto mt-6 rounded-full"></div>
         </div>
@@ -245,9 +245,9 @@ export default function AnnuaireOSCPage() {
       {/* OSC Grid */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {loading ? (
-          <div className="text-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-[#E05017]" />
-            <p className="text-gray-600 font-semibold">Chargement des OSC...</p>
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 text-[#E05017] animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Chargement des osc...</p>
           </div>
         ) : filteredOSCs.length === 0 ? (
           <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-12 text-center border-2 border-orange-100">
