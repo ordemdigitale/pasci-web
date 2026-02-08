@@ -97,7 +97,7 @@ Vous assurerez une gestion efficace des agendas, coordonnerez les réunions stra
 // Fetch single Job
 export async function getJobBySlug(job_slug: string): Promise<IJobs> {
   try {
-    const response = await fetch (`http://localhost:8000/api/v1/jobs/${job_slug}`, {
+    const response = await fetch (`https://api.plateforme-osci.org/api/v1/jobs/${job_slug}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
