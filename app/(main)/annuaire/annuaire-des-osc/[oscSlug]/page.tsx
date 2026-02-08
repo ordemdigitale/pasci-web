@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
-import { MapPin, Mail, Phone, Globe, Users2, Building, Calendar, Facebook, Linkedin } from 'lucide-react';
+import { MapPin, Mail, Phone, Globe, Users2, Building, Calendar, Facebook, Linkedin, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface IOSCDetail {
@@ -149,7 +149,7 @@ export default function OSCDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#E05017] mx-auto"></div>
+          <Loader2 className="w-8 h-8 animate-spin text-[#E05017]" />
           <p className="mt-4 text-gray-600">Chargement...</p>
         </div>
       </div>

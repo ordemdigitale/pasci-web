@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Users2, Building, Filter, ArrowRight } from 'lucide-react';
+import { Search, MapPin, Users2, Building, Filter, ArrowRight, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from 'next/link';
 
@@ -246,7 +246,7 @@ export default function AnnuaireOSCPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {loading ? (
           <div className="text-center py-20">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#E05017] mx-auto mb-4"></div>
+            <Loader2 className="w-8 h-8 animate-spin text-[#E05017]" />
             <p className="text-gray-600 font-semibold">Chargement des OSC...</p>
           </div>
         ) : filteredOSCs.length === 0 ? (
