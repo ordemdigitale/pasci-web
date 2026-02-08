@@ -23,34 +23,11 @@ const NavLinks = [
   { href: "/", key: 1, text: "Accueil" },
   { href: "/services", key: 2, text: "Services" },
   { href: "/formations", key: 3, text: "Formations" },
-  { href: "#", key: 4, text: "Ressources", hasDropdown: true },
+  { href: "/ressources", key: 4, text: "Ressources" },
   { href: "#", key: 5, text: "Espace collaboratif", hasDropdown: true },
   { href: "/a-propos", key: 6, text: "À propos" },
   { href: "/contact", key: 7, text: "Contact" },
 ];
-
-const ressourcesSubmenu = {
-    submenu1: {
-      title: 'Documentation',
-      href: "/ressources/documentation",
-      items: [
-        { name: 'North Region', href: '#north' },
-        { name: 'South Region', href: '#south' },
-        { name: 'East Region', href: '#east' },
-        { name: 'West Region', href: '#west' },
-      ]
-    },
-    submenu2: {
-      title: 'Fiche Informative',
-      href: "/ressources/fiches-informatives",
-      items: [
-        { name: 'Community Centers', href: '#centers' },
-        { name: 'Training Facilities', href: '#training' },
-        { name: 'Support Services', href: '#support' },
-        { name: 'Resources', href: '#resources' },
-      ]
-    }
-  };
 
   const espaceCollabSubmenu = {
     submenu1: {
@@ -75,7 +52,7 @@ const user = {
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPlacesOpen, setIsPlacesOpen] = useState(false);
-  const [isRessourcesSubmenuOpen, setIsRessourcesSubmenuOpen] = useState(false);
+  const [isEspaceCollabSubmenuOpen, setIsEspaceCollabSubmenuOpen] = useState(false);
   const pathname = usePathname();
   const isActive = (path: Url) => pathname === path;
 
@@ -96,22 +73,7 @@ export default function Navbar() {
               {NavLinks.map((link) => {
                 if (link.hasDropdown) {
                   let submenuContent = null;
-                  if (link.text === "Ressources") {
-                    submenuContent = (
-                      <DropdownMenuContent className="w-48">
-                        <DropdownMenuSub>
-                          <Link href={ressourcesSubmenu.submenu1.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
-                            <span>{ressourcesSubmenu.submenu1.title}</span>
-                          </Link>
-                        </DropdownMenuSub>
-                        <DropdownMenuSub>
-                          <Link href={ressourcesSubmenu.submenu2.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
-                            <span>{ressourcesSubmenu.submenu2.title}</span>
-                          </Link>
-                        </DropdownMenuSub>
-                      </DropdownMenuContent>
-                    );
-                  } else if (link.text === "Espace collaboratif") {
+                  if (link.text === "Espace collaboratif") {
                     submenuContent = (
                       <DropdownMenuContent className="w-48">
                         <DropdownMenuSub>
@@ -231,25 +193,25 @@ export default function Navbar() {
                   link.hasDropdown ? (
                     <div key={link.text}>
                     <button
-                      onClick={() => setIsRessourcesSubmenuOpen(!isRessourcesSubmenuOpen)}
+                      onClick={() => setIsEspaceCollabSubmenuOpen(!isEspaceCollabSubmenuOpen)}
                       className="text-gray-700 hover:text-gray-900 text-sm tracking-wide transition-colors flex items-center gap-1 w-full"
                     >
                       {link.text}
-                      <ChevronDown className={`w-4 h-4 transition-transform ${isRessourcesSubmenuOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-4 h-4 transition-transform ${isEspaceCollabSubmenuOpen ? 'rotate-180' : ''}`} />
                     </button>
-                    {isRessourcesSubmenuOpen && (
+                    {isEspaceCollabSubmenuOpen && (
                       <div className="ml-4">
                         <div>
-                          <Link href={ressourcesSubmenu.submenu1.href}>
-                            <span className="text-sm text-gray-900">{ressourcesSubmenu.submenu1.title}</span>
+                          <Link href={espaceCollabSubmenu.submenu1.href}>
+                            <span className="text-sm text-gray-900">{espaceCollabSubmenu.submenu1.title}</span>
                           </Link>
-                          
+
                         </div>
                         <div className="pt-2">
-                          <Link href={ressourcesSubmenu.submenu2.href}>
-                            <span className="text-sm text-gray-900">{ressourcesSubmenu.submenu2.title}</span>
+                          <Link href={espaceCollabSubmenu.submenu2.href}>
+                            <span className="text-sm text-gray-900">{espaceCollabSubmenu.submenu2.title}</span>
                           </Link>
-                          
+
                         </div>
                       </div>
                     )}

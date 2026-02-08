@@ -1,9 +1,12 @@
+/* app/(main)/annuaire/annuaire-des-osc/[oscSlug]/page.tsx: Page detail d'une OSC */
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { use, useState, useEffect } from 'react';
+import { getOscBySlug } from "@/lib/fetch-crasc";
+import { IOscDetail, INews } from "@/types/api.types";
+import { useParams } from 'next/navigation'; // to remove
 import { ImageWithFallback } from "@/lib/imageWithFallback";
-import { MapPin, Mail, Phone, Globe, Users2, Building, Calendar, Facebook, Linkedin } from 'lucide-react';
+import { MapPin, Mail, Phone, Globe, Users2, Building, Calendar, Facebook, Linkedin, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface IOSCDetail {
@@ -128,28 +131,41 @@ const mockOSCData: Record<string, IOSCDetail> = {
   }
 };
 
-export default function OSCDetailPage() {
-  const params = useParams();
-  const oscSlug = params.oscSlug as string;
-  const [oscData, setOscData] = useState<IOSCDetail | null>(null);
+export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: string }>; }) {
+  const resolvedParams = use(params);
+  const oscSlug = resolvedParams.oscSlug;
+  const [oscData, setOscData] = useState<IOscDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulation du chargement des données
-    // Remplacer par un vrai appel API
-    setLoading(true);
-    setTimeout(() => {
-      const data = mockOSCData[oscSlug];
-      setOscData(data || null);
-      setLoading(false);
-    }, 500);
+    if (!oscSlug) return;
+    let isCurrent = true;
+
+    async function fetchOsc() {
+      try {
+        setLoading(true);
+        const data = await getOscBySlug(oscSlug);
+        if (isCurrent) setOscData(data);
+      } catch (err: any) {
+        if (isCurrent) setError("Impossible de charger les données de l'OSC.");
+      } finally {
+        if (isCurrent) setLoading(false);
+      }
+    }
+
+    fetchOsc();
+
+    return () => {
+      isCurrent = false;
+    };
   }, [oscSlug]);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#E05017] mx-auto"></div>
+          <Loader2 className="w-8 h-8 animate-spin text-[#E05017]" />
           <p className="mt-4 text-gray-600">Chargement...</p>
         </div>
       </div>
@@ -178,10 +194,10 @@ export default function OSCDetailPage() {
     <section className="py-10 font-poppins">
 
       {/* Cover Image */}
-      {oscData.coverImage && (
+      {oscData.thumbnail_url && (
         <div className="relative h-64 md:h-80 overflow-hidden mb-8">
           <ImageWithFallback
-            src={oscData.coverImage}
+            src={oscData.thumbnail_url}
             alt={oscData.name}
             className="w-full h-full object-cover"
           />
@@ -196,11 +212,11 @@ export default function OSCDetailPage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8 -mt-20 relative z-10">
           <div className="flex flex-col md:flex-row gap-6 items-start">
             {/* Logo */}
-            {oscData.logo && (
+            {oscData.thumbnail_url && (
               <div className="flex-shrink-0">
                 <div className="w-32 h-32 rounded-lg overflow-hidden border-4 border-white shadow-lg">
                   <ImageWithFallback
-                    src={oscData.logo}
+                    src={oscData.thumbnail_url}
                     alt={oscData.name}
                     className="w-full h-full object-cover"
                   />
@@ -216,24 +232,24 @@ export default function OSCDetailPage() {
               <div className="grid md:grid-cols-2 gap-3 text-sm">
                 <div className="flex items-center gap-2 text-gray-600">
                   <Building className="w-4 h-4 text-[#E05017]" />
-                  <span><span className="font-semibold">Domaine:</span> {oscData.domaine}</span>
+                  <span><span className="font-semibold">Domaine:</span> {/* {oscData.domaine} */} Aucun domaine</span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <MapPin className="w-4 h-4 text-[#E05017]" />
-                  <span><span className="font-semibold">Localisation:</span> {oscData.ville}, {oscData.region}</span>
+                  <span><span className="font-semibold">Localisation:</span> {oscData.ville}, {oscData.crasc?.name}</span>
                 </div>
-                {oscData.createdAt && (
+                {oscData.created_at && (
                   <div className="flex items-center gap-2 text-gray-600">
                     <Calendar className="w-4 h-4 text-[#E05017]" />
-                    <span><span className="font-semibold">Création:</span> {oscData.createdAt}</span>
+                    <span><span className="font-semibold">Création:</span> {new Date(oscData.created_at).toLocaleDateString('fr-FR')}</span>
                   </div>
                 )}
-                {oscData.nombreMembres && (
+               {/*  {oscData.nombreMembres && ( */}
                   <div className="flex items-center gap-2 text-gray-600">
                     <Users2 className="w-4 h-4 text-[#E05017]" />
-                    <span><span className="font-semibold">Membres:</span> {oscData.nombreMembres}</span>
+                    <span><span className="font-semibold">Membres:</span> {/* {oscData.nombreMembres} */} 23</span>
                   </div>
-                )}
+                {/* )} */}
               </div>
             </div>
           </div>
@@ -245,12 +261,12 @@ export default function OSCDetailPage() {
           <div className="md:col-span-2 space-y-8">
 
             {/* Mission */}
-            {oscData.mission && (
+            {/* {oscData.mission && (
               <div className="bg-[#f0f9ff] border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Mission</h2>
                 <p className="text-gray-700">{oscData.mission}</p>
               </div>
-            )}
+            )} */}
 
             {/* Vision */}
            {/*  {oscData.vision && (
@@ -278,7 +294,7 @@ export default function OSCDetailPage() {
             )} */}
 
             {/* Réalisations */}
-            {oscData.realisations && oscData.realisations.length > 0 && (
+            {/* {oscData.realisations && oscData.realisations.length > 0 && (
               <div className="bg-[#f0f9ff] border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Nos Réalisations</h2>
                 <ul className="space-y-3">
@@ -290,7 +306,7 @@ export default function OSCDetailPage() {
                   ))}
                 </ul>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Right Column - Contact Info */}
@@ -301,12 +317,12 @@ export default function OSCDetailPage() {
               <h3 className="text-xl font-bold text-gray-900 mb-4">Informations de Contact</h3>
 
               <div className="space-y-4">
-                {oscData.adresse && (
+                {oscData.address && (
                   <div className="flex items-start gap-3">
                     <MapPin className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">Adresse</p>
-                      <p className="text-sm text-gray-600">{oscData.adresse}</p>
+                      <p className="text-sm text-gray-600">{oscData.address}</p>
                     </div>
                   </div>
                 )}
@@ -352,15 +368,15 @@ export default function OSCDetailPage() {
                   </div>
                 )}
 
-                {oscData.president && (
+                {/* {oscData.president && ( */}
                   <div className="flex items-start gap-3">
                     <Users2 className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">Président(e)</p>
-                      <p className="text-sm text-gray-600">{oscData.president}</p>
+                      <p className="text-sm text-gray-600">{/* {oscData.president} */} Zoé Bruno</p>
                     </div>
                   </div>
-                )}
+                {/* )} */}
               </div>
 
               {/* Social Media Links */}

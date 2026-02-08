@@ -68,11 +68,7 @@ export default function AdminSidebar({
     {
       icon: <FileText size={20} />,
       label: "Ressources",
-      dropdown: true,
-      submenus: [
-        { label: "Documentation", href: "/admin/ressources" },
-        { label: "Fiches Informatives", href: "/ressources/fiches-informatives" },
-      ],
+      href: "/admin/ressources",
     },
     {
       icon: <Settings size={20} />,

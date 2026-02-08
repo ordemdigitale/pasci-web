@@ -6,6 +6,7 @@ export interface IDocumentation {
   id: number;
   title: string;
   description: string | null;
+  type: string; // 'documentation' or 'fiche'
   category: string | null;
   file_path: string | null;
   file_type: string | null;
@@ -33,6 +34,7 @@ export interface IDocumentation {
 export interface DocumentationFilters {
   skip?: number;
   limit?: number;
+  type?: string; // 'documentation' or 'fiche'
   category?: string;
   crasc_id?: number;
   osc_id?: number;
@@ -48,9 +50,10 @@ export async function fetchAllDocumentation(
   filters: DocumentationFilters = {}
 ): Promise<IDocumentation[]> {
   const params = new URLSearchParams();
-  
+
   if (filters.skip !== undefined) params.append("skip", filters.skip.toString());
   if (filters.limit !== undefined) params.append("limit", filters.limit.toString());
+  if (filters.type) params.append("type", filters.type);
   if (filters.category) params.append("category", filters.category);
   if (filters.crasc_id !== undefined) params.append("crasc_id", filters.crasc_id.toString());
   if (filters.osc_id !== undefined) params.append("osc_id", filters.osc_id.toString());

@@ -21,11 +21,40 @@ import {
 } from 'lucide-react';
 import { ICrasc, IJobs } from '@/types/api.types';
 
+interface DashboardStats {
+  crasc: { total: number };
+  regions: { total: number };
+  osc: { total: number; types: number };
+  news: { total: number; recent_30_days: number };
+  jobs: { total: number; active: number; recent_30_days: number };
+  users: { total: number };
+}
+
 export default function Dashboard() {
   const [crascData, setCrascData] = useState<ICrasc[] | null>(null);
   const [jobsData, setJobsData] = useState<IJobs[] | null>(null);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+  // fetch dashboard stats
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/stats/dashboard`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        const result = await response.json();
+        setDashboardStats(result);
+      } catch (err) {
+        console.log("Error fetching dashboard stats:", err);
+      }
+    };
+    fetchDashboardStats();
+  }, []);
 
   // fetch all crasc data
   useEffect(() => {
@@ -34,7 +63,7 @@ export default function Dashboard() {
       setError(null);
 
       try {
-        const response = await fetch("http://localhost:8000/api/v1/crasc/crasc");
+        const response = await fetch(`${API_BASE_URL}/api/v1/crasc/crasc`);
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`)
         }
@@ -48,6 +77,7 @@ export default function Dashboard() {
     };
     fetchCrascData();
   }, [])
+
   // fetch job offers
   useEffect(() => {
     const fetchJobsData = async () => {
@@ -55,7 +85,7 @@ export default function Dashboard() {
       setError(null);
 
       try {
-        const response = await fetch("http://localhost:8000/api/v1/jobs");
+        const response = await fetch(`${API_BASE_URL}/api/v1/jobs`);
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`)
         }
@@ -138,8 +168,8 @@ export default function Dashboard() {
               <Map className="w-6 h-6 text-[#2a591d]" />
             </div>
             <div className="flex items-center gap-1 text-green-600 text-sm font-semibold">
-              <ArrowUpRight className="w-4 h-4" />
-              +12%
+              <Activity className="w-4 h-4" />
+              {dashboardStats?.regions.total || 0} régions
             </div>
           </div>
           <p className="text-gray-600 text-sm mb-1">Nombre de CRASC</p>
@@ -155,13 +185,13 @@ export default function Dashboard() {
             <div className="p-3 bg-blue-100 rounded-lg">
               <Building2 className="w-6 h-6 text-blue-600" />
             </div>
-            <div className="flex items-center gap-1 text-green-600 text-sm font-semibold">
-              <ArrowUpRight className="w-4 h-4" />
-              +8%
+            <div className="flex items-center gap-1 text-blue-600 text-sm font-semibold">
+              <Activity className="w-4 h-4" />
+              {dashboardStats?.osc.types || 0} types
             </div>
           </div>
           <p className="text-gray-600 text-sm mb-1">Total OSC</p>
-          <p className="text-3xl font-bold text-gray-900">3,201</p>
+          <p className="text-3xl font-bold text-gray-900">{dashboardStats?.osc.total.toLocaleString() || 0}</p>
           <Link href="/admin/gestion-des-crasc/osc" className="text-[#2a591d] text-xs font-semibold mt-2 inline-block hover:underline">
             Gérer les OSC →
           </Link>
@@ -175,7 +205,7 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center gap-1 text-green-600 text-sm font-semibold">
               <ArrowUpRight className="w-4 h-4" />
-              +15%
+              {dashboardStats?.jobs.recent_30_days ? `+${dashboardStats.jobs.recent_30_days}` : '+0'}
             </div>
           </div>
           <p className="text-gray-600 text-sm mb-1">Offres d'emploi</p>
@@ -191,13 +221,13 @@ export default function Dashboard() {
             <div className="p-3 bg-orange-100 rounded-lg">
               <Users className="w-6 h-6 text-orange-600" />
             </div>
-            <div className="flex items-center gap-1 text-green-600 text-sm font-semibold">
-              <ArrowUpRight className="w-4 h-4" />
-              +5%
+            <div className="flex items-center gap-1 text-gray-400 text-sm font-semibold">
+              <Activity className="w-4 h-4" />
+              Actifs
             </div>
           </div>
-          <p className="text-gray-600 text-sm mb-1">Utilisateurs actifs</p>
-          <p className="text-3xl font-bold text-gray-900">1,245</p>
+          <p className="text-gray-600 text-sm mb-1">Utilisateurs</p>
+          <p className="text-3xl font-bold text-gray-900">{dashboardStats?.users.total.toLocaleString() || 0}</p>
           <Link href="/admin/utilisateurs" className="text-[#2a591d] text-xs font-semibold mt-2 inline-block hover:underline">
             Gérer les utilisateurs →
           </Link>

@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { IJobs } from "@/types/api.types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function EmploisPage() {
   const router = useRouter();
@@ -153,6 +153,7 @@ export default function EmploisPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-[#E05017]" />
+        <p className="mt-4 text-gray-600">Chargement...</p>
       </div>
     );
   }
