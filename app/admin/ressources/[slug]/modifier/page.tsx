@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +9,7 @@ import * as z from "zod";
 import * as Select from "@radix-ui/react-select";
 import { ICrasc, IOsc } from "@/types/api.types";
 import { fetchAllCrasc, fetchAllOsc } from "@/lib/fetch-crasc";
+import { getDocumentationBySlug } from "@/lib/fetch-documentation";
 import {
   ArrowLeft,
   FileText,
@@ -19,14 +20,13 @@ import {
   AlertCircle,
   ChevronDown,
   Building2,
-  Users,
   File as FileIcon,
 } from 'lucide-react';
 import { fetchWithAuth } from "@/lib/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-// Schema de validation
+// Schema de validation pour modification (fichier optionnel)
 const documentSchema = z.object({
   title: z.string().min(8, "Le titre doit contenir au moins 8 caractères."),
   description: z.string().optional().nullable(),
@@ -78,15 +78,58 @@ const categories = [
   "Plan",
 ];
 
-export default function AdminAjoutDocument() {
+export default function AdminModifierDocument() {
+  const params = useParams();
+  const slug = params?.slug as string;
   const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
   const [oscs, setOscs] = useState<IOsc[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
   const [previewFileName, setPreviewFileName] = useState<string | null>(null);
+  const [existingFile, setExistingFile] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  const { register, control, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<DocumentForm>({
+    resolver: zodResolver(documentSchema),
+    defaultValues: { title: "", description: "", type: "documentation", category: "", crasc_id: "", osc_id: "" },
+  });
+
+  const documentFile = watch("file");
+
+  // Charger les données du document
+  useEffect(() => {
+    if (!slug) return;
+
+    const loadDocument = async () => {
+      try {
+        setLoadingData(true);
+        const doc = await getDocumentationBySlug(slug);
+
+        // Pré-remplir le formulaire
+        setValue("title", doc.title);
+        setValue("description", doc.description || "");
+        setValue("type", doc.type as "documentation" | "fiche");
+        setValue("category", doc.category || "");
+        setValue("crasc_id", doc.crasc_id?.toString() || "");
+        setValue("osc_id", doc.osc_id?.toString() || "");
+
+        // Sauvegarder le fichier existant
+        if (doc.file_path) {
+          setExistingFile(doc.file_path);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement du document:", error);
+        setErrorMessage("Impossible de charger le document.");
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    loadDocument();
+  }, [slug, setValue]);
 
   // Récupérer les CRASC et OSC
   useEffect(() => {
@@ -98,13 +141,6 @@ export default function AdminAjoutDocument() {
       .then(data => setOscs(data))
       .catch(error => console.error("Erreur OSC:", error));
   }, []);
-
-  const { register, control, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<DocumentForm>({
-    resolver: zodResolver(documentSchema),
-    defaultValues: { title: "", description: "", type: "documentation", category: "", crasc_id: "", osc_id: "" },
-  });
-
-  const documentFile = watch("file");
 
   // Preview du nom de fichier
   useEffect(() => {
@@ -128,7 +164,6 @@ export default function AdminAjoutDocument() {
 
   // Soumission du formulaire
   const onSubmit = async (values: DocumentForm) => {
-    console.log("Form submitted with values:", values);
     setLoading(true);
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -141,47 +176,49 @@ export default function AdminAjoutDocument() {
       if (values.category) formData.append("category", values.category);
       if (values.crasc_id) formData.append("crasc_id", values.crasc_id);
       if (values.osc_id) formData.append("osc_id", values.osc_id);
-      if (values.file) formData.append("file", values.file);
 
-      console.log("Sending request to:", `${API_BASE_URL}/api/v1/documentation`);
-      console.log("FormData entries:");
-      for (const [key, value] of formData.entries()) {
-        console.log(key, value instanceof File ? value.name : value);
+      // Ajouter le fichier seulement si un nouveau fichier a été sélectionné
+      if (values.file) {
+        formData.append("file", values.file);
       }
 
-      const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/documentation`, {
-        method: "POST",
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/documentation/${slug}`, {
+        method: "PUT",
         body: formData,
       });
 
-      console.log("Response status:", response.status);
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error("Error response:", errorData);
-        const errorMessage = errorData.detail?.errors?.[0]?.message || 
-                            errorData.detail || 
+        const errorMessage = errorData.detail?.errors?.[0]?.message ||
+                            errorData.detail ||
                             `Erreur ${response.status}: ${response.statusText}`;
         throw new Error(errorMessage);
       }
 
       const result = await response.json();
-      console.log("Success response:", result);
-
-      setSuccessMessage("✅ Document ajouté avec succès!");
-      reset();
-      setPreviewFileName(null);
+      setSuccessMessage("✅ Document modifié avec succès!");
 
       setTimeout(() => {
         router.push("/admin/ressources");
       }, 2000);
     } catch (error: any) {
       console.error("Error in onSubmit:", error);
-      setErrorMessage(error.message || "Une erreur est survenue lors de la création du document.");
+      setErrorMessage(error.message || "Une erreur est survenue lors de la modification du document.");
     } finally {
       setLoading(false);
     }
   };
+
+  if (loadingData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 font-poppins flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-[#2A591D] mx-auto mb-4" />
+          <p className="text-gray-600">Chargement des données...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 font-poppins">
@@ -193,8 +230,8 @@ export default function AdminAjoutDocument() {
               <FileText className="w-8 h-8" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold">Ajouter un Document</h1>
-              <p className="text-white/80 mt-1">Ajoutez un nouveau document à la bibliothèque</p>
+              <h1 className="text-3xl font-bold">Modifier le Document</h1>
+              <p className="text-white/80 mt-1">Modifiez les informations du document</p>
             </div>
           </div>
           <Link
@@ -222,19 +259,7 @@ export default function AdminAjoutDocument() {
         )}
 
         {/* Formulaire */}
-        <form 
-          onSubmit={handleSubmit(
-            (data) => {
-              console.log("Form validation passed, submitting:", data);
-              onSubmit(data);
-            },
-            (errors) => {
-              console.error("Form validation errors:", errors);
-              setErrorMessage("Veuillez corriger les erreurs dans le formulaire.");
-            }
-          )} 
-          className="space-y-6"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Section: Informations de base */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
@@ -251,8 +276,9 @@ export default function AdminAjoutDocument() {
                 id="title"
                 type="text"
                 {...register("title")}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all ${errors.title ? "border-red-500" : "border-gray-300"
-                  }`}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all ${
+                  errors.title ? "border-red-500" : "border-gray-300"
+                }`}
                 placeholder="Ex: Guide de rédaction de propositions de projets"
               />
               {errors.title && (
@@ -272,8 +298,9 @@ export default function AdminAjoutDocument() {
                 id="description"
                 {...register("description")}
                 rows={4}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all ${errors.description ? "border-red-500" : "border-gray-300"
-                  }`}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all ${
+                  errors.description ? "border-red-500" : "border-gray-300"
+                }`}
                 placeholder="Description du document..."
               />
               {errors.description && (
@@ -291,7 +318,9 @@ export default function AdminAjoutDocument() {
                 control={control}
                 render={({ field }) => (
                   <Select.Root onValueChange={field.onChange} value={field.value}>
-                    <Select.Trigger className={`w-full px-4 py-3 border rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between ${errors.type ? "border-red-500" : "border-gray-300"}`}>
+                    <Select.Trigger className={`w-full px-4 py-3 border rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between ${
+                      errors.type ? "border-red-500" : "border-gray-300"
+                    }`}>
                       <Select.Value placeholder="Sélectionnez le type de ressource" />
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Trigger>
@@ -436,11 +465,23 @@ export default function AdminAjoutDocument() {
               <h2 className="text-xl font-bold text-gray-900">Fichier document</h2>
             </div>
 
+            {existingFile && !previewFileName && (
+              <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Fichier actuel:</strong> {existingFile.split('/').pop()}
+                </p>
+                <p className="text-xs text-blue-600 mt-1">
+                  Vous pouvez télécharger un nouveau fichier pour le remplacer (optionnel)
+                </p>
+              </div>
+            )}
+
             <div
-              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${errors.file
+              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+                errors.file
                   ? "border-red-500 bg-red-50"
                   : "border-gray-300 hover:border-[#2A591D] hover:bg-gray-50"
-                }`}
+              }`}
               onClick={() => fileInputRef.current?.click()}
             >
               <input
@@ -464,14 +505,14 @@ export default function AdminAjoutDocument() {
                     className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
                     <X className="w-4 h-4" />
-                    Supprimer le fichier
+                    Supprimer le nouveau fichier
                   </button>
                 </div>
               ) : (
                 <>
                   <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                   <p className="text-gray-700 font-medium mb-1">
-                    Cliquez pour sélectionner un fichier
+                    Cliquez pour sélectionner un nouveau fichier
                   </p>
                   <p className="text-gray-500 text-sm">
                     PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT • Max 50MB
@@ -492,14 +533,11 @@ export default function AdminAjoutDocument() {
           <div className="flex items-center justify-between gap-4 pt-4">
             <button
               type="button"
-              onClick={() => {
-                reset();
-                setPreviewFileName(null);
-              }}
+              onClick={() => router.push("/admin/ressources")}
               disabled={loading}
               className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
             >
-              Réinitialiser
+              Annuler
             </button>
 
             <button
@@ -510,12 +548,12 @@ export default function AdminAjoutDocument() {
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Ajout en cours...
+                  Modification en cours...
                 </>
               ) : (
                 <>
                   <Check className="w-5 h-5" />
-                  Ajouter le document
+                  Enregistrer les modifications
                 </>
               )}
             </button>

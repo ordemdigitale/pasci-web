@@ -151,7 +151,7 @@ export default function FormationDetailPage() {
             </Link>
             <nav className="hidden lg:flex items-center gap-9">
               <Link href="/formations" className="text-sm font-medium hover:text-[#E05017]">Mes cours</Link>
-              <Link href="/ressources/documentation" className="text-sm font-medium hover:text-[#E05017]">Ressources</Link>
+              <Link href="/ressources" className="text-sm font-medium hover:text-[#E05017]">Ressources</Link>
             </nav>
           </div>
 
