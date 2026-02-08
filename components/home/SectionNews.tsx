@@ -7,9 +7,10 @@ import { ImageWithFallback } from "@/lib/imageWithFallback"
 import { fetchSpotlightNews } from "@/lib/fetch-crasc"
 import { SpotlightNews } from "@/types/api.types"
 import DOMPurify from 'dompurify';
+import { Loader2 } from "lucide-react";
 
 // Mock data de fallback si l'API ne répond pas
-const mockNews: SpotlightNews[] = [
+/* const mockNews: SpotlightNews[] = [
   {
     id: 1,
     title: "Lancement du nouveau programme de formation pour les OSC",
@@ -75,14 +76,14 @@ const mockNews: SpotlightNews[] = [
       osc_count: 110
     }
   }
-];
+]; */
 
 export default function SectionNews() {
-  const [spotlightNewsData, setSpotlightNewsData] = useState<SpotlightNews[]>(mockNews);
+  const [spotlightNewsData, setSpotlightNewsData] = useState<SpotlightNews[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // fetch all crasc data
+  // fetch all spotlight news
   useEffect(() => {
     const fetchSpotlightNewsData = async () => {
       setLoading(true);
@@ -90,7 +91,7 @@ export default function SectionNews() {
 
       try {
         // Updated to use dedicated /news/spotlight endpoint
-        const response = await fetch("http://localhost:8000/api/v1/news/spotlight");
+        const response = await fetch("https://api.plateforme-osci.org/api/v1/news/spotlight");
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`)
         }
@@ -128,7 +129,7 @@ export default function SectionNews() {
         {/* Loading State */}
         {loading && (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E05017] mx-auto mb-4"></div>
+            <Loader2 className="w-12 h-12 text-[#E05017] animate-spin mx-auto mb-4" />
             <p className="text-gray-600">Chargement des actualités...</p>
           </div>
         )}

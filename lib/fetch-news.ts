@@ -1,6 +1,6 @@
 import { INews } from "@/types/api.types";
 
-const API_BASE_URL = "http://localhost:8000/api/v1/crasc";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Fetch all news with optional filters
 export async function fetchAllNews(filters?: {
