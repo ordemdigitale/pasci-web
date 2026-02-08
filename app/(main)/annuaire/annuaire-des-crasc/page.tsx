@@ -3,8 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
-import { fetchAllCrasc } from "@/lib/fetch-crasc";
-import { ICrasc, IKeyStats, SpotlightNews } from "@/types/api.types";
+import { fetchAllCrasc, fetchAllOsc } from "@/lib/fetch-crasc";
+import { ICrasc, IKeyStats, IOsc, SpotlightNews } from "@/types/api.types";
 import { Users, Building2, Target, ArrowRight, MapPin, Calendar } from "lucide-react";
 import Link from "next/link";
 import DOMPurify from 'dompurify';
@@ -186,6 +186,7 @@ const mockNews: SpotlightNews[] = [
 export default function PageAnnuaireCrasc() {
   const [keyStats, setKeyStats] = useState<IKeyStats[] | null>([]);
   const [crascData, setCrascData] = useState<ICrasc[]>([]);
+  const [oscData, setOscData] = useState<IOsc[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [spotlightNewsData, setSpotlightNewsData] = useState<SpotlightNews[]>(mockNews);
@@ -202,10 +203,25 @@ export default function PageAnnuaireCrasc() {
         setCrascData(crasc);
       }
       catch (error) {
-        console.error("Error fetching CRASC regions data: ", error);
+        console.error("Error fetching CRASC data: ", error);
       }
     }
     fetchCrascData();
+  }, []);
+
+  // Fetch OSC data on component mount
+  useEffect(() => {
+    const fetchOscData = async () => {
+      try {
+        const osc = await fetchAllOsc();
+        console.log("Page annuaire des OSC: ", osc);
+        setOscData(osc);
+      }
+      catch (error) {
+        console.error("Error fetching OSC data: ", error);
+      }
+    }
+    fetchOscData();
   }, []);
 
   // fetch key stats data
@@ -215,7 +231,7 @@ export default function PageAnnuaireCrasc() {
       setError(null);
 
       try {
-        const response = await fetch("http://localhost:8000/api/v1/key-stats");
+        const response = await fetch("https://api.plateforme-osci.org/api/v1/key-stats");
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`)
         }
@@ -238,7 +254,7 @@ export default function PageAnnuaireCrasc() {
       setNewsError(null);
 
       try {
-        const response = await fetch("http://localhost:8000/api/v1/crasc/news-spotlight-crasc");
+        const response = await fetch("https://api.plateforme-osci.org/api/v1/crasc/news-spotlight-crasc");
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`)
         }
@@ -388,15 +404,7 @@ export default function PageAnnuaireCrasc() {
                   <>
                     {crascData.map((crasc) => (
                       <div key={crasc.id} className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                        {/* <MapPin className="w-3 h-3 flex-shrink-0" /> */}
                         <span className="truncate">{crasc.name}</span>
-                      </div>
-                    ))}
-                    {/* Ajouter des éléments supplémentaires pour atteindre 10 */}
-                    {Array.from({ length: Math.max(0, 10 - crascData.length) }).map((_, index) => (
-                      <div key={`placeholder-${index}`} className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                        <MapPin className="w-3 h-3 flex-shrink-0" />
-                        <span className="truncate">CRASC {index + crascData.length + 1}</span>
                       </div>
                     ))}
                   </>
@@ -463,7 +471,7 @@ export default function PageAnnuaireCrasc() {
 
         {/* OSC Cards Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {activityCards.slice(0, 3).map((osc) => (
+          {oscData.length && oscData.slice(0, 3).map((osc) => (
             <Link
               key={osc.id}
               href={`/annuaire/annuaire-des-osc/${osc.slug}`}
@@ -472,8 +480,8 @@ export default function PageAnnuaireCrasc() {
               {/* Image */}
               <div className="aspect-video overflow-hidden relative">
                 <ImageWithFallback
-                  src={osc.image}
-                  alt={osc.title}
+                  src={osc.thumbnail_url}
+                  alt={osc.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </div>
@@ -481,7 +489,7 @@ export default function PageAnnuaireCrasc() {
               {/* Content */}
               <div className="p-5">
                 <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-[#E05017] transition-colors">
-                  {osc.title}
+                  {osc.name}
                 </h3>
                 <p className="text-gray-600 text-sm line-clamp-3">
                   {osc.description}
