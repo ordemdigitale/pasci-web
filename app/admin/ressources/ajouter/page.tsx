@@ -30,8 +30,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const documentSchema = z.object({
   title: z.string().min(8, "Le titre doit contenir au moins 8 caractères."),
   description: z.string().optional().nullable(),
-  type: z.enum(["documentation", "fiche"], {
-    required_error: "Le type de ressource est requis",
+  type: z.enum(["documentation", "fiche"]).refine((val) => val !== undefined, {
+    message: "Le type de ressource est requis",
   }),
   category: z.string().optional().nullable(),
   crasc_id: z.string().optional().nullable(),

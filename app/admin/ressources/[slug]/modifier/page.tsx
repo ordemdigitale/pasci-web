@@ -31,7 +31,7 @@ const documentSchema = z.object({
   title: z.string().min(8, "Le titre doit contenir au moins 8 caractères."),
   description: z.string().optional().nullable(),
   type: z.enum(["documentation", "fiche"], {
-    required_error: "Le type de ressource est requis",
+    errorMap: () => ({ message: "Le type de ressource est requis" }),
   }),
   category: z.string().optional().nullable(),
   crasc_id: z.string().optional().nullable(),
