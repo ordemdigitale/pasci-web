@@ -163,14 +163,14 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center font-poppins">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#E05017]" />
-          <p className="mt-4 text-gray-600">Chargement...</p>
+          <Loader2 className="w-12 h-12 text-[#E05017] animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Chargement...</p>
         </div>
       </div>
     );
-  }
+    }
 
   if (!oscData) {
     return (
@@ -191,7 +191,7 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
   }
 
   return (
-    <section className="py-10 font-poppins">
+    <section className="pb-10 font-poppins">
 
       {/* Cover Image */}
       {oscData.thumbnail_url && (

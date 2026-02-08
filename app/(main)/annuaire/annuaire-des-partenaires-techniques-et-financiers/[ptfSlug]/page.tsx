@@ -428,7 +428,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
       )}
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header with Logo and Basic Info */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8 -mt-20 relative z-10">
