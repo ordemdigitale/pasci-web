@@ -3,6 +3,7 @@
 
 import React, { use, useState, useEffect } from "react";
 import { getCrascBySlug  } from "@/lib/fetch-crasc";
+import { fetchAllNews } from "@/lib/fetch-news";
 import Link from "next/link";
 import { ImageWithFallback } from '@/lib/imageWithFallback';
 import { ICrascDetail, INews } from "@/types/api.types";
@@ -34,7 +35,17 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
       try {
         setLoading(true);
         const data = await getCrascBySlug(crascSlug);
-        if (isCurrent) setCrascData(data);
+        if (isCurrent) {
+          setCrascData(data);
+          
+          // Fetch news related to this CRASC
+          if (data.id) {
+            const newsData = await fetchAllNews({ crasc_id: parseInt(data.id) });
+            if (isCurrent) {
+              setCrascData(prev => prev ? { ...prev, news: newsData } : prev);
+            }
+          }
+        }
       } catch (err: any) {
         if (isCurrent) setError("Impossible de charger les données du CRASC.");
       } finally {
@@ -241,7 +252,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {crascData.news.slice(0, 4).map((news: INews) => (
+                  {crascData.news.map((news: INews) => (
                     <Link
                       key={news.id}
                       href={`/actualites/${news.slug}`}
@@ -274,18 +285,6 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                     </Link>
                   ))}
                 </div>
-
-                {crascData.news.length > 4 && (
-                  <div className="mt-6 text-center">
-                    <Link
-                      href="/actualites"
-                      className="inline-flex items-center gap-2 text-[#E05017] hover:text-[#d04010] font-semibold transition-colors"
-                    >
-                      Voir toutes les actualités
-                      <ExternalLink className="w-4 h-4" />
-                    </Link>
-                  </div>
-                )}
               </div>
             )}
 

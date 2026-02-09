@@ -17,7 +17,7 @@ export async function fetchAllNews(filters?: {
         if (filters?.skip !== undefined) params.append("skip", filters.skip.toString());
         if (filters?.limit !== undefined) params.append("limit", filters.limit.toString());
 
-        const url = `${API_BASE_URL}/news${params.toString() ? `?${params.toString()}` : ''}`;
+        const url = `${API_BASE_URL}/api/v1/news${params.toString() ? `?${params.toString()}` : ''}`;
 
         const response = await fetch(url, {
             next: { revalidate: 60 }, // Revalidate every minute
@@ -28,7 +28,9 @@ export async function fetchAllNews(filters?: {
         });
 
         if (!response.ok) {
-            throw new Error("Échec du chargement des actualités");
+            const errorData = await response.json().catch(() => ({}));
+            console.error(`Erreur API (${response.status}):`, errorData);
+            throw new Error(errorData.detail || `Échec du chargement des actualités (${response.status})`);
         }
 
         return await response.json();
