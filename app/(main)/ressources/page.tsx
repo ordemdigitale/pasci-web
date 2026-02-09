@@ -124,7 +124,14 @@ export default function PageRessources() {
 
   const handleDownload = (fileUrl: string | null, title: string) => {
     if (fileUrl) {
-      window.open(fileUrl, '_blank');
+      // Create a temporary link element to force download
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = title || 'document';
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   };
 
