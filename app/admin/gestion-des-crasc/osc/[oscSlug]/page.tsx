@@ -351,7 +351,7 @@ export default function OscDetailPage() {
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <Link
-            href={`/admin/gestion-des-crasc/osc/ajouter-osc?edit=${osc.slug}`}
+            href={`/admin/gestion-des-crasc/osc/${osc.slug}/modifier`}
             className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:shadow-lg transition-all font-semibold flex items-center justify-center gap-2"
           >
             <Edit className="w-5 h-5" />

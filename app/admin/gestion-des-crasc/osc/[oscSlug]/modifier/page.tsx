@@ -1,6 +1,7 @@
 "use client";
+
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,16 +23,18 @@ import {
   Loader2,
   AlertCircle,
   ChevronDown,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Save
 } from 'lucide-react';
 
-// Schema de validation pour le formulaire d'ajout d'OSC
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+// Schema de validation pour le formulaire de modification d'OSC
 const oscSchema = z.object({
-  name: z.string().min(4, "Le nom de l'OSC doit contenir au moins 4 caractères."),
+  name: z.string().min(4, "Le nom de l'OSC doit contenir au moins 4 caractères.").optional(),
   description: z.string().max(500, "La description ne peut pas dépasser 500 caractères.").optional(),
-  crasc_id: z.string().min(1, "Veuillez sélectionner un CRASC."),
-  type_id: z.string().min(1, "Veuillez sélectionner un type d'OSC."),
-  // Informations de contact
+  crasc_id: z.string().optional(),
+  type_id: z.string().optional(),
   email: z.string().email("Email invalide").optional().or(z.literal("")),
   phone: z.string().optional(),
   ville: z.string().optional(),
@@ -42,7 +45,7 @@ const oscSchema = z.object({
     .instanceof(File)
     .optional()
     .refine(
-      (file) => !file || file.size <= 5 * 1024 * 1024, // 5MB max
+      (file) => !file || file.size <= 5 * 1024 * 1024,
       { message: "L'image doit être inférieure à 5MB" }
     )
     .refine(
@@ -53,27 +56,83 @@ const oscSchema = z.object({
 
 type OscForm = z.infer<typeof oscSchema>;
 
-export default function AdminAjoutOsc() {
+interface IOscDetail {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  thumbnail_url: string;
+  thumbnail_path: string;
+  type?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+  crasc?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+  ville: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export default function ModifierOscPage() {
+  const params = useParams();
+  const oscSlug = params.oscSlug as string;
+  const router = useRouter();
+
   const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
   const [oscType, setOscType] = useState<IOscType[]>([]);
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [osc, setOsc] = useState<IOscDetail | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  // Récupérer les données de l'OSC
+  useEffect(() => {
+    const fetchOsc = async () => {
+      try {
+        setFetchLoading(true);
+        const response = await fetch(`${API_BASE_URL}/api/v1/crasc/osc/${oscSlug}`, {
+          cache: "no-store"
+        });
 
-  // Récupérer les régions CRASC depuis l'API
+        if (!response.ok) {
+          throw new Error("OSC non trouvée");
+        }
+
+        const data = await response.json();
+        setOsc(data);
+        setPreviewImage(data.thumbnail_url || null);
+      } catch (err) {
+        setErrorMessage(err instanceof Error ? err.message : "Erreur de chargement");
+      } finally {
+        setFetchLoading(false);
+      }
+    };
+
+    if (oscSlug) {
+      fetchOsc();
+    }
+  }, [oscSlug]);
+
+  // Récupérer les régions CRASC
   useEffect(() => {
     fetchAllCrasc()
       .then(data => setCrascRegions(data))
       .catch(error => console.error("Erreur lors de la récupération des CRASC: ", error));
   }, []);
 
-  // Récupérer les types d'OSC depuis l'API
+  // Récupérer les types d'OSC
   useEffect(() => {
     fetchAllOscType()
       .then(data => setOscType(data))
@@ -96,6 +155,22 @@ export default function AdminAjoutOsc() {
     },
   });
 
+  // Remplir le formulaire avec les données de l'OSC
+  useEffect(() => {
+    if (osc) {
+      setValue("name", osc.name || "");
+      setValue("description", osc.description || "");
+      setValue("crasc_id", osc.crasc?.id.toString() || "");
+      setValue("type_id", osc.type?.id.toString() || "");
+      setValue("email", osc.email || "");
+      setValue("phone", osc.phone || "");
+      setValue("ville", osc.ville || "");
+      setValue("address", osc.address || "");
+      setValue("latitude", osc.latitude?.toString() || "");
+      setValue("longitude", osc.longitude?.toString() || "");
+    }
+  }, [osc, setValue]);
+
   const thumbnailFile = watch("thumbnail");
 
   // Gestion du preview de l'image
@@ -106,8 +181,6 @@ export default function AdminAjoutOsc() {
         setPreviewImage(reader.result as string);
       };
       reader.readAsDataURL(thumbnailFile);
-    } else {
-      setPreviewImage(null);
     }
   }, [thumbnailFile]);
 
@@ -122,7 +195,7 @@ export default function AdminAjoutOsc() {
   // Supprimer l'image sélectionnée
   const handleRemoveImage = () => {
     setValue("thumbnail", undefined);
-    setPreviewImage(null);
+    setPreviewImage(osc?.thumbnail_url || null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -137,8 +210,10 @@ export default function AdminAjoutOsc() {
 
     try {
       const formData = new FormData();
-      formData.append("name", values.name);
 
+      if (values.name && values.name.trim() !== "") {
+        formData.append("name", values.name);
+      }
       if (values.description && values.description.trim() !== "") {
         formData.append("description", values.description);
       }
@@ -148,8 +223,6 @@ export default function AdminAjoutOsc() {
       if (values.type_id) {
         formData.append("type_id", values.type_id);
       }
-
-      // Informations de contact
       if (values.email && values.email.trim() !== "") {
         formData.append("email", values.email);
       }
@@ -168,95 +241,85 @@ export default function AdminAjoutOsc() {
       if (values.longitude && values.longitude.trim() !== "") {
         formData.append("longitude", values.longitude);
       }
-
       if (values.thumbnail) {
         formData.append("thumbnail", values.thumbnail);
       }
 
-      const xhr = new XMLHttpRequest();
+      const response = await fetch(`${API_BASE_URL}/api/v1/crasc/osc/${oscSlug}`, {
+        method: "PATCH",
+        body: formData,
+      });
 
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const progress = Math.round((event.loaded / event.total) * 100);
-          setUploadProgress(progress);
-        }
-      };
+      if (response.ok) {
+        setSuccessMessage("OSC modifiée avec succès!");
+        setTimeout(() => {
+          router.push(`/admin/gestion-des-crasc/osc/${oscSlug}`);
+        }, 1500);
+      } else {
+        const errorData = await response.json();
+        let errorMsg = "Une erreur est survenue lors de la modification de l'OSC.";
 
-      xhr.onload = () => {
-        if (xhr.status === 201) {
-          setSuccessMessage("OSC créée avec succès!");
-          reset();
-          setPreviewImage(null);
-
-          // Rediriger après 2 secondes
-          setTimeout(() => {
-            router.push("/admin/gestion-des-crasc");
-          }, 2000);
-        } else {
-          let errorMsg = "Une erreur est survenue lors de la création de l'OSC.";
-
-          try {
-            const response = JSON.parse(xhr.responseText);
-            if (response.detail) {
-              if (typeof response.detail === 'string') {
-                errorMsg = response.detail;
-              } else if (response.detail.type === 'duplicate_error' && response.detail.errors) {
-                response.detail.errors.forEach((error: any) => {
-                  if (error.field === 'name') {
-                    errorMsg = error.message;
-                  }
-                });
-              } else if (response.detail.type === 'validation_error' && response.detail.errors) {
-                response.detail.errors.forEach((error: any) => {
-                  if (error.field === 'thumbnail') {
-                    errorMsg = error.message;
-                  }
-                });
-              }
-            }
-          } catch (e) {
-            errorMsg = `Erreur ${xhr.status}: ${xhr.statusText}`;
+        if (errorData.detail) {
+          if (typeof errorData.detail === 'string') {
+            errorMsg = errorData.detail;
           }
-
-          setErrorMessage(errorMsg);
         }
-        setLoading(false);
-        setUploadProgress(null);
-      };
-
-      xhr.onerror = () => {
-        setErrorMessage("Erreur réseau. Vérifiez votre connexion et que l'API est en cours d'exécution.");
-        setLoading(false);
-        setUploadProgress(null);
-      };
-
-      xhr.open("POST", `${API_BASE_URL}/api/v1/crasc/osc`);
-      xhr.send(formData);
-
+        setErrorMessage(errorMsg);
+      }
     } catch (error) {
-      console.error("Erreur lors de la création de l'OSC: ", error);
-      setErrorMessage("Une erreur inattendue est survenue. Veuillez réessayer.");
+      console.error("Erreur lors de la modification de l'OSC: ", error);
+      setErrorMessage("Erreur réseau. Vérifiez votre connexion et que l'API est en cours d'exécution.");
+    } finally {
       setLoading(false);
       setUploadProgress(null);
     }
   };
+
+  if (fetchLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 py-8 px-4 font-poppins flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-[#2A591D] animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Chargement des données...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!osc) {
+    return (
+      <div className="min-h-screen bg-slate-50 py-8 px-4 font-poppins">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+            <p className="text-red-800">{errorMessage || "OSC non trouvée"}</p>
+            <Link
+              href="/admin/gestion-des-crasc/osc"
+              className="mt-4 inline-block text-blue-600 hover:underline"
+            >
+              ← Retour à la liste des OSC
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section className="max-w-5xl mx-auto font-poppins bg-slate-50 py-8 px-4">
       {/* Header */}
       <div className="mb-8">
         <Link
-          href="/admin/gestion-des-crasc"
+          href={`/admin/gestion-des-crasc/osc/${oscSlug}`}
           className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Retour à la gestion des CRASC
+          Retour aux détails de l'OSC
         </Link>
         <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <Building2 className="w-8 h-8 text-[#2A591D]" />
-          Ajouter une OSC
+          Modifier {osc.name}
         </h1>
-        <p className="text-gray-600 mt-2">Remplissez les informations ci-dessous pour créer une nouvelle organisation</p>
+        <p className="text-gray-600 mt-2">Modifiez les informations de l'organisation</p>
       </div>
 
       {/* Success Message */}
@@ -293,14 +356,15 @@ export default function AdminAjoutOsc() {
             {/* Nom */}
             <div>
               <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                Nom de l'OSC <span className="text-red-500">*</span>
+                Nom de l'OSC
               </label>
               <input
                 id="name"
                 type="text"
                 {...control.register("name")}
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all ${errors.name ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-[#2A591D]'
-                  }`}
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all ${
+                  errors.name ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-[#2A591D]'
+                }`}
                 placeholder="Ex: Association pour le développement"
               />
               {errors.name && (
@@ -342,15 +406,14 @@ export default function AdminAjoutOsc() {
             {/* CRASC */}
             <div>
               <label htmlFor="crasc_id" className="block text-sm font-semibold text-gray-700 mb-2">
-                CRASC associé <span className="text-red-500">*</span>
+                CRASC associé
               </label>
               <Controller
                 name="crasc_id"
                 control={control}
                 render={({ field }) => (
                   <Select.Root onValueChange={field.onChange} value={field.value}>
-                    <Select.Trigger className={`w-full px-4 py-3 border-2 rounded-lg text-left flex items-center justify-between transition-all ${errors.crasc_id ? 'border-red-300' : 'border-gray-200 hover:border-[#2A591D]'
-                      }`}>
+                    <Select.Trigger className="w-full px-4 py-3 border-2 border-gray-200 hover:border-[#2A591D] rounded-lg text-left flex items-center justify-between transition-all">
                       <Select.Value placeholder="Sélectionnez un CRASC" />
                       <ChevronDown className="w-4 h-4 text-gray-400" />
                     </Select.Trigger>
@@ -370,26 +433,19 @@ export default function AdminAjoutOsc() {
                   </Select.Root>
                 )}
               />
-              {errors.crasc_id && (
-                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {errors.crasc_id.message}
-                </p>
-              )}
             </div>
 
             {/* Type d'OSC */}
             <div>
               <label htmlFor="type_id" className="block text-sm font-semibold text-gray-700 mb-2">
-                Type d'OSC <span className="text-red-500">*</span>
+                Type d'OSC
               </label>
               <Controller
                 name="type_id"
                 control={control}
                 render={({ field }) => (
                   <Select.Root onValueChange={field.onChange} value={field.value}>
-                    <Select.Trigger className={`w-full px-4 py-3 border-2 rounded-lg text-left flex items-center justify-between transition-all ${errors.type_id ? 'border-red-300' : 'border-gray-200 hover:border-[#2A591D]'
-                      }`}>
+                    <Select.Trigger className="w-full px-4 py-3 border-2 border-gray-200 hover:border-[#2A591D] rounded-lg text-left flex items-center justify-between transition-all">
                       <Select.Value placeholder="Sélectionnez un type" />
                       <ChevronDown className="w-4 h-4 text-gray-400" />
                     </Select.Trigger>
@@ -409,12 +465,6 @@ export default function AdminAjoutOsc() {
                   </Select.Root>
                 )}
               />
-              {errors.type_id && (
-                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {errors.type_id.message}
-                </p>
-              )}
             </div>
           </div>
         </div>
@@ -530,12 +580,13 @@ export default function AdminAjoutOsc() {
 
           <div className="space-y-4">
             <div
-              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${errors.thumbnail
+              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+                errors.thumbnail
                   ? "border-red-300 bg-red-50"
                   : previewImage
-                    ? "border-[#2A591D] bg-[#2A591D]/5"
-                    : "border-gray-300 hover:border-[#2A591D] hover:bg-[#2A591D]/5"
-                }`}
+                  ? "border-[#2A591D] bg-[#2A591D]/5"
+                  : "border-gray-300 hover:border-[#2A591D] hover:bg-[#2A591D]/5"
+              }`}
               onClick={() => fileInputRef.current?.click()}
             >
               <input
@@ -566,14 +617,14 @@ export default function AdminAjoutOsc() {
                     className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
                     <X className="w-4 h-4" />
-                    Supprimer l'image
+                    Changer l'image
                   </button>
                 </div>
               ) : (
                 <>
                   <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-700 font-medium mb-1">
-                    Cliquez pour sélectionner une image
+                    Cliquez pour sélectionner une nouvelle image
                   </p>
                   <p className="text-gray-500 text-sm">
                     Formats: JPG, PNG, WebP • Taille max: 5MB
@@ -588,25 +639,6 @@ export default function AdminAjoutOsc() {
                 {errors.thumbnail.message}
               </p>
             )}
-
-            {/* Barre de progression */}
-            {uploadProgress !== null && (
-              <div className="space-y-2">
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="bg-[#2A591D] h-3 rounded-full transition-all duration-300 flex items-center justify-center"
-                    style={{ width: `${uploadProgress}%` }}
-                  >
-                    {uploadProgress > 10 && (
-                      <span className="text-xs text-white font-semibold">{uploadProgress}%</span>
-                    )}
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 text-center font-medium">
-                  Téléchargement en cours...
-                </p>
-              </div>
-            )}
           </div>
         </div>
 
@@ -620,34 +652,24 @@ export default function AdminAjoutOsc() {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Création en cours...
+                Modification en cours...
               </>
             ) : (
               <>
-                <Check className="w-5 h-5" />
-                Créer l'OSC
+                <Save className="w-5 h-5" />
+                Enregistrer les modifications
               </>
             )}
           </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              reset();
-              setPreviewImage(null);
-              setErrorMessage(null);
-              setSuccessMessage(null);
-              if (fileInputRef.current) {
-                fileInputRef.current.value = "";
-              }
-            }}
+          <Link
+            href={`/admin/gestion-des-crasc/osc/${oscSlug}`}
             className="px-6 py-3 text-gray-700 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
-            disabled={loading}
           >
-            Réinitialiser
-          </button>
+            Annuler
+          </Link>
         </div>
       </form>
     </section>
-  )
+  );
 }
