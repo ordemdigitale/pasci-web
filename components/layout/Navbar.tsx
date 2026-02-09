@@ -114,7 +114,7 @@ export default function Navbar() {
 
             {/* Right Side Actions */}
             <div className="hidden md:flex items-center space-x-4">
-              <Link href="/login" className='px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017] flex items-center gap-2'>
+              <Link href="/auth/login" className='px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017] flex items-center gap-2'>
                 <UserCircle className="w-4 h-4" />
                 Connexion
               </Link>
