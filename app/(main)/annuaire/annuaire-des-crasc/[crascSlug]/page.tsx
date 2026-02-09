@@ -201,8 +201,9 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
 
                 <div className="grid md:grid-cols-2 gap-4">
                   {crascData.oscs.map((osc) => (
-                    <div
+                    <Link
                       key={osc.id}
+                      href={`/annuaire/annuaire-des-osc/${osc.slug}`}
                       className="group bg-gray-50 rounded-xl overflow-hidden border border-gray-200 hover:border-[#E05017] hover:shadow-md transition-all"
                     >
                       <div className="aspect-video overflow-hidden bg-gray-200">
@@ -227,7 +228,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                           </span>
                         )}
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>
