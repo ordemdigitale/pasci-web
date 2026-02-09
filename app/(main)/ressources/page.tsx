@@ -139,7 +139,8 @@ export default function PageRessources() {
   };
 
   // Separate documents by type
-  const documentationItems = documents.filter(doc => doc.type === "documentation");
+  // Si le champ type n'existe pas (ancien serveur), considérer tout comme documentation
+  const documentationItems = documents.filter(doc => !doc.type || doc.type === "documentation");
   const ficheItems = documents.filter(doc => doc.type === "fiche");
 
   // Determine what to display based on selectedType

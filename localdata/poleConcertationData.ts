@@ -2,67 +2,88 @@ export interface IPoleConcert {
   id: number;
   image?: string;
   poleName: string;
-  sections?: string[];
-  contents?: string[];
+  category: string;
+  objectifs: string[];
+  membres: string[];
+  regions: string[];
+  realisations: string[];
+  agenda: string[];
 }
 
-export const mockPoleConcert = [
+export const mockPoleConcert: IPoleConcert[] = [
   {
     id: 1,
     image: '/images/espace-collabo/2d5632f9-ac11-4f20-8029-a58de61ba137.jpg',
-    poleName: "Agriculture, Sylviculture et Pêche",
-    sections: [
-      {
-        id: 1,
-        sectionTitle: "Objectifs annuels du pôle",
-        contents: [
-          {
-            id: 1,
-            content: "Agir pour autonomiser les femmes et les jeunes agriculteurs"
-          },
-          {
-            id: 2,
-            content: "Maîtriser nos productions et agîr ensemble pour l'autosuffisance alimentaire"
-          },
-          {
-            id: 3,
-            content: "Partager nos expériences et transformer nos échecs individuels "
-          }
-        ]
-      },
-      {
-        id: 2,
-        sectionTitle: "Nombre d'OSC membres",
-        contents: [
-          {
-            id: 1,
-            content: "757 membres"
-          },
-          {
-            id: 2,
-            content: "300 membres actifs"
-          },
-        ]
-      },
+    poleName: "Pôle Agriculture",
+    category: "Agriculture, Sylviculture et Pêche",
+    objectifs: [
+      "Agir pour autonomiser les femmes et les jeunes agriculteurs ;",
+      "Maîtriser nos productions et agir ensemble pour l'autosuffisance alimentaire ;",
+      "Partager nos expériences et transformer nos échecs individuels"
     ],
+    membres: [
+      "757 membres ;",
+      "300 membres actifs ;"
+    ],
+    regions: [
+      "Okèkè (115 OSC) ;",
+      "Guémon (98 OSC) ;",
+      "Folon (77 OSC) ;",
+      "Hambol (74 OSC) ;",
+      "Bafing (59 OSC) ;"
+    ],
+    realisations: [
+      "118 OSC de jeunes et de femmes autonomes ;",
+      "3000 tonnes d'igname et 6000 tonnes de manioc produits 2025 ;",
+      "50 renforcements de capacités ;"
+    ],
+    agenda: [
+      "Formation sur les types de contrats de terres rurales le 10 mai 2026 ;",
+      "Journées des jeunes agriculteurs du Guémon du 2 au 5 juin 2026 ;"
+    ]
   },
-   {
+  {
     id: 2,
     image: '/images/espace-collabo/63ac2eed-9ce3-4108-bad4-c7cf536795da.jpg',
-    poleName: "Éducation",
-    sections: [
-      {
-        id: 1,
-        sectionTitle: "Objectifs annuels du pôle",
-        contents: [],
-      }
+    poleName: "Pôle Éducation",
+    category: "Education",
+    objectifs: [
+      "Lutter contre les fléaux (grossesse, scolisme, drogue, etc.) scolaires ;",
+      "Mutualiser les forces et créer des AGR pour auto-financer les projets communs ;",
+      "Renforcer les capacités techniques, structurelles et matérielles des OSC;"
     ],
+    membres: [
+      "472 membres ;",
+      "100 membres actifs ;"
+    ],
+    regions: [
+      "Gbêkê (69 OSC) ;",
+      "Guémon (29 OSC) ;",
+      "Folon (77 OSC) ;",
+      "Hambol (74 OSC) ;"
+    ],
+    realisations: [
+      "118 OSC de jeunes et de femmes autonomes ;",
+      "3000 tonnes d'igname et 6000 tonnes de manioc produisent 2025 ;",
+      "50 renforcements de capacités ;"
+    ],
+    agenda: [
+      "Formation sur les types de contrats de terres rurales le 10 mai 2026 ;",
+      "Journées des jeunes agriculteurs du Guémon du 2 au 5 juin 2026 ;"
+    ]
   },
-/*  {
+  {
     id: 3,
     image: '/images/espace-collabo/d24228b8-f1e2-4943-a058-124e90667f40.jpg',
-    poleName: "Recherche",
-    sectionTitle: "Deployment",
-    contents: ["Environment Variables", "Build Optimization", "Vercel Hosting"],
-  }, */
+    poleName: "Pôle Commerce",
+    category: "Commerce et Tourisme",
+    objectifs: [],
+    membres: [
+      "membres ;",
+      "membres actifs ;"
+    ],
+    regions: [],
+    realisations: [],
+    agenda: []
+  }
 ];
