@@ -130,8 +130,8 @@ export default function AdminLoginPage() {
                 </div>
               </div>
 
-              {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between">
+              {/* Remember Me */}
+              <div className="flex items-center">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -139,12 +139,6 @@ export default function AdminLoginPage() {
                   />
                   <span className="text-sm text-gray-600">Se souvenir de moi</span>
                 </label>
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-sm text-[#2a591d] hover:text-green-700 font-semibold transition-colors"
-                >
-                  Mot de passe oublié ?
-                </Link>
               </div>
 
               {/* Submit Button */}
