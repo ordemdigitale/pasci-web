@@ -10,6 +10,9 @@ import * as Select from "@radix-ui/react-select";
 import { ICrasc, IRegionCiv } from "@/types/api.types";
 import { fetchAllCrasc, fetchAllRegion } from "@/lib/fetch-crasc";
 
+// Get API base URL from environment variable
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 // Schema de validation pour le formulaire d'ajout de région CIV
 const regionCivSchema = z.object({
   name: z.string().min(4, "Le nom de la région doit contenir au moins 4 caractères."),
@@ -46,7 +49,7 @@ export default function AdminAddRegionCiv() {
         formData.append("crasc_id", values.crasc_id);
       }
 
-      const response = await fetch("http://localhost:8000/api/v1/crasc/region", {
+      const response = await fetch(`${API_BASE_URL}/api/v1/crasc/region`, {
         method: "POST",
         body: formData,
       });
