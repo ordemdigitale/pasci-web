@@ -351,7 +351,7 @@ export default function AnnuaireOSCPage() {
               Rejoignez le réseau des CRASC pour bénéficier d'un accompagnement personnalisé et apparaître dans cet annuaire.
             </p>
             <Link
-              href="/rejoindre"
+              href="/auth/login"
               className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#E05017] font-bold rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300"
             >
               Rejoignez-nous
