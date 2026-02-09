@@ -98,14 +98,14 @@ export default async function AdminOscPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-xs space-y-1">
+                    <div className="text-xs space-y-1 max-w-[200px]">
                       {osc.email && (
-                        <div className="text-gray-600 truncate max-w-xs">
+                        <div className="text-gray-600 truncate" title={osc.email}>
                           📧 {osc.email}
                         </div>
                       )}
                       {osc.phone && (
-                        <div className="text-gray-600">
+                        <div className="text-gray-600 truncate" title={osc.phone}>
                           📞 {osc.phone}
                         </div>
                       )}
