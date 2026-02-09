@@ -208,6 +208,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                       <div className="aspect-video overflow-hidden bg-gray-200">
                         <ImageWithFallback
                           alt={osc.name}
+                          src={osc?.thumbnail_url}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
