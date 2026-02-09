@@ -75,15 +75,31 @@ export const mockPoleConcert: IPoleConcert[] = [
   {
     id: 3,
     image: '/images/espace-collabo/d24228b8-f1e2-4943-a058-124e90667f40.jpg',
-    poleName: "Pôle Commerce",
+    poleName: "Pôle Commerce et Tourisme",
     category: "Commerce et Tourisme",
-    objectifs: [],
-    membres: [
-      "membres ;",
-      "membres actifs ;"
+    objectifs: [
+      "Promouvoir le commerce équitable et les circuits courts ;",
+      "Développer le tourisme local et valoriser le patrimoine culturel ;",
+      "Renforcer les capacités des acteurs du secteur commercial et touristique ;"
     ],
-    regions: [],
-    realisations: [],
-    agenda: []
+    membres: [
+      "385 membres ;",
+      "150 membres actifs ;"
+    ],
+    regions: [
+      "Lagunes (92 OSC) ;",
+      "Montagnes (65 OSC) ;",
+      "Comoé (48 OSC) ;",
+      "Nzi (41 OSC) ;"
+    ],
+    realisations: [
+      "75 OSC accompagnées dans la structuration de leurs activités commerciales ;",
+      "12 circuits touristiques créés en collaboration avec les communautés locales ;",
+      "40 formations sur l'entrepreneuriat et le marketing digital ;"
+    ],
+    agenda: [
+      "Salon du commerce local et de l'artisanat le 15 mars 2026 ;",
+      "Formation sur le tourisme communautaire du 20 au 22 avril 2026 ;"
+    ]
   }
 ];
