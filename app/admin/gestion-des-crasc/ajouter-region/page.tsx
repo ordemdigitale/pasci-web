@@ -45,61 +45,53 @@ export default function AdminAddRegionCiv() {
       if (values.crasc_id) {
         formData.append("crasc_id", values.crasc_id);
       }
-      const xhr = new XMLHttpRequest();
 
-      xhr.onload = () => {
-        if (xhr.status === 201) {
-          reset();
-          router.push("/admin/gestion-des-crasc");
-        } else {
-          // Parse error response
-          let errorMessage = "Une erreur est survenue lors de l'ajout de region.";
-          let fieldErrors: Record<string, string> = {};
+      const response = await fetch("http://localhost:8000/api/v1/crasc/region", {
+        method: "POST",
+        body: formData,
+      });
 
-          try {
-            const response = JSON.parse(xhr.responseText);
+      if (response.ok) {
+        reset();
+        router.push("/admin/gestion-des-crasc");
+      } else {
+        // Parse error response
+        let errorMessage = "Une erreur est survenue lors de l'ajout de region.";
+        let fieldErrors: Record<string, string> = {};
 
-            if(response.detail) {
-              // Handle structured error response
-              if (typeof response.detail === 'string') {
-                errorMessage = response.detail;
-              } else if (response.detail.type === 'duplicate_error' && response.detail.errors) {
-                // Handle duplicate title error
-                response.detail.errors.forEach((error: any) => {
-                  if (error.field === 'name') {
-                    errorMessage = error.message;
-                    fieldErrors.title = error.message;
-                  }
-                });
-              }
+        try {
+          const errorData = await response.json();
+
+          if(errorData.detail) {
+            // Handle structured error response
+            if (typeof errorData.detail === 'string') {
+              errorMessage = errorData.detail;
+            } else if (errorData.detail.type === 'duplicate_error' && errorData.detail.errors) {
+              // Handle duplicate title error
+              errorData.detail.errors.forEach((error: any) => {
+                if (error.field === 'name') {
+                  errorMessage = error.message;
+                  fieldErrors.name = error.message;
+                }
+              });
             }
-          } catch (e) {
-            // Response is not JSON or parsing failed
-            errorMessage = `Erreur ${xhr.status}: ${xhr.statusText}`;
           }
-          // Show error message
-          alert(errorMessage);
-          // If we have field-specific errors, we could set them in form state
-          // For now, we just log them
-          if (Object.keys(fieldErrors).length > 0) {
-            console.log("Field errors:", fieldErrors);
-          }
+        } catch (e) {
+          // Response is not JSON or parsing failed
+          errorMessage = `Erreur ${response.status}: ${response.statusText}`;
         }
-        setLoading(false);
-      };
-      
-      xhr.onerror = () => {
-        console.error("Erreur réseau lors de l'envoi du formulaire");
-        alert("Erreur réseau. Vérifiez votre connexion et que l'API est en cours d'exécution.");
-        setLoading(false);
-      };
-      
-      xhr.open("POST", "http://localhost:8000/api/v1/crasc/region");
-      xhr.send(formData);
-      
+        // Show error message
+        alert(errorMessage);
+        // If we have field-specific errors, we could set them in form state
+        // For now, we just log them
+        if (Object.keys(fieldErrors).length > 0) {
+          console.log("Field errors:", fieldErrors);
+        }
+      }
+      setLoading(false);
     } catch (error) {
       console.error("Erreur lors de l'ajout d'une région: ", error);
-      alert("Une erreur inattendue est survenue. Veuillez réessayer.");
+      alert("Erreur réseau. Vérifiez votre connexion et que l'API est en cours d'exécution.");
       setLoading(false);
     }
   };
