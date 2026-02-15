@@ -401,7 +401,7 @@ export default function PageRessources() {
                       className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-white py-4 px-5 relative min-h-[280px] cursor-pointer"
                       onClick={() => handleFicheClick(fiche)}
                     >
-                      {viewMode === "grid" && fiche.thumbnail_url && (
+                      {/* {viewMode === "grid" && fiche.thumbnail_url && (
                         <div className="mb-4">
                           <ImageWithFallback
                             src={fiche.thumbnail_url}
@@ -409,7 +409,7 @@ export default function PageRessources() {
                             className="w-full h-32 object-cover rounded-lg"
                           />
                         </div>
-                      )}
+                      )} */}
                       <div className="mb-2">
                         <h3 className="text-lg font-semibold text-gray-900">{fiche.title}</h3>
                         <p className="text-sm text-gray-600 mt-3">{fiche.description}</p>
