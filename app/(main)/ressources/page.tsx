@@ -122,16 +122,25 @@ export default function PageRessources() {
     }
   };
 
-  const handleDownload = (fileUrl: string | null, title: string) => {
-    if (fileUrl) {
-      // Create a temporary link element to force download
+  const handleDownload = async (downloadUrl: string | null, title: string) => {
+    if (!downloadUrl) return;
+    try {
+      const response = await fetch(downloadUrl);
+      if (!response.ok) {
+        alert("Le fichier est introuvable sur le serveur. Veuillez contacter l'administrateur.");
+        return;
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = fileUrl;
+      link.href = url;
       link.download = title || 'document';
-      link.target = '_blank';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch {
+      alert("Une erreur est survenue lors du téléchargement. Veuillez réessayer.");
     }
   };
 
@@ -329,7 +338,7 @@ export default function PageRessources() {
                     <div
                       key={`doc-${doc.id}`}
                       className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer"
-                      onClick={() => doc.file_url && handleDownload(doc.file_url, doc.title)}
+                      onClick={() => handleDownload(doc.download_url, doc.title)}
                     >
                       {viewMode === "grid" && doc.thumbnail_url && (
                         <div className="mb-4">
@@ -361,7 +370,7 @@ export default function PageRessources() {
                           <span>{formatDate(doc.created_at)}</span>
                         </div>
                       </div>
-                      {doc.file_url && (
+                      {doc.download_url && (
                         <div className="mt-4 flex items-center gap-2 text-sm text-[#E05017]">
                           <Download className="w-4 h-4" />
                           <span>Télécharger</span>
@@ -516,10 +525,10 @@ export default function PageRessources() {
               )}
 
               {/* Download button */}
-              {selectedFiche.file_url && (
+              {selectedFiche.download_url && (
                 <div className="flex justify-end gap-3">
                   <button
-                    onClick={() => handleDownload(selectedFiche.file_url, selectedFiche.title)}
+                    onClick={() => handleDownload(selectedFiche.download_url, selectedFiche.title)}
                     className="px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c94515] transition-colors flex items-center gap-2"
                   >
                     <Download className="w-5 h-5" />

@@ -13,6 +13,7 @@ export interface IDocumentation {
   file_size: number | null;
   thumbnail_path: string | null;
   file_url: string | null;
+  download_url: string | null;
   thumbnail_url: string;
   crasc_id: number | null;
   osc_id: number | null;
