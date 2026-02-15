@@ -340,7 +340,7 @@ export default function PageRessources() {
                       className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer"
                       onClick={() => handleDownload(doc.file_url, doc.title)}
                     >
-                      {viewMode === "grid" && doc.thumbnail_url && (
+                      {/* {viewMode === "grid" && doc.thumbnail_url && (
                         <div className="mb-4">
                           <ImageWithFallback
                             src={doc.thumbnail_url}
@@ -348,7 +348,7 @@ export default function PageRessources() {
                             className="w-full h-40 object-cover rounded-lg"
                           />
                         </div>
-                      )}
+                      )} */}
                       <h3 className="text-gray-900 mb-3 font-semibold">
                         {doc.title}
                       </h3>
