@@ -11,16 +11,16 @@ interface IItems {
 export default async function AboutPage() {
   return (
     <section className="mx-auto pt-12 pb-6 font-poppins">
-      
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 bg-[#f0f9ff] rounded-lg p-8 mb-10">
-      
         <div className="pb-6">
           <h2 className="text-[#2a591d] font-bold text-3xl pb-2">Présentation de la plateforme</h2>
           <p className="mb-3">Cette Plateforme digitale est la résultante d’une démarche alliant à la fois, inclusivité, représentativité, accessibilité et pérennité. En effet, sa conception a impliqué plusieurs acteurs clés du milieu associatif Ivoirien notamment, les organisations de la société civile, les structures techniques et décisionnelles de l’État, les Partenaires techniques et financiers (PTF).</p>
           <p className="mb-3">L’adoption et l’appropriation de ce projet de Plateforme a pu se démontrer par l’implication directe et la qualité des suggestions et propositions de ces acteurs au cours des sessions de cadrage. Les offres et services, les orientations techniques de cette nouvelle Plateforme digitalisée sont donc axées sur les usages et les fonctionnalités que ces parties prenantes se sont convenues.</p>
           <p className="mb-3">Dédiée aux organisations de la société civile membre ou ayant un rapport avec les Centre Régionaux d’Appui à la Société Civile, cette plateforme est multifonctionnelle et dynamique. Elle vise à accroitre la visibilité des OSC, la synergie d’action, le partage d’expérience. Les activités du projet permettront de renforcer le vivre ensemble, réparer les populations à des élections apaisées dans une synergie d’action des OSC y compris celles des femmes et des jeunes.</p>
         </div>
+      </div>
 
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 bg-[#f0f9ff] rounded-lg p-8 mb-10">
         <div className="pb-6">
 
           <h2 className="text-[#2a591d] font-bold text-3xl">Présentation du CRASC</h2>
