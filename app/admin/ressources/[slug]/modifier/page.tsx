@@ -181,7 +181,7 @@ export default function AdminModifierDocument() {
       }
 
       const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/documentation/${slug}`, {
-        method: "PUT",
+        method: "PATCH",
         body: formData,
       });
 
