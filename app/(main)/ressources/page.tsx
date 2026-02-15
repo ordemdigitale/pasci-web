@@ -338,7 +338,7 @@ export default function PageRessources() {
                     <div
                       key={`doc-${doc.id}`}
                       className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer"
-                      onClick={() => handleDownload(doc.download_url, doc.title)}
+                      onClick={() => handleDownload(doc.file_url, doc.title)}
                     >
                       {viewMode === "grid" && doc.thumbnail_url && (
                         <div className="mb-4">
@@ -370,7 +370,7 @@ export default function PageRessources() {
                           <span>{formatDate(doc.created_at)}</span>
                         </div>
                       </div>
-                      {doc.download_url && (
+                      {doc.file_url && (
                         <div className="mt-4 flex items-center gap-2 text-sm text-[#E05017]">
                           <Download className="w-4 h-4" />
                           <span>Télécharger</span>
