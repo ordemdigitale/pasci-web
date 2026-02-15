@@ -488,7 +488,7 @@ export default function PageRessources() {
 
             {/* Modal Content */}
             <div className="p-6">
-              {selectedFiche.thumbnail_url && (
+              {/* {selectedFiche.thumbnail_url && (
                 <div className="mb-6">
                   <ImageWithFallback
                     src={selectedFiche.thumbnail_url}
@@ -496,7 +496,7 @@ export default function PageRessources() {
                     className="w-full h-64 object-cover rounded-lg"
                   />
                 </div>
-              )}
+              )} */}
 
               {selectedFiche.description && (
                 <div className="mb-6">
