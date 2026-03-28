@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Url } from "next/dist/shared/lib/router/router";
-import { Search, Menu, X, User, UserCircle, LogOut, ChevronDown } from 'lucide-react'
+import { Search, Menu, X, UserCircle, LogOut, ChevronDown } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import {
   DropdownMenu,
@@ -15,9 +15,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
 } from '../ui/dropdown-menu'
+import { getStoredUser, authService } from '@/lib/auth'
+import { IUser } from '@/types/api.types'
 
 const NavLinks = [
   { href: "/", key: 1, text: "Accueil" },
@@ -42,19 +42,30 @@ const NavLinks = [
 
   
 
-// Mock user data - replace with actual user data
-const user = {
-  name: 'Jane Doe',
-  email: 'jane.doe@example.com',
-  avatar: '/images/avatar.jpg', // Empty string will show fallback. Actually shows error.
-};
-
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isPlacesOpen, setIsPlacesOpen] = useState(false);
   const [isEspaceCollabSubmenuOpen, setIsEspaceCollabSubmenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<IUser | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
   const isActive = (path: Url) => pathname === path;
+
+  useEffect(() => {
+    setCurrentUser(getStoredUser());
+  }, [pathname]);
+
+  function handleLogout() {
+    authService.logout();
+    setCurrentUser(null);
+    router.push('/');
+  }
+
+  const displayName = currentUser
+    ? (currentUser.username || `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() || currentUser.email)
+    : '';
+  const initials = displayName
+    ? displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+    : '?';
 
   return (
     <header>
@@ -114,49 +125,43 @@ export default function Navbar() {
 
             {/* Right Side Actions */}
             <div className="hidden md:flex items-center space-x-4">
-              <Link href="/auth/login" className='px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017] flex items-center gap-2'>
-                <UserCircle className="w-4 h-4" />
-                Connexion
-              </Link>
-              {/* Search Bar */}
-              {/* <div className="relative">
-                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Rechercher..."
-                  className="bg-white border border-gray-300 rounded-lg pl-4 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent w-48"
-                />
-              </div> */}
-
-              {/* User Avatar Dropdown */}
-              {/* <DropdownMenu>
-                <DropdownMenuTrigger className="focus:outline-none">
-                  <Avatar className="cursor-pointer border-2 border-transparent hover:border-[#ff8c42] transition-colors">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="bg-[#ff8c42] text-white">
-                      {user.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white">
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm">{user.name}</p>
-                      <p className="text-xs text-gray-500">{user.email}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <UserCircle className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-600">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Déconnexion</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu> */}
+              {currentUser ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="focus:outline-none">
+                    <Avatar className="cursor-pointer border-2 border-transparent hover:border-[#E05017] transition-colors">
+                      <AvatarImage src={currentUser.avatar || ''} alt={displayName} />
+                      <AvatarFallback className="bg-[#E05017] text-white text-sm font-semibold">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 bg-white">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-semibold">{displayName}</p>
+                        <p className="text-xs text-gray-500">{currentUser.email}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/profil" className="flex items-center cursor-pointer">
+                        <UserCircle className="mr-2 h-4 w-4" />
+                        Mon profil
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Déconnexion
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link href="/auth/login" className='px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017] flex items-center gap-2'>
+                  <UserCircle className="w-4 h-4" />
+                  Connexion
+                </Link>
+              )}
             </div>
 
             {/* Mobile menu button */}
@@ -229,36 +234,23 @@ export default function Navbar() {
                 ))}
 
                 {/* Mobile Actions */}
-                <div className="flex items-center space-x-4 pt-2">
-                  {/* Mobile User Avatar */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="focus:outline-none">
-                      <Avatar className="cursor-pointer border-2 border-transparent hover:border-[#ff8c42] transition-colors">
-                        <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback className="bg-[#ff8c42] text-white">
-                          {user.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 bg-white">
-                      <DropdownMenuLabel>
-                        <div className="flex flex-col space-y-1">
-                          <p className="text-sm">{user.name}</p>
-                          <p className="text-xs text-gray-500">{user.email}</p>
-                        </div>
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>
-                        <UserCircle className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600">
-                        <LogOut className="mr-2 h-4 w-4" />
-                        <span>Logout</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                <div className="pt-2 border-t border-gray-100">
+                  {currentUser ? (
+                    <div className="space-y-2">
+                      <div className="text-sm font-semibold text-gray-800">{displayName}</div>
+                      <div className="text-xs text-gray-500">{currentUser.email}</div>
+                      <Link href="/profil" className="flex items-center gap-2 text-sm text-gray-700 hover:text-[#E05017]">
+                        <UserCircle className="w-4 h-4" /> Mon profil
+                      </Link>
+                      <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-red-600 hover:text-red-800">
+                        <LogOut className="w-4 h-4" /> Déconnexion
+                      </button>
+                    </div>
+                  ) : (
+                    <Link href="/auth/login" className="flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-3xl text-sm w-fit">
+                      <UserCircle className="w-4 h-4" /> Connexion
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

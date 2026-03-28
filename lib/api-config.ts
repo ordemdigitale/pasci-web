@@ -112,4 +112,17 @@ export const API_ENDPOINTS = {
   keyStats: {
     list: `${API_BASE_URL}/api/v1/key-stats`,
   },
+
+  // Forum / Pôles de concertation
+  forum: {
+    poles: `${API_BASE_URL}/api/v1/forum/poles`,
+    poleBySlug: (slug: string) => `${API_BASE_URL}/api/v1/forum/poles/${slug}`,
+    sujets: (poleSlug: string) => `${API_BASE_URL}/api/v1/forum/poles/${poleSlug}/sujets`,
+    sujetDetail: (poleSlug: string, sujetSlug: string) =>
+      `${API_BASE_URL}/api/v1/forum/poles/${poleSlug}/sujets/${sujetSlug}`,
+    createSujet: (poleSlug: string) => `${API_BASE_URL}/api/v1/forum/poles/${poleSlug}/sujets`,
+    createCommentaire: (poleSlug: string, sujetSlug: string) =>
+      `${API_BASE_URL}/api/v1/forum/poles/${poleSlug}/sujets/${sujetSlug}/commentaires`,
+    deleteCommentaire: (id: number) => `${API_BASE_URL}/api/v1/forum/commentaires/${id}`,
+  },
 };

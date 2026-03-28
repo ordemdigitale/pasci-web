@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ImageWithFallback } from '@/lib/imageWithFallback';
 import { User, Mail, Lock, Eye, EyeOff, Building, Phone, MapPin } from 'lucide-react';
+import { authService } from '@/lib/auth';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -49,18 +52,16 @@ export default function RegisterPage() {
       return;
     }
 
-    // TODO: Implement actual registration logic
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Replace with actual registration
-      console.log('Registration attempt:', formData);
-
-      // Redirect to login or dashboard after successful registration
-      // router.push('/auth/login');
-    } catch (err) {
-      setError('Une erreur est survenue. Veuillez réessayer.');
+      await authService.register({
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+      });
+      router.push('/auth/login?registered=1');
+    } catch (err: any) {
+      setError(err.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setLoading(false);
     }

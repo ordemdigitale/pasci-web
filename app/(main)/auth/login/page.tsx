@@ -1,35 +1,35 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ImageWithFallback } from '@/lib/imageWithFallback';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { authService, setStoredUser } from '@/lib/auth';
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const justRegistered = searchParams.get('registered') === '1';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    // TODO: Implement actual authentication logic
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Replace with actual authentication
-      console.log('Login attempt:', { email, password, rememberMe });
-
-      // Redirect to dashboard or home page after successful login
-      // router.push('/dashboard');
-    } catch (err) {
-      setError('Identifiants incorrects. Veuillez réessayer.');
+      await authService.login({ username: email, password });
+      const user = await authService.getCurrentUser();
+      setStoredUser(user);
+      const redirect = searchParams.get('redirect') || '/';
+      router.push(redirect);
+    } catch (err: any) {
+      setError(err.message || 'Identifiants incorrects. Veuillez réessayer.');
     } finally {
       setLoading(false);
     }
@@ -94,6 +94,12 @@ export default function LoginPage() {
               <p className="text-gray-600">Connectez-vous à votre compte</p>
             </div>
 
+            {justRegistered && (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-700 text-sm">Compte créé avec succès ! Connectez-vous.</p>
+              </div>
+            )}
+
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-red-600 text-sm">{error}</p>
@@ -146,20 +152,8 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="remember"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 text-[#E05017] border-gray-300 rounded focus:ring-[#E05017]"
-                  />
-                  <label htmlFor="remember" className="ml-2 text-sm text-gray-700">
-                    Se souvenir de moi
-                  </label>
-                </div>
+              {/* Forgot Password */}
+              <div className="flex justify-end">
                 <Link
                   href="/auth/forgot-password"
                   className="text-sm text-[#E05017] hover:underline font-semibold"
@@ -206,5 +200,13 @@ export default function LoginPage() {
         </div>
       </div>
     </section>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

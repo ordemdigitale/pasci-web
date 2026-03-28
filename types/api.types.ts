@@ -223,6 +223,50 @@ export interface IRegisterRequest {
   last_name?: string;
 }
 
+// Forum types
+export interface IPoleConcertation {
+  id: number;
+  name: string;
+  slug: string;
+  category?: string;
+  description?: string;
+  image_path?: string;
+  objectifs?: string;
+  objectifs_list?: string[];
+  is_active: boolean;
+  sujets_count: number;
+  created_at: string;
+}
+
+export interface IForumSujet {
+  id: number;
+  title: string;
+  slug: string;
+  content: string;
+  pole_id: number;
+  author_id?: string;
+  author_name?: string;
+  is_pinned: boolean;
+  views_count: number;
+  comments_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IForumCommentaire {
+  id: number;
+  content: string;
+  sujet_id: number;
+  author_id?: string;
+  author_name?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IForumSujetDetail extends IForumSujet {
+  commentaires: IForumCommentaire[];
+}
+
 // Offre Projet types
 export interface IOffreProjet {
   id: string;
