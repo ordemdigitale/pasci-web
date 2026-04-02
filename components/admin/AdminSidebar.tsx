@@ -11,6 +11,7 @@ import {
   Settings,
   X,
   BookOpen,
+  MessageSquare,
 } from "lucide-react";
 
 interface NavItem {
@@ -63,6 +64,14 @@ export default function AdminSidebar({
         { label: "Offres de Projets", href: "/admin/projets" },
         { label: "Offres d'emploi", href: "/admin/emplois" },
         { label: "Actualités", href: "/admin/actualites" },
+      ],
+    },
+    {
+      icon: <MessageSquare size={20} />,
+      label: "Forum",
+      dropdown: true,
+      submenus: [
+        { label: "Pôles de concertation", href: "/admin/forum/poles" },
       ],
     },
     {
