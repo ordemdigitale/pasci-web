@@ -82,7 +82,7 @@ export default function AdminSidebar({
     {
       icon: <Settings size={20} />,
       label: "Paramètres",
-      href: "/admin/parametres",
+      href: "/admin/settings",
     },
   ];
 
