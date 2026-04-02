@@ -9,7 +9,7 @@ import * as z from "zod";
 import * as Select from "@radix-ui/react-select";
 import { ICrasc, IOsc } from "@/types/api.types";
 import { fetchAllCrasc, fetchAllOsc } from "@/lib/fetch-crasc";
-import { getFormationBySlug } from "@/lib/fetch-formations";
+import { getFormationBySlug, fetchAllRubriques, IFormationRubrique } from "@/lib/fetch-formations";
 import {
   ArrowLeft,
   BookOpen,
@@ -22,6 +22,8 @@ import {
   MapPin,
   Users,
   Link as LinkIcon,
+  Tag,
+  DollarSign,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 
@@ -42,6 +44,9 @@ const formationSchema = z.object({
   materials_link: z.string().url("Lien invalide").or(z.literal("")).optional().nullable(),
   is_published: z.boolean(),
   is_completed: z.boolean(),
+  type: z.enum(["gratuite", "payante"]),
+  price: z.number().positive("Le prix doit être positif").optional().nullable(),
+  rubrique_id: z.string().optional().nullable(),
   crasc_id: z.string().optional().nullable(),
   osc_id: z.string().optional().nullable(),
 });
@@ -53,6 +58,7 @@ export default function AdminModifierFormation() {
   const slug = params.slug as string;
   const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
   const [oscs, setOscs] = useState<IOsc[]>([]);
+  const [rubriques, setRubriques] = useState<IFormationRubrique[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -63,12 +69,15 @@ export default function AdminModifierFormation() {
     register,
     control,
     handleSubmit,
+    watch,
     formState: { errors },
     reset,
     setValue,
   } = useForm<FormationForm>({
     resolver: zodResolver(formationSchema),
   });
+
+  const watchType = watch("type");
 
   // Charger les données
   useEffect(() => {
@@ -103,13 +112,21 @@ export default function AdminModifierFormation() {
         setValue("materials_link", formation.materials_link || "");
         setValue("is_published", formation.is_published);
         setValue("is_completed", formation.is_completed);
+        setValue("type", (formation.type as "gratuite" | "payante") || "gratuite");
+        setValue("price", formation.price || undefined);
+        setValue("rubrique_id", formation.rubrique_id?.toString() || "");
         setValue("crasc_id", formation.crasc_id?.toString() || "");
         setValue("osc_id", formation.osc_id?.toString() || "");
 
-        // Charger CRASC et OSC
-        const [crascData, oscData] = await Promise.all([fetchAllCrasc(), fetchAllOsc()]);
+        // Charger CRASC, OSC et rubriques
+        const [crascData, oscData, rubriquesData] = await Promise.all([
+          fetchAllCrasc(),
+          fetchAllOsc(),
+          fetchAllRubriques(),
+        ]);
         setCrascRegions(crascData);
         setOscs(oscData);
+        setRubriques(rubriquesData.filter((r) => r.is_active));
       } catch (error) {
         console.error("Erreur lors du chargement:", error);
         setErrorMessage("Erreur lors du chargement de la formation");
@@ -146,6 +163,10 @@ export default function AdminModifierFormation() {
       if (values.materials_link) formData.append("materials_link", values.materials_link);
       formData.append("is_published", values.is_published.toString());
       formData.append("is_completed", values.is_completed.toString());
+      formData.append("type", values.type);
+      if (values.type === "payante" && values.price !== null && values.price !== undefined)
+        formData.append("price", values.price.toString());
+      if (values.rubrique_id) formData.append("rubrique_id", values.rubrique_id);
       if (values.crasc_id) formData.append("crasc_id", values.crasc_id);
       if (values.osc_id) formData.append("osc_id", values.osc_id);
 
@@ -327,6 +348,75 @@ export default function AdminModifierFormation() {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Type et Prix */}
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <Tag className="inline w-4 h-4 mr-1" />
+                  Type de formation
+                </label>
+                <select
+                  {...register("type")}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent"
+                >
+                  <option value="gratuite">Gratuite</option>
+                  <option value="payante">Payante</option>
+                </select>
+              </div>
+
+              {watchType === "payante" && (
+                <div>
+                  <label htmlFor="price" className="block text-sm font-semibold text-gray-700 mb-2">
+                    <DollarSign className="inline w-4 h-4 mr-1" />
+                    Prix (FCFA)
+                  </label>
+                  <input
+                    id="price"
+                    type="number"
+                    {...register("price", { valueAsNumber: true })}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent ${
+                      errors.price ? "border-red-500" : "border-gray-300"
+                    }`}
+                    placeholder="Ex: 15000"
+                    min="0"
+                  />
+                  {errors.price && (
+                    <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Rubrique */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Rubrique / Catégorie</label>
+              <Controller
+                name="rubrique_id"
+                control={control}
+                render={({ field }) => (
+                  <Select.Root onValueChange={field.onChange} value={field.value || undefined}>
+                    <Select.Trigger className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between">
+                      <Select.Value placeholder="Sélectionnez une rubrique (optionnel)" />
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </Select.Trigger>
+                    <Select.Content className="bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-auto z-50">
+                      <Select.Viewport>
+                        {rubriques.map((r) => (
+                          <Select.Item
+                            key={r.id}
+                            value={r.id.toString()}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
+                          >
+                            <Select.ItemText>{r.name}</Select.ItemText>
+                          </Select.Item>
+                        ))}
+                      </Select.Viewport>
+                    </Select.Content>
+                  </Select.Root>
+                )}
+              />
             </div>
 
             {/* Statuts */}

@@ -2,54 +2,47 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Clock, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button'
+import { Search, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback"
-import illustrationImage from 'figma:asset/e64e574db940281630010d12290bbd99ac5f9f9e.png';
-import { fetchAllFormations, IFormation } from '@/lib/fetch-formations';
-
-const sidebarItems = [
-  { id: 1, label: 'Santé', active: true },
-  { id: 2, label: 'Jeunesse', active: false },
-  { id: 3, label: 'Politique', active: false },
-  { id: 4, label: 'Agriculture', active: false },
-  { id: 5, label: 'Éducation', active: false },
-  { id: 6, label: 'Suivi-évaluation', active: false }
-];
+import { fetchAllFormations, fetchAllRubriques, IFormation, IFormationRubrique } from '@/lib/fetch-formations';
 
 export default function FormationsPage() {
-  const [activeCategory, setActiveCategory] = useState(1);
+  const [activeRubriqueId, setActiveRubriqueId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [visiblePrograms, setVisiblePrograms] = useState(5);
+  const [visiblePrograms, setVisiblePrograms] = useState(9);
   const [formations, setFormations] = useState<IFormation[]>([]);
+  const [rubriques, setRubriques] = useState<IFormationRubrique[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadFormations = async () => {
+    const loadData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await fetchAllFormations({
-          published_only: true,
-          limit: 100
-        });
-        setFormations(data);
+        const [formationsData, rubriquesData] = await Promise.all([
+          fetchAllFormations({ published_only: true, limit: 100 }),
+          fetchAllRubriques(),
+        ]);
+        setFormations(formationsData);
+        setRubriques(rubriquesData.filter((r) => r.is_active));
       } catch (err) {
-        console.error("Erreur lors du chargement des formations:", err);
+        console.error("Erreur lors du chargement:", err);
         setError("Erreur lors du chargement des formations. Veuillez réessayer plus tard.");
       } finally {
         setLoading(false);
       }
     };
-    loadFormations();
+    loadData();
   }, []);
 
-  // Filter formations based on search query
-  const filteredFormations = formations.filter(formation =>
-    formation.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (formation.description && formation.description.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  // Filter formations
+  const filteredFormations = formations.filter(formation => {
+    const matchesSearch = formation.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (formation.description && formation.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesRubrique = activeRubriqueId === null || formation.rubrique_id === activeRubriqueId;
+    return matchesSearch && matchesRubrique;
+  });
 
   const loadMorePrograms = () => {
     setVisiblePrograms(prev => Math.min(prev + 5, filteredFormations.length));
@@ -62,20 +55,30 @@ export default function FormationsPage() {
           {/* Left Sidebar */}
           <div className="hidden lg:block w-64 flex-shrink-0">
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              {sidebarItems.map((item, index) => (
+              <button
+                onClick={() => setActiveRubriqueId(null)}
+                className={`w-full text-left px-6 py-4 transition-colors rounded-t-lg ${
+                  activeRubriqueId === null ? 'text-white' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+                style={activeRubriqueId === null ? { backgroundColor: '#E05017' } : {}}
+              >
+                <span className="flex items-center gap-3">
+                  <span className="text-sm">•</span>
+                  <span>Toutes les formations</span>
+                </span>
+              </button>
+              {rubriques.map((r, index) => (
                 <button
-                  key={item.id}
-                  onClick={() => setActiveCategory(item.id)}
+                  key={r.id}
+                  onClick={() => setActiveRubriqueId(r.id)}
                   className={`w-full text-left px-6 py-4 transition-colors ${
-                    item.active
-                      ? 'text-white'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  } ${index === 0 ? 'rounded-t-lg' : ''}`}
-                  style={item.active ? { backgroundColor: '#E05017' } : {}}
+                    activeRubriqueId === r.id ? 'text-white' : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                  style={activeRubriqueId === r.id ? { backgroundColor: r.color || '#E05017' } : {}}
                 >
                   <span className="flex items-center gap-3">
                     <span className="text-sm">{index + 1}</span>
-                    <span>{item.label}</span>
+                    <span>{r.name}</span>
                   </span>
                 </button>
               ))}
@@ -165,6 +168,25 @@ export default function FormationsPage() {
                           />
                         </div>
                         <div className="p-5">
+                          <div className="flex items-center gap-2 mb-2">
+                            {formation.type === "payante" ? (
+                              <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">
+                                {formation.price ? `${formation.price.toLocaleString()} FCFA` : "Payante"}
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                                Gratuite
+                              </span>
+                            )}
+                            {formation.rubrique && (
+                              <span
+                                className="px-2 py-0.5 text-white text-xs font-semibold rounded-full"
+                                style={{ backgroundColor: formation.rubrique.color || '#E05017' }}
+                              >
+                                {formation.rubrique.name}
+                              </span>
+                            )}
+                          </div>
                           <h4 className="text-gray-800 text-xl font-semibold mb-3">{formation.title}</h4>
                           <p className="text-gray-600 text-sm mb-4 line-clamp-3">
                             {formation.description || "Aucune description disponible."}

@@ -2,6 +2,16 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+export interface IFormationRubrique {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  color: string | null;
+  is_active: boolean;
+  created_at: string;
+}
+
 export interface IFormation {
   id: number;
   title: string;
@@ -17,10 +27,14 @@ export interface IFormation {
   is_published: boolean;
   is_full: boolean;
   is_completed: boolean;
+  type: string;
+  price: number | null;
   thumbnail_path: string;
   thumbnail_url: string;
   registration_link: string | null;
   materials_link: string | null;
+  rubrique_id: number | null;
+  rubrique?: IFormationRubrique | null;
   crasc_id: number | null;
   osc_id: number | null;
   crasc?: {
@@ -45,6 +59,7 @@ export interface FormationFilters {
   search?: string;
   crasc_id?: number;
   osc_id?: number;
+  rubrique_id?: number;
 }
 
 /**
@@ -62,6 +77,7 @@ export async function fetchAllFormations(
   if (filters.search) params.append("search", filters.search);
   if (filters.crasc_id !== undefined) params.append("crasc_id", filters.crasc_id.toString());
   if (filters.osc_id !== undefined) params.append("osc_id", filters.osc_id.toString());
+  if (filters.rubrique_id !== undefined) params.append("rubrique_id", filters.rubrique_id.toString());
 
   const url = `${API_BASE_URL}/api/v1/formations${params.toString() ? `?${params.toString()}` : ""}`;
 
@@ -127,6 +143,58 @@ export async function getFormationBySlug(
     throw new Error("Problème de chargement de la formation.");
   }
 
+  return response.json();
+}
+
+/**
+ * Fetch active rubriques
+ */
+export async function fetchAllRubriques(): Promise<IFormationRubrique[]> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/formations/rubriques`, {
+    cache: "no-store",
+  });
+  if (!response.ok) return [];
+  return response.json();
+}
+
+/**
+ * Inscrire un participant à une formation
+ */
+export async function inscrireFormation(
+  formation_slug: string,
+  participant_name: string,
+  participant_email: string
+): Promise<{ id: number; participant_name: string; participant_email: string }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/formations/${formation_slug}/inscrire`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ participant_name, participant_email }),
+    }
+  );
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || "Erreur lors de l'inscription.");
+  }
+  return response.json();
+}
+
+/**
+ * Vérifier un certificat par code
+ */
+export async function verifierCertificat(code: string): Promise<{
+  code: string;
+  formation_title: string;
+  participant_name: string;
+  participant_email: string;
+  issued_at: string;
+} | null> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/formations/certificats/verifier/${code}`,
+    { cache: "no-store" }
+  );
+  if (!response.ok) return null;
   return response.json();
 }
 
