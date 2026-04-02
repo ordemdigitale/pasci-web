@@ -44,11 +44,20 @@ export default function PagePoleForum() {
 
   useEffect(() => {
     Promise.all([
-      fetch(API_ENDPOINTS.forum.poleBySlug(poleSlug)).then((r) => r.json()),
-      fetch(API_ENDPOINTS.forum.sujets(poleSlug)).then((r) => r.json()),
+      fetch(API_ENDPOINTS.forum.poleBySlug(poleSlug)).then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      }),
+      fetch(API_ENDPOINTS.forum.sujets(poleSlug)).then((r) => {
+        if (!r.ok) return [];
+        return r.json();
+      }),
     ])
       .then(([poleData, sujetsData]) => {
-        setPole(poleData);
+        // Vérifier que poleData est bien un objet avec un id (pas une erreur API)
+        if (poleData && typeof poleData === "object" && poleData.id) {
+          setPole(poleData);
+        }
         setSujets(Array.isArray(sujetsData) ? sujetsData : []);
       })
       .catch(console.error)

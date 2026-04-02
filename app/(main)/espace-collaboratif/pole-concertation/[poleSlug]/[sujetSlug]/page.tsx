@@ -40,8 +40,16 @@ export default function PageSujetDetail() {
 
   useEffect(() => {
     fetch(API_ENDPOINTS.forum.sujetDetail(poleSlug, sujetSlug))
-      .then((r) => r.json())
-      .then((data) => setSujet(data))
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data) => {
+        // S'assurer que commentaires est toujours un tableau
+        if (data && typeof data === "object" && data.id) {
+          setSujet({ ...data, commentaires: Array.isArray(data.commentaires) ? data.commentaires : [] });
+        }
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [poleSlug, sujetSlug]);
@@ -167,11 +175,11 @@ export default function PageSujetDetail() {
 
       {/* Comments */}
       <h2 className="text-base font-bold text-gray-800 mb-4">
-        {sujet.commentaires.length} réponse{sujet.commentaires.length !== 1 ? "s" : ""}
+        {(sujet.commentaires ?? []).length} réponse{(sujet.commentaires ?? []).length !== 1 ? "s" : ""}
       </h2>
 
       <div className="space-y-4 mb-8">
-        {sujet.commentaires.map((c) => {
+        {(sujet.commentaires ?? []).map((c) => {
           const isOwner = currentUser && c.author_id === currentUser.id;
           const isStaff = currentUser && (currentUser.is_staff || currentUser.is_superuser);
           return (
