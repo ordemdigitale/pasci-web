@@ -1,425 +1,280 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { ImageWithFallback } from "@/lib/imageWithFallback";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   User,
   Mail,
-  Phone,
-  MapPin,
-  Building2,
-  Calendar,
   Edit,
   Save,
   X,
-  Camera,
   Lock,
-  Bell,
   FileText,
-  Award,
-  Briefcase,
   LogOut,
-  Settings,
+  Loader2,
+  Calendar,
 } from "lucide-react";
-
-// Mock user data - À remplacer par les vraies données de l'utilisateur connecté
-const mockUserData = {
-  id: 1,
-  firstName: "Marie",
-  lastName: "KOUASSI",
-  email: "marie.kouassi@exemple.com",
-  phone: "+225 07 12 34 56 78",
-  avatar: "/images/avatar-placeholder.jpg",
-  organization: "Initiative Eau Claire",
-  organizationType: "OSC (Organisation de la Société Civile)",
-  city: "Abidjan",
-  position: "Directrice de Projet",
-  joinDate: "2024-01-15",
-  bio: "Passionnée par le développement durable et l'accès à l'eau potable pour tous. Plus de 10 ans d'expérience dans la gestion de projets sociaux.",
-  stats: {
-    projectsParticipated: 12,
-    trainingsCompleted: 8,
-    hoursVolunteered: 156,
-  },
-};
+import { authService, getToken, fetchWithAuth } from "@/lib/auth";
+import { IUser } from "@/types/api.types";
+import { API_BASE_URL } from "@/lib/api-config";
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const [user, setUser] = useState<IUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [userData, setUserData] = useState(mockUserData);
-  const [editedData, setEditedData] = useState(mockUserData);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleEdit = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
+  const [bio, setBio] = useState("");
+
+  useEffect(() => {
+    const token = getToken();
+    if (!token) {
+      router.replace("/auth/login");
+      return; // loading reste true → rien ne s'affiche avant la redirection
+    }
+    setAuthorized(true);
+    authService.getCurrentUser()
+      .then((u) => {
+        setUser(u);
+        setFirstName(u.first_name || "");
+        setLastName(u.last_name || "");
+        setUsername(u.username || "");
+        setBio(u.bio || "");
+      })
+      .catch(() => router.replace("/auth/login"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  function handleEdit() {
     setIsEditing(true);
-    setEditedData(userData);
-  };
+    setError("");
+    setSuccess("");
+  }
 
-  const handleCancel = () => {
+  function handleCancel() {
     setIsEditing(false);
-    setEditedData(userData);
-  };
+    setFirstName(user?.first_name || "");
+    setLastName(user?.last_name || "");
+    setUsername(user?.username || "");
+    setBio(user?.bio || "");
+    setError("");
+  }
 
-  const handleSave = () => {
-    // TODO: Envoyer les données au backend
-    setUserData(editedData);
-    setIsEditing(false);
-  };
+  async function handleSave() {
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetchWithAuth(`${API_BASE_URL}/api/v1/users/me`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          first_name: firstName.trim() || null,
+          last_name: lastName.trim() || null,
+          username: username.trim() || null,
+          bio: bio.trim() || null,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || "Erreur lors de la mise à jour.");
+      }
+      const updated: IUser = await res.json();
+      setUser(updated);
+      setIsEditing(false);
+      setSuccess("Profil mis à jour avec succès.");
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    setEditedData({
-      ...editedData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  function handleLogout() {
+    authService.logout();
+    router.push("/auth/login");
+  }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("fr-FR", {
+  function formatDate(dateStr?: string) {
+    if (!dateStr) return "—";
+    return new Date(dateStr).toLocaleDateString("fr-FR", {
       day: "numeric",
       month: "long",
       year: "numeric",
     });
-  };
+  }
+
+  if (!authorized || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#E05017]" />
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
+  const displayName =
+    [user.first_name, user.last_name].filter(Boolean).join(" ") ||
+    user.username ||
+    user.email;
 
   return (
     <div className="min-h-screen bg-gray-50 font-poppins py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900">Mon Profil</h1>
-          <p className="text-gray-600 mt-2">
-            Gérez vos informations personnelles et vos préférences
-          </p>
-        </div>
+      <div className="max-w-3xl mx-auto px-4">
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-8">Mon Profil</h1>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Profile Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              {/* Avatar */}
-              <div className="relative w-32 h-32 mx-auto mb-4">
-                <div className="w-full h-full rounded-full overflow-hidden border-4 border-gray-200">
-                  <ImageWithFallback
-                    src={userData.avatar}
-                    alt={`${userData.firstName} ${userData.lastName}`}
-                    className="w-full h-full object-cover"
-                  />
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Sidebar */}
+          <div className="space-y-4">
+            {/* Avatar + nom */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+              <div className="w-20 h-20 rounded-full bg-[#E05017]/10 flex items-center justify-center mx-auto mb-4">
+                <User className="w-10 h-10 text-[#E05017]" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-900">{displayName}</h2>
+              <p className="text-sm text-gray-500 mt-1">{user.email}</p>
+              {user.date_joined && (
+                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-center gap-2 text-xs text-gray-400">
+                  <Calendar className="w-3.5 h-3.5" />
+                  Membre depuis {formatDate(user.date_joined)}
                 </div>
-                {isEditing && (
-                  <button className="absolute bottom-0 right-0 bg-[#E05017] text-white p-2 rounded-full hover:bg-[#c44315] transition-colors">
-                    <Camera className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
-              {/* Name */}
-              <div className="text-center">
-                <h2 className="text-xl font-bold text-gray-900">
-                  {userData.firstName} {userData.lastName}
-                </h2>
-                <p className="text-sm text-gray-600 mt-1">{userData.position}</p>
-                <p className="text-sm text-[#E05017] font-semibold mt-1">
-                  {userData.organization}
-                </p>
-              </div>
-
-              {/* Member Since */}
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    Membre depuis {formatDate(userData.joinDate)}
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Stats Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Award className="w-5 h-5 text-[#E05017]" />
-                Mes statistiques
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Projets participés</span>
-                  <span className="font-bold text-[#E05017]">
-                    {userData.stats.projectsParticipated}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Formations suivies</span>
-                  <span className="font-bold text-[#E05017]">
-                    {userData.stats.trainingsCompleted}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Heures bénévoles</span>
-                  <span className="font-bold text-[#E05017]">
-                    {userData.stats.hoursVolunteered}h
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="font-bold text-gray-900 mb-4">Actions rapides</h3>
-              <div className="space-y-2">
-                <Link
-                  href="/profil/parametres"
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
-                >
-                  <Settings className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium">Paramètres</span>
-                </Link>
-                <Link
-                  href="/profil/securite"
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
-                >
-                  <Lock className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium">Sécurité</span>
-                </Link>
-                <Link
-                  href="/profil/notifications"
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
-                >
-                  <Bell className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium">Notifications</span>
-                </Link>
-                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors text-red-600">
-                  <LogOut className="w-5 h-5" />
-                  <span className="text-sm font-medium">Déconnexion</span>
-                </button>
-              </div>
+            {/* Actions */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 space-y-1">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 text-red-600 transition-colors text-sm font-medium"
+              >
+                <LogOut className="w-4 h-4" />
+                Déconnexion
+              </button>
             </div>
           </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Personal Information */}
+          {/* Main */}
+          <div className="lg:col-span-2 space-y-4">
+            {success && (
+              <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">
+                {success}
+              </div>
+            )}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
+                {error}
+              </div>
+            )}
+
+            {/* Informations personnelles */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <User className="w-6 h-6 text-[#E05017]" />
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <User className="w-5 h-5 text-[#E05017]" />
                   Informations personnelles
                 </h2>
                 {!isEditing ? (
                   <button
                     onClick={handleEdit}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-semibold text-sm"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-lg text-sm font-semibold hover:bg-[#c44315] transition-colors"
                   >
-                    <Edit className="w-4 h-4" />
-                    Modifier
+                    <Edit className="w-4 h-4" /> Modifier
                   </button>
                 ) : (
                   <div className="flex gap-2">
                     <button
                       onClick={handleCancel}
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold text-sm"
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors"
                     >
-                      <X className="w-4 h-4" />
-                      Annuler
+                      <X className="w-4 h-4" /> Annuler
                     </button>
                     <button
                       onClick={handleSave}
-                      className="flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-semibold text-sm"
+                      disabled={saving}
+                      className="flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-lg text-sm font-semibold hover:bg-[#c44315] disabled:opacity-50 transition-colors"
                     >
-                      <Save className="w-4 h-4" />
-                      Enregistrer
+                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                      {saving ? "Enregistrement..." : "Enregistrer"}
                     </button>
                   </div>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* First Name */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Prénom
-                  </label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Prénom</label>
                   {isEditing ? (
                     <input
                       type="text"
-                      name="firstName"
-                      value={editedData.firstName}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#E05017] focus:outline-none"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{userData.firstName}</p>
+                    <p className="text-gray-900 py-2">{user.first_name || "—"}</p>
                   )}
                 </div>
-
-                {/* Last Name */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Nom
-                  </label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Nom</label>
                   {isEditing ? (
                     <input
                       type="text"
-                      name="lastName"
-                      value={editedData.lastName}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#E05017] focus:outline-none"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{userData.lastName}</p>
+                    <p className="text-gray-900 py-2">{user.last_name || "—"}</p>
                   )}
                 </div>
-
-                {/* Email */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                    Email
+                  <label className="block text-sm font-medium text-gray-600 mb-1 flex items-center gap-1">
+                    <Mail className="w-3.5 h-3.5" /> Email
                   </label>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      name="email"
-                      value={editedData.email}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{userData.email}</p>
-                  )}
+                  <p className="text-gray-900 py-2">{user.email}</p>
                 </div>
-
-                {/* Phone */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-gray-400" />
-                    Téléphone
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={editedData.phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{userData.phone}</p>
-                  )}
-                </div>
-
-                {/* City */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-gray-400" />
-                    Ville
-                  </label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Nom d'utilisateur</label>
                   {isEditing ? (
                     <input
                       type="text"
-                      name="city"
-                      value={editedData.city}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#E05017] focus:outline-none"
                     />
                   ) : (
-                    <p className="text-gray-900 py-3">{userData.city}</p>
-                  )}
-                </div>
-
-                {/* Position */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <Briefcase className="w-4 h-4 text-gray-400" />
-                    Poste
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="position"
-                      value={editedData.position}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{userData.position}</p>
+                    <p className="text-gray-900 py-2">{user.username || "—"}</p>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Professional Information */}
+            {/* Biographie */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <Building2 className="w-6 h-6 text-[#E05017]" />
-                Informations professionnelles
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Organization */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Organisation
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="organization"
-                      value={editedData.organization}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
-                    />
-                  ) : (
-                    <p className="text-gray-900 py-3">{userData.organization}</p>
-                  )}
-                </div>
-
-                {/* Organization Type */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Type d'organisation
-                  </label>
-                  {isEditing ? (
-                    <select
-                      name="organizationType"
-                      value={editedData.organizationType}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
-                    >
-                      <option>OSC (Organisation de la Société Civile)</option>
-                      <option>PTF (Partenaire Technique et Financier)</option>
-                      <option>Institution publique</option>
-                      <option>Entreprise privée</option>
-                      <option>Indépendant</option>
-                      <option>Autre</option>
-                    </select>
-                  ) : (
-                    <p className="text-gray-900 py-3">{userData.organizationType}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Bio */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <FileText className="w-6 h-6 text-[#E05017]" />
+              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-[#E05017]" />
                 Biographie
               </h2>
-
               {isEditing ? (
                 <textarea
-                  name="bio"
-                  value={editedData.bio}
-                  onChange={handleChange}
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#E05017] focus:outline-none"
                   placeholder="Parlez-nous de vous..."
                 />
               ) : (
-                <p className="text-gray-700 leading-relaxed">{userData.bio}</p>
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  {user.bio || "Aucune biographie renseignée."}
+                </p>
               )}
             </div>
           </div>

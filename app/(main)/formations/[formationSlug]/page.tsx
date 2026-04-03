@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { ImageWithFallback } from '@/lib/imageWithFallback';
 import {
@@ -24,41 +24,39 @@ import {
 import Link from 'next/link';
 import { getFormationBySlug, inscrireFormation, verifierCertificat, IFormation } from '@/lib/fetch-formations';
 import { initierPaiement } from '@/lib/cinetpay';
+import { getStoredUser } from '@/lib/auth';
 
-interface ILesson {
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+interface ILecon {
   id: number;
+  module_id: number;
   title: string;
-  type: 'video' | 'article' | 'quiz';
-  duration: string;
-  completed: boolean;
-  locked: boolean;
+  type: 'video' | 'pdf' | 'text';
+  content: string | null;
+  file_url: string | null;
+  duration_minutes: number | null;
+  is_preview: boolean;
+  order: number;
 }
 
 interface IModule {
   id: number;
   title: string;
-  lessons: ILesson[];
+  description: string | null;
+  order: number;
+  lecons: ILecon[];
 }
 
-// Modules statiques de présentation (pas encore dans le backend)
-const defaultModules: IModule[] = [
-  {
-    id: 1,
-    title: "Module 1 : Introduction",
-    lessons: [
-      { id: 1, title: "01. Présentation de la formation", type: "article", duration: "5 min", completed: false, locked: false },
-      { id: 2, title: "02. Objectifs et programme", type: "article", duration: "8 min", completed: false, locked: false },
-    ]
-  },
-  {
-    id: 2,
-    title: "Module 2 : Contenu principal",
-    lessons: [
-      { id: 3, title: "03. Concepts fondamentaux", type: "video", duration: "15 min", completed: false, locked: true },
-      { id: 4, title: "04. Mise en pratique", type: "video", duration: "20 min", completed: false, locked: true },
-    ]
-  }
-];
+function getEmbedUrl(url: string): string {
+  // YouTube
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+  // Vimeo
+  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  return url;
+}
 
 function formatDate(dateStr: string | null) {
   if (!dateStr) return null;
@@ -74,7 +72,11 @@ export default function FormationDetailPage() {
   const formationSlug = params.formationSlug as string;
 
   const [formation, setFormation] = useState<IFormation | null>(null);
+  const [modules, setModules] = useState<IModule[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeLecon, setActiveLecon] = useState<ILecon | null>(null);
+  const currentUser = getStoredUser();
+  const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 
   // Inscription
   const [showInscription, setShowInscription] = useState(false);
@@ -91,10 +93,37 @@ export default function FormationDetailPage() {
   const [certLoading, setCertLoading] = useState(false);
 
   useEffect(() => {
-    getFormationBySlug(formationSlug)
-      .then(setFormation)
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    async function load() {
+      try {
+        const user = getStoredUser();
+        const checkUrl = user
+          ? `${API_BASE_URL}/api/v1/formations/${formationSlug}/check-inscription?email=${encodeURIComponent(user.email)}`
+          : null;
+
+        const [f, mods, checkResult] = await Promise.all([
+          getFormationBySlug(formationSlug),
+          fetch(`${API_BASE_URL}/api/v1/formations/${formationSlug}/modules`)
+            .then((r) => (r.ok ? r.json() : []))
+            .catch(() => []),
+          checkUrl
+            ? fetch(checkUrl).then((r) => (r.ok ? r.json() : null)).catch(() => null)
+            : Promise.resolve(null),
+        ]);
+
+        if (checkResult?.registered) setAlreadyRegistered(true);
+        setFormation(f);
+        const modList = Array.isArray(mods) ? mods : [];
+        setModules(modList);
+        // Auto-select first preview leçon if any
+        const firstPreview = modList.flatMap((m: IModule) => m.lecons).find((l: ILecon) => l.is_preview);
+        if (firstPreview) setActiveLecon(firstPreview);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
   }, [formationSlug]);
 
   async function handleInscription(e: React.FormEvent) {
@@ -149,7 +178,7 @@ export default function FormationDetailPage() {
     );
   }
 
-  const canRegister = !formation.is_completed && !formation.is_full &&
+  const canRegister = !alreadyRegistered && !formation.is_completed && !formation.is_full &&
     (!formation.registration_deadline || new Date(formation.registration_deadline) > new Date());
 
   return (
@@ -170,11 +199,11 @@ export default function FormationDetailPage() {
               <Link href="/formations" className="text-sm font-medium hover:text-[#E05017]">Formations</Link>
             </nav>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/profile" className="w-10 h-10 bg-[#E05017] rounded-full flex items-center justify-center text-white">
-              <Users className="w-5 h-5" />
+          {currentUser && (
+            <Link href="/profil" className="w-10 h-10 bg-[#E05017] rounded-full flex items-center justify-center text-white font-bold text-sm" title={currentUser.email}>
+              {(currentUser.first_name?.[0] || currentUser.email[0]).toUpperCase()}
             </Link>
-          </div>
+          )}
         </div>
       </header>
 
@@ -234,37 +263,52 @@ export default function FormationDetailPage() {
             <h2 className="text-xs font-bold uppercase tracking-wider mb-4 px-3 text-gray-600">
               Programme
             </h2>
-            <div className="flex flex-col gap-6">
-              {defaultModules.map((module) => (
-                <div key={module.id}>
-                  <h3 className="text-[10px] font-bold uppercase tracking-widest mb-3 px-3 text-gray-500">
-                    {module.title}
-                  </h3>
-                  <div className="flex flex-col gap-1">
-                    {module.lessons.map((lesson) => (
-                      <button
-                        key={lesson.id}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors w-full text-left hover:bg-gray-100"
-                      >
-                        {lesson.locked ? (
-                          <Lock className="w-5 h-5 text-gray-400" />
-                        ) : lesson.type === 'article' ? (
-                          <FileText className="w-5 h-5 text-gray-600" />
-                        ) : (
-                          <Play className="w-5 h-5 text-gray-600" />
-                        )}
-                        <div className="flex-1">
-                          <p className="text-sm font-medium line-clamp-1">{lesson.title}</p>
-                          <p className="text-[10px] text-gray-500">
-                            {lesson.locked ? 'Inscription requise' : `${lesson.type === 'video' ? 'Vidéo' : 'Lecture'} • ${lesson.duration}`}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
+            {modules.length === 0 ? (
+              <p className="text-xs text-gray-400 px-3">Aucun contenu disponible.</p>
+            ) : (
+              <div className="flex flex-col gap-6">
+                {modules.map((module) => (
+                  <div key={module.id}>
+                    <h3 className="text-[10px] font-bold uppercase tracking-widest mb-3 px-3 text-gray-500">
+                      {module.title}
+                    </h3>
+                    <div className="flex flex-col gap-1">
+                      {module.lecons.map((lecon) => {
+                        const isLocked = !lecon.is_preview;
+                        const isActive = activeLecon?.id === lecon.id;
+                        return (
+                          <button
+                            key={lecon.id}
+                            onClick={() => lecon.is_preview ? setActiveLecon(lecon) : undefined}
+                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors w-full text-left ${
+                              isActive ? "bg-[#E05017]/10 text-[#E05017]" : "hover:bg-gray-100"
+                            } ${isLocked ? "cursor-default opacity-70" : "cursor-pointer"}`}
+                          >
+                            {isLocked ? (
+                              <Lock className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                            ) : lecon.type === 'video' ? (
+                              <Play className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#E05017]" : "text-gray-600"}`} />
+                            ) : lecon.type === 'pdf' ? (
+                              <FileText className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#E05017]" : "text-blue-500"}`} />
+                            ) : (
+                              <FileText className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#E05017]" : "text-gray-600"}`} />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium line-clamp-1">{lecon.title}</p>
+                              <p className="text-[10px] text-gray-500">
+                                {isLocked
+                                  ? "Inscription requise"
+                                  : `${lecon.type === 'video' ? 'Vidéo' : lecon.type === 'pdf' ? 'PDF' : 'Lecture'}${lecon.duration_minutes ? ` • ${lecon.duration_minutes} min` : ''}`}
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* S'inscrire button */}
@@ -278,8 +322,19 @@ export default function FormationDetailPage() {
                 S'inscrire à cette formation
               </button>
             ) : (
-              <div className="text-center text-sm text-gray-500">
-                {formation.is_completed ? "Formation terminée" : formation.is_full ? "Formation complète" : "Inscriptions closes"}
+              <div className="text-center text-sm">
+                {alreadyRegistered ? (
+                  <span className="flex items-center justify-center gap-2 text-green-600 font-medium">
+                    <CheckCircle className="w-4 h-4" />
+                    Vous êtes inscrit
+                  </span>
+                ) : formation.is_completed ? (
+                  <span className="text-gray-500">Formation terminée</span>
+                ) : formation.is_full ? (
+                  <span className="text-gray-500">Formation complète</span>
+                ) : (
+                  <span className="text-gray-500">Inscriptions closes</span>
+                )}
               </div>
             )}
           </div>
@@ -317,16 +372,115 @@ export default function FormationDetailPage() {
               </button>
             </div>
 
-            {/* Thumbnail */}
-            <div className="mb-8">
-              <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl bg-gray-200">
-                <ImageWithFallback
-                  src={formation.thumbnail_url}
-                  alt={formation.title}
-                  className="w-full h-full object-cover"
-                />
+            {/* Active Leçon Viewer */}
+            {activeLecon ? (
+              <div className="mb-8">
+                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                  <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-gray-50">
+                    {activeLecon.type === 'video' && <Play className="w-4 h-4 text-red-500" />}
+                    {activeLecon.type === 'pdf' && <FileText className="w-4 h-4 text-blue-500" />}
+                    {activeLecon.type === 'text' && <BookOpen className="w-4 h-4 text-green-500" />}
+                    <span className="font-semibold text-sm text-gray-800">{activeLecon.title}</span>
+                    {activeLecon.duration_minutes && (
+                      <span className="text-xs text-gray-400 ml-auto">{activeLecon.duration_minutes} min</span>
+                    )}
+                  </div>
+                  <div>
+                    {/* Vidéo */}
+                    {activeLecon.type === 'video' && activeLecon.content && (
+                      <div className="relative aspect-video bg-black">
+                        <iframe
+                          src={getEmbedUrl(activeLecon.content)}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    )}
+                    {activeLecon.type === 'video' && !activeLecon.content && (
+                      <div className="flex flex-col items-center justify-center py-12 text-gray-400 gap-2">
+                        <Play className="w-10 h-10" />
+                        <p className="text-sm">Aucune URL vidéo renseignée</p>
+                      </div>
+                    )}
+                    {/* PDF de support lié à la vidéo */}
+                    {activeLecon.type === 'video' && activeLecon.file_url && (
+                      <div className="border-t border-gray-100 p-4 bg-gray-50 flex items-center gap-3">
+                        <FileText className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                        <span className="text-sm text-gray-700 flex-1">Support de cours (PDF)</span>
+                        <a
+                          href={activeLecon.file_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700"
+                        >
+                          <Download className="w-4 h-4" />
+                          Télécharger
+                        </a>
+                      </div>
+                    )}
+
+                    {/* PDF embarqué */}
+                    {activeLecon.type === 'pdf' && activeLecon.file_url && (
+                      <div className="flex flex-col">
+                        <iframe
+                          src={activeLecon.file_url}
+                          className="w-full border-0"
+                          style={{ height: '70vh', minHeight: 500 }}
+                          title={activeLecon.title}
+                        />
+                        <div className="flex justify-end p-3 border-t border-gray-100 bg-gray-50">
+                          <a
+                            href={activeLecon.file_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700"
+                          >
+                            <Download className="w-4 h-4" />
+                            Télécharger
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                    {activeLecon.type === 'pdf' && !activeLecon.file_url && (
+                      <div className="flex flex-col items-center justify-center py-12 text-gray-400 gap-2">
+                        <FileText className="w-10 h-10" />
+                        <p className="text-sm">PDF non disponible</p>
+                      </div>
+                    )}
+
+                    {/* Texte */}
+                    {activeLecon.type === 'text' && activeLecon.content && (
+                      <div
+                        className="p-6 text-gray-700 leading-relaxed text-base"
+                        style={{
+                          lineHeight: '1.75',
+                          fontSize: '15px',
+                        }}
+                        dangerouslySetInnerHTML={{ __html: activeLecon.content }}
+                      />
+                    )}
+                    {activeLecon.type === 'text' && !activeLecon.content && (
+                      <div className="flex flex-col items-center justify-center py-12 text-gray-400 gap-2">
+                        <BookOpen className="w-10 h-10" />
+                        <p className="text-sm">Aucun contenu texte</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : (
+              /* Thumbnail */
+              <div className="mb-8">
+                <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl bg-gray-200">
+                  <ImageWithFallback
+                    src={formation.thumbnail_url}
+                    alt={formation.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Inscription form (inline) */}
             {showInscription && canRegister && (

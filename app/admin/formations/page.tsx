@@ -362,6 +362,13 @@ export default function FormationsPage() {
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
+                        onClick={() => router.push(`/admin/formations/${formation.slug}/contenu`)}
+                        className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                        title="Gérer le contenu"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                      </button>
+                      <button
                         onClick={() => router.push(`/admin/formations/${formation.slug}/modifier`)}
                         className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                         title="Modifier"
@@ -562,6 +569,16 @@ export default function FormationsPage() {
                   <button
                     onClick={() => {
                       setIsModalOpen(false);
+                      router.push(`/admin/formations/${selectedFormation.slug}/contenu`);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-bold"
+                  >
+                    <BookOpen className="w-5 h-5" />
+                    Contenu
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsModalOpen(false);
                       router.push(`/admin/formations/${selectedFormation.slug}/modifier`);
                     }}
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold"
@@ -574,7 +591,7 @@ export default function FormationsPage() {
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-bold"
                   >
                     {selectedFormation.is_published
-                      ? "Mettre en brouillon"
+                      ? "Brouillon"
                       : "Publier"}
                   </button>
                 </div>

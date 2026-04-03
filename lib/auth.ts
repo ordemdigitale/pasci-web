@@ -19,12 +19,16 @@ export const getToken = (): string | null => {
 export const setToken = (token: string): void => {
   if (typeof window !== "undefined") {
     localStorage.setItem(TOKEN_KEY, token);
+    // Cookie lisible par le middleware Next.js pour la protection des routes
+    document.cookie = `auth_token=${token}; path=/; SameSite=Lax`;
   }
 };
 
 export const removeToken = (): void => {
   if (typeof window !== "undefined") {
     localStorage.removeItem(TOKEN_KEY);
+    // Supprimer aussi le cookie
+    document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
   }
 };
 

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from '@/components/ui/button'
 import { ImageWithFallback } from '@/lib/imageWithFallback'
 import {
   Search,
@@ -11,97 +10,8 @@ import {
   MapPin
 } from "lucide-react";
 import { IJobs } from '@/types/api.types';
+import { API_BASE_URL } from "@/lib/api-config";
 import Link from "next/link";
-
-interface IJobItem {
-  id: number;
-  title: string;
-  description: string;
-  location: string;
-  type: string;
-}
-
-// Mock data de fallback
-const mockJobs: IJobs[] = [
-  {
-    id: "1",
-    title: 'Chargé de Mission Innovation',
-    description: 'Rejoignez notre équipe dynamique pour piloter des initiatives stratégiques au sein de l\'espace collaboratif PASCI. Vous serez au cœur de l\'innovation sociale et environnementale en Afrique de l\'Ouest.',
-    location: 'Abidjan, Côte d\'Ivoire',
-    type: 'CDI',
-    slug: 'charge-mission-innovation',
-    employer: 'PASCI Côte d\'Ivoire',
-    publication_date: new Date().toISOString(),
-    is_expired: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  },
-  {
-    id: "2",
-    title: 'Responsable Communication Digitale',
-    description: 'Nous recherchons un(e) Responsable Communication Digitale passionné(e) pour développer et animer notre présence en ligne. Vous serez en charge de la stratégie digitale et de l\'engagement de nos communautés.',
-    location: 'Dakar, Sénégal',
-    type: 'CDD',
-    slug: 'responsable-communication-digitale',
-    employer: 'PASCI Sénégal',
-    publication_date: new Date(Date.now() - 86400000).toISOString(),
-    is_expired: false,
-    created_at: new Date(Date.now() - 86400000).toISOString(),
-    updated_at: new Date(Date.now() - 86400000).toISOString()
-  },
-  {
-    id: "3",
-    title: 'Chef de Projet Développement Durable',
-    description: 'Pilotez des projets d\'envergure dans le domaine du développement durable et de la responsabilité sociétale. Vous coordonnerez des initiatives multi-partenaires et contribuerez à l\'impact positif de PASCI.',
-    location: 'Ouagadougou, Burkina Faso',
-    type: 'CDI',
-    slug: 'chef-projet-developpement-durable',
-    employer: 'PASCI Burkina Faso',
-    publication_date: new Date(Date.now() - 172800000).toISOString(),
-    is_expired: false,
-    created_at: new Date(Date.now() - 172800000).toISOString(),
-    updated_at: new Date(Date.now() - 172800000).toISOString()
-  },
-  {
-    id: "4",
-    title: 'Analyste de Données Impact',
-    description: 'Transformez les données en insights stratégiques pour mesurer et optimiser l\'impact de nos programmes. Vous développerez des outils d\'analyse et de reporting pour nos partenaires.',
-    location: 'Dakar, Sénégal',
-    type: 'CDI',
-    slug: 'analyste-donnees-impact',
-    employer: 'PASCI Sénégal',
-    publication_date: new Date(Date.now() - 259200000).toISOString(),
-    is_expired: false,
-    created_at: new Date(Date.now() - 259200000).toISOString(),
-    updated_at: new Date(Date.now() - 259200000).toISOString()
-  },
-  {
-    id: "5",
-    title: 'Coordonnateur RSE Senior',
-    description: 'Accompagnez les entreprises dans leur démarche RSE et favorisez les partenariats stratégiques. Vous serez l\'interface entre le secteur privé et les organisations de la société civile.',
-    location: 'Abidjan, Côte d\'Ivoire',
-    type: 'CDI',
-    slug: 'coordonnateur-rse-senior',
-    employer: 'PASCI Côte d\'Ivoire',
-    publication_date: new Date(Date.now() - 345600000).toISOString(),
-    is_expired: false,
-    created_at: new Date(Date.now() - 345600000).toISOString(),
-    updated_at: new Date(Date.now() - 345600000).toISOString()
-  },
-  {
-    id: "6",
-    title: 'Assistant(e) de Direction',
-    description: 'Apportez votre soutien à l\'équipe de direction dans la gestion quotidienne et la coordination des activités de PASCI. Un rôle polyvalent au cœur de notre organisation.',
-    location: 'Lomé, Togo',
-    type: 'CDD',
-    slug: 'assistant-direction',
-    employer: 'PASCI Togo',
-    publication_date: new Date(Date.now() - 432000000).toISOString(),
-    is_expired: false,
-    created_at: new Date(Date.now() - 432000000).toISOString(),
-    updated_at: new Date(Date.now() - 432000000).toISOString()
-  },
-];
 
 const faqCategories = [
   { id: 1, title: 'Comment puis-je postuler à une offre d\'emploi ?', answer: "Pour postuler à une offre d'emploi, veuillez consulter les offres disponibles sur notre site et cliquez sur le bouton Postuler", isOpen: false },
@@ -114,7 +24,7 @@ const faqCategories = [
 
 export default function PageOffreEmploi() {
   const router = useRouter();
-  const [jobs, setJobs] = useState<IJobs[]>(mockJobs);
+  const [jobs, setJobs] = useState<IJobs[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openFaqs, setOpenFaqs] = useState<number[]>([]);
@@ -124,40 +34,14 @@ export default function PageOffreEmploi() {
   const [selectedDate, setSelectedDate] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Timeout de 3 secondes pour l'appel API
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-        const response = await fetch('https://api.plateforme-osci.org/api/v1/jobs', {
-          signal: controller.signal
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const result = await response.json();
-        if (result && result.length > 0) {
-          setJobs(result);
-          setError(null);
-        }
-      } catch (error: any) {
-        console.log("Erreur lors du chargement des offres:", error);
-        if (error.name === 'AbortError') {
-          setError("Le serveur met trop de temps à répondre. Affichage des données de démonstration.");
-        } else {
-          setError("Impossible de charger les offres depuis le serveur. Affichage des données de démonstration.");
-        }
-        // On garde les données mock en cas d'erreur
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    fetch(`${API_BASE_URL}/api/v1/jobs`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data) => setJobs(Array.isArray(data) ? data : []))
+      .catch(() => setError("Impossible de charger les offres d'emploi."))
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
