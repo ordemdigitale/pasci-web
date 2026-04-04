@@ -13,6 +13,8 @@ import {
   LogOut,
   Loader2,
   Calendar,
+  Award,
+  ExternalLink,
 } from "lucide-react";
 import { authService, getToken, fetchWithAuth } from "@/lib/auth";
 import { IUser } from "@/types/api.types";
@@ -32,6 +34,9 @@ export default function ProfilePage() {
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
+  const [certificats, setCertificats] = useState<any[]>([]);
+  const [loadingCerts, setLoadingCerts] = useState(false);
+  const [showAllCerts, setShowAllCerts] = useState(false);
 
   useEffect(() => {
     const token = getToken();
@@ -47,6 +52,13 @@ export default function ProfilePage() {
         setLastName(u.last_name || "");
         setUsername(u.username || "");
         setBio(u.bio || "");
+        // Charger les certificats
+        setLoadingCerts(true);
+        fetchWithAuth(`${API_BASE_URL}/api/v1/formations/mes-certificats`)
+          .then((r) => r.json())
+          .then((data) => setCertificats(Array.isArray(data) ? data : []))
+          .catch(() => {})
+          .finally(() => setLoadingCerts(false));
       })
       .catch(() => router.replace("/auth/login"))
       .finally(() => setLoading(false));
@@ -255,6 +267,63 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* Mes Certificats */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <Award className="w-5 h-5 text-[#E05017]" />
+                  Mes Certificats
+                  {certificats.length > 0 && (
+                    <span className="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                      {certificats.length}
+                    </span>
+                  )}
+                </h2>
+              </div>
+              {loadingCerts ? (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+                </div>
+              ) : certificats.length === 0 ? (
+                <p className="text-gray-400 text-sm">Aucun certificat pour le moment.</p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {(showAllCerts ? certificats : certificats.slice(0, 4)).map((cert) => (
+                      <a
+                        key={cert.id}
+                        href={`/certificat/${cert.code}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg hover:border-[#E05017] hover:bg-orange-50 transition-all"
+                      >
+                        <div className="shrink-0 w-9 h-9 rounded-full bg-[#E05017]/10 flex items-center justify-center group-hover:bg-[#E05017]/20 transition-colors">
+                          <Award className="w-4 h-4 text-[#E05017]" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-gray-900 text-xs leading-tight truncate">{cert.formation_title}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            {new Date(cert.issued_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
+                            {" · "}
+                            <span className="font-mono font-bold text-amber-600">{cert.code}</span>
+                          </p>
+                        </div>
+                        <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#E05017] shrink-0 transition-colors" />
+                      </a>
+                    ))}
+                  </div>
+                  {certificats.length > 4 && (
+                    <button
+                      onClick={() => setShowAllCerts(!showAllCerts)}
+                      className="mt-3 w-full text-sm text-[#E05017] hover:underline font-medium py-1"
+                    >
+                      {showAllCerts ? "Voir moins" : `Voir les ${certificats.length - 4} autres certificats`}
+                    </button>
+                  )}
+                </>
+              )}
             </div>
 
             {/* Biographie */}

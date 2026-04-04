@@ -29,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${karla.variable} ${poppins.variable} antialiased`}>
-      <body>
+      <body suppressHydrationWarning>
         <Navbar />
         <SubMenu />
         {children}

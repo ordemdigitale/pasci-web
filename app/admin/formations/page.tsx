@@ -369,6 +369,13 @@ export default function FormationsPage() {
                         <BookOpen className="w-4 h-4" />
                       </button>
                       <button
+                        onClick={() => router.push(`/admin/formations/${formation.slug}/inscriptions`)}
+                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        title="Gérer les inscriptions"
+                      >
+                        <Users className="w-4 h-4" />
+                      </button>
+                      <button
                         onClick={() => router.push(`/admin/formations/${formation.slug}/modifier`)}
                         className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                         title="Modifier"
@@ -575,6 +582,16 @@ export default function FormationsPage() {
                   >
                     <BookOpen className="w-5 h-5" />
                     Contenu
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      router.push(`/admin/formations/${selectedFormation.slug}/inscriptions`);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold"
+                  >
+                    <Users className="w-5 h-5" />
+                    Inscrits
                   </button>
                   <button
                     onClick={() => {
