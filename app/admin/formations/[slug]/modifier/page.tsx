@@ -40,8 +40,8 @@ const formationSchema = z.object({
   registration_deadline: z.string().optional().nullable(),
   max_participants: z.number().int().positive().optional().nullable(),
   current_participants: z.number().int().nonnegative().optional().nullable(),
-  registration_link: z.string().url("Lien invalide").or(z.literal("")).optional().nullable(),
-  materials_link: z.string().url("Lien invalide").or(z.literal("")).optional().nullable(),
+  registration_link: z.string().optional().nullable(),
+  materials_link: z.string().optional().nullable(),
   is_published: z.boolean(),
   is_completed: z.boolean(),
   type: z.enum(["gratuite", "payante"]),
@@ -159,8 +159,8 @@ export default function AdminModifierFormation() {
         formData.append("max_participants", values.max_participants.toString());
       if (values.current_participants !== null && values.current_participants !== undefined)
         formData.append("current_participants", values.current_participants.toString());
-      if (values.registration_link) formData.append("registration_link", values.registration_link);
-      if (values.materials_link) formData.append("materials_link", values.materials_link);
+      formData.append("registration_link", values.registration_link || "");
+      formData.append("materials_link", values.materials_link || "");
       formData.append("is_published", values.is_published.toString());
       formData.append("is_completed", values.is_completed.toString());
       formData.append("type", values.type);
