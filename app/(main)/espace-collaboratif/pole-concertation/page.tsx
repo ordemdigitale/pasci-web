@@ -7,6 +7,14 @@ import { API_ENDPOINTS } from "@/lib/api-config";
 import { IPoleConcertation } from "@/types/api.types";
 import { Search, MessageSquare } from "lucide-react";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+function getPoleImageUrl(imagePath?: string | null): string {
+  if (!imagePath) return "/images/placeholder.jpg";
+  if (imagePath.startsWith("http") || imagePath.startsWith("/")) return imagePath;
+  return `${API_BASE}/static/${imagePath}`;
+}
+
 export default function PagePoleConcertation() {
   const [poles, setPoles] = useState<IPoleConcertation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,7 +104,7 @@ export default function PagePoleConcertation() {
                   >
                     <div className="relative h-44">
                       <ImageWithFallback
-                        src={pole.image_path || "/images/placeholder.jpg"}
+                        src={getPoleImageUrl(pole.image_path)}
                         alt={pole.name}
                         className="w-full h-full object-cover"
                       />

@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { fetchWithAuth } from "@/lib/auth";
-import { ArrowLeft, Plus, Trash2, Loader2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Loader2, Image as ImageIcon, X } from "lucide-react";
 
 const CATEGORIES = [
   "Gouvernance",
@@ -33,7 +33,8 @@ export default function AdminModifierPolePage() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
-  const [imagePath, setImagePath] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isActive, setIsActive] = useState(true);
   const [objectifs, setObjectifs] = useState<string[]>([""]);
 
@@ -44,7 +45,11 @@ export default function AdminModifierPolePage() {
         setName(data.name || "");
         setCategory(data.category || "");
         setDescription(data.description || "");
-        setImagePath(data.image_path || "");
+        if (data.image_path) {
+          const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+          const url = data.image_path.startsWith("/") ? data.image_path : `${API_BASE}/static/${data.image_path}`;
+          setImagePreview(url);
+        }
         setIsActive(data.is_active ?? true);
         try {
           const parsed = data.objectifs ? JSON.parse(data.objectifs) : [];
@@ -76,18 +81,17 @@ export default function AdminModifierPolePage() {
     setError("");
     try {
       const filteredObjectifs = objectifs.filter((o) => o.trim());
-      const body = {
-        name: name.trim(),
-        category: category || null,
-        description: description.trim() || null,
-        image_path: imagePath.trim() || null,
-        is_active: isActive,
-        objectifs: filteredObjectifs.length > 0 ? JSON.stringify(filteredObjectifs) : null,
-      };
+      const formData = new FormData();
+      formData.append("name", name.trim());
+      formData.append("category", category || "");
+      formData.append("description", description.trim());
+      formData.append("is_active", String(isActive));
+      formData.append("objectifs", filteredObjectifs.length > 0 ? JSON.stringify(filteredObjectifs) : "");
+      if (image) formData.append("image", image);
+
       const res = await fetchWithAuth(API_ENDPOINTS.forum.poleBySlug(poleSlug), {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: formData,
       });
       if (!res.ok) {
         const data = await res.json();
@@ -168,15 +172,43 @@ export default function AdminModifierPolePage() {
             />
           </div>
 
-          {/* Image URL */}
+          {/* Image */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">URL de l'image</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Image de couverture</label>
+            <div
+              className="relative border-2 border-dashed border-gray-300 rounded-lg overflow-hidden cursor-pointer hover:border-[#E05017] transition-colors"
+              style={{ height: "160px" }}
+              onClick={() => document.getElementById("pole-image-input-edit")?.click()}
+            >
+              {imagePreview ? (
+                <>
+                  <img src={imagePreview} alt="Aperçu" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setImage(null); setImagePreview(null); }}
+                    className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-red-50"
+                  >
+                    <X className="w-4 h-4 text-red-500" />
+                  </button>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
+                  <ImageIcon className="w-8 h-8" />
+                  <span className="text-sm">Cliquer pour ajouter une image</span>
+                  <span className="text-xs">JPG, PNG, WEBP</span>
+                </div>
+              )}
+            </div>
             <input
-              type="text"
-              value={imagePath}
-              onChange={(e) => setImagePath(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
-              placeholder="/images/pole.jpg"
+              id="pole-image-input-edit"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0] ?? null;
+                setImage(file);
+                if (file) setImagePreview(URL.createObjectURL(file));
+              }}
             />
           </div>
 
