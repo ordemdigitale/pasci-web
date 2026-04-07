@@ -55,7 +55,7 @@ function LoginForm() {
               </h2>
               <p className="text-gray-700 mb-6">
                 Connectez-vous pour accéder à votre espace personnel et profiter de tous les services
-                de la plateforme d'appui à la société civile ivoirienne.
+                du Pôle de concertation des OSC membres des CRASC notamment :
               </p>
 
               <div className="space-y-4">
@@ -63,25 +63,25 @@ function LoginForm() {
                   <div className="w-6 h-6 bg-[#E05017] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-white text-xs font-bold">✓</span>
                   </div>
-                  <p className="text-gray-700">Accédez aux formations en ligne</p>
+                  <p className="text-gray-700">Participer aux discussions ;</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-[#E05017] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-white text-xs font-bold">✓</span>
                   </div>
-                  <p className="text-gray-700">Participez à l'espace collaboratif</p>
+                  <p className="text-gray-700">Accéder aux formations en ligne ;</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-[#E05017] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-white text-xs font-bold">✓</span>
                   </div>
-                  <p className="text-gray-700">Consultez les offres d'emploi et de projets</p>
+                  <p className="text-gray-700">Consulter les offres d'emploi et de projets de votre domaine ;</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-[#E05017] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-white text-xs font-bold">✓</span>
                   </div>
-                  <p className="text-gray-700">Bénéficiez d'un accompagnement personnalisé</p>
+                  <p className="text-gray-700">Bénéficiez d'un accompagnement personnalisé.</p>
                 </div>
               </div>
             </div>
