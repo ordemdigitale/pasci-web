@@ -269,7 +269,7 @@ export default function Navbar() {
 
       {/* Ticker / Bande défilante */}
       {(() => {
-        const tickerItems = annonces.length > 0
+        const baseItems = annonces.length > 0
           ? annonces.map((a) => a.texte)
           : [
               "Bienvenue sur la Plateforme PASCI — Portail d'Appui à la Société Civile en Côte d'Ivoire",
@@ -277,6 +277,9 @@ export default function Navbar() {
               "✦ Rejoignez le Pôle de concertation des OSC membres des CRASC",
               "✦ Nouvelles offres d'emploi disponibles — Consultez l'espace collaboratif",
             ];
+        // Répéter assez pour garantir que chaque moitié dépasse l'écran
+        const repeat = Math.max(1, Math.ceil(8 / baseItems.length));
+        const tickerItems = Array(repeat).fill(baseItems).flat();
         return (
           <div className="bg-[#052838] text-white py-2 overflow-hidden font-poppins flex items-center">
             <span className="bg-[#E05017] text-white text-xs font-bold px-3 py-1 shrink-0 z-10 mr-3 self-stretch flex items-center">
@@ -284,13 +287,13 @@ export default function Navbar() {
             </span>
             <div className="overflow-hidden flex-1">
               <div
-                className="flex gap-12 whitespace-nowrap"
+                className="flex whitespace-nowrap"
                 style={{ animation: "ticker 35s linear infinite", width: "max-content" }}
               >
                 {[0, 1].map((copy) => (
-                  <div key={copy} className="flex gap-12 whitespace-nowrap">
+                  <div key={copy} className="flex whitespace-nowrap">
                     {tickerItems.map((texte, i) => (
-                      <span key={i} className="text-sm text-gray-200">{texte}</span>
+                      <span key={i} className="text-sm text-gray-200 px-10">{texte}</span>
                     ))}
                   </div>
                 ))}
