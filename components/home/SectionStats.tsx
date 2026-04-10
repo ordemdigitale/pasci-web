@@ -109,8 +109,22 @@ export default function Stats() {
     { id: 4, name: "projets", number: 120 }
   ];
 
+  const SORT_ORDER: Record<string, number> = {
+    "crasc": 0,
+    "régions": 1,
+    "osc": 2,
+    "projets": 3,
+  };
+
+  const DISPLAY_LABEL: Record<string, string> = {
+    "régions": "Régions et districts",
+  };
+
   // Utiliser les données de l'API si disponibles, sinon utiliser les données mock
-  const displayStats = keyStats && keyStats.length > 0 ? keyStats : mockStats;
+  const rawStats = keyStats && keyStats.length > 0 ? keyStats : mockStats;
+  const displayStats = [...rawStats].sort(
+    (a, b) => (SORT_ORDER[a.name] ?? 99) - (SORT_ORDER[b.name] ?? 99)
+  );
 
   return (
     <section className="py-12 bg-gradient-to-b from-gray-50 to-white font-poppins">
@@ -169,7 +183,7 @@ export default function Stats() {
 
                     {/* Label */}
                     <p className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/90 transition-colors duration-300">
-                      {item.name}
+                      {DISPLAY_LABEL[item.name] || item.name}
                     </p>
 
                     {/* Decorative element */}
