@@ -10,7 +10,7 @@ interface Formation {
   id: number;
   title: string;
   description: string | null;
-  image_url: string | null;
+  thumbnail_url: string | null;
   slug: string;
   type?: string;
 }
@@ -111,7 +111,7 @@ export default function SectionFormations() {
                     <div className="group bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-[#E05017]/30 transition-all duration-300 hover:shadow-xl h-full">
                       <div className="relative h-48 overflow-hidden">
                         <ImageWithFallback
-                          src={formation.image_url || "/images/placeholder.jpg"}
+                          src={formation.thumbnail_url || "/images/placeholder.jpg"}
                           alt={formation.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />

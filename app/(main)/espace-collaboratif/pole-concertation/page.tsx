@@ -102,14 +102,6 @@ export default function PagePoleConcertation() {
                     key={pole.id}
                     className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col"
                   >
-                    <div className="relative h-44">
-                      <ImageWithFallback
-                        src={getPoleImageUrl(pole.image_path)}
-                        alt={pole.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
                     <div className="p-5 flex-1 flex flex-col">
                       <div className="inline-block px-3 py-1 rounded-md text-xs font-semibold text-white mb-3 bg-[#E05017] self-start">
                         {pole.category}

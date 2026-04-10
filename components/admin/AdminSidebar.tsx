@@ -12,6 +12,7 @@ import {
   X,
   BookOpen,
   MessageSquare,
+  Megaphone,
 } from "lucide-react";
 
 interface NavItem {
@@ -64,6 +65,7 @@ export default function AdminSidebar({
         { label: "Offres de Projets", href: "/admin/projets" },
         { label: "Offres d'emploi", href: "/admin/emplois" },
         { label: "Actualités", href: "/admin/actualites" },
+      { label: "Bande défilante", href: "/admin/annonces" },
       ],
     },
     {

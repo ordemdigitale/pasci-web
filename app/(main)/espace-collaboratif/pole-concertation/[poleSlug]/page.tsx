@@ -160,7 +160,7 @@ export default function PagePoleForum() {
             href="/auth/login"
             className="text-sm text-[#E05017] font-semibold hover:underline"
           >
-            Connectez-vous pour participer
+            Se connecter pour participer
           </Link>
         )}
       </div>

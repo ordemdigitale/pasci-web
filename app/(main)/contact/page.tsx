@@ -11,6 +11,9 @@ export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    fonction: '',
+    sexe: '',
+    tranche_age: '',
     message: '',
   });
 
@@ -99,6 +102,56 @@ export default function ContactPage() {
                     required
                     className="bg-[#f5f5f5] border-gray-200 focus:border-[#ff8c42] focus:ring-[#ff8c42]"
                   />
+                </div>
+
+                {/* Fonction */}
+                <div className="space-y-2">
+                  <label htmlFor="fonction" className="text-gray-700 font-medium">Fonction</label>
+                  <Input
+                    id="fonction"
+                    name="fonction"
+                    type="text"
+                    placeholder="Votre fonction"
+                    value={formData.fonction}
+                    onChange={handleChange}
+                    className="bg-[#f5f5f5] border-gray-200 focus:border-[#ff8c42] focus:ring-[#ff8c42]"
+                  />
+                </div>
+
+                {/* Sexe & Tranche d'âge */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="sexe" className="text-gray-700 font-medium">Sexe</label>
+                    <select
+                      id="sexe"
+                      name="sexe"
+                      value={formData.sexe}
+                      onChange={(e) => setFormData({ ...formData, sexe: e.target.value })}
+                      className="w-full bg-[#f5f5f5] border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#ff8c42] focus:ring-1 focus:ring-[#ff8c42]"
+                    >
+                      <option value="">-- Sélectionner --</option>
+                      <option value="Homme">Homme</option>
+                      <option value="Femme">Femme</option>
+                      <option value="Autre">Autre</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="tranche_age" className="text-gray-700 font-medium">Tranche d'âge</label>
+                    <select
+                      id="tranche_age"
+                      name="tranche_age"
+                      value={formData.tranche_age}
+                      onChange={(e) => setFormData({ ...formData, tranche_age: e.target.value })}
+                      className="w-full bg-[#f5f5f5] border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#ff8c42] focus:ring-1 focus:ring-[#ff8c42]"
+                    >
+                      <option value="">-- Sélectionner --</option>
+                      <option value="Moins de 25 ans">Moins de 25 ans</option>
+                      <option value="25-35 ans">25-35 ans</option>
+                      <option value="36-45 ans">36-45 ans</option>
+                      <option value="46-55 ans">46-55 ans</option>
+                      <option value="Plus de 55 ans">Plus de 55 ans</option>
+                    </select>
+                  </div>
                 </div>
 
                 {/* Message Field */}

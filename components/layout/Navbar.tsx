@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from "next/navigation";
@@ -46,6 +46,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isEspaceCollabSubmenuOpen, setIsEspaceCollabSubmenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<IUser | null>(null);
+  const [annonces, setAnnonces] = useState<{ id: number; texte: string }[]>([]);
   const pathname = usePathname();
   const router = useRouter();
   const isActive = (path: Url) => pathname === path;
@@ -53,6 +54,14 @@ export default function Navbar() {
   useEffect(() => {
     setCurrentUser(getStoredUser());
   }, [pathname]);
+
+  useEffect(() => {
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    fetch(`${API_BASE}/api/v1/annonces?active_only=true`)
+      .then((r) => r.ok ? r.json() : [])
+      .then((data) => { if (Array.isArray(data) && data.length > 0) setAnnonces(data); })
+      .catch(() => {});
+  }, []);
 
   function handleLogout() {
     authService.logout();
@@ -257,6 +266,39 @@ export default function Navbar() {
           )}
         </div>
       </nav>
+
+      {/* Ticker / Bande défilante */}
+      {(() => {
+        const tickerItems = annonces.length > 0
+          ? annonces.map((a) => a.texte)
+          : [
+              "Bienvenue sur la Plateforme PASCI — Portail d'Appui à la Société Civile en Côte d'Ivoire",
+              "✦ Consultez les dernières formations disponibles dans votre région",
+              "✦ Rejoignez le Pôle de concertation des OSC membres des CRASC",
+              "✦ Nouvelles offres d'emploi disponibles — Consultez l'espace collaboratif",
+            ];
+        return (
+          <div className="bg-[#052838] text-white py-2 overflow-hidden font-poppins flex items-center">
+            <span className="bg-[#E05017] text-white text-xs font-bold px-3 py-1 shrink-0 z-10 mr-3 self-stretch flex items-center">
+              ANNONCES
+            </span>
+            <div className="overflow-hidden flex-1">
+              <div
+                className="flex gap-12 whitespace-nowrap"
+                style={{ animation: "ticker 35s linear infinite", width: "max-content" }}
+              >
+                {[0, 1].map((copy) => (
+                  <div key={copy} className="flex gap-12 whitespace-nowrap">
+                    {tickerItems.map((texte, i) => (
+                      <span key={i} className="text-sm text-gray-200">{texte}</span>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </header>
   )
 }

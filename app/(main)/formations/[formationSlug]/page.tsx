@@ -214,10 +214,14 @@ export default function FormationDetailPage() {
     setAvisLoading(true);
     setAvisError("");
     try {
-      const res = await fetchWithAuth(`${API_BASE_URL}/api/v1/formations/${formationSlug}/avis`, {
+      const token = getToken();
+      if (!token) { window.location.href = "/auth/login"; return; }
+      const res = await fetch(`${API_BASE_URL}/api/v1/formations/${formationSlug}/avis`, {
         method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ note: avisNote, commentaire: avisCommentaire || null }),
       });
+      if (res.status === 401) { window.location.href = "/auth/login"; return; }
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.detail || "Erreur");

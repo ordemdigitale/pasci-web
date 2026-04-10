@@ -52,7 +52,8 @@ export default function FormationsPage() {
     <section className="py-16 px-4 bg-white font-poppins">
       <div className="max-w-7xl mx-auto">
         <div className="flex gap-8">
-          {/* Left Sidebar */}
+          {/* Left Sidebar — visible uniquement s'il y a des rubriques */}
+          {rubriques.length > 0 && (
           <div className="hidden lg:block w-64 flex-shrink-0">
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <button
@@ -84,6 +85,7 @@ export default function FormationsPage() {
               ))}
             </div>
           </div>
+          )}
 
           {/* Main Content */}
           <div className="flex-1">
