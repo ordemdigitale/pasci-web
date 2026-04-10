@@ -94,7 +94,7 @@ export default function ModifierRegionPage({ params }: { params: Promise<{ regio
             href="/admin/gestion-des-crasc/regions"
             className="inline-block mt-4 text-blue-600 hover:text-blue-800 underline"
           >
-            Retour à la liste des régions
+            Retour à la liste des régions et districts
           </Link>
         </div>
       </div>
@@ -110,7 +110,7 @@ export default function ModifierRegionPage({ params }: { params: Promise<{ regio
           className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Retour à la liste des régions
+          Retour à la liste des régions et districts
         </Link>
         <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <MapPin className="w-8 h-8 text-green-600" />

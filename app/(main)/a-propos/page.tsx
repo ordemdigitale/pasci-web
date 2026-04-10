@@ -56,16 +56,16 @@ export default async function AboutPage() {
           </ul>
 
           <h4 className="font-bold text-lg pt-4 pb-2">Les zones de couvertures par CRASC</h4>
-          <p className='pb-3'>CRASC Centre, <span className='font-bold'>(05 Régions)</span>: BÉLIER (Toumodi), GBÊKÈ (Bouake), HAMBOL (Katiola), MARAHOUÉ (Bouaflé), N&#39;ZI (Dimbokro)</p>
+          <p className='pb-3'>CRASC Centre, <span className='font-bold'>(05 Régions et districts)</span>: BÉLIER (Toumodi), GBÊKÈ (Bouake), HAMBOL (Katiola), MARAHOUÉ (Bouaflé), N&#39;ZI (Dimbokro)</p>
 
-          <p className='pb-3'>CRASC Est, <span className='font-bold'>(04 Régions)</span>: BOUNKANI (Bouna), GONTOUGO (Bondoukou), IFFOU (Daoukro), MORONOU (Bongouanou)</p>
+          <p className='pb-3'>CRASC Est, <span className='font-bold'>(04 Régions et districts)</span>: BOUNKANI (Bouna), GONTOUGO (Bondoukou), IFFOU (Daoukro), MORONOU (Bongouanou)</p>
           
-          <p className='pb-3'>CRASC Nord, <span className='font-bold'>(07 Régions)</span>: BAGOUÉ (Boundiali), BERE (Mankono), (Minignan), KABADOUGOU (Odienné), PORO
+          <p className='pb-3'>CRASC Nord, <span className='font-bold'>(07 Régions et districts)</span>: BAGOUÉ (Boundiali), BERE (Mankono), (Minignan), KABADOUGOU (Odienné), PORO
           (Korhogo), FOLON (Minignan), TCHOLOGO (Ferkessédougou), WORODOUGOU (Séguéla)</p>
           
-          <p className='pb-3'>CRASC Ouest, <span className='font-bold'>(05 Régions)</span>: BAFING (Touba), CAVALLY (Guiglo), GUÉMON (Duékoué), HAUT-SASSANDRA (Daloa), TONKPI (Man)</p>
+          <p className='pb-3'>CRASC Ouest, <span className='font-bold'>(05 Régions et districts)</span>: BAFING (Touba), CAVALLY (Guiglo), GUÉMON (Duékoué), HAUT-SASSANDRA (Daloa), TONKPI (Man)</p>
 
-          <p className='pb-3'>CRASC Sud, <span className='font-bold'>(10 Régions)</span>: AGNÉBY-TIASSA (Agboville), GBOKLE (Sassandra), GOH (Gagnoa), ME (Adzopé), SAN-
+          <p className='pb-3'>CRASC Sud, <span className='font-bold'>(10 Régions et districts)</span>: AGNÉBY-TIASSA (Agboville), GBOKLE (Sassandra), GOH (Gagnoa), ME (Adzopé), SAN-
           PEDRO (Touba), GRANDS-PONTS (Dabou), INDENIE-DJUABLIN (Abengourou), LOH-DJIBOUA (Divo), NAWA
           (Soubré), SUD-COMOÉ (Aboisso), ABIDJAN.</p>
 

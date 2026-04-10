@@ -40,11 +40,11 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 export default function AnnuaireOSCPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDomaine, setSelectedDomaine] = useState('Tous les domaines');
-  const [selectedRegion, setSelectedRegion] = useState('Toutes les régions');
+  const [selectedRegion, setSelectedRegion] = useState('Toutes les régions et districts');
   const [oscData, setOscData] = useState<IOSC[]>([]);
   const [filteredOSCs, setFilteredOSCs] = useState<IOSC[]>([]);
   const [domaines, setDomaines] = useState<string[]>(["Tous les domaines"]);
-  const [regions, setRegions] = useState<string[]>(["Toutes les régions"]);
+  const [regions, setRegions] = useState<string[]>(["Toutes les régions et districts"]);
   const [visibleCount, setVisibleCount] = useState(6);
   const [loading, setLoading] = useState(true);
 
@@ -72,7 +72,7 @@ export default function AnnuaireOSCPage() {
 
         // Extract unique domaines and regions
         const uniqueDomaines = ["Tous les domaines", ...new Set(transformedOSCs.map(osc => osc.domaine || "Non spécifié"))];
-        const uniqueRegions = ["Toutes les régions", ...new Set(transformedOSCs.map(osc => osc.region || "Non spécifié"))];
+        const uniqueRegions = ["Toutes les régions et districts", ...new Set(transformedOSCs.map(osc => osc.region || "Non spécifié"))];
 
         setDomaines(uniqueDomaines);
         setRegions(uniqueRegions);
@@ -105,7 +105,7 @@ export default function AnnuaireOSCPage() {
     }
 
     // Region filter
-    if (selectedRegion !== 'Toutes les régions') {
+    if (selectedRegion !== 'Toutes les régions et districts') {
       filtered = filtered.filter(osc => osc.region === selectedRegion);
     }
 
@@ -119,7 +119,7 @@ export default function AnnuaireOSCPage() {
   const resetFilters = () => {
     setSearchQuery('');
     setSelectedDomaine('Tous les domaines');
-    setSelectedRegion('Toutes les régions');
+    setSelectedRegion('Toutes les régions et districts');
   };
 
   return (
@@ -172,7 +172,7 @@ export default function AnnuaireOSCPage() {
                 5
               </div>
               <div className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/80 transition-colors">
-                Régions Couvertes
+                Régions et districts couverts
               </div>
             </div>
           </div>
@@ -229,7 +229,7 @@ export default function AnnuaireOSCPage() {
               <p className="text-sm text-gray-600">
                 <span className="font-bold text-[#E05017]">{filteredOSCs.length}</span> OSC{filteredOSCs.length > 1 ? 's' : ''} trouvée{filteredOSCs.length > 1 ? 's' : ''}
               </p>
-              {(searchQuery || selectedDomaine !== 'Tous les domaines' || selectedRegion !== 'Toutes les régions') && (
+              {(searchQuery || selectedDomaine !== 'Tous les domaines' || selectedRegion !== 'Toutes les régions et districts') && (
                 <button
                   onClick={resetFilters}
                   className="text-sm text-[#E05017] hover:text-[#d04010] font-semibold transition-colors"

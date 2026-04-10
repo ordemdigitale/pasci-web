@@ -74,7 +74,7 @@ export default function PolesAndOpportunities() {
                   {/* Régions d'influence */}
                   <div className="mb-4">
                     <h3 className="text-base font-bold text-gray-900 mb-2">
-                      Régions d&apos;influence
+                      Régions et districts d&apos;influence
                     </h3>
                     {pole.regions.length > 0 ? (
                       <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">

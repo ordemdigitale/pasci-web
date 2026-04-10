@@ -169,7 +169,7 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center gap-1 text-green-600 text-sm font-semibold">
               <Activity className="w-4 h-4" />
-              {dashboardStats?.regions.total || 0} régions
+              {dashboardStats?.regions.total || 0} régions et districts
             </div>
           </div>
           <p className="text-gray-600 text-sm mb-1">Nombre de CRASC</p>

@@ -80,7 +80,7 @@ export default async function AdminCrascPage() {
 								<MapPin className="w-5 h-5 text-purple-600" />
 							</div>
 							<div>
-								<p className="text-sm text-gray-600 font-medium">Régions</p>
+								<p className="text-sm text-gray-600 font-medium">Régions et districts</p>
 								<p className="text-2xl font-bold text-gray-900">{allRegion.length}</p>
 							</div>
 						</div>
@@ -365,10 +365,10 @@ export default async function AdminCrascPage() {
 							<div>
 								<h3 className="text-lg font-bold text-gray-900">
 									<Link href="/admin/gestion-des-crasc/regions" className="hover:text-green-600 transition-colors">
-										Régions de Côte d'Ivoire
+										Régions et districts de Côte d'Ivoire
 									</Link>
 								</h3>
-								<p className="text-sm text-gray-600">{allRegion.length} régions</p>
+								<p className="text-sm text-gray-600">{allRegion.length} régions et districts</p>
 							</div>
 						</div>
 						<Link

@@ -66,6 +66,7 @@ export default function AdminSidebar({
         { label: "Offres d'emploi", href: "/admin/emplois" },
         { label: "Actualités", href: "/admin/actualites" },
       { label: "Bande défilante", href: "/admin/annonces" },
+      { label: "Slider accueil", href: "/admin/hero-slides" },
       ],
     },
     {

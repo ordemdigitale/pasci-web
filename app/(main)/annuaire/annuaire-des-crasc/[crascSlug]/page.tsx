@@ -144,7 +144,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                     <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                       <MapPin className="w-5 h-5 text-green-600" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900">Régions Couvertes</h3>
+                    <h3 className="text-lg font-bold text-gray-900">Régions et districts couverts</h3>
                   </div>
                   <div className="space-y-2">
                     {crascData.regions.map((region) => (
@@ -315,7 +315,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                 </div>
                 
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Régions</span>
+                  <span className="text-sm font-medium text-gray-700">Régions et districts</span>
                   <span className="text-2xl font-bold text-green-600">
                     {crascData.regions?.length || 0}
                   </span>

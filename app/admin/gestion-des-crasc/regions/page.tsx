@@ -74,9 +74,9 @@ export default function AdminRegionsPage() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <MapPin className="w-8 h-8 text-green-600" />
-              Gestion des Régions
+              Gestion des Régions et districts
             </h1>
-            <p className="text-gray-600 mt-2">Gérez les régions administratives de Côte d'Ivoire</p>
+            <p className="text-gray-600 mt-2">Gérez les régions et districts administratifs de Côte d'Ivoire</p>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -103,7 +103,7 @@ export default function AdminRegionsPage() {
               <MapPin className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600 font-medium">Total des régions</p>
+              <p className="text-sm text-gray-600 font-medium">Total des régions et districts</p>
               <p className="text-3xl font-bold text-gray-900">{regions.length}</p>
             </div>
           </div>
