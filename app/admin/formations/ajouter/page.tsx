@@ -13,7 +13,6 @@ import { fetchAllRubriques, IFormationRubrique } from "@/lib/fetch-formations";
 import {
   ArrowLeft,
   BookOpen,
-  X,
   Check,
   Loader2,
   AlertCircle,
@@ -58,8 +57,6 @@ export default function AdminAjoutFormation() {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [thumbnail, setThumbnail] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const router = useRouter();
 
   // Récupérer les CRASC, OSC et rubriques
@@ -136,7 +133,6 @@ export default function AdminAjoutFormation() {
       if (values.rubrique_id) formData.append("rubrique_id", values.rubrique_id);
       if (values.crasc_id) formData.append("crasc_id", values.crasc_id);
       if (values.osc_id) formData.append("osc_id", values.osc_id);
-      if (thumbnail) formData.append("thumbnail", thumbnail);
 
       console.log("Sending request to:", `${API_BASE_URL}/api/v1/formations`);
 
@@ -235,49 +231,6 @@ export default function AdminAjoutFormation() {
               <h2 className="text-xl font-bold text-gray-900">Informations de base</h2>
             </div>
 
-            {/* Image de couverture */}
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Image de couverture
-              </label>
-              <div
-                className="relative border-2 border-dashed border-gray-300 rounded-xl overflow-hidden cursor-pointer hover:border-[#2A591D] transition-colors"
-                style={{ height: 180 }}
-                onClick={() => document.getElementById("thumbnail-input-add")?.click()}
-              >
-                {thumbnailPreview ? (
-                  <img src={thumbnailPreview} alt="Aperçu" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
-                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-sm">Cliquer pour choisir une image</span>
-                    <span className="text-xs text-gray-400">JPG, PNG, WEBP — max 50 Mo</span>
-                  </div>
-                )}
-                {thumbnailPreview && (
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setThumbnail(null); setThumbnailPreview(null); }}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
-                  >✕</button>
-                )}
-              </div>
-              <input
-                id="thumbnail-input-add"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) {
-                    setThumbnail(f);
-                    setThumbnailPreview(URL.createObjectURL(f));
-                  }
-                }}
-              />
-            </div>
 
             {/* Titre */}
             <div className="mb-6">

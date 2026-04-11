@@ -15,6 +15,8 @@ interface Formation {
   type?: string;
 }
 
+const DEFAULT_FORMATION_IMAGE = "/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg";
+
 export default function SectionFormations() {
   const [formations, setFormations] = useState<Formation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -111,7 +113,7 @@ export default function SectionFormations() {
                     <div className="group bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-[#E05017]/30 transition-all duration-300 hover:shadow-xl h-full">
                       <div className="relative h-48 overflow-hidden">
                         <ImageWithFallback
-                          src={formation.thumbnail_url || "/images/placeholder.jpg"}
+                          src={formation.thumbnail_url || DEFAULT_FORMATION_IMAGE}
                           alt={formation.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />

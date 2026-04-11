@@ -6,6 +6,9 @@ import { Search, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback"
 import { fetchAllFormations, fetchAllRubriques, IFormation, IFormationRubrique } from '@/lib/fetch-formations';
 
+const FALLBACK_IMAGE = "/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export default function FormationsPage() {
   const [activeRubriqueId, setActiveRubriqueId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,6 +17,7 @@ export default function FormationsPage() {
   const [rubriques, setRubriques] = useState<IFormationRubrique[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [defaultImage, setDefaultImage] = useState(FALLBACK_IMAGE);
 
   useEffect(() => {
     const loadData = async () => {
@@ -34,6 +38,11 @@ export default function FormationsPage() {
       }
     };
     loadData();
+
+    fetch(`${API_BASE}/api/v1/config`)
+      .then((r) => r.ok ? r.json() : {})
+      .then((cfg: Record<string, string>) => { if (cfg.formation_default_image) setDefaultImage(cfg.formation_default_image); })
+      .catch(() => {});
   }, []);
 
   // Filter formations
@@ -164,7 +173,7 @@ export default function FormationsPage() {
                       >
                         <div className="relative h-48">
                           <ImageWithFallback
-                            src={formation.thumbnail_url}
+                            src={formation.thumbnail_url || defaultImage}
                             alt={formation.title}
                             className="w-full h-full object-cover"
                           />

@@ -20,9 +20,19 @@ import {
 } from 'lucide-react';
 
 
+const CRASC_ZONE_COLORS: Record<string, { color: string; darkColor: string }> = {
+  'crasc-nord':   { color: '#F59E42', darkColor: '#ff8c42' },
+  'crasc-est':    { color: '#FF6B8A', darkColor: '#ff5577' },
+  'crasc-centre': { color: '#5A7D5A', darkColor: '#4a6d4a' },
+  'crasc-ouest':  { color: '#4FC3DC', darkColor: '#3ab3cc' },
+  'crasc-sud':    { color: '#2E86C1', darkColor: '#2574a9' },
+};
+const DEFAULT_ZONE_COLORS = { color: '#E05017', darkColor: '#d04010' };
+
 export default function CrascRegionPage({ params }: { params: Promise<{ crascSlug: string }>; }) {
   const resolvedParams = use(params);
   const crascSlug = resolvedParams.crascSlug;
+  const zoneColors = CRASC_ZONE_COLORS[crascSlug] || DEFAULT_ZONE_COLORS;
   const [crascData, setCrascData] = useState<ICrascDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +75,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-[#E05017] animate-spin mx-auto mb-4" />
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: zoneColors.color }} />
           <p className="text-gray-600">Chargement des détails du CRASC...</p>
         </div>
       </div>
@@ -82,7 +92,8 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
             <p className="text-red-700 mb-6">{error || 'CRASC non trouvé'}</p>
             <Link
               href="/annuaire/annuaire-des-crasc"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-[#E05017] text-white font-semibold rounded-lg hover:bg-[#d04010] transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 text-white font-semibold rounded-lg transition-colors"
+              style={{ backgroundColor: zoneColors.color }}
             >
               <ArrowLeft className="w-4 h-4" />
               Retour à l'annuaire
@@ -95,8 +106,12 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white font-poppins">
+      <style>{`
+        .zone-card:hover { border-color: ${zoneColors.color} !important; }
+        .zone-card:hover .zone-title { color: ${zoneColors.color} !important; }
+      `}</style>
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#E05017] to-[#d04010] text-white py-16">
+      <div className="text-white py-16" style={{ background: `linear-gradient(to right, ${zoneColors.color}, ${zoneColors.darkColor})` }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/annuaire/annuaire-des-crasc"
@@ -204,7 +219,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                     <Link
                       key={osc.id}
                       href={`/annuaire/annuaire-des-osc/${osc.slug}`}
-                      className="group bg-gray-50 rounded-xl overflow-hidden border border-gray-200 hover:border-[#E05017] hover:shadow-md transition-all"
+                      className="zone-card group bg-gray-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition-all"
                     >
                       <div className="aspect-video overflow-hidden bg-gray-200">
                         <ImageWithFallback
@@ -214,7 +229,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                         />
                       </div>
                       <div className="p-4">
-                        <h3 className="font-bold text-gray-900 group-hover:text-[#E05017] transition-colors mb-2 line-clamp-1">
+                        <h3 className="zone-title font-bold text-gray-900 transition-colors mb-2 line-clamp-1">
                           {osc.name}
                         </h3>
                         {osc.description && (
@@ -258,7 +273,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                     <Link
                       key={news.id}
                       href={`/actualites/${news.slug}`}
-                      className="group block bg-gray-50 rounded-lg overflow-hidden border border-gray-200 hover:border-[#E05017] hover:shadow-md transition-all"
+                      className="zone-card group block bg-gray-50 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
                     >
                       {news.thumbnail_url && (
                         <div className="aspect-video overflow-hidden bg-gray-200">
@@ -270,7 +285,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                         </div>
                       )}
                       <div className="p-4">
-                        <h3 className="font-bold text-gray-900 group-hover:text-[#E05017] transition-colors line-clamp-2 mb-2">
+                        <h3 className="zone-title font-bold text-gray-900 transition-colors line-clamp-2 mb-2">
                           {news.title}
                         </h3>
                         {news.created_at && (
@@ -332,7 +347,8 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <Link
                   href="/contact"
-                  className="block w-full text-center px-4 py-3 bg-gradient-to-r from-[#E05017] to-[#d04010] text-white font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+                  className="block w-full text-center px-4 py-3 text-white font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+                  style={{ background: `linear-gradient(to right, ${zoneColors.color}, ${zoneColors.darkColor})` }}
                 >
                   Contacter le CRASC
                 </Link>

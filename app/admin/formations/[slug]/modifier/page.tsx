@@ -13,7 +13,6 @@ import { getFormationBySlug, fetchAllRubriques, IFormationRubrique } from "@/lib
 import {
   ArrowLeft,
   BookOpen,
-  X,
   Check,
   Loader2,
   AlertCircle,
@@ -24,7 +23,6 @@ import {
   Link as LinkIcon,
   Tag,
   DollarSign,
-  Image as ImageIcon,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 
@@ -64,8 +62,6 @@ export default function AdminModifierFormation() {
   const [loadingData, setLoadingData] = useState(true);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [thumbnail, setThumbnail] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const router = useRouter();
 
   const {
@@ -113,7 +109,6 @@ export default function AdminModifierFormation() {
         setValue("current_participants", formation.current_participants);
         setValue("registration_link", formation.registration_link || "");
         setValue("materials_link", formation.materials_link || "");
-        if (formation.thumbnail_url) setThumbnailPreview(formation.thumbnail_url);
         setValue("is_published", formation.is_published);
         setValue("is_completed", formation.is_completed);
         setValue("type", (formation.type as "gratuite" | "payante") || "gratuite");
@@ -173,7 +168,6 @@ export default function AdminModifierFormation() {
       if (values.rubrique_id) formData.append("rubrique_id", values.rubrique_id);
       if (values.crasc_id) formData.append("crasc_id", values.crasc_id);
       if (values.osc_id) formData.append("osc_id", values.osc_id);
-      if (thumbnail) formData.append("thumbnail", thumbnail);
 
       console.log("Sending PATCH request to:", `${API_BASE_URL}/api/v1/formations/${slug}`);
 
@@ -320,47 +314,6 @@ export default function AdminModifierFormation() {
               )}
             </div>
 
-            {/* Image de couverture */}
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Image de couverture
-              </label>
-              <div
-                className="relative border-2 border-dashed border-gray-300 rounded-lg overflow-hidden cursor-pointer hover:border-[#2A591D] transition-colors"
-                style={{ height: "180px" }}
-                onClick={() => document.getElementById("thumbnail-input-modifier")?.click()}
-              >
-                {thumbnailPreview ? (
-                  <>
-                    <img src={thumbnailPreview} alt="Aperçu" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); setThumbnail(null); setThumbnailPreview(null); }}
-                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-red-50"
-                    >
-                      <X className="w-4 h-4 text-red-500" />
-                    </button>
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
-                    <ImageIcon className="w-10 h-10" />
-                    <span className="text-sm">Cliquer pour ajouter une image</span>
-                    <span className="text-xs">JPG, PNG, WEBP — max 50 Mo</span>
-                  </div>
-                )}
-              </div>
-              <input
-                id="thumbnail-input-modifier"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0] ?? null;
-                  setThumbnail(file);
-                  if (file) setThumbnailPreview(URL.createObjectURL(file));
-                }}
-              />
-            </div>
 
             {/* Formateur et Lieu */}
             <div className="grid md:grid-cols-2 gap-6 mb-6">
