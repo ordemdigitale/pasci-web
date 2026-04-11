@@ -82,6 +82,7 @@ export default function FormationDetailPage() {
   const [showInscription, setShowInscription] = useState(false);
   const [inscriptionName, setInscriptionName] = useState("");
   const [inscriptionEmail, setInscriptionEmail] = useState("");
+  const [inscriptionPhone, setInscriptionPhone] = useState("");
   const [inscribing, setInscribing] = useState(false);
   const [inscriptionSuccess, setInscriptionSuccess] = useState(false);
   const [inscriptionError, setInscriptionError] = useState("");
@@ -174,12 +175,12 @@ export default function FormationDetailPage() {
     load();
   }, [formationSlug]);
 
-  async function inscrire(name: string, email: string) {
+  async function inscrire(name: string, email: string, phone?: string) {
     setInscribing(true);
     setInscriptionError("");
     try {
       if (formation?.type === "payante") {
-        const paiement = await initierPaiement(formationSlug, name, email);
+        const paiement = await initierPaiement(formationSlug, name, email, phone);
         const redirectUrl = paiement.cinetpay_configured
           ? paiement.payment_url
           : `${paiement.payment_url}&iid=${paiement.inscription_id}`;
@@ -205,7 +206,7 @@ export default function FormationDetailPage() {
 
   async function handleInscription(e: React.FormEvent) {
     e.preventDefault();
-    await inscrire(inscriptionName, inscriptionEmail);
+    await inscrire(inscriptionName, inscriptionEmail, inscriptionPhone || undefined);
   }
 
   async function handleSoumettrAvis(e: React.FormEvent) {
@@ -662,6 +663,22 @@ export default function FormationDetailPage() {
                         placeholder="votre@email.com"
                       />
                     </div>
+                    {formation?.type === "payante" && (
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          Numéro de téléphone <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="tel"
+                          required
+                          value={inscriptionPhone}
+                          onChange={(e) => setInscriptionPhone(e.target.value)}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+                          placeholder="+225 07 00 00 00 00"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Requis pour le paiement mobile money</p>
+                      </div>
+                    )}
                     <div className="md:col-span-2">
                       <button
                         type="submit"

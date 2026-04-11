@@ -34,7 +34,8 @@ export interface PaiementInitierResponse {
 export async function initierPaiement(
   formationSlug: string,
   participantName: string,
-  participantEmail: string
+  participantEmail: string,
+  participantPhone?: string
 ): Promise<PaiementInitierResponse> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/formations/${formationSlug}/paiement/initier`,
@@ -44,6 +45,7 @@ export async function initierPaiement(
       body: JSON.stringify({
         participant_name: participantName,
         participant_email: participantEmail,
+        participant_phone: participantPhone || null,
       }),
     }
   );
