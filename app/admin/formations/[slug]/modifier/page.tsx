@@ -124,7 +124,7 @@ export default function AdminModifierFormation() {
           fetchAllRubriques(),
         ]);
         setCrascRegions(crascData);
-        setOscs(oscData);
+        setOscs(oscData.items);
         setRubriques(rubriquesData.filter((r) => r.is_active));
       } catch (error) {
         console.error("Erreur lors du chargement:", error);

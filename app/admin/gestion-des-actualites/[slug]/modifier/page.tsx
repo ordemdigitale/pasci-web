@@ -88,7 +88,7 @@ export default function EditNewsPage({ params }: { params: Promise<{ slug: strin
 
                 setCurrentThumbnail(newsData.thumbnail_url || null);
                 setCrascRegions(crascData);
-                setOscs(oscData);
+                setOscs(oscData.items);
             } catch (error: any) {
                 setErrorMessage(error.message || "Erreur lors du chargement");
             } finally {

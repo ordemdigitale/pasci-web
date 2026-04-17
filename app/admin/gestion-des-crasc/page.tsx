@@ -24,7 +24,7 @@ export default async function AdminCrascPage() {
 	const allCrasc = await fetchAllCrasc();
 	const allRegion = await fetchAllRegion();
 	const allOscType = await fetchAllOscType();
-	const allOsc = await fetchAllOsc();
+	const oscData = await fetchAllOsc(1, 10);
 	const allNews = await fetchAllNews();
 
 	return (
@@ -69,7 +69,7 @@ export default async function AdminCrascPage() {
 							</div>
 							<div>
 								<p className="text-sm text-gray-600 font-medium">OSC</p>
-								<p className="text-2xl font-bold text-gray-900">{allOsc.length}</p>
+								<p className="text-2xl font-bold text-gray-900">{oscData.total}</p>
 							</div>
 						</div>
 					</div>
@@ -184,7 +184,7 @@ export default async function AdminCrascPage() {
 							</tr>
 						</thead>
 						<tbody className="bg-white divide-y divide-gray-200">
-							{allOsc.slice(0, 10).map((osc) => (
+							{oscData.items.map((osc) => (
 								<tr key={osc.id} className="hover:bg-gray-50 transition-colors">
 									<td className="px-6 py-4 whitespace-nowrap">
 										<div className="flex items-center gap-2">
@@ -214,10 +214,10 @@ export default async function AdminCrascPage() {
 							))}
 						</tbody>
 					</table>
-					{allOsc.length > 10 && (
+					{oscData.total > 10 && (
 						<div className="mt-4 text-center">
 							<p className="text-sm text-gray-600">
-								Affichage de 10 sur {allOsc.length} OSC
+								Affichage de 10 sur {oscData.total} OSC
 							</p>
 						</div>
 					)}

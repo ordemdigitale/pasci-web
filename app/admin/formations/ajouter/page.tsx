@@ -66,7 +66,7 @@ export default function AdminAjoutFormation() {
       .catch((error) => console.error("Erreur CRASC:", error));
 
     fetchAllOsc()
-      .then((data) => setOscs(data))
+      .then((data) => setOscs(data.items))
       .catch((error) => console.error("Erreur OSC:", error));
 
     fetchAllRubriques()

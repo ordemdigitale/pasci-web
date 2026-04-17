@@ -72,9 +72,9 @@ export async function fetchAllOscType(): Promise<IOscType[]> {
   return res.json();
 }
 
-// Fetch all OSC from API
-export async function fetchAllOsc(): Promise<IOsc[]> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?skip=0&limit=100`, {
+// Fetch paginated OSC from API
+export async function fetchAllOsc(page = 1, size = 20): Promise<{ items: IOsc[]; total: number; page: number; size: number; pages: number }> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?page=${page}&size=${size}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -82,7 +82,7 @@ export async function fetchAllOsc(): Promise<IOsc[]> {
     cache: "no-store"
   });
   if (!response.ok) {
-    throw new Error("Échec du chargement des types de OSC à partir de l'API");
+    throw new Error("Échec du chargement des OSC à partir de l'API");
   }
   return response.json();
 }

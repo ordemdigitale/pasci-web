@@ -215,7 +215,7 @@ export default function PageAnnuaireCrasc() {
       try {
         const osc = await fetchAllOsc();
         console.log("Page annuaire des OSC: ", osc);
-        setOscData(osc);
+        setOscData(osc.items);
       }
       catch (error) {
         console.error("Error fetching OSC data: ", error);
