@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from 'react';
 import { ImageWithFallback } from '@/lib/imageWithFallback'
 import {
   Users,
@@ -5,7 +8,10 @@ import {
   GraduationCap,
   PenLine,
   CalendarCheck,
-  Speech
+  Speech,
+  Info,
+  ChevronDown,
+  Search
 } from 'lucide-react';
 
 
@@ -51,11 +57,38 @@ const services: IService[] = [
     id: 6,
     icon: <CalendarCheck size={24} color="#E05017" />,
     name: "Suivi-évaluation",
-    content: "Mise en place d'outils et d'indicateurs de performance pour mesurer l’avancement et l’impact des actions menées."
+    content: "Mise en place d’outils et d’indicateurs de performance pour mesurer l’avancement et l’impact des actions menées."
+  },
+  {
+    id: 7,
+    icon: <Info size={24} color="#E05017" />,
+    name: "Information",
+    content: "Nous vous donnons des informations sur les opportunités de financements, de formation et de réseautage."
   },
 ];
 
+const faqItems = [
+  { id: 1, title: "Comment puis-je postuler à une offre d'emploi ?", answer: "Pour postuler à une offre d'emploi, veuillez consulter les offres disponibles sur notre site et cliquez sur le bouton Postuler." },
+  { id: 2, title: "Quel est le processus de recrutement chez PASCI ?", answer: "Le processus de recrutement chez PASCI comprend plusieurs étapes : l'analyse de votre profil, un entretien technique, un entretien RH et enfin une proposition d'embauche." },
+  { id: 3, title: "Puis-je envoyer une candidature spontanée ?", answer: "Oui, vous pouvez envoyer une candidature spontanée à travers notre formulaire en ligne ou par email à pdoc@plateforme-osci.org." },
+  { id: 4, title: "Proposez-vous des stages ou des alternances ?", answer: "Oui, PASCI propose des stages et des alternances dans divers domaines techniques et administratifs. Consultez nos offres spécifiques pour plus d'informations." },
+  { id: 5, title: "Comment savoir si ma candidature a été reçue ?", answer: "Vous recevrez un email de confirmation dès que votre candidature aura été reçue. Si vous ne recevez pas cet email dans les 24 heures suivantes, veuillez nous contacter." },
+  { id: 6, title: "Quelles sont les valeurs du projet PASCI ?", answer: "Les valeurs du projet PASCI incluent l'innovation technologique, la collaboration interdisciplinaire et le respect de l'environnement." },
+];
+
 export default function ServicesPage() {
+  const [openFaqs, setOpenFaqs] = useState<number[]>([]);
+  const [faqSearch, setFaqSearch] = useState("");
+
+  const toggleFaq = (id: number) => {
+    setOpenFaqs(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const filteredFaq = faqItems.filter(f =>
+    f.title.toLowerCase().includes(faqSearch.toLowerCase()) ||
+    f.answer.toLowerCase().includes(faqSearch.toLowerCase())
+  );
+
   return (
     <section className="py-10 lg:pb-32 lg:pt-10 font-poppins">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
@@ -139,6 +172,55 @@ export default function ServicesPage() {
         <p className="font-bold text-4xl text-center pb-4">Suivi-Évaluation</p>
         <div className="max-w-5xl mx-auto bg-[#f0f9ff] p-6 sm:px-6 lg:px-8 border border-gray-200 rounded-lg space-y-6">
           <p>Au-delà de la mesure, le suivi-évaluation constitue un véritable outil d'aide à la décision. Il permet d'ajuster les stratégies en temps réel, d'optimiser l'utilisation des ressources et de renforcer l'impact des interventions. En assurant une traçabilité des résultats et une évaluation rigoureuse des effets produits, ce service contribue à la transparence, à la redevabilité et à l&apos;amélioration continue des actions menées.</p>
+        </div>
+      </div>
+
+      {/* Service Information */}
+      <div className="py-8">
+        <p className="font-bold text-4xl text-center pb-4">Information</p>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg py-8 space-y-6">
+          <p>Nous vous donnons des informations sur les opportunités de financements, de formation et de réseautage. En centralisant et en diffusant ces informations stratégiques, nous permettons aux OSC membres du CRASC de saisir les occasions qui s'offrent à elles et de renforcer leur capacité d'action sur le terrain.</p>
+        </div>
+      </div>
+
+      {/* FAQ */}
+      <div className="py-8">
+        <div className="flex justify-center items-center mb-8">
+          <h2 className="text-gray-900 font-bold text-3xl">Foire Aux Questions</h2>
+        </div>
+        <div className="relative max-w-3xl mx-auto mb-10 px-4">
+          <Search className="absolute left-7 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Rechercher une question..."
+            value={faqSearch}
+            onChange={(e) => setFaqSearch(e.target.value)}
+            className="text-sm w-full pl-12 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2a591d]/30 focus:border-transparent"
+          />
+        </div>
+        <div className="max-w-4xl mx-auto px-4 mb-10">
+          {filteredFaq.length === 0 ? (
+            <p className="text-center text-gray-400 py-8">Aucune question trouvée.</p>
+          ) : (
+            filteredFaq.map((item) => (
+              <div key={item.id} className="border-b border-gray-300 mb-4">
+                <button
+                  onClick={() => toggleFaq(item.id)}
+                  className="w-full flex items-center justify-between pb-4 text-left cursor-pointer"
+                >
+                  <span className="text-gray-800 font-medium">{item.title}</span>
+                  <ChevronDown
+                    className={`w-5 h-5 text-gray-600 flex-shrink-0 transition-transform ${openFaqs.includes(item.id) ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {openFaqs.includes(item.id) && (
+                  <div className="px-4 pb-4 text-gray-600 text-sm">
+                    {item.answer}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
       </div>
 

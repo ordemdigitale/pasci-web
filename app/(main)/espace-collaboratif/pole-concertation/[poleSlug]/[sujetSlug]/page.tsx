@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { IForumSujetDetail, IForumCommentaire } from "@/types/api.types";
@@ -21,6 +21,7 @@ function formatDate(dateStr: string) {
 export default function PageSujetDetail() {
   const params = useParams();
   const router = useRouter();
+  const pathname = usePathname();
   const poleSlug = params.poleSlug as string;
   const sujetSlug = params.sujetSlug as string;
 
@@ -57,7 +58,7 @@ export default function PageSujetDetail() {
   async function handleComment(e: React.FormEvent) {
     e.preventDefault();
     if (!token) {
-      router.push("/auth/login");
+      router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
     if (!comment.trim()) return;
@@ -241,7 +242,7 @@ export default function PageSujetDetail() {
             Vous devez être connecté pour participer à cette discussion.
           </p>
           <Link
-            href="/auth/login"
+            href={`/auth/login?redirect=${encodeURIComponent(pathname)}`}
             className="inline-block px-6 py-2 bg-[#E05017] text-white rounded-full text-sm font-semibold hover:bg-[#C54415] transition-colors"
           >
             Se connecter

@@ -16,17 +16,20 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setError('');
 
-    // TODO: Implement actual password reset logic
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Replace with actual password reset request
-      console.log('Password reset request for:', email);
-
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_BASE}/api/v1/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || 'Une erreur est survenue.');
+      }
       setSubmitted(true);
-    } catch (err) {
-      setError('Une erreur est survenue. Veuillez réessayer.');
+    } catch (err: any) {
+      setError(err.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setLoading(false);
     }

@@ -26,7 +26,7 @@ const NavLinks = [
   { href: "/ressources", key: 4, text: "Ressources" },
   { href: "#", key: 5, text: "Espace collaboratif", hasDropdown: true },
   { href: "/a-propos", key: 6, text: "À propos" },
-  { href: "/contact", key: 7, text: "Contact" },
+  { href: "/contact", key: 7, text: "Contact", hasDropdown: true },
 ];
 
   const espaceCollabSubmenu = {
@@ -40,11 +40,18 @@ const NavLinks = [
     }
   };
 
+  const contactSubmenu = [
+    { title: 'Contact', href: '/contact' },
+    { title: 'Faire un don', href: '/faire-un-don' },
+    { title: 'Être volontaire', href: '/etre-volontaire' },
+  ];
+
   
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isEspaceCollabSubmenuOpen, setIsEspaceCollabSubmenuOpen] = useState(false);
+  const [isContactSubmenuOpen, setIsContactSubmenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<IUser | null>(null);
   const [annonces, setAnnonces] = useState<{ id: number; texte: string }[]>([]);
   const pathname = usePathname();
@@ -106,6 +113,19 @@ export default function Navbar() {
                             <span>{espaceCollabSubmenu.submenu2.title}</span>
                           </Link>
                         </DropdownMenuSub>
+                      </DropdownMenuContent>
+                    );
+                  }
+                  if (link.text === "Contact") {
+                    submenuContent = (
+                      <DropdownMenuContent className="w-44">
+                        {contactSubmenu.map((item) => (
+                          <DropdownMenuSub key={item.href}>
+                            <Link href={item.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
+                              {item.title}
+                            </Link>
+                          </DropdownMenuSub>
+                        ))}
                       </DropdownMenuContent>
                     );
                   }
@@ -206,30 +226,39 @@ export default function Navbar() {
                 {NavLinks.map((link) => (
                   link.hasDropdown ? (
                     <div key={link.text}>
-                    <button
-                      onClick={() => setIsEspaceCollabSubmenuOpen(!isEspaceCollabSubmenuOpen)}
-                      className="text-gray-700 hover:text-gray-900 text-sm tracking-wide transition-colors flex items-center gap-1 w-full"
-                    >
-                      {link.text}
-                      <ChevronDown className={`w-4 h-4 transition-transform ${isEspaceCollabSubmenuOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    {isEspaceCollabSubmenuOpen && (
-                      <div className="ml-4">
-                        <div>
-                          <Link href={espaceCollabSubmenu.submenu1.href}>
-                            <span className="text-sm text-gray-900">{espaceCollabSubmenu.submenu1.title}</span>
+                      <button
+                        onClick={() => {
+                          if (link.text === "Espace collaboratif") setIsEspaceCollabSubmenuOpen(!isEspaceCollabSubmenuOpen);
+                          if (link.text === "Contact") setIsContactSubmenuOpen(!isContactSubmenuOpen);
+                        }}
+                        className="text-gray-700 hover:text-gray-900 text-sm tracking-wide transition-colors flex items-center gap-1 w-full"
+                      >
+                        {link.text}
+                        <ChevronDown className={`w-4 h-4 transition-transform ${
+                          (link.text === "Espace collaboratif" && isEspaceCollabSubmenuOpen) ||
+                          (link.text === "Contact" && isContactSubmenuOpen) ? 'rotate-180' : ''
+                        }`} />
+                      </button>
+                      {link.text === "Espace collaboratif" && isEspaceCollabSubmenuOpen && (
+                        <div className="ml-4 mt-2 space-y-2">
+                          <Link href={espaceCollabSubmenu.submenu1.href} className="block text-sm text-gray-700">
+                            {espaceCollabSubmenu.submenu1.title}
                           </Link>
-
-                        </div>
-                        <div className="pt-2">
-                          <Link href={espaceCollabSubmenu.submenu2.href}>
-                            <span className="text-sm text-gray-900">{espaceCollabSubmenu.submenu2.title}</span>
+                          <Link href={espaceCollabSubmenu.submenu2.href} className="block text-sm text-gray-700">
+                            {espaceCollabSubmenu.submenu2.title}
                           </Link>
-
                         </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                      {link.text === "Contact" && isContactSubmenuOpen && (
+                        <div className="ml-4 mt-2 space-y-2">
+                          {contactSubmenu.map((item) => (
+                            <Link key={item.href} href={item.href} className="block text-sm text-gray-700">
+                              {item.title}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <a
                       key={link.text}
@@ -238,7 +267,6 @@ export default function Navbar() {
                     >
                       {link.text}
                     </a>
-
                   )
                 ))}
 

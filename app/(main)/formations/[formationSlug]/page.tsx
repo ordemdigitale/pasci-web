@@ -108,6 +108,23 @@ export default function FormationDetailPage() {
   const [totalLecons, setTotalLecons] = useState(0);
   const [certEmis, setCertEmis] = useState<string | null>(null);
 
+  // Partage
+  const [copied, setCopied] = useState(false);
+
+  async function handleShare() {
+    const url = window.location.href;
+    const title = formation?.title || "Formation";
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url });
+      } catch {}
+    } else {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  }
+
   useEffect(() => {
     async function load() {
       try {
@@ -492,9 +509,12 @@ export default function FormationDetailPage() {
                   )}
                 </div>
               </div>
-              <button className="flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-white border border-gray-200 text-sm font-bold hover:bg-gray-50">
+              <button
+                onClick={handleShare}
+                className="flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-white border border-gray-200 text-sm font-bold hover:bg-gray-50 transition-colors"
+              >
                 <Share2 className="w-4 h-4" />
-                Partager
+                {copied ? "Lien copié !" : "Partager"}
               </button>
             </div>
 

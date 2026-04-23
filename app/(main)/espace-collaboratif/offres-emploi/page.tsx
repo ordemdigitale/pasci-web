@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { ImageWithFallback } from '@/lib/imageWithFallback'
 import {
   Search,
-  ChevronDown,
   Briefcase,
   MapPin
 } from "lucide-react";
@@ -13,21 +12,12 @@ import { IJobs } from '@/types/api.types';
 import { API_BASE_URL } from "@/lib/api-config";
 import Link from "next/link";
 
-const faqCategories = [
-  { id: 1, title: 'Comment puis-je postuler à une offre d\'emploi ?', answer: "Pour postuler à une offre d'emploi, veuillez consulter les offres disponibles sur notre site et cliquez sur le bouton Postuler", isOpen: false },
-  { id: 2, title: 'Quel est le processus de recrutement chez PASCI ?', answer: "Le processus de recrutement chez PASCI comprend plusieurs étapes : l\'analyse de votre profil, un entretien technique, un entretien RH et enfin une proposition d\'embauche.", isOpen: false },
-  { id: 3, title: 'Puis-je envoyer une candidature spontanée ?', answer: "Oui, vous pouvez envoyer une candidature spontanée à travers notre formulaire en ligne ou par email à contact@pasci.fr.", isOpen: false },
-  { id: 4, title: 'Proposez-vous des stages ou des alternances ?', answer: "Oui, PASCI propose des stages et des alternances dans divers domaines techniques et administratifs. Consultez nos offres spécifiques pour plus d'informations.", isOpen: false },
-  { id: 5, title: 'Comment savoir si ma candidature a été reçue ?', answer: "Vous recevrez un email de confirmation dès que votre candidature aura été reçue. Si vous ne recevez pas cet email dans les 24 heures suivantes, veuillez nous contacter.", isOpen: false },
-  { id: 6, title: 'Quelles sont les valeurs du projet PASCI ?', answer: "Les valeurs du projet PASCI incluent l'innovation technologique, la collaboration interdisciplinaire et le respect de l'environnement.", isOpen: false }
-];
 
 export default function PageOffreEmploi() {
   const router = useRouter();
   const [jobs, setJobs] = useState<IJobs[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [openFaqs, setOpenFaqs] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedType, setSelectedType] = useState("");
@@ -71,12 +61,6 @@ export default function PageOffreEmploi() {
     "Desing",
     "Ressources Humaines"
   ];
-
-  const toggleFaq = (id: number) => {
-    setOpenFaqs(prev =>
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
-  };
 
   return (
     <section className="mx-auto pt-12 pb-6 font-poppins">
@@ -217,48 +201,6 @@ export default function PageOffreEmploi() {
                     Détails de l'offre
                   </button>
                 </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Section FAQ */}
-        <div>
-          <div className="flex justify-center items-center mb-8">
-            <h2 className="text-gray-900 font-bold text-3xl mb-2">Foire Aux Questions</h2>
-          </div>
-          {/* search bar */}
-          <div className="relative max-w-3xl mx-auto mb-10">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Rechercher une question..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="text-sm w-full pl-12 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
-            />
-          </div>
-
-          <div className="max-w-4xl mx-auto mb-26">
-            {/* FAQ content */}
-            {faqCategories.map((category) => (
-              <div key={category.id} className="border-b border-b-gray-300 mb-4">
-                <button
-                  onClick={() => toggleFaq(category.id)}
-                  className="w-full flex items-center justify-between pb-4 text-left cursor-pointer"
-                >
-                  <span className="text-gray-800">{category.title}</span>
-                  <ChevronDown
-                    className={`w-5 h-5 text-gray-600 transition-transform ${
-                      openFaqs.includes(category.id) ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-                {openFaqs.includes(category.id) && (
-                  <div className="p-4 pt-0 text-gray-600 text-sm">
-                    {category.answer}
-                  </div>
-                )}
               </div>
             ))}
           </div>

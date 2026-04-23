@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { IPoleConcertation, IForumSujet } from "@/types/api.types";
@@ -26,6 +26,7 @@ function formatDate(dateStr: string) {
 export default function PagePoleForum() {
   const params = useParams();
   const router = useRouter();
+  const pathname = usePathname();
   const poleSlug = params.poleSlug as string;
 
   const [pole, setPole] = useState<IPoleConcertation | null>(null);
@@ -67,7 +68,7 @@ export default function PagePoleForum() {
   async function handleCreateSujet(e: React.FormEvent) {
     e.preventDefault();
     if (!token) {
-      router.push("/auth/login");
+      router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
     setSubmitting(true);
@@ -157,7 +158,7 @@ export default function PagePoleForum() {
           </button>
         ) : (
           <Link
-            href="/auth/login"
+            href={`/auth/login?redirect=${encodeURIComponent(pathname)}`}
             className="text-sm text-[#E05017] font-semibold hover:underline"
           >
             Se connecter pour participer
