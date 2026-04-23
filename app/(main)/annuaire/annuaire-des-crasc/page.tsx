@@ -184,11 +184,10 @@ const mockNews: SpotlightNews[] = [
 
 
 export default function PageAnnuaireCrasc() {
-  const [keyStats, setKeyStats] = useState<IKeyStats[] | null>([]);
+  const [dashboardStats, setDashboardStats] = useState<{ osc: number; crasc: number; regions: number } | null>(null);
   const [crascData, setCrascData] = useState<ICrasc[]>([]);
   const [oscData, setOscData] = useState<IOsc[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [spotlightNewsData, setSpotlightNewsData] = useState<SpotlightNews[]>(mockNews);
   const [newsLoading, setNewsLoading] = useState(true);
   const [newsError, setNewsError] = useState<string | null>(null);
@@ -224,27 +223,27 @@ export default function PageAnnuaireCrasc() {
     fetchOscData();
   }, []);
 
-  // fetch key stats data
+  // fetch dashboard stats (comptages en temps réel)
   useEffect(() => {
-    const fetchKeyStatsData = async () => {
+    const fetchDashboardStats = async () => {
       setLoading(true);
-      setError(null);
-
       try {
-        const response = await fetch("https://api.plateforme-osci.org/api/v1/key-stats");
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`)
-        }
-        const result = await response.json();
-        setKeyStats(result);
-        console.log("Key Stats ", keyStats);
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        const response = await fetch(`${API_BASE_URL}/api/v1/stats/dashboard`);
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        const data = await response.json();
+        setDashboardStats({
+          osc: data.osc?.total ?? 0,
+          crasc: data.crasc?.total ?? 0,
+          regions: data.regions?.total ?? 0,
+        });
       } catch (err) {
         console.log(err);
       } finally {
         setLoading(false);
       }
     };
-    fetchKeyStatsData();
+    fetchDashboardStats();
   }, []);
 
   // fetch spotlight news data
@@ -273,7 +272,6 @@ export default function PageAnnuaireCrasc() {
     fetchSpotlightNewsData();
   }, []);
 
-  const firstKeyStat = keyStats?.find(item => item.name === "osc");
 
   return (
     <section className="py-12 bg-gradient-to-b from-gray-50 to-white font-poppins">
@@ -381,7 +379,7 @@ export default function PageAnnuaireCrasc() {
                 OSC MEMBRES
               </h3>
               <div className="text-4xl font-extrabold text-[#E05017] group-hover:text-white transition-colors mb-1">
-                {firstKeyStat?.number || "3201"}
+                {loading ? "..." : (dashboardStats?.osc ?? 0).toLocaleString()}
               </div>
               <p className="text-xs text-gray-500 group-hover:text-white/70 transition-colors">
                 Organisations actives
