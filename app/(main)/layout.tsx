@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import SubMenu from "@/components/layout/SubMenu";
 import Footer from "@/components/layout/Footer";
 import { Toaster } from "sonner";
+import PageTracker from "@/components/analytics/PageTracker";
 
 const karla = Karla({
   variable: "--font-karla",
