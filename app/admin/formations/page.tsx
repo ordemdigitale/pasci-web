@@ -23,6 +23,7 @@ import { fetchAllFormations, IFormation } from "@/lib/fetch-formations";
 import { fetchWithAuth } from "@/lib/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const PAGE_SIZE = 24;
 
 export default function FormationsPage() {
   const router = useRouter();
@@ -33,6 +34,7 @@ export default function FormationsPage() {
   const [selectedFormation, setSelectedFormation] = useState<IFormation | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Charger les formations
   useEffect(() => {
@@ -64,6 +66,12 @@ export default function FormationsPage() {
       (selectedStatus === "Brouillon" && !formation.is_published);
     return matchSearch && matchStatus;
   });
+
+  // Reset page on filter change
+  useEffect(() => { setCurrentPage(1); }, [searchQuery, selectedStatus]);
+
+  const totalPages = Math.ceil(filteredFormations.length / PAGE_SIZE);
+  const paginatedFormations = filteredFormations.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const handleViewFormation = (formation: IFormation) => {
     setSelectedFormation(formation);
@@ -288,7 +296,7 @@ export default function FormationsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredFormations.map((formation) => (
+            {paginatedFormations.map((formation) => (
               <div
                 key={formation.id}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all overflow-hidden"
@@ -411,6 +419,53 @@ export default function FormationsPage() {
             <p className="text-gray-400 text-sm mt-1">
               Essayez de modifier vos critères de recherche
             </p>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {!loading && filteredFormations.length > 0 && (
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-gray-600">
+              Affichage de {Math.min((currentPage - 1) * PAGE_SIZE + 1, filteredFormations.length)}–{Math.min(currentPage * PAGE_SIZE, filteredFormations.length)} sur {filteredFormations.length} formation{filteredFormations.length > 1 ? 's' : ''}
+            </p>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  ← Précédent
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
+                  .reduce<(number | string)[]>((acc, p, idx, arr) => {
+                    if (idx > 0 && (p as number) - (arr[idx - 1] as number) > 1) acc.push('…');
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((p, idx) =>
+                    p === '…' ? (
+                      <span key={`ellipsis-${idx}`} className="px-2 text-gray-400">…</span>
+                    ) : (
+                      <button
+                        key={p}
+                        onClick={() => setCurrentPage(p as number)}
+                        className={`px-3 py-2 text-sm border rounded-lg ${currentPage === p ? 'bg-[#E05017] text-white border-[#E05017]' : 'border-gray-300 hover:bg-gray-100'}`}
+                      >
+                        {p}
+                      </button>
+                    )
+                  )}
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Suivant →
+                </button>
+              </div>
+            )}
           </div>
         )}
 

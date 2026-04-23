@@ -286,7 +286,7 @@ function RechercheContent() {
             <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-gray-800 mb-2">Commencez votre recherche</h3>
             <p className="text-gray-600 mb-6">
-              Entrez des mots-clés pour rechercher des actualités, OSC, formations ou emplois.
+              Entrer des mots-clés pour rechercher des actualités, OSC, formations ou emplois.
             </p>
 
             <div className="max-w-md mx-auto">

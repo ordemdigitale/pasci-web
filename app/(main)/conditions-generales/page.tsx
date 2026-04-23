@@ -202,8 +202,8 @@ export default function ConditionsGeneralesPage() {
             Pour toute question concernant ces Conditions Générales d'Utilisation, vous pouvez nous contacter :
           </p>
           <div className="space-y-2 text-gray-700">
-            <p><strong>Email :</strong> <a href="mailto:contact@crasc.ivoire.org" className="text-[#E05017] hover:underline">contact@crasc.ivoire.org</a></p>
-            <p><strong>Téléphone :</strong> (+225) 27 22 40 47 20 / 07 09 26 67 66</p>
+            <p><strong>Email :</strong> <a href="mailto:pdoc@plateforme-osci.org" className="text-[#E05017] hover:underline">pdoc@plateforme-osci.org</a></p>
+            <p><strong>Téléphone :</strong> 05 05 56 57 41</p>
             <p><strong>Adresse :</strong> 15, avenue Jean Mermoz, Cocody, Abidjan, Côte d'Ivoire</p>
           </div>
         </div>

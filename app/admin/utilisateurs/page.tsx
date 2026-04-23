@@ -25,6 +25,8 @@ import { toast } from "sonner";
 import AddUserModal from "@/components/admin/AddUserModal";
 import EditUserModal from "@/components/admin/EditUserModal";
 
+const PAGE_SIZE = 25;
+
 export default function UtilisateursPage() {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<IUser[]>([]);
@@ -35,6 +37,7 @@ export default function UtilisateursPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Fetch users
   const fetchUsers = async () => {
@@ -54,6 +57,9 @@ export default function UtilisateursPage() {
     fetchUsers();
   }, []);
 
+  // Reset page on filter change
+  useEffect(() => { setCurrentPage(1); }, [searchQuery, selectedStatus]);
+
   // Filter users
   const filteredUsers = users.filter((user) => {
     const searchLower = searchQuery.toLowerCase();
@@ -69,6 +75,9 @@ export default function UtilisateursPage() {
 
     return matchSearch && matchStatus;
   });
+
+  const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
+  const paginatedUsers = filteredUsers.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const handleViewUser = (user: IUser) => {
     setSelectedUser(user);
@@ -281,7 +290,7 @@ export default function UtilisateursPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {filteredUsers.map((user) => (
+                {paginatedUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -395,6 +404,53 @@ export default function UtilisateursPage() {
               </div>
             )}
           </div>
+
+          {/* Pagination */}
+          {filteredUsers.length > 0 && (
+            <div className="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-sm text-gray-600">
+                Affichage de {Math.min((currentPage - 1) * PAGE_SIZE + 1, filteredUsers.length)}–{Math.min(currentPage * PAGE_SIZE, filteredUsers.length)} sur {filteredUsers.length} utilisateur{filteredUsers.length > 1 ? 's' : ''}
+              </p>
+              {totalPages > 1 && (
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    ← Précédent
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
+                    .reduce<(number | string)[]>((acc, p, idx, arr) => {
+                      if (idx > 0 && (p as number) - (arr[idx - 1] as number) > 1) acc.push('…');
+                      acc.push(p);
+                      return acc;
+                    }, [])
+                    .map((p, idx) =>
+                      p === '…' ? (
+                        <span key={`ellipsis-${idx}`} className="px-2 text-gray-400">…</span>
+                      ) : (
+                        <button
+                          key={p}
+                          onClick={() => setCurrentPage(p as number)}
+                          className={`px-3 py-2 text-sm border rounded-lg ${currentPage === p ? 'bg-[#2a591d] text-white border-[#2a591d]' : 'border-gray-300 hover:bg-gray-100'}`}
+                        >
+                          {p}
+                        </button>
+                      )
+                    )}
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Suivant →
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* User Details Modal */}

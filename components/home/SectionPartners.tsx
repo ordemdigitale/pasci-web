@@ -120,7 +120,7 @@ export default function Partners() {
             Devenir partenaire
           </h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Rejoignez notre réseau de partenaires engagés pour le développement de la société civile en Côte d'Ivoire
+            Rejoindre notre réseau de partenaires engagés pour le développement de la société civile en Côte d'Ivoire
           </p>
           <Link
             href="/contact"

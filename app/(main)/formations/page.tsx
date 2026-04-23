@@ -104,7 +104,7 @@ export default function FormationsPage() {
             <div className="">
               <h2 className="text-[#2a591d] font-bold text-4xl">Explorez nos programmes de formation</h2>
               <p className="text-gray-600 text-md max-w-xl mt-6">
-                Découvrez une bibliothèque complète de cours, formations, vidéos, audios et tutoriels conçus pour enrichir vos connaissances et développer vos compétences.
+                Découvrir une bibliothèque complète de cours, formations, vidéos, audios et tutoriels conçus pour enrichir vos connaissances et développer vos compétences.
               </p>
 
             </div>

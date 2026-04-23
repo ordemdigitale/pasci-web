@@ -94,7 +94,7 @@ export default function ForgotPasswordPage() {
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Mot de passe oublié ?</h1>
             <p className="text-gray-600">
-              Pas de problème. Entrez votre adresse email et nous vous enverrons un lien pour
+              Pas de problème. Entrer votre adresse email et nous vous enverrons un lien pour
               réinitialiser votre mot de passe.
             </p>
           </div>

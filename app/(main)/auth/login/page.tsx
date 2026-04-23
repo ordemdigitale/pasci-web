@@ -54,7 +54,7 @@ function LoginForm() {
                 Bienvenue à vous
               </h2>
               <p className="text-gray-700 mb-6">
-                Connectez-vous pour accéder à votre espace personnel et profiter de tous les services
+                Se connecter pour accéder à votre espace personnel et profiter de tous les services
                 du Pôle de concertation des OSC membres des CRASC notamment :
               </p>
 
@@ -91,12 +91,12 @@ function LoginForm() {
           <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Connexion</h1>
-              <p className="text-gray-600">Connectez-vous à votre compte</p>
+              <p className="text-gray-600">Se connecter à votre compte</p>
             </div>
 
             {justRegistered && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-green-700 text-sm">Compte créé avec succès ! Connectez-vous.</p>
+                <p className="text-green-700 text-sm">Compte créé avec succès ! Se connecter.</p>
               </div>
             )}
 

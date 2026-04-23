@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function AnnuaireCrascHeader() {
   const pathname = usePathname();
@@ -35,12 +36,12 @@ export default function AnnuaireCrascHeader() {
     router.push(tabHref);
   }
   const menuItems = [
-    { id: 0, label: 'Tous les CRASC' },
-    { id: 1, label: 'CRASC Sud', href: '/annuaire/annuaire-des-crasc/crasc-sud' },
-    { id: 2, label: 'CRASC Centre', href: '/annuaire/annuaire-des-crasc/crasc-centre' },
-    { id: 3, label: 'CRASC Nord', href: '/annuaire/annuaire-des-crasc/crasc-nord' },
-    { id: 4, label: 'CRASC Ouest', href: '/annuaire/annuaire-des-crasc/crasc-ouest' },
-    { id: 5, label: 'CRASC Est', href: '/annuaire/annuaire-des-crasc/crasc-est' }
+    { id: 0, label: 'Tous les CRASC', logo: null },
+    { id: 1, label: 'CRASC Sud', href: '/annuaire/annuaire-des-crasc/crasc-sud', logo: '/images/logos-crasc/crasc-sud.jpg' },
+    { id: 2, label: 'CRASC Centre', href: '/annuaire/annuaire-des-crasc/crasc-centre', logo: '/images/logos-crasc/crasc-centre.jpg' },
+    { id: 3, label: 'CRASC Nord', href: '/annuaire/annuaire-des-crasc/crasc-nord', logo: '/images/logos-crasc/crasc-nord.jpg' },
+    { id: 4, label: 'CRASC Ouest', href: '/annuaire/annuaire-des-crasc/crasc-ouest', logo: '/images/logos-crasc/crasc-ouest.jpg' },
+    { id: 5, label: 'CRASC Est', href: '/annuaire/annuaire-des-crasc/crasc-est', logo: '/images/logos-crasc/crasc-est.jpg' }
   ];
 
   return (
@@ -52,12 +53,15 @@ export default function AnnuaireCrascHeader() {
           <button
             key={menuItem.id}
             onClick={() => handleTabClick(menuItem.id, menuItem.href || "/annuaire/annuaire-des-crasc")}
-            className={`px-4 py-2 text-sm transition-colors cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors cursor-pointer ${
               activeTab === menuItem.id
                 ? 'border-b-2 border-b-[#E05017] text-[#E05017] font-semibold'
                 : 'text-gray-700 hover:text-[#E05017]'
             }`}
           >
+            {menuItem.logo && (
+              <Image src={menuItem.logo} alt={menuItem.label} width={24} height={24} className="rounded object-contain" />
+            )}
             {menuItem.label}
           </button>
         ))}

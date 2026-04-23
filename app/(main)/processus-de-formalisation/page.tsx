@@ -112,7 +112,7 @@ export default function PageProcessusFormalisation() {
         <div className="">
           <h2 className="font-bold text-4xl text-[#2a591d] leading-tight">Simplifiez la Formalisation de Votre Organisation</h2>
           <p className="text-gray-600 text-md max-w-xl mt-6">
-            Le processus de formalisation des Organisations de la Société Civile (OSC) est une étape cruciale pour leur reconnaissance légale et leur développement. Découvrez comment le projet PASCI vous accompagne pour naviguer efficacement dans cette démarche.
+            Le processus de formalisation des Organisations de la Société Civile (OSC) est une étape cruciale pour leur reconnaissance légale et leur développement. Découvrir comment le projet PASCI vous accompagne pour naviguer efficacement dans cette démarche.
           </p>
         </div>
         

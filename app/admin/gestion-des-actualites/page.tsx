@@ -6,12 +6,15 @@ import { Plus, Edit, Trash2, Eye, Search, AlertCircle } from 'lucide-react';
 import newsService, { INews } from '@/lib/services/news.service';
 import { toast } from 'sonner';
 
+const PAGE_SIZE = 25;
+
 export default function GestionActualitesPage() {
   const [articles, setArticles] = useState<INews[]>([]);
   const [filteredArticles, setFilteredArticles] = useState<INews[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Fetch articles from API
   useEffect(() => {
@@ -49,7 +52,11 @@ export default function GestionActualitesPage() {
       );
       setFilteredArticles(filtered);
     }
+    setCurrentPage(1);
   }, [searchQuery, articles]);
+
+  const totalPages = Math.ceil(filteredArticles.length / PAGE_SIZE);
+  const paginatedArticles = filteredArticles.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const handleDelete = async (slug: string, title: string) => {
     if (!confirm(`Êtes-vous sûr de vouloir supprimer l'actualité "${title}" ?`)) {
@@ -214,7 +221,7 @@ export default function GestionActualitesPage() {
                       </td>
                     </tr>
                   ) : (
-                    filteredArticles.map((article) => (
+                    paginatedArticles.map((article) => (
                       <tr key={article.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4">
                           <div>
@@ -280,13 +287,49 @@ export default function GestionActualitesPage() {
           </div>
         )}
 
-        {/* Results Count */}
+        {/* Pagination */}
         {!loading && filteredArticles.length > 0 && (
-          <div className="mt-4 text-sm text-gray-600 text-center">
-            {searchQuery && filteredArticles.length !== articles.length && (
-              <p>
-                Affichage de {filteredArticles.length} résultat{filteredArticles.length > 1 ? 's' : ''} sur {articles.length} total
-              </p>
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-gray-600">
+              Affichage de {Math.min((currentPage - 1) * PAGE_SIZE + 1, filteredArticles.length)}–{Math.min(currentPage * PAGE_SIZE, filteredArticles.length)} sur {filteredArticles.length} résultat{filteredArticles.length > 1 ? 's' : ''}
+            </p>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  ← Précédent
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
+                  .reduce<(number | string)[]>((acc, p, idx, arr) => {
+                    if (idx > 0 && (p as number) - (arr[idx - 1] as number) > 1) acc.push('…');
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((p, idx) =>
+                    p === '…' ? (
+                      <span key={`ellipsis-${idx}`} className="px-2 text-gray-400">…</span>
+                    ) : (
+                      <button
+                        key={p}
+                        onClick={() => setCurrentPage(p as number)}
+                        className={`px-3 py-2 text-sm border rounded-lg ${currentPage === p ? 'bg-[#E05017] text-white border-[#E05017]' : 'border-gray-300 hover:bg-gray-100'}`}
+                      >
+                        {p}
+                      </button>
+                    )
+                  )}
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Suivant →
+                </button>
+              </div>
             )}
           </div>
         )}

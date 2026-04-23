@@ -105,7 +105,7 @@ export default function PageRejoindre() {
           FORMULAIRE D'ADHÉSION
         </h1>
         <p className="text-gray-600">
-          Remplissez ce formulaire pour soumettre votre demande d'adhésion.
+          Remplir ce formulaire pour soumettre votre demande d'adhésion.
         </p>
       </div>
 

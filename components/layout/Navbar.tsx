@@ -273,9 +273,9 @@ export default function Navbar() {
           ? annonces.map((a) => a.texte)
           : [
               "Bienvenue sur la Plateforme PASCI — Portail d'Appui à la Société Civile en Côte d'Ivoire",
-              "✦ Consultez les dernières formations disponibles dans votre région",
-              "✦ Rejoignez le Pôle de concertation des OSC membres des CRASC",
-              "✦ Nouvelles offres d'emploi disponibles — Consultez l'espace collaboratif",
+              "✦ Consulter les dernières formations disponibles dans votre région",
+              "✦ Rejoindre le Pôle de concertation des OSC membres des CRASC",
+              "✦ Nouvelles offres d'emploi disponibles — Consulter l'espace collaboratif",
             ];
         // Répéter assez pour garantir que chaque moitié dépasse l'écran
         const repeat = Math.max(1, Math.ceil(8 / baseItems.length));

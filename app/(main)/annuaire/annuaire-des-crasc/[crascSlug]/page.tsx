@@ -9,10 +9,10 @@ import { ImageWithFallback } from '@/lib/imageWithFallback';
 import { ICrascDetail, INews } from "@/types/api.types";
 import { domainesIntervention } from "../page";
 import { 
-  Building2, 
-  MapPin, 
-  Users, 
-  ArrowLeft, 
+  Building2,
+  MapPin,
+  Users,
+  ArrowLeft,
   Calendar,
   ExternalLink,
   Loader2,
@@ -123,8 +123,12 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
           
           <div className="flex items-start gap-6">
             <div className="flex-shrink-0">
-              <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                <Building2 className="w-10 h-10 text-white" strokeWidth={2} />
+              <div className="w-20 h-20 bg-white rounded-2xl overflow-hidden flex items-center justify-center shadow-md">
+                <ImageWithFallback
+                  src={`/images/logos-crasc/${crascSlug}.jpg`}
+                  alt={`Logo ${crascData.name}`}
+                  className="w-full h-full object-contain"
+                />
               </div>
             </div>
             

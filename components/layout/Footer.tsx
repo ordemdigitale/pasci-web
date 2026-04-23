@@ -96,23 +96,23 @@ export default function Footer() {
 
           {/* Contact Column */}
           <div>
-            <h3 className="text-white mb-4 font-bold">Contactez nous</h3>
+            <h3 className="text-white mb-4 font-bold">Nous contacter</h3>
             <div className="space-y-3 text-sm text-gray-300">
               <p>15, avenue Jean Mermoz, Cocody, Abidjan, Côte d'Ivoire</p>
               
               <div>
                 <p className="mb-1">Numéro de téléphone</p>
-                <p className="text-white">(+225) 27 22 40 47 20 / 07 09 26 67 66</p>
+                <p className="text-white">05 05 56 57 41</p>
               </div>
 
               <p>
-                e-mail : <a href="mailto:contact@crasc.ivoire.org" className="text-white hover:underline">
-                  contact@plateforme-crasci.org
+                e-mail : <a href="mailto:pdoc@plateforme-osci.org" className="text-white hover:underline">
+                  pdoc@plateforme-osci.org
                 </a>
               </p>
 
               <div className="pt-2">
-                <p className="mb-2">Suivez-Nous sur :</p>
+                <p className="mb-2">Nous suivre sur :</p>
                 <div className="flex gap-3">
                   <a 
                     href="#" 

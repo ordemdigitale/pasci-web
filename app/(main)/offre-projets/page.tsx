@@ -97,7 +97,7 @@ export default function PageOffreProjet() {
                 Offres de Projets
               </h1>
               <p className="text-white/90 text-lg leading-relaxed">
-                Découvrez des initiatives à fort impact social portées par les OSC en Côte d'Ivoire.
+                Découvrir des initiatives à fort impact social portées par les OSC en Côte d'Ivoire.
                 Facilitez l'accès à des projets structurés et alignés sur les priorités de développement durable.
               </p>
             </div>
@@ -293,7 +293,7 @@ export default function PageOffreProjet() {
               </div>
               <h3 className="font-bold text-xl text-gray-900">Partenariats stratégiques</h3>
               <p className="text-gray-600 leading-relaxed">
-                Connectez-vous avec des organisations partageant les mêmes valeurs et construisez des collaborations solides pour un impact plus grand.
+                Se connecter avec des organisations partageant les mêmes valeurs et construisez des collaborations solides pour un impact plus grand.
               </p>
             </div>
           </div>

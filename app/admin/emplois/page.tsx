@@ -27,6 +27,7 @@ import {
 import { IJobs } from "@/types/api.types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const PAGE_SIZE = 24;
 
 export default function EmploisPage() {
   const router = useRouter();
@@ -37,6 +38,7 @@ export default function EmploisPage() {
   const [selectedStatut, setSelectedStatut] = useState("");
   const [selectedJob, setSelectedJob] = useState<IJobs | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Load jobs from API
   useEffect(() => {
@@ -75,6 +77,12 @@ export default function EmploisPage() {
 
     return matchSearch && matchType && matchStatut;
   });
+
+  // Reset page on filter change
+  useEffect(() => { setCurrentPage(1); }, [searchQuery, selectedType, selectedStatut]);
+
+  const totalPages = Math.ceil(filteredJobs.length / PAGE_SIZE);
+  const paginatedJobs = filteredJobs.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const handleViewJob = (job: IJobs) => {
     setSelectedJob(job);
@@ -273,7 +281,7 @@ export default function EmploisPage() {
 
         {/* Jobs Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredJobs.map((job) => (
+          {paginatedJobs.map((job) => (
             <div
               key={job.id}
               className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all overflow-hidden"
@@ -363,6 +371,53 @@ export default function EmploisPage() {
             <p className="text-gray-400 text-sm mt-1">
               Essayez de modifier vos critères de recherche
             </p>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {filteredJobs.length > 0 && (
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-gray-600">
+              Affichage de {Math.min((currentPage - 1) * PAGE_SIZE + 1, filteredJobs.length)}–{Math.min(currentPage * PAGE_SIZE, filteredJobs.length)} sur {filteredJobs.length} offre{filteredJobs.length > 1 ? 's' : ''}
+            </p>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  ← Précédent
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
+                  .reduce<(number | string)[]>((acc, p, idx, arr) => {
+                    if (idx > 0 && (p as number) - (arr[idx - 1] as number) > 1) acc.push('…');
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((p, idx) =>
+                    p === '…' ? (
+                      <span key={`ellipsis-${idx}`} className="px-2 text-gray-400">…</span>
+                    ) : (
+                      <button
+                        key={p}
+                        onClick={() => setCurrentPage(p as number)}
+                        className={`px-3 py-2 text-sm border rounded-lg ${currentPage === p ? 'bg-[#E05017] text-white border-[#E05017]' : 'border-gray-300 hover:bg-gray-100'}`}
+                      >
+                        {p}
+                      </button>
+                    )
+                  )}
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Suivant →
+                </button>
+              </div>
+            )}
           </div>
         )}
 

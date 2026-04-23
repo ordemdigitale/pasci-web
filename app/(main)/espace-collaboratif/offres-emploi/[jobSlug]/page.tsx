@@ -261,7 +261,7 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
 
           {/* Final CTA */}
           <section className="bg-[#E05017]/5 rounded-2xl p-8 md:p-12 text-center border border-[#E05017]/10">
-            <h3 className="text-2xl font-extrabold mb-4">Découvrez d'autres opportunités</h3>
+            <h3 className="text-2xl font-extrabold mb-4">Découvrir d'autres opportunités</h3>
             <p className="text-gray-600 mb-8 max-w-lg mx-auto leading-relaxed">
               Explorez notre plateforme pour découvrir plus d'offres d'emploi et d'opportunités de collaboration au sein de l'écosystème PASCI.
             </p>

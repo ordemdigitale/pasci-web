@@ -23,7 +23,7 @@ export default function AnnuairePage() {
 
       {/* Annuaires Grid */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h2 className="font-bold text-3xl mb-8 text-center">Choisissez un annuaire</h2>
+        <h2 className="font-bold text-3xl mb-8 text-center">Choisir un annuaire</h2>
 
         <div className="grid md:grid-cols-2 gap-8">
 
@@ -46,7 +46,7 @@ export default function AnnuairePage() {
               </div>
               <div className="p-6">
                 <p className="text-gray-600 mb-4">
-                  Découvrez les 5 Centres Régionaux d'Appui à la Société Civile répartis sur tout le territoire ivoirien.
+                  Découvrir les 5 Centres Régionaux d'Appui à la Société Civile répartis sur tout le territoire ivoirien.
                   Chaque CRASC accompagne les OSC de sa zone géographique.
                 </p>
                 <div className="flex items-center justify-between">

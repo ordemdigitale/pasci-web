@@ -285,7 +285,7 @@ export default function PageAnnuaireCrasc() {
             Annuaire des <span className="text-[#E05017]">CRASC</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Découvrez nos centres régionaux d'appui à la société civile et leurs organisations membres
+            Découvrir nos centres régionaux d'appui à la société civile et leurs organisations membres
           </p>
           <div className="w-24 h-1 bg-gradient-to-r from-[#E05017] to-[#2a591d] mx-auto mt-6 rounded-full"></div>
         </div>
@@ -296,7 +296,7 @@ export default function PageAnnuaireCrasc() {
         <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 shadow-lg">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Carte des CRASC en Côte d'Ivoire</h2>
-            <p className="text-gray-600">Cliquez sur une région pour découvrir le CRASC correspondant</p>
+            <p className="text-gray-600">Cliquer sur une région pour découvrir le CRASC correspondant</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -316,7 +316,7 @@ export default function PageAnnuaireCrasc() {
               <div className="space-y-3">
                 {/* Crasc Sud */}
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer">
-                  <div className="w-8 h-8 rounded bg-blue-300 border-2 border-blue-400"></div>
+                  <ImageWithFallback src="/images/logos-crasc/crasc-sud.jpg" alt="Logo CRASC SUD" className="w-10 h-10 rounded object-contain bg-white" />
                   <div>
                     <p className="font-bold text-blue-900">CRASC SUD</p>
                     <p className="text-xs text-blue-700">Abidjan, San-Pédro, Gagnoa</p>
@@ -324,7 +324,7 @@ export default function PageAnnuaireCrasc() {
                 </div>
                 {/* Crasc Centre */}
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200 hover:bg-green-100 transition-colors cursor-pointer">
-                  <div className="w-8 h-8 rounded bg-green-300 border-2 border-green-400"></div>
+                  <ImageWithFallback src="/images/logos-crasc/crasc-centre.jpg" alt="Logo CRASC CENTRE" className="w-10 h-10 rounded object-contain bg-white" />
                   <div>
                     <p className="font-bold text-green-900">CRASC CENTRE</p>
                     <p className="text-xs text-green-700">Yamoussoukro, Bouaké, Dimbokro</p>
@@ -332,7 +332,7 @@ export default function PageAnnuaireCrasc() {
                 </div>
                 {/* Crasc Nord */}
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-orange-50 border border-orange-200 hover:bg-orange-100 transition-colors cursor-pointer">
-                  <div className="w-8 h-8 rounded bg-orange-300 border-2 border-orange-400"></div>
+                  <ImageWithFallback src="/images/logos-crasc/crasc-nord.jpg" alt="Logo CRASC NORD" className="w-10 h-10 rounded object-contain bg-white" />
                   <div>
                     <p className="font-bold text-orange-900">CRASC NORD</p>
                     <p className="text-xs text-orange-700">Korhogo, Ferkessédougou, Séguéla</p>
@@ -340,7 +340,7 @@ export default function PageAnnuaireCrasc() {
                 </div>
                 {/* Crasc Ouest */}
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-cyan-50 border border-cyan-200 hover:bg-cyan-100 transition-colors cursor-pointer">
-                  <div className="w-8 h-8 rounded bg-cyan-300 border-2 border-cyan-400"></div>
+                  <ImageWithFallback src="/images/logos-crasc/crasc-ouest.jpg" alt="Logo CRASC OUEST" className="w-10 h-10 rounded object-contain bg-white" />
                   <div>
                     <p className="font-bold text-cyan-900">CRASC OUEST</p>
                     <p className="text-xs text-cyan-700">Man, Daloa, Guiglo</p>
@@ -348,7 +348,7 @@ export default function PageAnnuaireCrasc() {
                 </div>
                 {/* Crasc Est */}
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors cursor-pointer">
-                  <div className="w-8 h-8 rounded bg-rose-300 border-2 border-rose-400"></div>
+                  <ImageWithFallback src="/images/logos-crasc/crasc-est.jpg" alt="Logo CRASC EST" className="w-10 h-10 rounded object-contain bg-white" />
                   <div>
                     <p className="font-bold text-rose-900">CRASC EST</p>
                     <p className="text-xs text-rose-700">Abengourou, Bondoukou</p>

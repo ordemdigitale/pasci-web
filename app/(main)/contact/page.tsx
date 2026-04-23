@@ -40,7 +40,7 @@ export default function ContactPage() {
             <h2 className="text-[#2a591d] font-bold text-5xl">Contactez-nous</h2>
 
             <p className="text-gray-600 text-lg max-w-xl">
-              Nous sommes là pour répondre à vos questions et vous fournir toute l'assistance nécessaire. N'hésitez pas à nous contacter.
+              Nous sommes là pour répondre à vos questions et vous fournir toute l'assistance nécessaire. Ne pas hésiter à nous contacter.
             </p>
           </div>
 
@@ -66,7 +66,7 @@ export default function ContactPage() {
               <h2 className="text-gray-900 font-bold text-xl">Contactez-nous</h2>
               
               <p className="text-gray-600">
-                Remplissez le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais.
+                Remplir le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -79,7 +79,7 @@ export default function ContactPage() {
                     id="name"
                     name="name"
                     type="text"
-                    placeholder="Entrez votre nom"
+                    placeholder="Entrer votre nom"
                     value={formData.name}
                     onChange={handleChange}
                     required
@@ -96,7 +96,7 @@ export default function ContactPage() {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="Entrez votre adresse e-mail"
+                    placeholder="Entrer votre adresse e-mail"
                     value={formData.email}
                     onChange={handleChange}
                     required
@@ -145,11 +145,9 @@ export default function ContactPage() {
                       className="w-full bg-[#f5f5f5] border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#ff8c42] focus:ring-1 focus:ring-[#ff8c42]"
                     >
                       <option value="">-- Sélectionner --</option>
-                      <option value="Moins de 25 ans">Moins de 25 ans</option>
-                      <option value="25-35 ans">25-35 ans</option>
-                      <option value="36-45 ans">36-45 ans</option>
-                      <option value="46-55 ans">46-55 ans</option>
-                      <option value="Plus de 55 ans">Plus de 55 ans</option>
+                      <option value="-18 ans">-18 ans</option>
+                      <option value="18 à 35 ans">de 18 à 35 ans</option>
+                      <option value="+35 ans">+35 ans</option>
                     </select>
                   </div>
                 </div>
@@ -162,7 +160,7 @@ export default function ContactPage() {
                   <Textarea
                     id="message"
                     name="message"
-                    placeholder="Écrivez votre message ici"
+                    placeholder="Écrire votre message ici"
                     value={formData.message}
                     onChange={handleChange}
                     required
@@ -202,7 +200,7 @@ export default function ContactPage() {
                 <div className="flex items-start gap-3">
                   <Phone className="size-5 text-[#E05017] flex-shrink-0 mt-1" />
                   <p className="text-gray-600">
-                    (+225) 27 22 40 47 20 / 07 08 26 67 68
+                    05 05 56 57 41
                   </p>
                 </div>
               </div>
@@ -213,10 +211,10 @@ export default function ContactPage() {
                 <div className="flex items-start gap-3">
                   <Mail className="size-5 text-[#E05017] flex-shrink-0 mt-1" />
                   <a
-                    href="mailto:contact@crasc-inades.org"
+                    href="mailto:pdoc@plateforme-osci.org"
                     className="text-[#E05017] hover:underline"
                   >
-                    contact@plateforme-crasci.org
+                    pdoc@plateforme-osci.org
                   </a>
                 </div>
               </div>
