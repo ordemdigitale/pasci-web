@@ -8,7 +8,7 @@ import Link from "next/link";
 import { ImageWithFallback } from '@/lib/imageWithFallback';
 import { ICrascDetail, INews } from "@/types/api.types";
 import { domainesIntervention } from "../page";
-import { 
+import {
   Building2,
   MapPin,
   Users,
@@ -16,7 +16,10 @@ import {
   Calendar,
   ExternalLink,
   Loader2,
-  Target
+  Target,
+  Search,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 
@@ -36,6 +39,9 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
   const [crascData, setCrascData] = useState<ICrascDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [oscSearch, setOscSearch] = useState('');
+  const [oscPage, setOscPage] = useState(1);
+  const OSC_PER_PAGE = 6;
 
   useEffect(() => {
     if (!crascSlug) return;
@@ -202,61 +208,137 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
             </div>
 
             {/* OSC Members Section */}
-            {crascData.oscs && crascData.oscs.length > 0 && (
+            {crascData.oscs !== undefined && (
               <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-6">
+                {/* Header avec recherche */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                       <Users className="w-5 h-5 text-blue-600" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900">
-                      OSC Membres
-                    </h2>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">OSC Membres</h2>
+                      <p className="text-xs text-gray-500">
+                        {crascData.oscs.filter(o => o.name.toLowerCase().includes(oscSearch.toLowerCase())).length} / {crascData.oscs.length} organisation{crascData.oscs.length > 1 ? 's' : ''}
+                      </p>
+                    </div>
                   </div>
-                  <span className="text-sm font-semibold text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                    {crascData.oscs.length} organisation{crascData.oscs.length > 1 ? 's' : ''}
-                  </span>
+                  <div className="relative w-full sm:w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Rechercher une OSC..."
+                      value={oscSearch}
+                      onChange={(e) => { setOscSearch(e.target.value); setOscPage(1); }}
+                      className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#E05017] focus:ring-1 focus:ring-[#E05017]"
+                    />
+                  </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  {crascData.oscs.map((osc) => (
-                    <Link
-                      key={osc.id}
-                      href={`/annuaire/annuaire-des-osc/${osc.slug}`}
-                      className="zone-card group bg-gray-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition-all"
-                    >
-                      <div className="aspect-video overflow-hidden bg-gray-200">
-                        <ImageWithFallback
-                          alt={osc.name}
-                          src={osc?.thumbnail_url}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                      <div className="p-4">
-                        <h3 className="zone-title font-bold text-gray-900 transition-colors mb-2 line-clamp-1">
-                          {osc.name}
-                        </h3>
-                        {osc.description && (
-                          <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-                            {osc.description}
-                          </p>
-                        )}
-                        {osc.type && (
-                          <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
-                            {osc.type.name}
-                          </span>
-                        )}
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
+                {(() => {
+                  const filtered = crascData.oscs!.filter(o =>
+                    o.name.toLowerCase().includes(oscSearch.toLowerCase())
+                  );
+                  const totalPages = Math.ceil(filtered.length / OSC_PER_PAGE);
+                  const paginated = filtered.slice((oscPage - 1) * OSC_PER_PAGE, oscPage * OSC_PER_PAGE);
 
-            {crascData.oscs?.length === 0 && (
-              <div className="bg-white rounded-2xl border-2 border-gray-200 p-12 text-center shadow-sm">
-                <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-xl text-gray-500">Aucune OSC ajoutée pour le moment.</p>
+                  return (
+                    <>
+                      {filtered.length === 0 ? (
+                        <div className="text-center py-12 text-gray-400">
+                          <Search className="w-10 h-10 mx-auto mb-3 opacity-40" />
+                          <p className="font-medium">Aucune OSC trouvée pour &quot;{oscSearch}&quot;</p>
+                        </div>
+                      ) : (
+                        <div className="grid md:grid-cols-2 gap-4 mb-4">
+                          {paginated.map((osc) => (
+                            <Link
+                              key={osc.id}
+                              href={`/annuaire/annuaire-des-osc/${osc.slug}`}
+                              className="zone-card group bg-gray-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition-all"
+                            >
+                              <div className="aspect-video overflow-hidden bg-gray-200">
+                                <ImageWithFallback
+                                  alt={osc.name}
+                                  src={osc?.thumbnail_url}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                              </div>
+                              <div className="p-4">
+                                <h3 className="zone-title font-bold text-gray-900 transition-colors mb-2 line-clamp-1">
+                                  {osc.name}
+                                </h3>
+                                {osc.description && (
+                                  <p className="text-gray-600 text-sm line-clamp-2 mb-3">{osc.description}</p>
+                                )}
+                                {osc.type && (
+                                  <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                                    {osc.type.name}
+                                  </span>
+                                )}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Pagination */}
+                      {totalPages > 1 && (
+                        <div className="flex items-center justify-center gap-1 pt-2 border-t border-gray-100 flex-wrap">
+                          <button
+                            onClick={() => setOscPage(p => Math.max(1, p - 1))}
+                            disabled={oscPage === 1}
+                            className="p-2 rounded-lg border border-gray-200 hover:border-[#E05017] hover:text-[#E05017] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+                          {Array.from({ length: totalPages }, (_, i) => i + 1)
+                            .filter(page =>
+                              page === 1 ||
+                              page === totalPages ||
+                              (page >= oscPage - 1 && page <= oscPage + 1)
+                            )
+                            .reduce<(number | '...')[]>((acc, page, idx, arr) => {
+                              if (idx > 0 && page - (arr[idx - 1] as number) > 1) acc.push('...');
+                              acc.push(page);
+                              return acc;
+                            }, [])
+                            .map((item, idx) =>
+                              item === '...' ? (
+                                <span key={`ellipsis-${idx}`} className="w-8 text-center text-gray-400 text-sm">…</span>
+                              ) : (
+                                <button
+                                  key={item}
+                                  onClick={() => setOscPage(item as number)}
+                                  className={`w-8 h-8 rounded-lg text-sm font-semibold transition-colors ${
+                                    item === oscPage
+                                      ? 'bg-[#E05017] text-white'
+                                      : 'border border-gray-200 text-gray-700 hover:border-[#E05017] hover:text-[#E05017]'
+                                  }`}
+                                >
+                                  {item}
+                                </button>
+                              )
+                            )}
+                          <button
+                            onClick={() => setOscPage(p => Math.min(totalPages, p + 1))}
+                            disabled={oscPage === totalPages}
+                            className="p-2 rounded-lg border border-gray-200 hover:border-[#E05017] hover:text-[#E05017] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+
+                {crascData.oscs.length === 0 && (
+                  <div className="text-center py-12 text-gray-400">
+                    <Users className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                    <p className="text-xl">Aucune OSC ajoutée pour le moment.</p>
+                  </div>
+                )}
               </div>
             )}
 

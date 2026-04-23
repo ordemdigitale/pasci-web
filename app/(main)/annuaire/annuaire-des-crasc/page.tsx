@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import { fetchAllCrasc, fetchAllOsc } from "@/lib/fetch-crasc";
 import { ICrasc, IKeyStats, IOsc, SpotlightNews } from "@/types/api.types";
-import { Users, Building2, Target, ArrowRight, MapPin, Calendar } from "lucide-react";
+import { Users, Building2, Target, ArrowRight, MapPin, Calendar, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import DOMPurify from 'dompurify';
 import { CrascMapSvg } from '@/components/ui/CrascMapSvg';
@@ -191,6 +191,9 @@ export default function PageAnnuaireCrasc() {
   const [spotlightNewsData, setSpotlightNewsData] = useState<SpotlightNews[]>(mockNews);
   const [newsLoading, setNewsLoading] = useState(true);
   const [newsError, setNewsError] = useState<string | null>(null);
+  const [oscSearch, setOscSearch] = useState('');
+  const [oscPage, setOscPage] = useState(1);
+  const OSC_PER_PAGE = 6;
   const router = useRouter();
 
   // Fetch CRASC data on component mount
@@ -458,55 +461,108 @@ export default function PageAnnuaireCrasc() {
         </div>
       </div>
 
-      {/* Section OSC membres - Redesigned */}
+      {/* Section OSC membres */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-3xl font-extrabold text-gray-900 mb-2">OSC membres</h2>
-{/*             <p className="text-gray-600">Découvrez les organisations qui font partie de notre réseau</p> */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <h2 className="text-3xl font-extrabold text-gray-900">
+            OSC membres
+            {oscData.length > 0 && (
+              <span className="ml-3 text-base font-semibold text-gray-400">
+                ({oscData.filter(o => o.name.toLowerCase().includes(oscSearch.toLowerCase())).length})
+              </span>
+            )}
+          </h2>
+          {/* Barre de recherche */}
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Rechercher une OSC..."
+              value={oscSearch}
+              onChange={(e) => { setOscSearch(e.target.value); setOscPage(1); }}
+              className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:border-[#E05017] focus:ring-1 focus:ring-[#E05017]"
+            />
           </div>
         </div>
 
         {/* OSC Cards Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {oscData.length && oscData.slice(0, 3).map((osc) => (
-            <Link
-              key={osc.id}
-              href={`/annuaire/annuaire-des-osc/${osc.slug}`}
-              className="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block"
-            >
-              {/* Image */}
-              <div className="aspect-video overflow-hidden relative">
-                <ImageWithFallback
-                  src={osc.thumbnail_url}
-                  alt={osc.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-              </div>
+        {(() => {
+          const filtered = oscData.filter(o =>
+            o.name.toLowerCase().includes(oscSearch.toLowerCase())
+          );
+          const totalPages = Math.ceil(filtered.length / OSC_PER_PAGE);
+          const paginated = filtered.slice((oscPage - 1) * OSC_PER_PAGE, oscPage * OSC_PER_PAGE);
 
-              {/* Content */}
-              <div className="p-5">
-                <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-[#E05017] transition-colors">
-                  {osc.name}
-                </h3>
-                <p className="text-gray-600 text-sm line-clamp-3">
-                  {osc?.description}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
+          return (
+            <>
+              {paginated.length === 0 ? (
+                <div className="text-center py-16 text-gray-400">
+                  <Search className="w-10 h-10 mx-auto mb-3 opacity-40" />
+                  <p className="font-medium">Aucune OSC trouvée pour &quot;{oscSearch}&quot;</p>
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                  {paginated.map((osc) => (
+                    <Link
+                      key={osc.id}
+                      href={`/annuaire/annuaire-des-osc/${osc.slug}`}
+                      className="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block"
+                    >
+                      <div className="aspect-video overflow-hidden relative">
+                        <ImageWithFallback
+                          src={osc.thumbnail_url}
+                          alt={osc.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                      <div className="p-5">
+                        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-[#E05017] transition-colors">
+                          {osc.name}
+                        </h3>
+                        <p className="text-gray-600 text-sm line-clamp-3">{osc?.description}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
 
-        {/* Voir Plus Button */}
-        <div className="text-center">
-          <Link
-            href="/annuaire/annuaire-des-osc"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#E05017] to-[#d04010] text-white font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
-          >
-            Voir plus d'OSC
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-4">
+                  <button
+                    onClick={() => setOscPage(p => Math.max(1, p - 1))}
+                    disabled={oscPage === 1}
+                    className="p-2 rounded-lg border border-gray-200 hover:border-[#E05017] hover:text-[#E05017] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setOscPage(page)}
+                      className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors ${
+                        page === oscPage
+                          ? 'bg-[#E05017] text-white'
+                          : 'border border-gray-200 text-gray-700 hover:border-[#E05017] hover:text-[#E05017]'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setOscPage(p => Math.min(totalPages, p + 1))}
+                    disabled={oscPage === totalPages}
+                    className="p-2 rounded-lg border border-gray-200 hover:border-[#E05017] hover:text-[#E05017] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </>
+          );
+        })()}
       </div>
 
       {/* Section actualités - Redesigned */}
