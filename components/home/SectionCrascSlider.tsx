@@ -4,40 +4,36 @@ import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 
-const slides = [
-  {
-    src: "/images/actualites/13bf15a5-0f87-415a-a05d-e3775879560d.jpg",
-    caption: "Renforcement des capacités des OSC",
-  },
-  {
-    src: "/images/actualites/359a7b7d-c126-4fdf-934d-9038c01df7e0.jpg",
-    caption: "Activités des CRASC en régions",
-  },
-  {
-    src: "/images/actualites/433ece92-1b86-441e-b78a-8382fcf60a00.jpg",
-    caption: "Ateliers de formation et d'échanges",
-  },
-  {
-    src: "/images/actualites/99aff270-1397-4fe0-97df-b9c49415ceb1.jpg",
-    caption: "Partenariats et coopération",
-  },
-  {
-    src: "/images/page-annuaire-crasc/09d92f51-b85c-4581-be51-d5333472e74d.jpg",
-    caption: "Réseau des organisations de la société civile",
-  },
-  {
-    src: "/images/b81daf7f-c015-4a68-942f-ce602fdf5542.jpg",
-    caption: "Pôles de concertation des OSC",
-  },
+const FALLBACK_SLIDES = [
+  { src: "/images/actualites/13bf15a5-0f87-415a-a05d-e3775879560d.jpg" },
+  { src: "/images/actualites/359a7b7d-c126-4fdf-934d-9038c01df7e0.jpg" },
+  { src: "/images/actualites/433ece92-1b86-441e-b78a-8382fcf60a00.jpg" },
+  { src: "/images/actualites/99aff270-1397-4fe0-97df-b9c49415ceb1.jpg" },
+  { src: "/images/page-annuaire-crasc/09d92f51-b85c-4581-be51-d5333472e74d.jpg" },
+  { src: "/images/b81daf7f-c015-4a68-942f-ce602fdf5542.jpg" },
 ];
 
 export default function SectionCrascSlider() {
+  const [slides, setSlides] = useState(FALLBACK_SLIDES);
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
 
+  useEffect(() => {
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    fetch(`${API_BASE}/api/v1/hero-slides?active_only=true`)
+      .then((r) => r.ok ? r.json() : [])
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setSlides(data.map((s: { image_url: string }) => ({ src: s.image_url })));
+          setCurrent(0);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const next = useCallback(() => {
     setCurrent((prev) => (prev + 1) % slides.length);
-  }, []);
+  }, [slides.length]);
 
   const prev = () => {
     setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
@@ -68,13 +64,9 @@ export default function SectionCrascSlider() {
             >
               <ImageWithFallback
                 src={slide.src}
-                alt={slide.caption}
+                alt={`Slide ${index + 1}`}
                 className="w-full h-full object-cover"
               />
-              {/* Overlay gradient + caption */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-6 py-5">
-                <p className="text-white font-semibold text-lg drop-shadow">{slide.caption}</p>
-              </div>
             </div>
           ))}
 
@@ -97,7 +89,7 @@ export default function SectionCrascSlider() {
           </button>
 
           {/* Dots */}
-          <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
             {slides.map((_, index) => (
               <button
                 key={index}

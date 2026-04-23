@@ -288,7 +288,7 @@ export default function Navbar() {
             <div className="overflow-hidden flex-1">
               <div
                 className="flex whitespace-nowrap"
-                style={{ animation: "ticker 35s linear infinite", width: "max-content" }}
+                style={{ animation: "ticker 70s linear infinite", width: "max-content" }}
               >
                 {[0, 1].map((copy) => (
                   <div key={copy} className="flex whitespace-nowrap">
