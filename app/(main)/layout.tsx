@@ -4,6 +4,7 @@ import "../globals.css";
 import Navbar from "@/components/layout/Navbar";
 import SubMenu from "@/components/layout/SubMenu";
 import Footer from "@/components/layout/Footer";
+import { Toaster } from "sonner";
 
 const karla = Karla({
   variable: "--font-karla",
@@ -34,6 +35,7 @@ export default function RootLayout({
         <SubMenu />
         {children}
         <Footer />
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

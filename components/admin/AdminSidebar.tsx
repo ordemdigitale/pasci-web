@@ -13,6 +13,7 @@ import {
   BookOpen,
   MessageSquare,
   Megaphone,
+  ClipboardList,
 } from "lucide-react";
 
 interface NavItem {
@@ -81,6 +82,11 @@ export default function AdminSidebar({
       icon: <FileText size={20} />,
       label: "Ressources",
       href: "/admin/ressources",
+    },
+    {
+      icon: <ClipboardList size={20} />,
+      label: "Demandes d'adhésion",
+      href: "/admin/demandes-adhesion",
     },
     {
       icon: <Settings size={20} />,

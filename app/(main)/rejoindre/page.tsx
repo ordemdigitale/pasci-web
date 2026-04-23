@@ -114,9 +114,25 @@ export default function PageRejoindre() {
   async function onSubmit(values: RegistrationFormValues) {
     try {
       setIsSubmitting(true);
-      console.log('Form values:', values);
-
-      toast.success('Demande soumise avec succès!');
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_BASE_URL}/api/v1/adhesion`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nom_organisation: values.organizationName,
+          type_organisation: values.organizationType,
+          region: values.region,
+          ville: values.city || null,
+          email: values.email,
+          telephone: values.phone,
+          description: values.description || null,
+          motivation: values.motivation,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error('Erreur lors de la soumission');
+      }
+      toast.success('Demande soumise avec succès ! Nous vous contacterons prochainement.');
       form.reset();
     } catch (error) {
       toast.error('Une erreur est survenue. Veuillez réessayer.');
