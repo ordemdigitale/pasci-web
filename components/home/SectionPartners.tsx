@@ -117,16 +117,16 @@ export default function Partners() {
         {/* CTA Section */}
         <div className="mt-16 text-center bg-gradient-to-r from-[#E05017]/5 to-[#2a591d]/5 rounded-2xl p-8 border border-[#E05017]/20">
           <h3 className="text-2xl font-bold text-gray-900 mb-3">
-            Devenir partenaire
+            Adhésion au CRASC
           </h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Rejoindre notre réseau de partenaires engagés pour le développement de la société civile en Côte d'Ivoire
+            Votre organisation souhaite intégrer le réseau des OSC membres du CRASC ? Soumettez votre demande d'adhésion et bénéficiez de l'accompagnement de la plateforme PDOC.
           </p>
           <Link
-            href="/contact"
+            href="/rejoindre"
             className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-[#E05017] to-[#d04010] text-white font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
           >
-            Nous contacter
+            Formulaire d'adhésion
             <ExternalLink className="w-4 h-4" />
           </Link>
         </div>
