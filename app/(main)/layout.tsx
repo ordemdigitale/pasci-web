@@ -36,6 +36,7 @@ export default function RootLayout({
         <SubMenu />
         {children}
         <Footer />
+        <PageTracker />
         <Toaster position="top-right" richColors />
       </body>
     </html>

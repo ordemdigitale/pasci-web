@@ -18,6 +18,7 @@ import {
   Activity,
   Newspaper,
   FolderOpen,
+  Eye,
 } from 'lucide-react';
 import { ICrasc, IJobs } from '@/types/api.types';
 
@@ -30,10 +31,22 @@ interface DashboardStats {
   users: { total: number };
 }
 
+interface VisiteStats {
+  total: number;
+  visiteurs_uniques: number;
+  aujourd_hui: number;
+  hier: number;
+  "7_jours": number;
+  "30_jours": number;
+  top_pages: { path: string; visites: number }[];
+  par_jour: { date: string; visites: number }[];
+}
+
 export default function Dashboard() {
   const [crascData, setCrascData] = useState<ICrasc[] | null>(null);
   const [jobsData, setJobsData] = useState<IJobs[] | null>(null);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
+  const [visiteStats, setVisiteStats] = useState<VisiteStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -54,6 +67,13 @@ export default function Dashboard() {
       }
     };
     fetchDashboardStats();
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/v1/visites/stats`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data) setVisiteStats(data); })
+      .catch(() => {});
   }, []);
 
   // fetch all crasc data
@@ -99,53 +119,6 @@ export default function Dashboard() {
     };
     fetchJobsData();
   }, [])
-
-  if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto font-poppins bg-slate-50 min-h-screen p-8">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-64 mb-6"></div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200">
-            <div className="h-10 bg-gray-200 rounded mb-4"></div>
-            <div className="h-32 bg-gray-200 rounded mb-6"></div>
-            <div className="flex gap-4">
-              <div className="h-10 bg-gray-200 rounded w-32"></div>
-              <div className="h-10 bg-gray-200 rounded w-32"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  if (error) {
-    return (
-      <div className="max-w-4xl mx-auto font-poppins bg-slate-50 min-h-screen p-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <div className="flex items-center mb-4">
-            <svg className="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h2 className="text-lg font-semibold text-red-800">Erreur</h2>
-          </div>
-          <p className="text-red-700 mb-4">{error}</p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              Réessayer
-            </button>
-            <Link
-              href="/admin/gestion-des-crasc/type-de-osc"
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Retour à la liste
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="p-6">
@@ -232,6 +205,89 @@ export default function Dashboard() {
             Gérer les utilisateurs →
           </Link>
         </div>
+      </div>
+
+      {/* Visites */}
+      <div className="mb-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center gap-2 mb-5">
+          <Eye className="w-5 h-5 text-[#E05017]" />
+          <h2 className="text-xl font-bold text-gray-900">Visites de la plateforme</h2>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div className="bg-[#E05017]/5 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">Aujourd'hui</p>
+            <p className="text-2xl font-bold text-[#E05017]">{(visiteStats?.aujourd_hui ?? 0).toLocaleString("fr-FR")}</p>
+          </div>
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">7 derniers jours</p>
+            <p className="text-2xl font-bold text-gray-900">{(visiteStats?.["7_jours"] ?? 0).toLocaleString("fr-FR")}</p>
+          </div>
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">30 derniers jours</p>
+            <p className="text-2xl font-bold text-gray-900">{(visiteStats?.["30_jours"] ?? 0).toLocaleString("fr-FR")}</p>
+          </div>
+          <div className="bg-[#2a591d]/5 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">Total visites</p>
+            <p className="text-2xl font-bold text-[#2a591d]">{(visiteStats?.total ?? 0).toLocaleString("fr-FR")}</p>
+            <p className="text-xs text-gray-400 mt-1">{(visiteStats?.visiteurs_uniques ?? 0).toLocaleString("fr-FR")} visiteurs uniques</p>
+          </div>
+        </div>
+
+        {/* Histogramme 7 jours */}
+        {(visiteStats?.par_jour?.length ?? 0) > 0 && (
+          <div className="mb-5">
+            <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">Visites par jour (7 jours)</p>
+            <div className="flex items-end gap-2 h-16">
+              {visiteStats!.par_jour.map((j) => {
+                const max = Math.max(...visiteStats!.par_jour.map((x) => x.visites), 1);
+                const pct = Math.round((j.visites / max) * 100);
+                return (
+                  <div key={j.date} className="flex-1 flex flex-col items-center gap-1">
+                    <span className="text-xs text-gray-500">{j.visites}</span>
+                    <div
+                      className="w-full bg-[#E05017] rounded-t-md"
+                      style={{ height: `${Math.max(pct, 4)}%`, minHeight: "4px" }}
+                    />
+                    <span className="text-[10px] text-gray-400">
+                      {new Date(j.date).toLocaleDateString("fr-FR", { weekday: "short" })}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Top pages */}
+        {(visiteStats?.top_pages?.length ?? 0) > 0 && (
+          <div>
+            <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">Pages les plus visitées</p>
+            <div className="space-y-2">
+              {visiteStats!.top_pages.map((p, i) => {
+                const max = visiteStats!.top_pages[0].visites;
+                const pct = Math.round((p.visites / max) * 100);
+                return (
+                  <div key={p.path} className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400 w-4">{i + 1}</span>
+                    <div className="flex-1">
+                      <div className="flex justify-between mb-0.5">
+                        <span className="text-sm text-gray-700 truncate">{p.path || "/"}</span>
+                        <span className="text-sm font-semibold text-gray-900 ml-2">{p.visites}</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#2a591d] rounded-full" style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {!visiteStats && (
+          <p className="text-sm text-gray-400 text-center py-4">Chargement des statistiques…</p>
+        )}
       </div>
 
       {/* CRASC Overview Section */}

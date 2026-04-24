@@ -178,10 +178,10 @@ export default function PageProcessusFormalisation() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 rounded-lg py-8 space-y-6 text-center text-white shadow-md border border-gray-200">
           <p className="font-bold text-4xl text-black">Prêt à se faire accompagner ?</p>
           <p className="max-w-2xl mx-auto text-gray-800">
-            Nous sommes votre partenaire pour réussir votre processus de formalisation. Contactez-nous pour bénéficier d'un accompagnement personnalisé et propulser votre organisation vers de nouveaux sommets.
+            Nous sommes votre partenaire pour réussir votre processus de formalisation. Nous contacter pour bénéficier d'un accompagnement personnalisé et propulser votre organisation vers de nouveaux sommets.
           </p>
           <Link href="/contact" className="border border-transparent hover:border-[#E05017] text-white hover:text-[#E05017] hover:bg-transparent bg-[#E05017] rounded-lg py-2 px-5">
-            Contactez-nous
+            Nous contacter
           </Link>
         </div>
       </div>

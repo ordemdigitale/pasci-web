@@ -37,7 +37,7 @@ export default function ContactPage() {
         <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
           {/* Left content */}
           <div className="space-y-8">
-            <h2 className="text-[#2a591d] font-bold text-5xl">Contactez-nous</h2>
+            <h2 className="text-[#2a591d] font-bold text-5xl">Nous contacter</h2>
 
             <p className="text-gray-600 text-lg max-w-xl">
               Nous sommes là pour répondre à vos questions et vous fournir toute l'assistance nécessaire. Ne pas hésiter à nous contacter.
@@ -63,7 +63,7 @@ export default function ContactPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
             {/* Left - Contact Form */}
             <div className="space-y-6 border border-gray-200 rounded-lg p-8">
-              <h2 className="text-gray-900 font-bold text-xl">Contactez-nous</h2>
+              <h2 className="text-gray-900 font-bold text-xl">Nous contacter</h2>
               
               <p className="text-gray-600">
                 Remplir le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais.
@@ -221,7 +221,7 @@ export default function ContactPage() {
 
               {/* Social Media */}
               <div className="space-y-3">
-                <h3 className="text-gray-900 font-bold">Suivez-nous</h3>
+                <h3 className="text-gray-900 font-bold">Nous suivre</h3>
                 <div className="flex gap-4">
                   <a
                     href="#facebook"

@@ -233,6 +233,11 @@ export interface IPoleConcertation {
   image_path?: string;
   objectifs?: string;
   objectifs_list?: string[];
+  objectifs_annuels?: string;
+  nb_osc_membres?: number;
+  regions_influence?: string;
+  realisations?: string;
+  agenda?: string;
   is_active: boolean;
   sujets_count: number;
   created_at: string;

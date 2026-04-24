@@ -402,13 +402,13 @@ export default function AnnuaireOSCPage() {
           <div className="relative z-10">
             <h3 className="font-extrabold text-3xl mb-4">Votre OSC n'est pas listée ?</h3>
             <p className="max-w-2xl mx-auto mb-8 text-lg">
-              Rejoignez le réseau des CRASC pour bénéficier d'un accompagnement personnalisé et apparaître dans cet annuaire.
+              Rejoindre le réseau des CRASC pour bénéficier d'un accompagnement personnalisé et apparaître dans cet annuaire.
             </p>
             <Link
               href="/auth/login"
               className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#E05017] font-bold rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300"
             >
-              Rejoignez-nous
+              Nous rejoindre
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>

@@ -137,7 +137,7 @@ export default function AnnuairePage() {
         <div className="bg-[#E05017] rounded-lg py-12 px-8 text-center text-white">
           <h3 className="font-bold text-3xl mb-4">Vous ne trouvez pas ce que vous cherchez ?</h3>
           <p className="max-w-2xl mx-auto mb-6">
-            Contactez-nous pour obtenir plus d'informations ou pour ajouter votre organisation à nos annuaires.
+            Nous contacter pour obtenir plus d'informations ou pour ajouter votre organisation à nos annuaires.
           </p>
           <Link
             href="/contact"

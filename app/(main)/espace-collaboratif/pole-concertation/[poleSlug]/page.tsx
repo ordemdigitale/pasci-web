@@ -13,6 +13,11 @@ import {
   Pin,
   Plus,
   X,
+  Target,
+  Users,
+  MapPin,
+  Star,
+  CalendarDays,
 } from "lucide-react";
 
 function formatDate(dateStr: string) {
@@ -133,15 +138,130 @@ export default function PagePoleForum() {
       </Link>
 
       {/* Pole header */}
-      <div className="bg-[#f0f9ff] rounded-xl p-6 mb-8 border border-gray-200">
-        <div className="inline-block px-3 py-1 rounded-md text-xs font-semibold text-white bg-[#E05017] mb-3">
-          {pole.category}
-        </div>
+      <div className="bg-[#f0f9ff] rounded-xl p-6 mb-6 border border-gray-200">
+        {pole.category && (
+          <div className="inline-block px-3 py-1 rounded-md text-xs font-semibold text-white bg-[#E05017] mb-3">
+            {pole.category}
+          </div>
+        )}
         <h1 className="text-2xl font-bold text-[#2a591d] mb-2">{pole.name}</h1>
         {pole.description && (
           <p className="text-gray-600 text-sm">{pole.description}</p>
         )}
+        {pole.nb_osc_membres != null && (
+          <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
+            <Users className="w-4 h-4 text-[#E05017]" />
+            <span><strong>{pole.nb_osc_membres}</strong> OSC membres</span>
+          </div>
+        )}
       </div>
+
+      {/* Objectifs annuels */}
+      {pole.objectifs_annuels && (() => {
+        try {
+          const list: string[] = JSON.parse(pole.objectifs_annuels);
+          if (list.length === 0) return null;
+          return (
+            <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-3">
+                <Target className="w-5 h-5 text-[#E05017]" />
+                <h2 className="font-bold text-gray-800">Objectifs annuels du pôle</h2>
+              </div>
+              <ul className="space-y-2">
+                {list.map((obj, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#E05017] mt-2 flex-shrink-0" />
+                    {obj}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        } catch { return null; }
+      })()}
+
+      {/* Régions d'influence */}
+      {pole.regions_influence && (() => {
+        try {
+          const list: string[] = JSON.parse(pole.regions_influence);
+          if (list.length === 0) return null;
+          return (
+            <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="w-5 h-5 text-[#E05017]" />
+                <h2 className="font-bold text-gray-800">Régions d&apos;influence</h2>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {list.map((r, i) => (
+                  <span key={i} className="px-3 py-1 bg-[#2a591d]/10 text-[#2a591d] rounded-full text-sm font-medium">
+                    {r}
+                  </span>
+                ))}
+              </div>
+            </div>
+          );
+        } catch { return null; }
+      })()}
+
+      {/* Réalisations */}
+      {pole.realisations && (() => {
+        try {
+          const list: string[] = JSON.parse(pole.realisations);
+          if (list.length === 0) return null;
+          return (
+            <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="w-5 h-5 text-[#E05017]" />
+                <h2 className="font-bold text-gray-800">Nos réalisations</h2>
+              </div>
+              <ul className="space-y-2">
+                {list.map((r, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2a591d] mt-2 flex-shrink-0" />
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        } catch { return null; }
+      })()}
+
+      {/* Agenda */}
+      {pole.agenda && (() => {
+        try {
+          const items: { date: string; titre: string; description: string }[] = JSON.parse(pole.agenda);
+          if (items.length === 0) return null;
+          return (
+            <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <CalendarDays className="w-5 h-5 text-[#E05017]" />
+                <h2 className="font-bold text-gray-800">Agenda</h2>
+              </div>
+              <div className="space-y-3">
+                {items.map((item, i) => (
+                  <div key={i} className="flex gap-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    {item.date && (
+                      <div className="flex-shrink-0 text-center bg-[#E05017] text-white rounded-lg px-3 py-2 min-w-[60px]">
+                        <p className="text-xs font-semibold">
+                          {new Date(item.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })}
+                        </p>
+                        <p className="text-xs">{new Date(item.date).getFullYear()}</p>
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-800 text-sm">{item.titre}</p>
+                      {item.description && (
+                        <p className="text-xs text-gray-500 mt-0.5">{item.description}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        } catch { return null; }
+      })()}
 
       {/* Header actions */}
       <div className="flex items-center justify-between mb-6">
