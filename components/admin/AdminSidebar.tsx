@@ -15,6 +15,7 @@ import {
   Megaphone,
   ClipboardList,
   Heart,
+  Phone,
 } from "lucide-react";
 
 interface NavItem {
@@ -91,6 +92,7 @@ export default function AdminSidebar({
     },
     { icon: <Heart size={20} />, label: "Dons", href: "/admin/dons" },
     { icon: <Users size={20} />, label: "Volontaires", href: "/admin/volontaires" },
+    { icon: <Phone size={20} />, label: "Numéros utiles", href: "/admin/numeros-utiles" },
     {
       icon: <Settings size={20} />,
       label: "Paramètres",
