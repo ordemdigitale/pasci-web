@@ -58,17 +58,22 @@ export default function AdminModifierPolePage() {
           setImagePreview(url);
         }
         setIsActive(data.is_active ?? true);
-        const parseList = (raw: string | null, fallback: string[]) => {
+        const parseList = (raw: string | null, fallback: string[]): string[] => {
           try { const p = raw ? JSON.parse(raw) : []; return p.length > 0 ? p : fallback; }
           catch { return fallback; }
+        };
+        const parseAgenda = (raw: string | null) => {
+          try {
+            const p = raw ? JSON.parse(raw) : [];
+            return Array.isArray(p) && p.length > 0 ? p : [{ date: "", titre: "", description: "" }];
+          } catch { return [{ date: "", titre: "", description: "" }]; }
         };
         setObjectifs(parseList(data.objectifs, [""]));
         setObjectifsAnnuels(parseList(data.objectifs_annuels, [""]));
         setNbOscMembres(data.nb_osc_membres != null ? String(data.nb_osc_membres) : "");
         setRegionsInfluence(parseList(data.regions_influence, [""]));
         setRealisations(parseList(data.realisations, [""]));
-        const parsedAgenda = parseList(data.agenda, [{ date: "", titre: "", description: "" }]);
-        setAgenda(parsedAgenda.length > 0 ? parsedAgenda : [{ date: "", titre: "", description: "" }]);
+        setAgenda(parseAgenda(data.agenda));
       })
       .catch(() => setError("Impossible de charger le pôle."))
       .finally(() => setLoading(false));

@@ -97,31 +97,49 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
   if (oscData.financement_ong_intl) financements.push("ONG internationales");
   if (oscData.financement_multilateral) financements.push("Fonds multilatéraux");
 
+  /** Initiales de l'OSC (max 2 mots) */
+  const initiales = oscData.name
+    .split(" ")
+    .filter((w) => w.length > 1)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+
   return (
     <section className="pb-12 font-poppins">
 
-      {/* Cover */}
-      {oscData.thumbnail_url && (
+      {/* Bannière : image réelle ou bannière de couleur */}
+      {oscData.thumbnail_url ? (
         <div className="relative h-56 md:h-72 overflow-hidden">
           <ImageWithFallback src={oscData.thumbnail_url} alt={oscData.name} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        </div>
+      ) : (
+        <div className="relative h-40 md:h-52 bg-gradient-to-br from-[#052838] to-[#0a4060] flex items-end">
+          <div className="absolute inset-0 opacity-10"
+            style={{ backgroundImage: "radial-gradient(circle at 20% 50%, #E05017 0%, transparent 60%), radial-gradient(circle at 80% 20%, #2a591d 0%, transparent 50%)" }}
+          />
         </div>
       )}
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header card */}
-        <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8 ${oscData.thumbnail_url ? "-mt-16 relative z-10" : "mt-8"}`}>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8 -mt-16 relative z-10">
           <div className="flex flex-col md:flex-row gap-6 items-start">
 
-            {/* Logo */}
-            {oscData.thumbnail_url && (
-              <div className="flex-shrink-0">
+            {/* Avatar : image ou initiales */}
+            <div className="flex-shrink-0">
+              {oscData.thumbnail_url ? (
                 <div className="w-28 h-28 rounded-xl overflow-hidden border-4 border-white shadow-md">
                   <ImageWithFallback src={oscData.thumbnail_url} alt={oscData.name} className="w-full h-full object-cover" />
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="w-28 h-28 rounded-xl border-4 border-white shadow-md bg-[#052838] flex items-center justify-center">
+                  <span className="text-white text-3xl font-extrabold tracking-wide">{initiales}</span>
+                </div>
+              )}
+            </div>
 
             {/* Infos principales */}
             <div className="flex-1">

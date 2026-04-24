@@ -6,6 +6,7 @@ import SubMenu from "@/components/layout/SubMenu";
 import Footer from "@/components/layout/Footer";
 import { Toaster } from "sonner";
 import PageTracker from "@/components/analytics/PageTracker";
+import TextReader from "@/components/accessibility/TextReader";
 
 const karla = Karla({
   variable: "--font-karla",
@@ -36,6 +37,7 @@ export default function RootLayout({
         <SubMenu />
         {children}
         <Footer />
+        <TextReader />
         <PageTracker />
         <Toaster position="top-right" richColors />
       </body>
