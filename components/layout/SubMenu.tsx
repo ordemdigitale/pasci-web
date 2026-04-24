@@ -58,6 +58,14 @@ export default function SubMenu() {
             Processus de formalisation
           </a>
 
+          {/* Numéros utiles */}
+          <a
+            href="/numeros-utiles"
+            className="text-white hover:text-white/90 transition-colors"
+          >
+            Numéros utiles
+          </a>
+
           {/* Cri de coeur */}
           {/* <a
             href="#"

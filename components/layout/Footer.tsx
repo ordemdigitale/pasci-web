@@ -91,6 +91,11 @@ export default function Footer() {
                   Devenir partenaire
                 </Link>
               </li>
+              <li>
+                <Link href="/numeros-utiles" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Numéros utiles
+                </Link>
+              </li>
             </ul>
           </div>
 
