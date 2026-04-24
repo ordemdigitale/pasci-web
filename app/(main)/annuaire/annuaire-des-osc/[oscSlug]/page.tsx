@@ -1,164 +1,56 @@
-/* app/(main)/annuaire/annuaire-des-osc/[oscSlug]/page.tsx: Page detail d'une OSC */
+/* app/(main)/annuaire/annuaire-des-osc/[oscSlug]/page.tsx */
 "use client";
 
 import { use, useState, useEffect } from 'react';
 import { getOscBySlug } from "@/lib/fetch-crasc";
-import { IOscDetail, INews } from "@/types/api.types";
-import { useParams } from 'next/navigation'; // to remove
+import { IOscDetail } from "@/types/api.types";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
-import { MapPin, Mail, Phone, Globe, Users2, Building, Calendar, Facebook, Linkedin, Loader2 } from 'lucide-react';
+import {
+  MapPin, Mail, Phone, Globe, Users2, Building, Calendar,
+  Loader2, UserCircle, Briefcase, Target, Star, ChevronRight,
+  Hash, Flag, BarChart3,
+} from 'lucide-react';
 import Link from 'next/link';
 
-interface IOSCDetail {
-  id: number;
-  name: string;
-  logo?: string;
-  coverImage?: string;
-  description: string;
-  domaine: string;
-  region: string;
-  ville: string;
-  adresse?: string;
-  email?: string;
-  phone?: string;
-  website?: string;
-  createdAt?: string;
-  president?: string;
-  nombreMembres?: number;
-  mission?: string;
-  vision?: string;
-  objectifs?: string[];
-  realisations?: string[];
-  facebook?: string;
-  linkedin?: string;
+function fmt(n?: number | null) {
+  if (n == null) return null;
+  return n.toLocaleString('fr-FR');
 }
 
-// Mock data - À remplacer par un vrai fetch API
-const mockOSCData: Record<string, IOSCDetail> = {
-  "mplci": {
-    id: 1,
-    name: "Mouvement Pour Lutte contre l'injustice (MPLCI)",
-    logo: "/images/page-annuaire-crasc/mplci.jpg",
-    coverImage: "/images/page-annuaire-crasc/mplci.jpg",
-    description: "Organisation engagée dans la promotion de la justice sociale et la défense des droits humains en Côte d'Ivoire.",
-    domaine: "Droits Humains",
-    region: "CRASC Sud",
-    ville: "Abidjan",
-    adresse: "Cocody, Boulevard Latrille",
-    email: "contact@mplci.org",
-    phone: "+225 07 00 00 00",
-    website: "www.mplci.org",
-    createdAt: "2015",
-    president: "Kouassi N'Guessan",
-    nombreMembres: 150,
-    mission: "Promouvoir la justice sociale et défendre les droits fondamentaux des citoyens ivoiriens à travers des actions de plaidoyer, de sensibilisation et d'accompagnement juridique.",
-    vision: "Une société ivoirienne juste et équitable où chaque citoyen jouit pleinement de ses droits.",
-    objectifs: [
-      "Sensibiliser les populations sur leurs droits fondamentaux",
-      "Accompagner les victimes d'injustice dans leurs démarches juridiques",
-      "Mener des actions de plaidoyer auprès des autorités",
-      "Former les jeunes leaders aux questions de gouvernance et de justice sociale"
-    ],
-    realisations: [
-      "Organisation de 50+ sessions de sensibilisation sur les droits humains",
-      "Accompagnement juridique de plus de 200 personnes",
-      "Formation de 100 jeunes leaders aux questions de gouvernance"
-    ],
-    facebook: "https://facebook.com/mplci",
-    linkedin: "https://linkedin.com/company/mplci"
-  },
-  "fefab": {
-    id: 2,
-    name: "Fédération des femmes d'Anyama et de Brofodoumé (FEFAB)",
-    logo: "/images/page-annuaire-crasc/fefab.jpg",
-    coverImage: "/images/page-annuaire-crasc/fefab.jpg",
-    description: "Fédération qui œuvre pour l'autonomisation des femmes et le développement communautaire.",
-    domaine: "Genre et Développement",
-    region: "CRASC Sud",
-    ville: "Anyama",
-    adresse: "Anyama, Quartier Résidentiel",
-    email: "contact@fefab.org",
-    phone: "+225 07 11 11 11",
-    createdAt: "2012",
-    president: "Adjoua Koné",
-    nombreMembres: 250,
-    mission: "Promouvoir l'autonomisation économique et sociale des femmes à travers des programmes de formation, de micro-crédit et d'entrepreneuriat.",
-    vision: "Des communautés où les femmes sont économiquement autonomes et socialement épanouies.",
-    objectifs: [
-      "Former les femmes aux métiers porteurs",
-      "Faciliter l'accès au financement pour les projets féminins",
-      "Renforcer le leadership féminin dans les communautés",
-      "Lutter contre les violences basées sur le genre"
-    ],
-    realisations: [
-      "Formation de 500+ femmes en entrepreneuriat",
-      "Octroi de micro-crédits à 300 femmes entrepreneures",
-      "Création de 5 coopératives féminines"
-    ]
-  },
-  "fondation-vie": {
-    id: 3,
-    name: "Fondation Vie",
-    logo: "/images/page-annuaire-crasc/fondation-vie.jpg",
-    coverImage: "/images/page-annuaire-crasc/fondation-vie.jpg",
-    description: "Organisation dédiée à l'amélioration des conditions de vie des communautés vulnérables.",
-    domaine: "Développement Communautaire",
-    region: "CRASC Centre",
-    ville: "Yamoussoukro",
-    adresse: "Yamoussoukro, Boulevard de la République",
-    email: "contact@fondationvie.org",
-    phone: "+225 07 22 22 22",
-    website: "www.fondationvie.org",
-    createdAt: "2010",
-    president: "Jean-Baptiste Konan",
-    nombreMembres: 180,
-    mission: "Améliorer durablement les conditions de vie des populations vulnérables à travers des projets de développement communautaire intégrés.",
-    vision: "Des communautés autonomes et résilientes où chaque individu a accès aux services de base et aux opportunités de développement.",
-    objectifs: [
-      "Améliorer l'accès à l'eau potable et à l'assainissement",
-      "Renforcer la sécurité alimentaire des ménages",
-      "Promouvoir l'éducation et la santé communautaire",
-      "Développer des activités génératrices de revenus"
-    ],
-    realisations: [
-      "Construction de 10 forages d'eau potable dans les villages",
-      "Distribution de kits alimentaires à 500 familles",
-      "Alphabétisation de 200 adultes",
-      "Création de 3 jardins maraîchers communautaires"
-    ],
-    facebook: "https://facebook.com/fondationvie",
-    linkedin: "https://linkedin.com/company/fondationvie"
-  }
-};
+function InfoRow({ label, value }: { label: string; value?: string | null }) {
+  if (!value) return null;
+  return (
+    <div className="flex items-start gap-3">
+      <div>
+        <p className="text-sm font-semibold text-gray-700">{label}</p>
+        <p className="text-sm text-gray-600">{value}</p>
+      </div>
+    </div>
+  );
+}
 
-export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: string }>; }) {
+function Tag({ text }: { text: string }) {
+  return (
+    <span className="inline-block px-3 py-1 bg-[#2a591d]/10 text-[#2a591d] rounded-full text-xs font-medium">
+      {text}
+    </span>
+  );
+}
+
+export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: string }> }) {
   const resolvedParams = use(params);
   const oscSlug = resolvedParams.oscSlug;
   const [oscData, setOscData] = useState<IOscDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!oscSlug) return;
     let isCurrent = true;
-
-    async function fetchOsc() {
-      try {
-        setLoading(true);
-        const data = await getOscBySlug(oscSlug);
-        if (isCurrent) setOscData(data);
-      } catch (err: any) {
-        if (isCurrent) setError("Impossible de charger les données de l'OSC.");
-      } finally {
-        if (isCurrent) setLoading(false);
-      }
-    }
-
-    fetchOsc();
-
-    return () => {
-      isCurrent = false;
-    };
+    getOscBySlug(oscSlug)
+      .then((data) => { if (isCurrent) setOscData(data); })
+      .catch(() => { if (isCurrent) setOscData(null); })
+      .finally(() => { if (isCurrent) setLoading(false); });
+    return () => { isCurrent = false; };
   }, [oscSlug]);
 
   if (loading) {
@@ -170,19 +62,16 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
         </div>
       </div>
     );
-    }
+  }
 
   if (!oscData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center font-poppins">
         <div className="text-center">
           <Users2 className="w-24 h-24 text-gray-300 mx-auto mb-4" />
           <h2 className="text-3xl font-bold text-gray-800 mb-2">OSC non trouvée</h2>
           <p className="text-gray-600 mb-6">Cette organisation n'existe pas ou a été supprimée.</p>
-          <Link
-            href="/annuaire/annuaire-des-osc"
-            className="inline-block px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors"
-          >
+          <Link href="/annuaire/annuaire-des-osc" className="inline-block px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors">
             Retour à l'annuaire
           </Link>
         </div>
@@ -190,66 +79,99 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
     );
   }
 
-  return (
-    <section className="pb-10 font-poppins">
+  /* Domaines prioritaires */
+  const domaines = [
+    oscData.domaine_prioritaire,
+    oscData.domaine_prioritaire_2,
+    oscData.domaine_prioritaire_3,
+    oscData.domaine_prioritaire_4,
+  ].filter(Boolean) as string[];
 
-      {/* Cover Image */}
+  /* Sources de financement actives */
+  const financements: string[] = [];
+  if (oscData.financement_cotisation) financements.push("Cotisations");
+  if (oscData.financement_dons) financements.push("Dons");
+  if (oscData.financement_legs) financements.push("Legs");
+  if (oscData.financement_collectivites) financements.push("Collectivités");
+  if (oscData.financement_fonds_propres) financements.push("Fonds propres");
+  if (oscData.financement_ong_intl) financements.push("ONG internationales");
+  if (oscData.financement_multilateral) financements.push("Fonds multilatéraux");
+
+  return (
+    <section className="pb-12 font-poppins">
+
+      {/* Cover */}
       {oscData.thumbnail_url && (
-        <div className="relative h-64 md:h-80 overflow-hidden mb-8">
-          <ImageWithFallback
-            src={oscData.thumbnail_url}
-            alt={oscData.name}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        <div className="relative h-56 md:h-72 overflow-hidden">
+          <ImageWithFallback src={oscData.thumbnail_url} alt={oscData.name} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         </div>
       )}
 
-      {/* Main Content */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Header with Logo and Basic Info */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8 -mt-20 relative z-10">
+        {/* Header card */}
+        <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8 ${oscData.thumbnail_url ? "-mt-16 relative z-10" : "mt-8"}`}>
           <div className="flex flex-col md:flex-row gap-6 items-start">
+
             {/* Logo */}
             {oscData.thumbnail_url && (
               <div className="flex-shrink-0">
-                <div className="w-32 h-32 rounded-lg overflow-hidden border-4 border-white shadow-lg">
-                  <ImageWithFallback
-                    src={oscData.thumbnail_url}
-                    alt={oscData.name}
-                    className="w-full h-full object-cover"
-                  />
+                <div className="w-28 h-28 rounded-xl overflow-hidden border-4 border-white shadow-md">
+                  <ImageWithFallback src={oscData.thumbnail_url} alt={oscData.name} className="w-full h-full object-cover" />
                 </div>
               </div>
             )}
 
-            {/* Basic Info */}
+            {/* Infos principales */}
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{oscData.name}</h1>
-              <p className="text-gray-600 mb-4">{oscData.description}</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{oscData.name}</h1>
+              {oscData.categorie && (
+                <span className="inline-block px-3 py-0.5 bg-[#E05017]/10 text-[#E05017] rounded-md text-xs font-semibold mb-3">
+                  {oscData.categorie}
+                </span>
+              )}
+              {oscData.description && (
+                <p className="text-gray-600 text-sm mb-4 max-w-2xl">{oscData.description}</p>
+              )}
 
-              <div className="grid md:grid-cols-2 gap-3 text-sm">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Building className="w-4 h-4 text-[#E05017]" />
-                  <span><span className="font-semibold">Domaine:</span> {/* {oscData.domaine} */} Aucun domaine</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <MapPin className="w-4 h-4 text-[#E05017]" />
-                  <span><span className="font-semibold">Localisation:</span> {oscData.ville}, {oscData.crasc?.name}</span>
-                </div>
-                {oscData.created_at && (
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Calendar className="w-4 h-4 text-[#E05017]" />
-                    <span><span className="font-semibold">Création:</span> {new Date(oscData.created_at).toLocaleDateString('fr-FR')}</span>
+              <div className="grid sm:grid-cols-2 gap-2 text-sm">
+                {domaines.length > 0 && (
+                  <div className="flex items-start gap-2 text-gray-600">
+                    <Building className="w-4 h-4 text-[#E05017] mt-0.5 flex-shrink-0" />
+                    <span><span className="font-semibold">Domaine :</span> {domaines[0]}{domaines.length > 1 ? ` (+${domaines.length - 1})` : ""}</span>
                   </div>
                 )}
-               {/*  {oscData.nombreMembres && ( */}
+                {(oscData.ville || oscData.crasc?.name) && (
                   <div className="flex items-center gap-2 text-gray-600">
-                    <Users2 className="w-4 h-4 text-[#E05017]" />
-                    <span><span className="font-semibold">Membres:</span> {/* {oscData.nombreMembres} */} 23</span>
+                    <MapPin className="w-4 h-4 text-[#E05017] flex-shrink-0" />
+                    <span><span className="font-semibold">Localisation :</span> {[oscData.ville, oscData.crasc?.name].filter(Boolean).join(", ")}</span>
                   </div>
-                {/* )} */}
+                )}
+                {oscData.date_creation && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Calendar className="w-4 h-4 text-[#E05017] flex-shrink-0" />
+                    <span><span className="font-semibold">Création :</span> {oscData.date_creation}</span>
+                  </div>
+                )}
+                {oscData.nb_membres != null && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Users2 className="w-4 h-4 text-[#E05017] flex-shrink-0" />
+                    <span><span className="font-semibold">Membres :</span> {fmt(oscData.nb_membres)}</span>
+                  </div>
+                )}
+                {oscData.niveau_couverture && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Flag className="w-4 h-4 text-[#E05017] flex-shrink-0" />
+                    <span><span className="font-semibold">Couverture :</span> {oscData.niveau_couverture}</span>
+                  </div>
+                )}
+                {oscData.numero_recepisse && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Hash className="w-4 h-4 text-[#E05017] flex-shrink-0" />
+                    <span><span className="font-semibold">N° récépissé :</span> {oscData.numero_recepisse}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -257,66 +179,163 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
 
         <div className="grid md:grid-cols-3 gap-8">
 
-          {/* Left Column - Main Content */}
-          <div className="md:col-span-2 space-y-8">
+          {/* Colonne gauche */}
+          <div className="md:col-span-2 space-y-6">
 
-            {/* Mission */}
-            {/* {oscData.mission && (
-              <div className="bg-[#f0f9ff] border border-gray-200 rounded-lg p-6">
-                <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Mission</h2>
-                <p className="text-gray-700">{oscData.mission}</p>
+            {/* Statistiques clés */}
+            {(oscData.nb_membres != null || oscData.nb_femmes_membres != null || oscData.nb_membres_jeunes != null || oscData.nb_beneficiaires != null || oscData.nb_activites != null || oscData.nb_personnes_engagees != null) && (
+              <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <BarChart3 className="w-5 h-5 text-[#E05017]" />
+                  <h2 className="text-lg font-bold text-gray-900">Chiffres clés</h2>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {oscData.nb_membres != null && (
+                    <div className="bg-gray-50 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-extrabold text-[#E05017]">{fmt(oscData.nb_membres)}</p>
+                      <p className="text-xs text-gray-500 mt-1">Membres</p>
+                    </div>
+                  )}
+                  {oscData.nb_femmes_membres != null && (
+                    <div className="bg-gray-50 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-extrabold text-[#2a591d]">{fmt(oscData.nb_femmes_membres)}</p>
+                      <p className="text-xs text-gray-500 mt-1">Femmes membres</p>
+                    </div>
+                  )}
+                  {oscData.nb_membres_jeunes != null && (
+                    <div className="bg-gray-50 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-extrabold text-[#052838]">{fmt(oscData.nb_membres_jeunes)}</p>
+                      <p className="text-xs text-gray-500 mt-1">Membres jeunes</p>
+                    </div>
+                  )}
+                  {oscData.nb_beneficiaires != null && (
+                    <div className="bg-gray-50 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-extrabold text-[#E05017]">{fmt(oscData.nb_beneficiaires)}</p>
+                      <p className="text-xs text-gray-500 mt-1">Bénéficiaires</p>
+                    </div>
+                  )}
+                  {oscData.nb_activites != null && (
+                    <div className="bg-gray-50 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-extrabold text-[#2a591d]">{fmt(oscData.nb_activites)}</p>
+                      <p className="text-xs text-gray-500 mt-1">Activités réalisées</p>
+                    </div>
+                  )}
+                  {oscData.nb_personnes_engagees != null && (
+                    <div className="bg-gray-50 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-extrabold text-[#052838]">{fmt(oscData.nb_personnes_engagees)}</p>
+                      <p className="text-xs text-gray-500 mt-1">Personnes engagées</p>
+                    </div>
+                  )}
+                </div>
               </div>
-            )} */}
+            )}
 
-            {/* Vision */}
-           {/*  {oscData.vision && (
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Vision</h2>
-                <p className="text-gray-700">{oscData.vision}</p>
+            {/* Domaines prioritaires */}
+            {domaines.length > 0 && (
+              <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Target className="w-5 h-5 text-[#E05017]" />
+                  <h2 className="text-lg font-bold text-gray-900">Domaines prioritaires</h2>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {domaines.map((d, i) => <Tag key={i} text={d} />)}
+                </div>
               </div>
-            )} */}
+            )}
 
-            {/* Objectifs */}
-            {/* {oscData.objectifs && oscData.objectifs.length > 0 && (
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Objectifs</h2>
-                <ul className="space-y-3">
-                  {oscData.objectifs.map((objectif, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-[#E05017] text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                        {index + 1}
-                      </span>
-                      <span className="text-gray-700 pt-0.5">{objectif}</span>
-                    </li>
-                  ))}
-                </ul>
+            {/* Secteurs d'activités */}
+            {oscData.secteurs_activites && (
+              <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Briefcase className="w-5 h-5 text-[#E05017]" />
+                  <h2 className="text-lg font-bold text-gray-900">Secteurs d&apos;activités</h2>
+                </div>
+                <p className="text-sm text-gray-700 whitespace-pre-line">{oscData.secteurs_activites}</p>
               </div>
-            )} */}
+            )}
 
-            {/* Réalisations */}
-            {/* {oscData.realisations && oscData.realisations.length > 0 && (
-              <div className="bg-[#f0f9ff] border border-gray-200 rounded-lg p-6">
-                <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Nos Réalisations</h2>
-                <ul className="space-y-3">
-                  {oscData.realisations.map((realisation, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="text-[#E05017] text-xl">✓</span>
-                      <span className="text-gray-700 pt-0.5">{realisation}</span>
-                    </li>
-                  ))}
-                </ul>
+            {/* Populations cibles */}
+            {oscData.populations_cibles && (
+              <div className="bg-[#f0f9ff] border border-gray-200 rounded-xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Users2 className="w-5 h-5 text-[#E05017]" />
+                  <h2 className="text-lg font-bold text-gray-900">Populations cibles</h2>
+                </div>
+                <p className="text-sm text-gray-700 whitespace-pre-line">{oscData.populations_cibles}</p>
               </div>
-            )} */}
+            )}
+
+            {/* Savoir-faire */}
+            {oscData.savoir_faire && (
+              <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Star className="w-5 h-5 text-[#E05017]" />
+                  <h2 className="text-lg font-bold text-gray-900">Savoir-faire &amp; expertise</h2>
+                </div>
+                <p className="text-sm text-gray-700 whitespace-pre-line">{oscData.savoir_faire}</p>
+              </div>
+            )}
+
+            {/* Zone de couverture */}
+            {oscData.zone_couverture && (
+              <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <MapPin className="w-5 h-5 text-[#E05017]" />
+                  <h2 className="text-lg font-bold text-gray-900">Zone de couverture</h2>
+                </div>
+                <p className="text-sm text-gray-700">{oscData.zone_couverture}</p>
+              </div>
+            )}
+
+            {/* Financement */}
+            {(financements.length > 0 || oscData.budget_annuel != null || oscData.type_financement) && (
+              <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <BarChart3 className="w-5 h-5 text-[#E05017]" />
+                  <h2 className="text-lg font-bold text-gray-900">Financement</h2>
+                </div>
+                {oscData.budget_annuel != null && (
+                  <p className="text-sm text-gray-700 mb-3">
+                    <span className="font-semibold">Budget annuel :</span> {fmt(oscData.budget_annuel)} F CFA
+                  </p>
+                )}
+                {financements.length > 0 && (
+                  <div>
+                    <p className="text-sm font-semibold text-gray-700 mb-2">Sources de financement :</p>
+                    <div className="flex flex-wrap gap-2">
+                      {financements.map((f, i) => <Tag key={i} text={f} />)}
+                    </div>
+                  </div>
+                )}
+                {oscData.type_financement && (
+                  <p className="text-sm text-gray-600 mt-2">{oscData.type_financement}</p>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Right Column - Contact Info */}
+          {/* Colonne droite — Contact & Gouvernance */}
           <div className="space-y-6">
 
-            {/* Contact Card */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6 sticky top-4">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Informations de Contact</h3>
-
+            {/* Contact */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-4">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Informations de contact</h3>
               <div className="space-y-4">
+
+                {/* Président */}
+                {oscData.nom_president && (
+                  <div className="flex items-start gap-3">
+                    <UserCircle className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-gray-700">Président(e)</p>
+                      <p className="text-sm text-gray-600">{oscData.nom_president}</p>
+                      {oscData.mode_designation_president && (
+                        <p className="text-xs text-gray-400 mt-0.5">{oscData.mode_designation_president}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {oscData.address && (
                   <div className="flex items-start gap-3">
                     <MapPin className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
@@ -332,7 +351,7 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
                     <Mail className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">Email</p>
-                      <a href={`mailto:${oscData.email}`} className="text-sm text-[#E05017] hover:underline">
+                      <a href={`mailto:${oscData.email}`} className="text-sm text-[#E05017] hover:underline break-all">
                         {oscData.email}
                       </a>
                     </div>
@@ -357,10 +376,10 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
                     <div>
                       <p className="text-sm font-semibold text-gray-700">Site Web</p>
                       <a
-                        href={`https://${oscData.website}`}
+                        href={oscData.website.startsWith("http") ? oscData.website : `https://${oscData.website}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-[#E05017] hover:underline"
+                        className="text-sm text-[#E05017] hover:underline break-all"
                       >
                         {oscData.website}
                       </a>
@@ -368,66 +387,39 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
                   </div>
                 )}
 
-                {/* {oscData.president && ( */}
+                {oscData.reseaux_sociaux && (
                   <div className="flex items-start gap-3">
-                    <Users2 className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
+                    <Globe className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-semibold text-gray-700">Président(e)</p>
-                      <p className="text-sm text-gray-600">{/* {oscData.president} */} Zoé Bruno</p>
+                      <p className="text-sm font-semibold text-gray-700">Réseaux sociaux</p>
+                      <p className="text-sm text-gray-600 break-all">{oscData.reseaux_sociaux}</p>
                     </div>
                   </div>
-                {/* )} */}
+                )}
               </div>
 
-              {/* Social Media Links */}
-              {/* {(oscData.facebook || oscData.linkedin) && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <p className="text-sm font-semibold text-gray-700 mb-3">Suivez-nous</p>
-                  <div className="flex gap-3">
-                    {oscData.facebook && (
-                      <a
-                        href={oscData.facebook}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-10 h-10 bg-[#E05017] hover:bg-[#c44315] rounded-full flex items-center justify-center transition-colors"
-                      >
-                        <Facebook className="w-5 h-5 text-white" />
-                      </a>
-                    )}
-                    {oscData.linkedin && (
-                      <a
-                        href={oscData.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-10 h-10 bg-[#E05017] hover:bg-[#c44315] rounded-full flex items-center justify-center transition-colors"
-                      >
-                        <Linkedin className="w-5 h-5 text-white" />
-                      </a>
-                    )}
-                  </div>
+              {/* Gouvernance complémentaire */}
+              {(oscData.duree_mandat_be || oscData.nb_membres_be != null || oscData.etat_cotisations) && (
+                <div className="mt-6 pt-5 border-t border-gray-100 space-y-3">
+                  <h4 className="text-sm font-bold text-gray-700">Gouvernance</h4>
+                  <InfoRow label="Durée du mandat BE" value={oscData.duree_mandat_be} />
+                  {oscData.nb_membres_be != null && (
+                    <InfoRow label="Membres du bureau exécutif" value={String(oscData.nb_membres_be)} />
+                  )}
+                  <InfoRow label="État des cotisations" value={oscData.etat_cotisations} />
+                  {oscData.reseau_appartenance && (
+                    <InfoRow label="Réseau d'appartenance" value={oscData.reseau_appartenance} />
+                  )}
                 </div>
-              )} */}
-
-              {/* Contact Button */}
-              {/* <div className="mt-6">
-                <Link
-                  href={`/contact?osc=${oscData.name}`}
-                  className="block w-full text-center px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-semibold"
-                >
-                  Contacter l'OSC
-                </Link>
-              </div> */}
+              )}
             </div>
           </div>
         </div>
 
-        {/* Back to Directory */}
+        {/* Retour */}
         <div className="mt-12 text-center">
-          <Link
-            href="/annuaire/annuaire-des-osc"
-            className="inline-flex items-center gap-2 text-[#E05017] hover:underline font-semibold"
-          >
-            ← Retour à l'annuaire des OSC
+          <Link href="/annuaire/annuaire-des-osc" className="inline-flex items-center gap-2 text-[#E05017] hover:underline font-semibold text-sm">
+            <ChevronRight className="w-4 h-4 rotate-180" /> Retour à l'annuaire des OSC
           </Link>
         </div>
       </div>

@@ -60,6 +60,46 @@ export interface IOscDetail {
   type: IOscType;
   crasc: ICrasc;
   news_items?: INews[];
+  // Champs étendus
+  nom_president?: string | null;
+  sexe_president?: string | null;
+  mode_designation_president?: string | null;
+  duree_mandat_be?: string | null;
+  nb_membres?: number | null;
+  nb_femmes_membres?: number | null;
+  nb_membres_jeunes?: number | null;
+  nb_membres_be?: number | null;
+  nb_personnes_engagees?: number | null;
+  nb_beneficiaires?: number | null;
+  nb_activites?: number | null;
+  domaine_prioritaire?: string | null;
+  domaine_prioritaire_2?: string | null;
+  domaine_prioritaire_3?: string | null;
+  domaine_prioritaire_4?: string | null;
+  categorie?: string | null;
+  niveau_couverture?: string | null;
+  zone_couverture?: string | null;
+  date_creation?: string | null;
+  numero_recepisse?: string | null;
+  reseaux_sociaux?: string | null;
+  secteurs_activites?: string | null;
+  populations_cibles?: string | null;
+  savoir_faire?: string | null;
+  budget_annuel?: number | null;
+  type_financement?: string | null;
+  etat_cotisations?: string | null;
+  montant_cotisation?: number | null;
+  adhesion_crasc?: boolean | null;
+  reseau_appartenance?: string | null;
+  difficultes?: string | null;
+  recommandations?: string | null;
+  financement_cotisation?: boolean | null;
+  financement_dons?: boolean | null;
+  financement_legs?: boolean | null;
+  financement_collectivites?: boolean | null;
+  financement_fonds_propres?: boolean | null;
+  financement_ong_intl?: boolean | null;
+  financement_multilateral?: boolean | null;
 }
 
 // Interface for Crasc region by slug with OSCs and Region CIVs
