@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { Volume2, VolumeX, Pause, Play, Square, ChevronUp, ChevronDown } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Volume2, VolumeX, Pause, Play, Square, ChevronDown } from "lucide-react";
 
 type State = "idle" | "playing" | "paused";
 
@@ -10,9 +10,13 @@ export default function TextReader() {
   const [supported, setSupported] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const [progress, setProgress] = useState(0); // 0-100
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const textRef = useRef<string>("");
+  const [progress, setProgress] = useState(0);
+
+  // Full text of the page
+  const fullTextRef = useRef<string>("");
+  // Index (charIndex) where we paused — used to resume from that point
+  const pausedAtRef = useRef<number>(0);
+  const totalCharsRef = useRef<number>(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -23,111 +27,119 @@ export default function TextReader() {
     };
   }, []);
 
-  /** Extract visible page text, excluding nav / footer / admin zones */
   function extractPageText(): string {
-    const mainEl =
+    const root =
       document.querySelector("main") ||
       document.querySelector("section") ||
-      document.querySelector("article");
+      document.querySelector("article") ||
+      document.body;
 
-    const root = mainEl || document.body;
-
-    // Clone to avoid modifying DOM
     const clone = root.cloneNode(true) as HTMLElement;
+    clone
+      .querySelectorAll(
+        "nav, footer, script, style, button, input, textarea, select, [aria-hidden='true'], .no-read"
+      )
+      .forEach((el) => el.remove());
 
-    // Remove elements we don't want read
-    clone.querySelectorAll("nav, footer, script, style, button, input, textarea, select, [aria-hidden='true'], .no-read").forEach((el) => el.remove());
-
-    return (clone.textContent || "")
-      .replace(/\s+/g, " ")
-      .trim();
+    return (clone.textContent || "").replace(/\s+/g, " ").trim();
   }
 
-  const stop = useCallback(() => {
-    window.speechSynthesis.cancel();
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    setState("idle");
-    setProgress(0);
-  }, []);
+  function clearProgress() {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }
 
-  const speak = useCallback((text: string, rate: number) => {
+  /**
+   * Speak `text` from position `fromChar`.
+   * Tracks charIndex via onboundary so pause remembers exact position.
+   */
+  function speakFrom(text: string, fromChar: number, rate: number) {
     window.speechSynthesis.cancel();
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    clearProgress();
 
-    const utter = new SpeechSynthesisUtterance(text);
+    const slice = text.substring(fromChar);
+    if (!slice.trim()) {
+      setState("idle");
+      setProgress(0);
+      pausedAtRef.current = 0;
+      return;
+    }
+
+    const utter = new SpeechSynthesisUtterance(slice);
     utter.lang = "fr-FR";
     utter.rate = rate;
 
-    // Prefer a French voice if available
     const voices = window.speechSynthesis.getVoices();
     const frVoice = voices.find((v) => v.lang.startsWith("fr"));
     if (frVoice) utter.voice = frVoice;
 
-    // Track progress by elapsed time vs estimated total duration
-    const estimatedDuration = (text.length / 15) * (1 / rate) * 1000; // rough ms
-    const startTime = Date.now();
-
-    intervalRef.current = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const pct = Math.min((elapsed / estimatedDuration) * 100, 99);
+    // Track the real character offset within the full text
+    utter.onboundary = (e) => {
+      const absChar = fromChar + e.charIndex;
+      pausedAtRef.current = absChar;
+      const pct = Math.min((absChar / totalCharsRef.current) * 100, 99);
       setProgress(pct);
-    }, 300);
+    };
 
     utter.onend = () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      clearProgress();
+      setState("idle");
+      setProgress(0);
+      pausedAtRef.current = 0;
+    };
+
+    utter.onerror = (e) => {
+      // "interrupted" fires when we cancel intentionally — ignore it
+      if (e.error === "interrupted") return;
+      clearProgress();
       setState("idle");
       setProgress(0);
     };
 
-    utter.onerror = () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      setState("idle");
-      setProgress(0);
-    };
-
-    utteranceRef.current = utter;
     window.speechSynthesis.speak(utter);
     setState("playing");
-  }, []);
+  }
 
   function handlePlay() {
     if (state === "playing") {
-      window.speechSynthesis.pause();
+      // PAUSE: cancel speech (pause() unreliable in Chrome), keep charIndex
+      window.speechSynthesis.cancel();
+      clearProgress();
       setState("paused");
-      if (intervalRef.current) clearInterval(intervalRef.current);
       return;
     }
+
     if (state === "paused") {
-      window.speechSynthesis.resume();
-      setState("playing");
-      // Restart progress tracking
-      const remaining = textRef.current.length;
-      const estimatedDuration = (remaining / 15) * (1 / speed) * 1000;
-      const startTime = Date.now() - (progress / 100) * estimatedDuration;
-      intervalRef.current = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const pct = Math.min((elapsed / estimatedDuration) * 100, 99);
-        setProgress(pct);
-      }, 300);
+      // RESUME from saved charIndex
+      speakFrom(fullTextRef.current, pausedAtRef.current, speed);
       return;
     }
-    // idle → start fresh
+
+    // IDLE → start fresh
     const text = extractPageText();
     if (!text) return;
-    textRef.current = text;
-    speak(text, speed);
+    fullTextRef.current = text;
+    totalCharsRef.current = text.length;
+    pausedAtRef.current = 0;
+    speakFrom(text, 0, speed);
     setExpanded(true);
   }
 
   function handleStop() {
-    stop();
+    window.speechSynthesis.cancel();
+    clearProgress();
+    setState("idle");
+    setProgress(0);
+    pausedAtRef.current = 0;
   }
 
   function handleSpeedChange(newSpeed: number) {
     setSpeed(newSpeed);
-    if (state !== "idle") {
-      // Restart with new speed from beginning (browser limitation)
-      speak(textRef.current, newSpeed);
+    if (state === "playing") {
+      // Restart from current position with new speed
+      speakFrom(fullTextRef.current, pausedAtRef.current, newSpeed);
     }
   }
 
@@ -165,8 +177,8 @@ export default function TextReader() {
           {/* Status */}
           <p className="text-xs text-gray-500 text-center">
             {state === "playing" && "Lecture en cours..."}
-            {state === "paused" && "En pause"}
-            {state === "idle" && "Appuyer sur Play pour lire la page"}
+            {state === "paused" && "En pause — cliquer sur ▶ pour reprendre"}
+            {state === "idle" && "Cliquer sur ▶ pour lire la page"}
           </p>
 
           {/* Controls */}
@@ -176,7 +188,11 @@ export default function TextReader() {
               className="w-10 h-10 bg-[#E05017] hover:bg-[#c44315] text-white rounded-full flex items-center justify-center transition-colors shadow"
               aria-label={state === "playing" ? "Pause" : "Lecture"}
             >
-              {state === "playing" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              {state === "playing" ? (
+                <Pause className="w-4 h-4" />
+              ) : (
+                <Play className="w-4 h-4" />
+              )}
             </button>
             <button
               onClick={handleStop}
@@ -190,7 +206,7 @@ export default function TextReader() {
 
           {/* Speed selector */}
           <div>
-            <p className="text-xs text-gray-500 mb-1.5 text-center">Vitesse de lecture</p>
+            <p className="text-xs text-gray-500 mb-1.5 text-center">Vitesse</p>
             <div className="flex items-center justify-center gap-1">
               {SPEEDS.map((s) => (
                 <button
@@ -212,14 +228,8 @@ export default function TextReader() {
 
       {/* FAB button */}
       <button
-        onClick={() => {
-          if (state === "idle") {
-            setExpanded(true);
-          } else {
-            setExpanded((prev) => !prev);
-          }
-        }}
-        className={`group w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 ${
+        onClick={() => setExpanded((prev) => !prev)}
+        className={`group relative w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 ${
           state === "playing"
             ? "bg-[#E05017] animate-pulse"
             : state === "paused"
