@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Facebook, Linkedin } from 'lucide-react';
 import footerLogo from 'figma:asset/b43efaef04948e9d9cfc8116775c87a868a332af.png';
 import { ImageWithFallback } from "@/lib/imageWithFallback"
+import VisiteCounter from "./VisiteCounter";
 
 export default function Footer() {
   return (
@@ -154,6 +155,7 @@ export default function Footer() {
               Conditions Générales
             </Link>
           </div>
+          <VisiteCounter />
         </div>
       </div>
     </footer>
