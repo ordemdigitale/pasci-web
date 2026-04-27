@@ -42,7 +42,7 @@ export default function AdminModerationPage() {
         if (r.status !== "fulfilled" || !r.value.ok) return [];
         const data = await r.value.json();
         return (Array.isArray(data) ? data : []).map((d: Record<string, unknown>) => ({
-          id: d.id,
+          id: d.id as number | string,
           slug: (d.slug as string) ?? String(d.id),
           title: (d.title as string) || (d.nom as string),
           created_at: d.created_at as string,
