@@ -1,4 +1,5 @@
 "use client";
+import { fetchWithAuth } from "@/lib/auth";
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -118,7 +119,7 @@ export default function EditJobPage() {
   useEffect(() => {
     const loadJob = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/jobs/${slug}`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/jobs/${slug}`);
         if (!response.ok) {
           throw new Error("Offre d'emploi non trouvée");
         }
@@ -194,7 +195,7 @@ export default function EditJobPage() {
         payload.expiration_date = new Date(data.expiration_date).toISOString();
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/jobs/${slug}`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/jobs/${slug}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

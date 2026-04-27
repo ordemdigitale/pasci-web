@@ -2,15 +2,26 @@
 
 import { useState } from 'react';
 import { User, Mail, Phone, MapPin, Calendar, Save, Camera } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminProfilePage() {
+  const { user } = useAuth();
+
+  const roleLabel = user?.is_superuser
+    ? "Superuser"
+    : user?.is_staff
+    ? "Staff"
+    : user?.is_redacteur
+    ? "Rédacteur"
+    : "Utilisateur";
+
   const [formData, setFormData] = useState({
-    firstName: 'Admin',
-    lastName: 'PASCI',
-    email: 'admin@pasci.ci',
-    phone: '+225 01 02 03 04 05',
-    location: 'Abidjan, Côte d\'Ivoire',
-    role: 'Administrateur Principal'
+    firstName: user?.first_name || '',
+    lastName: user?.last_name || '',
+    email: user?.email || '',
+    phone: '',
+    location: '',
+    role: roleLabel,
   });
 
   const [saving, setSaving] = useState(false);

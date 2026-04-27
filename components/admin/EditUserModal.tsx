@@ -27,10 +27,10 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
     is_active: user.is_active,
     is_staff: user.is_staff,
     is_superuser: user.is_superuser,
+    is_redacteur: (user as IUser & { is_redacteur?: boolean }).is_redacteur ?? false,
   });
 
   useEffect(() => {
-    // Update form data when user prop changes
     setFormData({
       email: user.email,
       username: user.username || "",
@@ -41,6 +41,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
       is_active: user.is_active,
       is_staff: user.is_staff,
       is_superuser: user.is_superuser,
+      is_redacteur: (user as IUser & { is_redacteur?: boolean }).is_redacteur ?? false,
     });
   }, [user]);
 
@@ -240,6 +241,21 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                     <p className="font-semibold text-gray-900">Staff</p>
                     <p className="text-sm text-gray-600">
                       Accès à l'interface d'administration
+                    </p>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={(formData as typeof formData & { is_redacteur?: boolean }).is_redacteur ?? false}
+                    onChange={() => handleCheckboxChange("is_redacteur" as keyof UpdateUserAdminData)}
+                    className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
+                  />
+                  <div>
+                    <p className="font-semibold text-gray-900">Rédacteur</p>
+                    <p className="text-sm text-gray-600">
+                      Peut créer du contenu — nécessite validation du staff avant publication
                     </p>
                   </div>
                 </label>

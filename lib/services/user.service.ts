@@ -26,6 +26,7 @@ export interface UpdateUserAdminData extends UpdateUserData {
   is_active?: boolean;
   is_staff?: boolean;
   is_superuser?: boolean;
+  is_redacteur?: boolean;
 }
 
 export interface ChangePasswordData {

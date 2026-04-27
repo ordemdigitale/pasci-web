@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     isAuthenticated: user !== null,
-    isAdmin: user !== null && (user.is_staff || user.is_superuser),
+    isAdmin: user !== null && (user.is_staff || user.is_superuser || user.is_redacteur),
     isSuperuser: user !== null && user.is_superuser,
     refreshUser,
   };

@@ -1,4 +1,5 @@
 "use client";
+import { fetchWithAuth } from "@/lib/auth";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -43,7 +44,7 @@ export default function ProjetsPage() {
     const loadProjets = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${API_BASE_URL}/api/v1/offre-projets`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/offre-projets`);
         if (response.ok) {
           const data = await response.json();
           setProjets(data);
@@ -80,7 +81,7 @@ export default function ProjetsPage() {
   const handleDeleteProjet = async (projetSlug: string) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce projet ?")) {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/offre-projets/${projetSlug}`, {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/offre-projets/${projetSlug}`, {
           method: "DELETE",
         });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -16,7 +16,12 @@ import {
   ClipboardList,
   Heart,
   Phone,
+  ShieldAlert,
 } from "lucide-react";
+import { fetchWithAuth } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface NavItem {
   icon: React.ReactNode;
@@ -24,6 +29,8 @@ interface NavItem {
   href?: string;
   dropdown?: boolean;
   submenus?: { label: string; href: string }[];
+  badge?: number;
+  staffOnly?: boolean;
 }
 
 interface AdminSidebarProps {
@@ -36,24 +43,53 @@ export default function AdminSidebar({
   setSidebarOpen,
 }: AdminSidebarProps) {
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
+  const [pendingCount, setPendingCount] = useState(0);
   const pathname = usePathname();
+  const { user } = useAuth();
+  const isRedacteur = user?.is_redacteur && !user?.is_staff && !user?.is_superuser;
 
-  const navItems: NavItem[] = [
+  useEffect(() => {
+    async function fetchPending() {
+      try {
+        const results = await Promise.allSettled([
+          fetchWithAuth(`${API_BASE}/api/v1/news/admin/en-attente`),
+          fetchWithAuth(`${API_BASE}/api/v1/jobs/admin/en-attente`),
+          fetchWithAuth(`${API_BASE}/api/v1/formations/admin/en-attente`),
+          fetchWithAuth(`${API_BASE}/api/v1/offre-projets/admin/en-attente`),
+        ]);
+        let count = 0;
+        for (const r of results) {
+          if (r.status === "fulfilled" && r.value.ok) {
+            const data = await r.value.json();
+            if (Array.isArray(data)) count += data.length;
+          }
+        }
+        setPendingCount(count);
+      } catch { /* silencieux */ }
+    }
+    fetchPending();
+    const interval = setInterval(fetchPending, 5 * 60_000); // toutes les 5 min
+    return () => clearInterval(interval);
+  }, []);
+
+  const allNavItems: NavItem[] = [
     {
       icon: <LayoutDashboard size={20} />,
       label: "Tableau de bord",
       href: "/admin",
     },
-    { icon: <Users size={20} />, label: "Utilisateurs", href: "/admin/utilisateurs" },
+    { icon: <Users size={20} />, label: "Utilisateurs", href: "/admin/utilisateurs", staffOnly: true },
     {
       icon: <Map size={20} />,
       label: "Gestion des CRASC",
       href: "/admin/gestion-des-crasc",
+      staffOnly: true,
     },
     {
       icon: <FileText size={20} />,
       label: "Organisations",
       dropdown: true,
+      staffOnly: true,
       submenus: [
         { label: "PTF", href: "/admin/ptf" },
         { label: "OSC", href: "/admin/gestion-des-crasc/osc" },
@@ -68,14 +104,15 @@ export default function AdminSidebar({
         { label: "Offres de Projets", href: "/admin/projets" },
         { label: "Offres d'emploi", href: "/admin/emplois" },
         { label: "Actualités", href: "/admin/actualites" },
-      { label: "Bande défilante", href: "/admin/annonces" },
-      { label: "Slider accueil", href: "/admin/hero-slides" },
+        { label: "Bande défilante", href: "/admin/annonces", },
+        { label: "Slider accueil", href: "/admin/hero-slides" },
       ],
     },
     {
       icon: <MessageSquare size={20} />,
       label: "Forum",
       dropdown: true,
+      staffOnly: true,
       submenus: [
         { label: "Pôles de concertation", href: "/admin/forum/poles" },
       ],
@@ -84,21 +121,29 @@ export default function AdminSidebar({
       icon: <FileText size={20} />,
       label: "Ressources",
       href: "/admin/ressources",
+      staffOnly: true,
     },
     {
       icon: <ClipboardList size={20} />,
       label: "Demandes d'adhésion",
       href: "/admin/demandes-adhesion",
+      staffOnly: true,
     },
-    { icon: <Heart size={20} />, label: "Dons", href: "/admin/dons" },
-    { icon: <Users size={20} />, label: "Volontaires", href: "/admin/volontaires" },
-    { icon: <Phone size={20} />, label: "Numéros utiles", href: "/admin/numeros-utiles" },
+    { icon: <Heart size={20} />, label: "Dons", href: "/admin/dons", staffOnly: true },
+    { icon: <Users size={20} />, label: "Volontaires", href: "/admin/volontaires", staffOnly: true },
+    { icon: <Phone size={20} />, label: "Numéros utiles", href: "/admin/numeros-utiles", staffOnly: true },
+    { icon: <ShieldAlert size={20} />, label: "Modération", href: "/admin/moderation", badge: pendingCount, staffOnly: true },
     {
       icon: <Settings size={20} />,
       label: "Paramètres",
       href: "/admin/settings",
+      staffOnly: true,
     },
   ];
+
+  const navItems = isRedacteur
+    ? allNavItems.filter((item) => !item.staffOnly)
+    : allNavItems;
 
   const isActiveLink = (href: string) => {
     if (href === "/admin") {
@@ -208,7 +253,12 @@ export default function AdminSidebar({
               }`}
             >
               {item.icon}
-              <span className="text-sm font-medium">{item.label}</span>
+              <span className="text-sm font-medium flex-1">{item.label}</span>
+              {item.badge != null && item.badge > 0 && (
+                <span className="ml-auto bg-[#E05017] text-white text-xs font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           );
         })}

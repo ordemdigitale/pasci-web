@@ -1,4 +1,5 @@
 "use client";
+import { fetchWithAuth } from "@/lib/auth";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -163,7 +164,7 @@ export default function AddProjetPage() {
         formData.append("image", imageFile);
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/offre-projets`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/offre-projets`, {
         method: "POST",
         body: formData,
       });

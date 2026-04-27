@@ -317,7 +317,12 @@ export default function UtilisateursPage() {
                             Staff
                           </span>
                         )}
-                        {!user.is_staff && !user.is_superuser && (
+                        {(user as { is_redacteur?: boolean }).is_redacteur && !user.is_staff && !user.is_superuser && (
+                          <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700">
+                            Rédacteur
+                          </span>
+                        )}
+                        {!user.is_staff && !user.is_superuser && !(user as { is_redacteur?: boolean }).is_redacteur && (
                           <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
                             Utilisateur
                           </span>

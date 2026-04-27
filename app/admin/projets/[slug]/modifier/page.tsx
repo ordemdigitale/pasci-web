@@ -1,4 +1,5 @@
 "use client";
+import { fetchWithAuth } from "@/lib/auth";
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -87,7 +88,7 @@ export default function EditProjetPage() {
   useEffect(() => {
     const loadProjet = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/offre-projets/${slug}`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/offre-projets/${slug}`);
         if (!response.ok) {
           throw new Error("Projet non trouvé");
         }
@@ -216,7 +217,7 @@ export default function EditProjetPage() {
         formData.append("image", imageFile);
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/offre-projets/${slug}`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/offre-projets/${slug}`, {
         method: "PATCH",
         body: formData,
       });

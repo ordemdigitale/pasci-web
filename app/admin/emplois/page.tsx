@@ -1,4 +1,5 @@
 "use client";
+import { fetchWithAuth } from "@/lib/auth";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -44,7 +45,7 @@ export default function EmploisPage() {
   useEffect(() => {
     const loadJobs = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/jobs`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/jobs`);
         if (response.ok) {
           const data = await response.json();
           setJobs(data);
@@ -95,7 +96,7 @@ export default function EmploisPage() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/jobs/${slug}`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/jobs/${slug}`, {
         method: "DELETE",
       });
 
@@ -115,7 +116,7 @@ export default function EmploisPage() {
 
   const handleToggleExpired = async (slug: string, currentExpired: boolean) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/jobs/${slug}`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/jobs/${slug}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

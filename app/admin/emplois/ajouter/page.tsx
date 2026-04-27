@@ -1,4 +1,5 @@
 "use client";
+import { fetchWithAuth } from "@/lib/auth";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -137,7 +138,7 @@ export default function AddJobPage() {
         payload.expiration_date = new Date(data.expiration_date).toISOString();
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/jobs`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/jobs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

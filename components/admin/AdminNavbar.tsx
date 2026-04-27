@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menu, Bell, User, LogOut, Settings, UserCircle, ChevronDown } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AdminNavbarProps {
   setSidebarOpen: (open: boolean) => void;
@@ -12,8 +13,21 @@ interface AdminNavbarProps {
 
 export default function AdminNavbar({ setSidebarOpen, title = "Tableau de bord" }: AdminNavbarProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const roleLabel = user?.is_superuser
+    ? "Superuser"
+    : user?.is_staff
+    ? "Staff"
+    : user?.is_redacteur
+    ? "Rédacteur"
+    : "Utilisateur";
+
+  const displayName = user
+    ? [user.first_name, user.last_name].filter(Boolean).join(" ") || user.username || user.email
+    : "";
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -79,8 +93,9 @@ export default function AdminNavbar({ setSidebarOpen, title = "Tableau de bord" 
             <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
               {/* User Info */}
               <div className="px-4 py-3 border-b border-gray-200">
-                <p className="text-sm font-semibold text-gray-900">Administrateur</p>
-                <p className="text-xs text-gray-500">admin@pasci.ci</p>
+                <p className="text-sm font-semibold text-gray-900">{displayName}</p>
+                <p className="text-xs text-gray-500">{user?.email}</p>
+                <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">{roleLabel}</span>
               </div>
 
               {/* Menu Items */}
