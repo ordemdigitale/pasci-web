@@ -63,7 +63,7 @@ export default function SectionHero() {
   return (
     <section className="py-8 font-poppins">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <p className="text-[#2a591d] font-bold text-xl sm:text-2xl lg:text-3xl text-center pb-8 sm:pb-[50px]">Plateforme Digitale des OSC membres du CRASC ( PDOC )</p>
+        <p className="text-[#2a591d] font-bold text-xl sm:text-2xl lg:text-3xl text-center pb-8 sm:pb-[50px]">Plateforme Digitale des Organisations de la Société Civile - PDOC</p>
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
 
           {/* Left side */}

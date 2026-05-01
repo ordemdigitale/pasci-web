@@ -44,6 +44,7 @@ const NavLinks = [
     { title: 'Contact', href: '/contact' },
     { title: 'Faire un don', href: '/faire-un-don' },
     { title: 'Être volontaire', href: '/etre-volontaire' },
+    { title: 'Numéros utiles', href: '/numeros-utiles' },
   ];
 
   

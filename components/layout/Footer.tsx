@@ -39,6 +39,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/annuaire/annuaire-des-partenaires-techniques-et-financiers" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Annuaire des PTF
+                </Link>
+              </li>
+              <li>
                 <Link href="/espace-collaboratif/pole-concertation" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Pôle de concertation
                 </Link>
@@ -85,6 +90,11 @@ export default function Footer() {
               <li>
                 <Link href="/a-propos" className="text-gray-300 hover:text-white text-sm transition-colors">
                   À propos
+                </Link>
+              </li>
+              <li>
+                <Link href="/rejoindre" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Adhérer au CRASC
                 </Link>
               </li>
               <li>
