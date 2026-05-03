@@ -146,7 +146,7 @@ export default function PageRejoindre() {
     <section className="w-full max-w-2xl mx-auto px-4 py-8 font-poppins">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[#2a591d] mb-2">
-          FORMULAIRE D'ADHÉSION
+          DEMANDE D'ADHÉSION
         </h1>
         <p className="text-gray-600">
           Remplir ce formulaire pour soumettre votre demande d'adhésion.
