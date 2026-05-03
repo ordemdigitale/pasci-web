@@ -145,7 +145,7 @@ function LoginForm() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -166,28 +166,28 @@ function LoginForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Connexion en cours...' : 'Se connecter'}
               </button>
             </form>
 
             {/* Divider */}
-            <div className="my-6 flex items-center">
+            {/* <div className="my-6 flex items-center">
               <div className="flex-1 border-t border-gray-300"></div>
               <span className="px-4 text-sm text-gray-500">OU</span>
               <div className="flex-1 border-t border-gray-300"></div>
-            </div>
+            </div> */}
 
             {/* Register Link */}
-            <div className="text-center">
+            {/* <div className="text-center">
               <p className="text-gray-600">
                 Vous n'avez pas de compte ?{' '}
                 <Link href="/auth/register" className="text-[#E05017] hover:underline font-semibold">
                   Créer un compte
                 </Link>
               </p>
-            </div>
+            </div> */}
 
             {/* Back to Home */}
             <div className="mt-6 text-center">
