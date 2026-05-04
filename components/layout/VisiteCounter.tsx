@@ -18,9 +18,6 @@ export default function VisiteCounter() {
   if (total === null) return null;
 
   return (
-    <span className="inline-flex items-center gap-1.5 text-gray-400 text-xs">
-      <Eye className="w-3.5 h-3.5" />
-      <span>{total.toLocaleString("fr-FR")} visites</span>
-    </span>
+    <span>{total.toLocaleString("fr-FR")}</span>
   );
 }
