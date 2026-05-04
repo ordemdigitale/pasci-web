@@ -165,7 +165,7 @@ export default function Footer() {
               Conditions Générales
             </Link>
           </div>
-          <VisiteCounter />
+          {/* <VisiteCounter /> */}
         </div>
       </div>
     </footer>
