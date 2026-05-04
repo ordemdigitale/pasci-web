@@ -696,6 +696,7 @@ export default function FormationDetailPage() {
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
                           placeholder="+225 07 00 00 00 00"
                         />
+                        <p className="text-xs font-bold text-gray-500 mt-1">Renseigner l&apos;indicatif du pays, Ex : +225 07 00</p>
                         <p className="text-xs text-gray-500 mt-1">Requis pour le paiement mobile money</p>
                       </div>
                     )}
