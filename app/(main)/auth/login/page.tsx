@@ -153,14 +153,14 @@ function LoginForm() {
               </div>
 
               {/* Forgot Password */}
-              <div className="flex justify-end">
+{/*               <div className="flex justify-end">
                 <Link
                   href="/auth/forgot-password"
                   className="text-sm text-[#E05017] hover:underline font-semibold"
                 >
                   Mot de passe oublié ?
                 </Link>
-              </div>
+              </div> */}
 
               {/* Submit Button */}
               <button
