@@ -237,11 +237,11 @@ export default function PageRejoindre() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-gray-700 font-semibold">
-                  Ville
+                  Localité
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Ville de votre siège"
+                    placeholder="Localité de votre siège"
                     className="border-gray-300"
                     {...field}
                   />
