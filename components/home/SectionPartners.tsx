@@ -126,7 +126,7 @@ export default function Partners() {
             href="/rejoindre"
             className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-[#E05017] to-[#d04010] text-white font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
           >
-            Formulaire d'adhésion
+            Demande d'adhésion
             <ExternalLink className="w-4 h-4" />
           </Link>
         </div>
