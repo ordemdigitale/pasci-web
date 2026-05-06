@@ -219,8 +219,16 @@ export default function PTFPage() {
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <Building2 className="w-8 h-8 text-[#E05017]" />
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                      {ptf.thumbnail_url ? (
+                        <img
+                          src={ptf.thumbnail_url}
+                          alt={ptf.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Building2 className="w-8 h-8 text-[#E05017]" />
+                      )}
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -303,32 +311,81 @@ export default function PTFPage() {
         {/* PTF Details Modal */}
         {isModalOpen && selectedPTF && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Détails du PTF
-                </h2>
+            <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
+
+              {/* Hero — bouton X en overlay */}
+              <div className="relative">
+                {selectedPTF.cover_url ? (
+                  /* PTF avec photo de couverture */
+                  <>
+                    <div className="w-full h-52 overflow-hidden rounded-t-2xl">
+                      <img
+                        src={selectedPTF.cover_url}
+                        alt={`Couverture ${selectedPTF.name}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="px-8 pb-0">
+                      <div className="flex items-end gap-5 -mt-10 mb-2">
+                        <div className="w-20 h-20 bg-white border-4 border-white shadow-md rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {selectedPTF.thumbnail_url ? (
+                            <img src={selectedPTF.thumbnail_url} alt={selectedPTF.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <Building2 className="w-10 h-10 text-[#E05017]" />
+                          )}
+                        </div>
+                        <div className="pb-1">
+                          <h3 className="text-2xl font-bold text-gray-900">{selectedPTF.name}</h3>
+                          {selectedPTF.description && (
+                            <p className="text-gray-500 text-sm mt-0.5">{selectedPTF.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  /* PTF sans photo de couverture — hero dégradé style OSC */
+                  <div className="bg-gradient-to-r from-[#E05017] to-[#c44315] rounded-t-2xl p-8 text-white shadow-lg">
+                    <div className="flex items-start gap-6">
+                      <div className="w-24 h-24 rounded-xl overflow-hidden bg-white/20 border-2 border-white/30 flex-shrink-0 flex items-center justify-center">
+                        {selectedPTF.thumbnail_url ? (
+                          <img src={selectedPTF.thumbnail_url} alt={selectedPTF.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <Building2 className="w-12 h-12 text-white" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-2xl font-bold mb-1">{selectedPTF.name}</h3>
+                        {selectedPTF.description && (
+                          <p className="text-white/80 text-sm leading-relaxed">{selectedPTF.description}</p>
+                        )}
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {selectedPTF.pays && (
+                            <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />{selectedPTF.pays}
+                            </span>
+                          )}
+                          {selectedPTF.projets && selectedPTF.projets.length > 0 && (
+                            <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold flex items-center gap-1">
+                              <Target className="w-3 h-3" />{selectedPTF.projets.length} projet(s)
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bouton fermer en overlay */}
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="absolute top-3 right-3 p-2 bg-black/30 hover:bg-black/50 text-white rounded-lg transition-colors"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="p-6 space-y-6">
-                <div className="text-center">
-                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Building2 className="w-12 h-12 text-[#E05017]" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {selectedPTF.name}
-                  </h3>
-                  {selectedPTF.description && (
-                    <p className="text-gray-600 mt-1">{selectedPTF.description}</p>
-                  )}
-                </div>
-
                 {selectedPTF.mission && (
                   <div className="bg-gray-50 rounded-lg p-4">
                     <h4 className="font-bold text-gray-900 mb-2">Mission</h4>

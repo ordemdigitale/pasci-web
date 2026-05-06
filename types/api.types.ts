@@ -241,6 +241,7 @@ export interface IUser {
   is_staff: boolean;
   is_superuser: boolean;
   is_redacteur: boolean;
+  crasc_id?: number | null;
   avatar?: string;
   bio?: string;
   date_joined?: string;

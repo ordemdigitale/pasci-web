@@ -27,6 +27,7 @@ export interface UpdateUserAdminData extends UpdateUserData {
   is_staff?: boolean;
   is_superuser?: boolean;
   is_redacteur?: boolean;
+  crasc_id?: number | null;
 }
 
 export interface ChangePasswordData {

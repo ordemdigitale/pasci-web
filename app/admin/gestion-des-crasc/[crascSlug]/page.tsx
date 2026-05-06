@@ -8,6 +8,7 @@ import { ImageWithFallback } from '@/lib/imageWithFallback';
 import { ICrascDetail } from "@/types/api.types";
 import Link from "next/link";
 import { EditCrascForm } from "@/components/admin/EditCrascForm";
+import CrascGuard from "@/components/auth/CrascGuard";
 import {
   ArrowLeft,
   Edit,
@@ -91,6 +92,7 @@ export default function AdminCrascPage({ params }: { params: Promise<{ crascSlug
   }
 
   return (
+    <CrascGuard crascId={crascData?.id}>
     <section className="max-w-5xl mx-auto font-poppins bg-slate-50 py-4 px-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
@@ -271,5 +273,6 @@ export default function AdminCrascPage({ params }: { params: Promise<{ crascSlug
         </>
       )}
     </section>
+    </CrascGuard>
   )
 }

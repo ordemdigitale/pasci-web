@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Loader2, User, Mail, Shield, CheckCircle, XCircle } from "lucide-react";
+import { X, Loader2, User, Mail, Shield, CheckCircle, XCircle, Building2 } from "lucide-react";
 import { userService, UpdateUserAdminData } from "@/lib/services/user.service";
-import { IUser } from "@/types/api.types";
+import { IUser, ICrasc } from "@/types/api.types";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { fetchAllCrasc } from "@/lib/fetch-crasc";
 
 interface EditUserModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface EditUserModalProps {
 export default function EditUserModal({ isOpen, user, onClose, onSuccess }: EditUserModalProps) {
   const { user: currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [crascs, setCrascs] = useState<ICrasc[]>([]);
   const [formData, setFormData] = useState<UpdateUserAdminData>({
     email: user.email,
     username: user.username || "",
@@ -27,7 +29,8 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
     is_active: user.is_active,
     is_staff: user.is_staff,
     is_superuser: user.is_superuser,
-    is_redacteur: (user as IUser & { is_redacteur?: boolean }).is_redacteur ?? false,
+    is_redacteur: user.is_redacteur ?? false,
+    crasc_id: user.crasc_id ?? null,
   });
 
   useEffect(() => {
@@ -41,9 +44,16 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
       is_active: user.is_active,
       is_staff: user.is_staff,
       is_superuser: user.is_superuser,
-      is_redacteur: (user as IUser & { is_redacteur?: boolean }).is_redacteur ?? false,
+      is_redacteur: user.is_redacteur ?? false,
+      crasc_id: user.crasc_id ?? null,
     });
   }, [user]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchAllCrasc().then(setCrascs).catch(() => {});
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -234,21 +244,58 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                   <input
                     type="checkbox"
                     checked={formData.is_staff}
-                    onChange={() => handleCheckboxChange("is_staff")}
+                    onChange={() => {
+                      const newIsStaff = !formData.is_staff;
+                      setFormData((prev) => ({
+                        ...prev,
+                        is_staff: newIsStaff,
+                        crasc_id: newIsStaff ? prev.crasc_id : null,
+                      }));
+                    }}
                     className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
                   />
                   <div>
-                    <p className="font-semibold text-gray-900">Staff</p>
+                    <p className="font-semibold text-gray-900">Admin CRASC</p>
                     <p className="text-sm text-gray-600">
-                      Accès à l'interface d'administration
+                      Accès à l'interface d'administration — limité à son CRASC
                     </p>
                   </div>
                 </label>
 
+                {/* Sélecteur CRASC — visible uniquement si is_staff est coché */}
+                {formData.is_staff && (
+                  <div className="ml-2 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-[#2a591d]" />
+                      CRASC rattaché <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formData.crasc_id ?? ""}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          crasc_id: e.target.value ? Number(e.target.value) : null,
+                        }))
+                      }
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2a591d] focus:border-[#2a591d] bg-white"
+                    >
+                      <option value="">-- Choisir un CRASC --</option>
+                      {crascs.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Cet admin ne verra que les données de ce CRASC.
+                    </p>
+                  </div>
+                )}
+
                 <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
                   <input
                     type="checkbox"
-                    checked={(formData as typeof formData & { is_redacteur?: boolean }).is_redacteur ?? false}
+                    checked={formData.is_redacteur ?? false}
                     onChange={() => handleCheckboxChange("is_redacteur" as keyof UpdateUserAdminData)}
                     className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
                   />
