@@ -40,6 +40,8 @@ export default function EditPTFPage() {
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [removeThumbnail, setRemoveThumbnail] = useState(false);
+  const [removeCover, setRemoveCover] = useState(false);
   const [domaines, setDomaines] = useState<string[]>([]);
   const [domaineInput, setDomaineInput] = useState("");
 
@@ -101,10 +103,9 @@ export default function EditPTFPage() {
     const file = e.target.files?.[0];
     if (file) {
       setThumbnailFile(file);
+      setRemoveThumbnail(false);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setThumbnailPreview(reader.result as string);
-      };
+      reader.onloadend = () => setThumbnailPreview(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
@@ -113,10 +114,9 @@ export default function EditPTFPage() {
     const file = e.target.files?.[0];
     if (file) {
       setCoverFile(file);
+      setRemoveCover(false);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setCoverPreview(reader.result as string);
-      };
+      reader.onloadend = () => setCoverPreview(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
@@ -150,7 +150,9 @@ export default function EditPTFPage() {
       if (data.date_creation) formData.append("date_creation", data.date_creation);
       if (domaines.length > 0) formData.append("domaines", JSON.stringify(domaines));
       if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
+      else if (removeThumbnail) formData.append("remove_thumbnail", "1");
       if (coverFile) formData.append("cover", coverFile);
+      else if (removeCover) formData.append("remove_cover", "1");
 
       const response = await fetch(`${API_BASE_URL}/api/v1/ptf/${slug}`, {
         method: "PATCH",
@@ -309,6 +311,7 @@ export default function EditPTFPage() {
                         onClick={() => {
                           setThumbnailPreview(null);
                           setThumbnailFile(null);
+                          setRemoveThumbnail(true);
                         }}
                         className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
                       >
@@ -359,6 +362,7 @@ export default function EditPTFPage() {
                         onClick={() => {
                           setCoverPreview(null);
                           setCoverFile(null);
+                          setRemoveCover(true);
                         }}
                         className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
                       >
