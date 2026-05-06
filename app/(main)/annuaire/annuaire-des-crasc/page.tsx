@@ -483,6 +483,14 @@ export default function PageAnnuaireCrasc() {
               className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:border-[#E05017] focus:ring-1 focus:ring-[#E05017]"
             />
           </div>
+          
+          <Link
+            href="/annuaire/annuaire-des-osc"
+            className="text-[#E05017] hover:text-[#d04010] font-semibold flex items-center gap-2 transition-colors"
+          >
+            Voir tout
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
 
         {/* OSC Cards Grid */}
