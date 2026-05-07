@@ -338,4 +338,12 @@ export interface IOffreProjet {
   date_publication: string;
   created_at: string;
   updated_at: string;
+  ptf_id?: number | null;
+  ptf?: {
+    id: number;
+    name: string;
+    slug?: string;
+    thumbnail_url?: string;
+    pays?: string;
+  } | null;
 }

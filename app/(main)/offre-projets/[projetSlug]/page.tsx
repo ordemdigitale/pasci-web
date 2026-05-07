@@ -19,7 +19,8 @@ import {
   Lightbulb,
   TrendingUp,
   Award,
-  FileText
+  FileText,
+  Handshake,
 } from "lucide-react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
@@ -239,6 +240,37 @@ export default function PageDetailOffreProjet({
                     </li>
                   ))}
                 </ul>
+              </section>
+            )}
+
+            {/* PTF associé */}
+            {projet.ptf && (
+              <section className="bg-orange-50 border border-orange-100 rounded-xl p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Handshake className="w-5 h-5 text-[#E05017]" />
+                  Partenaire Technique et Financier
+                </h2>
+                <div className="flex items-center gap-4">
+                  {projet.ptf.thumbnail_url ? (
+                    <img src={projet.ptf.thumbnail_url} alt={projet.ptf.name} className="w-16 h-16 object-contain rounded-lg bg-white p-1 border border-orange-200" />
+                  ) : (
+                    <div className="w-16 h-16 bg-white rounded-lg border border-orange-200 flex items-center justify-center">
+                      <Building2 className="w-8 h-8 text-[#E05017]" />
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-bold text-gray-900 text-lg">{projet.ptf.name}</p>
+                    {projet.ptf.pays && <p className="text-sm text-gray-500">{projet.ptf.pays}</p>}
+                    {projet.ptf.slug && (
+                      <a
+                        href={`/annuaire/annuaire-des-partenaires-techniques-et-financiers/${projet.ptf.slug}`}
+                        className="text-sm text-[#E05017] hover:underline font-semibold mt-1 inline-block"
+                      >
+                        Voir le profil →
+                      </a>
+                    )}
+                  </div>
+                </div>
               </section>
             )}
 

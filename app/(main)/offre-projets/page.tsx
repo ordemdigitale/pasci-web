@@ -242,6 +242,18 @@ export default function PageOffreProjet() {
                       </div>
                     </div>
 
+                    {/* Badge PTF */}
+                    {projet.ptf && (
+                      <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-orange-50 border border-orange-100 rounded-lg">
+                        {projet.ptf.thumbnail_url ? (
+                          <img src={projet.ptf.thumbnail_url} alt={projet.ptf.name} className="w-6 h-6 object-contain rounded" />
+                        ) : (
+                          <Handshake className="w-4 h-4 text-[#E05017] flex-shrink-0" />
+                        )}
+                        <span className="text-xs font-semibold text-[#E05017] truncate">{projet.ptf.name}</span>
+                      </div>
+                    )}
+
                     <div className="mt-auto pt-4 border-t border-gray-100">
                       <span className="inline-flex items-center gap-2 text-[#E05017] font-semibold text-sm group-hover:gap-3 transition-all">
                         Voir les détails

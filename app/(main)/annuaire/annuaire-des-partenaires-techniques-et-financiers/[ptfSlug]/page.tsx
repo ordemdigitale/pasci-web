@@ -6,8 +6,10 @@ import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from "next/link";
 import {
   MapPin, Mail, Phone, Globe, Building2, Target,
-  ArrowRight, ExternalLink, FileText, NotepadText, Loader2
+  ArrowRight, ExternalLink, FileText, NotepadText, Loader2,
+  Clock, DollarSign, FolderOpen
 } from 'lucide-react';
+import { IOffreProjet } from '@/types/api.types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -18,6 +20,7 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
   const [ptfData, setPtfData] = useState<IPTF | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [offres, setOffres] = useState<IOffreProjet[]>([]);
 
   useEffect(() => {
     if (!ptfSlug) return;
@@ -26,7 +29,13 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
         setLoading(true);
         const response = await fetch(`${API_BASE_URL}/api/v1/ptf/${ptfSlug}`);
         if (!response.ok) throw new Error(response.status === 404 ? "Partenaire non trouvé" : `Erreur ${response.status}`);
-        setPtfData(await response.json());
+        const data = await response.json();
+        setPtfData(data);
+        // Charger les offres liées à ce PTF
+        if (data.id) {
+          const offresRes = await fetch(`${API_BASE_URL}/api/v1/offre-projets?ptf_id=${data.id}`);
+          if (offresRes.ok) setOffres(await offresRes.json());
+        }
       } catch (err: any) {
         setError(err.message || "Erreur de chargement");
       } finally {
@@ -256,6 +265,89 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Section Offres disponibles */}
+        <div className="mt-12">
+          <div className="flex items-center gap-3 mb-6">
+            <FolderOpen className="w-6 h-6 text-[#E05017]" />
+            <h2 className="text-2xl font-bold text-gray-900">
+              Offres disponibles
+              {offres.length > 0 && (
+                <span className="ml-2 text-sm font-semibold bg-[#E05017] text-white px-2 py-0.5 rounded-full">
+                  {offres.length}
+                </span>
+              )}
+            </h2>
+          </div>
+
+          {offres.length === 0 ? (
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-10 text-center">
+              <FolderOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500 font-medium">Aucune offre disponible pour ce PTF pour le moment.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {offres.map((offre) => (
+                <Link
+                  key={offre.id}
+                  href={`/offre-projets/${offre.slug}`}
+                  className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-[#E05017]/30 transition-all duration-300 flex flex-col"
+                >
+                  {/* Image */}
+                  <div className="relative h-40 overflow-hidden bg-gray-100">
+                    {offre.image_url ? (
+                      <img
+                        src={offre.image_url}
+                        alt={offre.nom}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <FolderOpen className="w-12 h-12 text-gray-300" />
+                      </div>
+                    )}
+                    <span className="absolute top-2 right-2 bg-[#E05017] text-white text-xs font-bold px-2 py-1 rounded-full">
+                      {offre.statut}
+                    </span>
+                  </div>
+
+                  {/* Contenu */}
+                  <div className="p-4 flex flex-col flex-1">
+                    <span className="text-xs font-bold text-[#E05017] bg-[#E05017]/10 px-2 py-1 rounded w-fit mb-2">
+                      {offre.domaine}
+                    </span>
+                    <h3 className="font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-[#E05017] transition-colors">
+                      {offre.nom}
+                    </h3>
+                    <div className="space-y-1.5 text-sm text-gray-600 mb-3">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <span className="truncate">{offre.osc}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <span>{offre.zone}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <span>{offre.durée}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <span className="font-semibold">{offre.budget}</span>
+                      </div>
+                    </div>
+                    <div className="mt-auto pt-3 border-t border-gray-100">
+                      <span className="inline-flex items-center gap-1 text-[#E05017] font-semibold text-sm group-hover:gap-2 transition-all">
+                        Voir les détails <ArrowRight className="w-4 h-4" />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="mt-12 text-center">

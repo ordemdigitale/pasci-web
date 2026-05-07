@@ -9,7 +9,7 @@ import * as z from "zod";
 import { ArrowLeft, Plus, Trash2, Upload, X, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { IOffreProjet } from "@/types/api.types";
+import { IOffreProjet, IPTF } from "@/types/api.types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -67,6 +67,10 @@ export default function EditProjetPage() {
   const [resultats, setResultats] = useState<string[]>([""]);
   const [partenaires, setPartenaires] = useState<string[]>([""]);
 
+  // PTF
+  const [ptfList, setPtfList] = useState<IPTF[]>([]);
+  const [selectedPtfId, setSelectedPtfId] = useState<string>("");
+
   // Image
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -123,6 +127,11 @@ export default function EditProjetPage() {
         if (data.image_url) {
           setCurrentImage(data.image_url);
         }
+
+        // Load PTF
+        if (data.ptf_id) {
+          setSelectedPtfId(data.ptf_id.toString());
+        }
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -132,6 +141,22 @@ export default function EditProjetPage() {
 
     loadProjet();
   }, [slug, setValue]);
+
+  // Load PTF list
+  useEffect(() => {
+    const loadPtfList = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/ptf`);
+        if (response.ok) {
+          const data = await response.json();
+          setPtfList(data);
+        }
+      } catch (err) {
+        console.error("Erreur lors du chargement des PTF:", err);
+      }
+    };
+    loadPtfList();
+  }, []);
 
   // Gestion des résultats attendus
   const addResultat = () => {
@@ -215,6 +240,10 @@ export default function EditProjetPage() {
 
       if (imageFile) {
         formData.append("image", imageFile);
+      }
+
+      if (selectedPtfId) {
+        formData.append("ptf_id", selectedPtfId);
       }
 
       const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/offre-projets/${slug}`, {
@@ -490,6 +519,30 @@ export default function EditProjetPage() {
                   <span>100%</span>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Partenaire Technique et Financier */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              Partenaire Technique et Financier
+            </h2>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                PTF associé (optionnel)
+              </label>
+              <select
+                value={selectedPtfId}
+                onChange={(e) => setSelectedPtfId(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+              >
+                <option value="">Aucun PTF</option>
+                {ptfList.map((ptf) => (
+                  <option key={ptf.id} value={ptf.id.toString()}>
+                    {ptf.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

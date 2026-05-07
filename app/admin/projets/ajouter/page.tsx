@@ -1,7 +1,7 @@
 "use client";
 import { fetchWithAuth } from "@/lib/auth";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -61,6 +61,10 @@ export default function AddProjetPage() {
   const [resultats, setResultats] = useState<string[]>([""]);
   const [partenaires, setPartenaires] = useState<string[]>([""]);
 
+  // PTF
+  const [ptfList, setPtfList] = useState<{ id: number; name: string }[]>([]);
+  const [selectedPtfId, setSelectedPtfId] = useState<number | null>(null);
+
   // Image
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -80,6 +84,14 @@ export default function AddProjetPage() {
   });
 
   const progression = watch("progression");
+
+  // Charger la liste des PTF
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/v1/ptf`)
+      .then(r => r.json())
+      .then(data => setPtfList(data.map((p: any) => ({ id: p.id, name: p.name }))))
+      .catch(() => {});
+  }, []);
 
   // Gestion des résultats attendus
   const addResultat = () => {
@@ -160,9 +172,8 @@ export default function AddProjetPage() {
         formData.append("partenaires", JSON.stringify(filteredPartenaires));
       }
 
-      if (imageFile) {
-        formData.append("image", imageFile);
-      }
+      if (selectedPtfId) formData.append("ptf_id", selectedPtfId.toString());
+      if (imageFile) formData.append("image", imageFile);
 
       const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/offre-projets`, {
         method: "POST",
@@ -246,6 +257,23 @@ export default function AddProjetPage() {
                 {errors.osc && (
                   <p className="text-red-600 text-sm mt-1">{errors.osc.message}</p>
                 )}
+              </div>
+
+              {/* Sélecteur PTF */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  PTF associé (optionnel)
+                </label>
+                <select
+                  value={selectedPtfId ?? ""}
+                  onChange={(e) => setSelectedPtfId(e.target.value ? Number(e.target.value) : null)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                >
+                  <option value="">— Aucun PTF —</option>
+                  {ptfList.map((ptf) => (
+                    <option key={ptf.id} value={ptf.id}>{ptf.name}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
