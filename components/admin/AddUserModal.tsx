@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { X, Loader2, User, Mail, Lock, Shield } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Loader2, User, Mail, Lock, Shield, Building2 } from "lucide-react";
 import { userService, CreateUserData } from "@/lib/services/user.service";
+import { ICrasc } from "@/types/api.types";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { fetchAllCrasc } from "@/lib/fetch-crasc";
 
 interface AddUserModalProps {
   isOpen: boolean;
@@ -15,6 +17,7 @@ interface AddUserModalProps {
 export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModalProps) {
   const { user: currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [crascs, setCrascs] = useState<ICrasc[]>([]);
   const [formData, setFormData] = useState<CreateUserData>({
     email: "",
     username: "",
@@ -25,12 +28,19 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
   const [permissions, setPermissions] = useState({
     is_staff: false,
     is_superuser: false,
+    is_redacteur: false,
+    crasc_id: null as number | null,
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchAllCrasc().then(setCrascs).catch(() => {});
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
     if (!formData.email || !formData.password) {
       toast.error("L'email et le mot de passe sont requis");
       return;
@@ -41,16 +51,24 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
       return;
     }
 
+    if (permissions.is_staff && !permissions.crasc_id) {
+      toast.error("Veuillez sélectionner un CRASC pour l'Admin CRASC");
+      return;
+    }
+
     setLoading(true);
     try {
-      // Create user
       const newUser = await userService.createUser(formData);
 
-      // Update permissions if staff and any permission is set
-      if (currentUser?.is_staff && (permissions.is_staff || permissions.is_superuser)) {
+      if (
+        currentUser?.is_staff &&
+        (permissions.is_staff || permissions.is_superuser || permissions.is_redacteur)
+      ) {
         await userService.updateUser(newUser.id, {
           is_staff: permissions.is_staff,
           is_superuser: permissions.is_superuser,
+          is_redacteur: permissions.is_redacteur,
+          crasc_id: permissions.is_staff ? permissions.crasc_id : null,
         });
       }
 
@@ -109,7 +127,7 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
                     onChange={handleChange}
                     required
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2a591d] focus:border-[#2a591d]"
-                    placeholder="admin@pasci.dz"
+                    placeholder="admin@pasci.ci"
                   />
                 </div>
               </div>
@@ -141,7 +159,7 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
                   value={formData.first_name}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2a591d] focus:border-[#2a591d]"
-                  placeholder="Admin"
+                  placeholder="Prénom"
                 />
               </div>
 
@@ -155,7 +173,7 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
                   value={formData.last_name}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2a591d] focus:border-[#2a591d]"
-                  placeholder="PASCI"
+                  placeholder="Nom de famille"
                 />
               </div>
             </div>
@@ -177,21 +195,20 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
                   placeholder="••••••••"
                 />
               </div>
-              <p className="text-sm text-gray-500 mt-1">
-                Minimum 8 caractères
-              </p>
+              <p className="text-sm text-gray-500 mt-1">Minimum 8 caractères</p>
             </div>
           </div>
 
-          {/* Permissions (only visible to staff) */}
+          {/* Permissions */}
           {currentUser?.is_staff && (
             <div className="space-y-4 pt-4 border-t border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <Shield className="w-5 h-5 text-[#2a591d]" />
-                Permissions
+                Rôle et permissions
               </h3>
 
               <div className="space-y-3">
+                {/* Admin CRASC */}
                 <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
                   <input
                     type="checkbox"
@@ -200,18 +217,71 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
                       setPermissions((prev) => ({
                         ...prev,
                         is_staff: e.target.checked,
+                        crasc_id: e.target.checked ? prev.crasc_id : null,
                       }))
                     }
                     className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
                   />
                   <div>
-                    <p className="font-semibold text-gray-900">Staff</p>
+                    <p className="font-semibold text-gray-900">Admin CRASC</p>
                     <p className="text-sm text-gray-600">
-                      Accès à l'interface d'administration
+                      Accès à l'interface d'administration — limité à son CRASC
                     </p>
                   </div>
                 </label>
 
+                {/* Sélecteur CRASC */}
+                {permissions.is_staff && (
+                  <div className="ml-2 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-[#2a591d]" />
+                      CRASC rattaché <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={permissions.crasc_id ?? ""}
+                      onChange={(e) =>
+                        setPermissions((prev) => ({
+                          ...prev,
+                          crasc_id: e.target.value ? Number(e.target.value) : null,
+                        }))
+                      }
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2a591d] focus:border-[#2a591d] bg-white"
+                    >
+                      <option value="">-- Choisir un CRASC --</option>
+                      {crascs.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Cet admin ne verra que les données de ce CRASC.
+                    </p>
+                  </div>
+                )}
+
+                {/* Rédacteur */}
+                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={permissions.is_redacteur}
+                    onChange={(e) =>
+                      setPermissions((prev) => ({
+                        ...prev,
+                        is_redacteur: e.target.checked,
+                      }))
+                    }
+                    className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
+                  />
+                  <div>
+                    <p className="font-semibold text-gray-900">Rédacteur</p>
+                    <p className="text-sm text-gray-600">
+                      Peut créer du contenu — nécessite validation avant publication
+                    </p>
+                  </div>
+                </label>
+
+                {/* Superuser */}
                 <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
                   <input
                     type="checkbox"

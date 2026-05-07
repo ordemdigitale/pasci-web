@@ -314,7 +314,7 @@ export default function UtilisateursPage() {
                         )}
                         {user.is_staff && !user.is_superuser && (
                           <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">
-                            Staff
+                            Admin CRASC
                           </span>
                         )}
                         {(user as { is_redacteur?: boolean }).is_redacteur && !user.is_staff && !user.is_superuser && (
@@ -487,7 +487,9 @@ export default function UtilisateursPage() {
                     {selectedUser.is_superuser
                       ? "Superuser"
                       : selectedUser.is_staff
-                      ? "Staff"
+                      ? "Admin CRASC"
+                      : selectedUser.is_redacteur
+                      ? "Rédacteur"
                       : "Utilisateur"}
                   </p>
                 </div>
