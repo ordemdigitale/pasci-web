@@ -13,6 +13,7 @@ import {
   Clock,
   CreditCard,
   AlertCircle,
+  Trash2,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 
@@ -51,6 +52,8 @@ export default function InscriptionsPage() {
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [certEmise, setCertEmise] = useState<Certificat | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Inscription | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
@@ -123,6 +126,25 @@ export default function InscriptionsPage() {
       showToast(e.message || "Erreur lors de l'émission du certificat.", "error");
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const supprimerInscription = async () => {
+    if (!confirmDelete) return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetchWithAuth(
+        `${API_BASE_URL}/api/v1/formations/inscriptions/${confirmDelete.id}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error();
+      setInscriptions((prev) => prev.filter((i) => i.id !== confirmDelete.id));
+      showToast(`${confirmDelete.participant_name} a été désinscrit.`, "success");
+    } catch {
+      showToast("Erreur lors de la désinscription.", "error");
+    } finally {
+      setDeleteLoading(false);
+      setConfirmDelete(null);
     }
   };
 
@@ -254,6 +276,42 @@ export default function InscriptionsPage() {
             >
               Fermer
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal confirmation suppression */}
+      {confirmDelete && (
+        <div
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 9998, display: "flex", alignItems: "center", justifyContent: "center" }}
+          onClick={() => !deleteLoading && setConfirmDelete(null)}
+        >
+          <div
+            style={{ background: "#fff", borderRadius: 12, padding: 32, maxWidth: 400, width: "100%", margin: "0 16px" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Trash2 size={40} color="#dc2626" style={{ margin: "0 auto 16px", display: "block" }} />
+            <h3 style={{ fontSize: 18, fontWeight: 700, textAlign: "center", marginBottom: 8 }}>Désinscrire ce participant ?</h3>
+            <p style={{ color: "#6b7280", fontSize: 14, textAlign: "center", marginBottom: 24 }}>
+              <strong>{confirmDelete.participant_name}</strong> ({confirmDelete.participant_email}) sera supprimé de cette formation. Cette action est irréversible.
+            </p>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+              <button
+                onClick={() => setConfirmDelete(null)}
+                disabled={deleteLoading}
+                style={{ padding: "9px 20px", borderRadius: 8, border: "1px solid #e5e7eb", background: "#f9fafb", cursor: "pointer", fontWeight: 500, fontSize: 14 }}
+              >
+                Annuler
+              </button>
+              <button
+                onClick={supprimerInscription}
+                disabled={deleteLoading}
+                style={{ padding: "9px 20px", borderRadius: 8, border: "none", background: "#dc2626", color: "#fff", cursor: deleteLoading ? "not-allowed" : "pointer", fontWeight: 600, fontSize: 14, display: "inline-flex", alignItems: "center", gap: 6, opacity: deleteLoading ? 0.7 : 1 }}
+              >
+                {deleteLoading ? <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} /> : <Trash2 size={14} />}
+                Désinscrire
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -428,6 +486,30 @@ export default function InscriptionsPage() {
                             Compléter
                           </button>
                         )}
+
+                        {/* Désinscrire */}
+                        <button
+                          onClick={() => setConfirmDelete(inscription)}
+                          disabled={actionLoading === inscription.id}
+                          title="Désinscrire ce participant"
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 6,
+                            padding: "7px 14px",
+                            background: "#fef2f2",
+                            color: "#dc2626",
+                            border: "1px solid #fecaca",
+                            borderRadius: 7,
+                            cursor: actionLoading === inscription.id ? "not-allowed" : "pointer",
+                            fontSize: 13,
+                            fontWeight: 500,
+                            opacity: actionLoading === inscription.id ? 0.6 : 1,
+                          }}
+                        >
+                          <Trash2 size={14} />
+                          Désinscrire
+                        </button>
 
                         {/* Délivrer certificat */}
                         <button
