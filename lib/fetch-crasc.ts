@@ -9,6 +9,8 @@ import {
   SpotlightNews
 } from "@/types/api.types";
 
+export type { ICrasc, ICrascDetail, IRegionCiv, IOscType, IOsc, IOscDetail, INews, SpotlightNews };
+
 // Get API base URL from environment variable
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
