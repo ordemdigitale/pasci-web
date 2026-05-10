@@ -184,7 +184,7 @@ export default function AdminAjoutDocument() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 font-poppins">
+    <div className="bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 font-poppins">
       <div className="max-w-4xl mx-auto">
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-[#2A591D] to-[#3d7a28] rounded-2xl p-8 mb-8 text-white shadow-xl">

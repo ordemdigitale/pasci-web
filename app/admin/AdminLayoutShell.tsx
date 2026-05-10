@@ -26,7 +26,7 @@ export default function AdminLayoutShell({
         </div>
       ) : (
         <ProtectedRoute requireAdmin={true}>
-          <div className="flex h-screen bg-cyan-50/50 font-poppins">
+          <div className="flex h-screen overflow-hidden bg-cyan-50/50 font-poppins">
             <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
             {sidebarOpen && (

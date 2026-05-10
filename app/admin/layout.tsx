@@ -26,8 +26,8 @@ export default function AdminRootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${karla.variable} ${poppins.variable} antialiased`}>
-      <body>
+    <html lang="en" className={`${karla.variable} ${poppins.variable} antialiased h-full overflow-hidden`}>
+      <body className="h-full overflow-hidden">
         <AdminLayoutShell>
           {children}
         </AdminLayoutShell>
