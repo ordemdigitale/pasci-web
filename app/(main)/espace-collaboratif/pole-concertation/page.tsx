@@ -31,10 +31,8 @@ export default function PagePoleConcertation() {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = poles.filter(
-    (p) =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (p.category || "").toLowerCase().includes(searchQuery.toLowerCase())
+  const filtered = poles.filter((p) =>
+    p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -108,10 +106,6 @@ export default function PagePoleConcertation() {
                       className="w-full h-40 object-cover"
                     />
                     <div className="p-5 flex-1 flex flex-col">
-                      <div className="inline-block px-3 py-1 rounded-md text-xs font-semibold text-white mb-3 bg-[#E05017] self-start">
-                        {pole.category}
-                      </div>
-
                       <h3 className="text-base font-bold text-gray-900 mb-2">{pole.name}</h3>
 
                       {objectifsList.length > 0 && (

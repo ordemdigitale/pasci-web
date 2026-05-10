@@ -7,20 +7,6 @@ import { API_ENDPOINTS } from "@/lib/api-config";
 import { fetchWithAuth } from "@/lib/auth";
 import { ArrowLeft, Plus, Trash2, Loader2, Image as ImageIcon, X } from "lucide-react";
 
-const CATEGORIES = [
-  "Gouvernance",
-  "Droits humains",
-  "Environnement",
-  "Éducation",
-  "Santé",
-  "Économie",
-  "Genre",
-  "Jeunesse",
-  "Culture",
-  "Sécurité",
-  "Autre",
-];
-
 export default function AdminModifierPolePage() {
   const params = useParams();
   const router = useRouter();
@@ -31,7 +17,6 @@ export default function AdminModifierPolePage() {
   const [error, setError] = useState("");
 
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -50,7 +35,6 @@ export default function AdminModifierPolePage() {
       .then((r) => r.json())
       .then((data) => {
         setName(data.name || "");
-        setCategory(data.category || "");
         setDescription(data.description || "");
         if (data.image_path) {
           const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -114,7 +98,6 @@ export default function AdminModifierPolePage() {
       const filteredAgenda = agenda.filter((a) => a.titre.trim() || a.date.trim());
       const formData = new FormData();
       formData.append("name", name.trim());
-      formData.append("category", category || "");
       formData.append("description", description.trim());
       formData.append("is_active", String(isActive));
       formData.append("objectifs", filteredObjectifs.length > 0 ? JSON.stringify(filteredObjectifs) : "");
@@ -180,21 +163,6 @@ export default function AdminModifierPolePage() {
               required
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
             />
-          </div>
-
-          {/* Catégorie */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
-            >
-              <option value="">-- Sélectionner --</option>
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
           </div>
 
           {/* Description */}

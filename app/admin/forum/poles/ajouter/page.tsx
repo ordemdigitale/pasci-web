@@ -7,27 +7,12 @@ import { API_ENDPOINTS } from "@/lib/api-config";
 import { fetchWithAuth } from "@/lib/auth";
 import { ArrowLeft, Plus, Trash2, Loader2, Image as ImageIcon, X } from "lucide-react";
 
-const CATEGORIES = [
-  "Gouvernance",
-  "Droits humains",
-  "Environnement",
-  "Éducation",
-  "Santé",
-  "Économie",
-  "Genre",
-  "Jeunesse",
-  "Culture",
-  "Sécurité",
-  "Autre",
-];
-
 export default function AdminAjouterPolePage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -76,7 +61,6 @@ export default function AdminAjouterPolePage() {
       const filteredAgenda = agenda.filter((a) => a.titre.trim() || a.date.trim());
       const formData = new FormData();
       formData.append("name", name.trim());
-      if (category) formData.append("category", category);
       if (description.trim()) formData.append("description", description.trim());
       formData.append("is_active", String(isActive));
       if (filteredObjectifs.length > 0) formData.append("objectifs", JSON.stringify(filteredObjectifs));
@@ -135,21 +119,6 @@ export default function AdminAjouterPolePage() {
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
               placeholder="Ex: Pôle Gouvernance et Citoyenneté"
             />
-          </div>
-
-          {/* Catégorie */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
-            >
-              <option value="">-- Sélectionner --</option>
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
           </div>
 
           {/* Description */}
