@@ -157,6 +157,7 @@ export default function InscriptionsPage() {
           </span>
         );
       case "confirmed":
+      case "paid":
         return (
           <span style={{ background: "#dcfce7", color: "#15803d", padding: "2px 8px", borderRadius: 9999, fontSize: 12, fontWeight: 500 }}>
             Payée
