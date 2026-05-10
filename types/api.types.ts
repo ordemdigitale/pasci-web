@@ -215,6 +215,7 @@ export interface IPTF {
   // General information
   pays?: string;
   date_creation?: string;
+  conseil?: string;
 
   // Domaines (JSON string and parsed list)
   domaines?: string;

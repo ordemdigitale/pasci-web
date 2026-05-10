@@ -23,6 +23,7 @@ const ptfSchema = z.object({
   address: z.string().optional().nullable(),
   pays: z.string().optional().nullable(),
   date_creation: z.string().optional().nullable(),
+  conseil: z.string().optional().nullable(),
 });
 
 type PtfFormData = z.infer<typeof ptfSchema>;
@@ -76,6 +77,7 @@ export default function EditPTFPage() {
         setValue("address", data.address || "");
         setValue("pays", data.pays || "");
         setValue("date_creation", data.date_creation || "");
+        setValue("conseil", data.conseil || "");
 
         // Set images
         if (data.thumbnail_url) {
@@ -148,6 +150,7 @@ export default function EditPTFPage() {
       if (data.address) formData.append("address", data.address);
       if (data.pays) formData.append("pays", data.pays);
       if (data.date_creation) formData.append("date_creation", data.date_creation);
+      if (data.conseil) formData.append("conseil", data.conseil);
       if (domaines.length > 0) formData.append("domaines", JSON.stringify(domaines));
       if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
       else if (removeThumbnail) formData.append("remove_thumbnail", "1");
@@ -488,6 +491,18 @@ export default function EditPTFPage() {
                   type="text"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
                   placeholder="Ex: 2020"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Conseil
+                </label>
+                <textarea
+                  {...register("conseil")}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                  placeholder="Conseil associé au PTF..."
                 />
               </div>
 
