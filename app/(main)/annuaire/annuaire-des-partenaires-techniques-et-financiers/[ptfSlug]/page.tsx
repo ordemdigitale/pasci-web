@@ -157,6 +157,13 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
               </div>
             )}
 
+            {ptfData.conseil && (
+              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Conseil</h2>
+                <p className="text-gray-700 whitespace-pre-wrap">{ptfData.conseil}</p>
+              </div>
+            )}
+
             {domaines.length > 0 && (
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Domaines d'intervention</h2>
