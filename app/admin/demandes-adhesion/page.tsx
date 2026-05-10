@@ -19,6 +19,8 @@ interface DemandeAdhesion {
   id: number;
   nom_organisation: string;
   type_organisation: string;
+  crasc_nom: string | null;
+  type_osc: string | null;
   region: string;
   ville: string | null;
   email: string;
@@ -235,7 +237,7 @@ export default function DemandesAdhesionPage() {
                     className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-4 py-3 font-medium text-gray-900">{demande.nom_organisation}</td>
-                    <td className="px-4 py-3 text-gray-600">{demande.type_organisation}</td>
+                    <td className="px-4 py-3 text-gray-600">{demande.type_osc || demande.type_organisation}</td>
                     <td className="px-4 py-3 text-gray-600">{demande.region}</td>
                     <td className="px-4 py-3">
                       <div className="text-gray-800">{demande.email}</div>
@@ -301,9 +303,15 @@ export default function DemandesAdhesionPage() {
             {/* Modal body */}
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
+                {selected.crasc_nom && (
+                  <div>
+                    <div className="text-gray-500 text-xs mb-0.5">CRASC</div>
+                    <div className="font-medium">{selected.crasc_nom}</div>
+                  </div>
+                )}
                 <div>
-                  <div className="text-gray-500 text-xs mb-0.5">Type d'organisation</div>
-                  <div className="font-medium">{selected.type_organisation}</div>
+                  <div className="text-gray-500 text-xs mb-0.5">Type d'OSC</div>
+                  <div className="font-medium">{selected.type_osc || selected.type_organisation}</div>
                 </div>
                 <div>
                   <div className="text-gray-500 text-xs mb-0.5">Région</div>

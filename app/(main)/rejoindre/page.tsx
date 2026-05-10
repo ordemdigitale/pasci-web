@@ -1,7 +1,7 @@
 // OSC registration form
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -24,16 +24,19 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { toast } from 'sonner';
+import { fetchAllCrasc, ICrasc } from '@/lib/fetch-crasc';
 
 const registrationSchema = z.object({
   organizationName: z
     .string()
     .min(1, 'Le nom de l\'organisation est requis')
     .min(2, 'Le nom doit contenir au moins 2 caractères'),
-  organizationType: z.string().min(1, 'Sélectionnez un type d\'organisation'),
+  crascNom: z.string().min(1, 'Sélectionnez un CRASC'),
+  typeOsc: z.string().min(1, 'Sélectionnez un type d\'OSC'),
   region: z.string().min(1, 'Sélectionnez une région'),
   city: z.string().optional(),
   email: z
+    .string()
     .email('Veuillez entrer une adresse email valide')
     .min(1, 'L\'email est requis'),
   phone: z
@@ -48,14 +51,14 @@ const registrationSchema = z.object({
 });
 
 type RegistrationFormValues = z.infer<typeof registrationSchema>;
-/* replace with real data */
-const ORGANIZATION_TYPES = [
-  { value: 'ngo', label: 'ONG' },
-  { value: 'company', label: 'Entreprise' },
-  { value: 'government', label: 'Gouvernement' },
-  { value: 'academic', label: 'Académique' },
-  { value: 'other', label: 'Autre' },
+
+const TYPE_OSC_OPTIONS = [
+  { value: 'Association', label: 'Association' },
+  { value: 'Fondation', label: 'Fondation' },
+  { value: 'Organisation cultuelle', label: 'Organisation cultuelle' },
+  { value: 'ONG', label: 'ONG' },
 ];
+
 const REGIONS = [
   { value: 'District Autonome d\'Abidjan', label: 'District Autonome d\'Abidjan' },
   { value: 'District Autonome de Yamoussoukro', label: 'District Autonome de Yamoussoukro' },
@@ -92,16 +95,20 @@ const REGIONS = [
   { value: 'Worodougou', label: 'Worodougou' },
 ];
 
-
-
 export default function PageRejoindre() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [crascs, setCrascs] = useState<ICrasc[]>([]);
+
+  useEffect(() => {
+    fetchAllCrasc().then(setCrascs).catch(() => {});
+  }, []);
 
   const form = useForm<RegistrationFormValues>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
       organizationName: '',
-      organizationType: '',
+      crascNom: '',
+      typeOsc: '',
       region: '',
       city: '',
       email: '',
@@ -120,7 +127,9 @@ export default function PageRejoindre() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nom_organisation: values.organizationName,
-          type_organisation: values.organizationType,
+          type_organisation: values.typeOsc,
+          crasc_nom: values.crascNom,
+          type_osc: values.typeOsc,
           region: values.region,
           ville: values.city || null,
           email: values.email,
@@ -176,24 +185,25 @@ export default function PageRejoindre() {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* CRASC */}
             <FormField
               control={form.control}
-              name="organizationType"
+              name="crascNom"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-gray-700 font-semibold">
-                    Type d'organisation <span className="text-red-600">*</span>
+                    CRASC <span className="text-red-600">*</span>
                   </FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="border-gray-300">
-                        <SelectValue placeholder="Sélectionnez un type" />
+                        <SelectValue placeholder="Sélectionnez un CRASC" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {ORGANIZATION_TYPES.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
+                      {crascs.map((c) => (
+                        <SelectItem key={c.id} value={c.name}>
+                          {c.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -203,6 +213,36 @@ export default function PageRejoindre() {
               )}
             />
 
+            {/* Type d'OSC */}
+            <FormField
+              control={form.control}
+              name="typeOsc"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 font-semibold">
+                    Type d'OSC <span className="text-red-600">*</span>
+                  </FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="border-gray-300">
+                        <SelectValue placeholder="Sélectionnez un type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {TYPE_OSC_OPTIONS.map((t) => (
+                        <SelectItem key={t.value} value={t.value}>
+                          {t.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
               control={form.control}
               name="region"
@@ -346,6 +386,5 @@ export default function PageRejoindre() {
         </form>
       </Form>
     </section>
-  )
+  );
 }
-{/* <div class="card p-8" style="opacity: 1; transform: none;"><h2 class="font-heading text-3xl text-primary mb-2">Formulaire d'adhésion</h2><p class="text-gray-600 mb-8">Remplissez ce formulaire pour soumettre votre demande d'adhésion au réseau.</p><form class="space-y-6"><div><label class="block text-sm font-medium text-gray-700 mb-2">Nom de l'organisation *</label><input type="text" required="" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Nom légal de votre organisation" value=""></div><div class="grid md:grid-cols-2 gap-6"><div><label class="block text-sm font-medium text-gray-700 mb-2">Type d'organisation *</label><select required="" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white"><option value="" selected="">Sélectionnez un type</option><option value="Association">Association</option><option value="ONG">ONG</option><option value="Fondation">Fondation</option><option value="Coopérative">Coopérative</option><option value="Groupement">Groupement</option><option value="Réseau">Réseau</option><option value="Autre">Autre</option></select></div><div><label class="block text-sm font-medium text-gray-700 mb-2">Région *</label><select required="" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white"><option value="" selected="">Sélectionnez une région</option><option value="District Autonome d'Abidjan">District Autonome d'Abidjan</option><option value="District Autonome de Yamoussoukro">District Autonome de Yamoussoukro</option><option value="Agnéby-Tiassa">Agnéby-Tiassa</option><option value="Bafing">Bafing</option><option value="Bagoué">Bagoué</option><option value="Béré">Béré</option><option value="Bélier">Bélier</option><option value="Bounkani">Bounkani</option><option value="Cavally">Cavally</option><option value="Folon">Folon</option><option value="Gbêkê">Gbêkê</option><option value="Gbôklé">Gbôklé</option><option value="Gôh">Gôh</option><option value="Gontougo">Gontougo</option><option value="Grands-Ponts">Grands-Ponts</option><option value="Guémon">Guémon</option><option value="Hambol">Hambol</option><option value="Haut-Sassandra">Haut-Sassandra</option><option value="Iffou">Iffou</option><option value="Indénié-Djuablin">Indénié-Djuablin</option><option value="Kabadougou">Kabadougou</option><option value="La Mé">La Mé</option><option value="Loh-Djiboua">Loh-Djiboua</option><option value="Marahoué">Marahoué</option><option value="Moronou">Moronou</option><option value="Nawa">Nawa</option><option value="N'Zi">N'Zi</option><option value="Poro">Poro</option><option value="San-Pédro">San-Pédro</option><option value="Sud-Comoé">Sud-Comoé</option><option value="Tchologo">Tchologo</option><option value="Tonkpi">Tonkpi</option><option value="Worodougou">Worodougou</option></select></div></div><div><label class="block text-sm font-medium text-gray-700 mb-2">Ville</label><input type="text" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Ville de votre siège" value=""></div><div class="grid md:grid-cols-2 gap-6"><div><label class="block text-sm font-medium text-gray-700 mb-2">Email *</label><input type="email" required="" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="contact@organisation.cm" value=""></div><div><label class="block text-sm font-medium text-gray-700 mb-2">Téléphone *</label><input type="tel" required="" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="+237 6XX XXX XXX" value=""></div></div><div><label class="block text-sm font-medium text-gray-700 mb-2">Description de votre organisation</label><textarea rows="4" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none" placeholder="Décrivez brièvement votre organisation et ses activités..."></textarea></div><div><label class="block text-sm font-medium text-gray-700 mb-2">Motivation pour rejoindre le réseau *</label><textarea required="" rows="4" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none" placeholder="Pourquoi souhaitez-vous rejoindre le réseau RI-CRASC ?"></textarea></div><button type="submit" class="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50">Soumettre la demande<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg></button></form></div> */}
