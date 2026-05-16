@@ -405,7 +405,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
             )}
 
             {/* ── Agenda Section ── */}
-            <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+            <div id="agenda" className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${zoneColors.color}20` }}>
                   <CalendarDays className="w-5 h-5" style={{ color: zoneColors.color }} />
@@ -525,7 +525,15 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                 </div>
               </div>
 
-              <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
+                <a
+                  href="#agenda"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 font-semibold rounded-lg hover:shadow-md transition-all"
+                  style={{ borderColor: zoneColors.color, color: zoneColors.color }}
+                >
+                  <CalendarDays className="w-4 h-4" />
+                  Voir l'agenda
+                </a>
                 <Link
                   href="/contact"
                   className="block w-full text-center px-4 py-3 text-white font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
