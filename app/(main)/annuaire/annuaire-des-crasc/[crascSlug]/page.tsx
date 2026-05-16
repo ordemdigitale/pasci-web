@@ -2,11 +2,11 @@
 "use client";
 
 import React, { use, useState, useEffect } from "react";
-import { getCrascBySlug  } from "@/lib/fetch-crasc";
+import { getCrascBySlug, fetchEvenements } from "@/lib/fetch-crasc";
 import { fetchAllNews } from "@/lib/fetch-news";
 import Link from "next/link";
 import { ImageWithFallback } from '@/lib/imageWithFallback';
-import { ICrascDetail, INews } from "@/types/api.types";
+import { ICrascDetail, INews, IEvenement } from "@/types/api.types";
 import { domainesIntervention } from "../page";
 import {
   Building2,
@@ -14,12 +14,14 @@ import {
   Users,
   ArrowLeft,
   Calendar,
-  ExternalLink,
+  CalendarDays,
+  MapPin as LocationPin,
   Loader2,
   Target,
   Search,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Clock
 } from 'lucide-react';
 
 
@@ -37,6 +39,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
   const crascSlug = resolvedParams.crascSlug;
   const zoneColors = CRASC_ZONE_COLORS[crascSlug] || DEFAULT_ZONE_COLORS;
   const [crascData, setCrascData] = useState<ICrascDetail | null>(null);
+  const [evenements, setEvenements] = useState<IEvenement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [oscSearch, setOscSearch] = useState('');
@@ -53,12 +56,15 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
         const data = await getCrascBySlug(crascSlug);
         if (isCurrent) {
           setCrascData(data);
-          
-          // Fetch news related to this CRASC
+
           if (data.id) {
-            const newsData = await fetchAllNews({ crasc_id: parseInt(data.id) });
+            const [newsData, evtData] = await Promise.all([
+              fetchAllNews({ crasc_id: parseInt(data.id) }),
+              fetchEvenements(parseInt(data.id), false),
+            ]);
             if (isCurrent) {
               setCrascData(prev => prev ? { ...prev, news: newsData } : prev);
+              setEvenements(evtData);
             }
           }
         }
@@ -397,6 +403,88 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                 <p className="text-xl text-gray-500">Aucune actualité ajoutée pour le moment.</p>
               </div>
             )}
+
+            {/* ── Agenda Section ── */}
+            <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${zoneColors.color}20` }}>
+                  <CalendarDays className="w-5 h-5" style={{ color: zoneColors.color }} />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">Agenda</h2>
+              </div>
+
+              {evenements.length === 0 ? (
+                <div className="text-center py-10 text-gray-400">
+                  <CalendarDays className="w-14 h-14 mx-auto mb-3 opacity-30" />
+                  <p className="text-lg">Aucun événement à venir.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {evenements
+                    .sort((a, b) => new Date(a.date_debut).getTime() - new Date(b.date_debut).getTime())
+                    .map((evt) => {
+                      const debut = new Date(evt.date_debut);
+                      const isPast = debut < new Date();
+                      return (
+                        <div
+                          key={evt.id}
+                          className={`flex gap-4 p-4 rounded-xl border-l-4 ${isPast ? 'bg-gray-50 border-gray-300 opacity-70' : 'bg-white border-l-4'}`}
+                          style={!isPast ? { borderLeftColor: zoneColors.color, background: `${zoneColors.color}08` } : {}}
+                        >
+                          {/* Date badge */}
+                          <div
+                            className="flex-shrink-0 w-14 h-14 rounded-xl flex flex-col items-center justify-center text-white font-bold shadow-sm"
+                            style={{ backgroundColor: isPast ? '#9ca3af' : zoneColors.color }}
+                          >
+                            <span className="text-xl leading-none">
+                              {debut.toLocaleDateString('fr-FR', { day: '2-digit' })}
+                            </span>
+                            <span className="text-xs uppercase">
+                              {debut.toLocaleDateString('fr-FR', { month: 'short' })}
+                            </span>
+                          </div>
+
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-gray-900 line-clamp-1">{evt.title}</h3>
+                            {evt.description && (
+                              <p className="text-sm text-gray-600 line-clamp-2 mt-0.5">{evt.description}</p>
+                            )}
+                            <div className="flex flex-wrap gap-3 mt-2">
+                              <span className="flex items-center gap-1 text-xs text-gray-500">
+                                <Clock className="w-3 h-3" />
+                                {debut.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                {evt.date_fin && (
+                                  <> – {new Date(evt.date_fin).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</>
+                                )}
+                              </span>
+                              {evt.lieu && (
+                                <span className="flex items-center gap-1 text-xs text-gray-500">
+                                  <LocationPin className="w-3 h-3" />
+                                  {evt.lieu}
+                                </span>
+                              )}
+                              {evt.date_fin && new Date(evt.date_fin).toDateString() !== debut.toDateString() && (
+                                <span className="text-xs text-gray-400">
+                                  au {new Date(evt.date_fin).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {!isPast && (
+                            <div className="flex-shrink-0 self-start">
+                              <span className="px-2 py-1 text-xs font-semibold rounded-full text-white" style={{ backgroundColor: zoneColors.color }}>
+                                À venir
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Sidebar */}
@@ -426,6 +514,13 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                   <span className="text-sm font-medium text-gray-700">Actualités</span>
                   <span className="text-2xl font-bold text-orange-600">
                     {crascData.news?.length || 0}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                  <span className="text-sm font-medium text-gray-700">Événements agenda</span>
+                  <span className="text-2xl font-bold text-purple-600">
+                    {evenements.length}
                   </span>
                 </div>
               </div>

@@ -6,10 +6,11 @@ import {
   IOsc,
   IOscDetail,
   INews,
+  IEvenement,
   SpotlightNews
 } from "@/types/api.types";
 
-export type { ICrasc, ICrascDetail, IRegionCiv, IOscType, IOsc, IOscDetail, INews, SpotlightNews };
+export type { ICrasc, ICrascDetail, IRegionCiv, IOscType, IOsc, IOscDetail, INews, IEvenement, SpotlightNews };
 
 // Get API base URL from environment variable
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -222,5 +223,46 @@ export async function deleteRegion(slug: string): Promise<void> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.detail || "Échec de la suppression de la région");
+  }
+}
+
+// Fetch events for a CRASC (upcoming by default)
+export async function fetchEvenements(crasc_id?: number, a_venir = true): Promise<IEvenement[]> {
+  const params = new URLSearchParams();
+  if (crasc_id) params.set("crasc_id", String(crasc_id));
+  params.set("a_venir", String(a_venir));
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/evenement?${params}`, {
+    cache: "no-store"
+  });
+  if (!response.ok) throw new Error("Échec du chargement des événements");
+  return response.json();
+}
+
+// Create an event (requires auth token)
+export async function createEvenement(
+  data: { title: string; description?: string; date_debut: string; date_fin?: string; lieu?: string; crasc_id?: number },
+  token: string
+): Promise<IEvenement> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/evenement`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data)
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || "Échec de la création de l'événement");
+  }
+  return response.json();
+}
+
+// Delete an event (requires auth token)
+export async function deleteEvenement(id: number, token: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/evenement/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || "Échec de la suppression de l'événement");
   }
 }

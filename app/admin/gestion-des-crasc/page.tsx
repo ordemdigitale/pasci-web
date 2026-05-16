@@ -12,6 +12,7 @@ import {
 	MapPin,
 	Tag,
 	Newspaper,
+	CalendarDays,
 	Plus,
 	ArrowRight,
 	Home,
@@ -309,6 +310,37 @@ export default async function AdminCrascPage() {
 							</p>
 						</div>
 					)}
+				</div>
+			</div>
+
+			{/* Agenda Section */}
+			<div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm mb-6">
+				<div className="flex items-center justify-between mb-4">
+					<div className="flex items-center gap-3">
+						<div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+							<CalendarDays className="w-5 h-5 text-indigo-600" />
+						</div>
+						<div>
+							<h2 className="text-xl font-bold text-gray-900">Agenda des CRASC</h2>
+							<p className="text-sm text-gray-600">Événements et activités à venir</p>
+						</div>
+					</div>
+					<div className="flex items-center gap-2">
+						<Link
+							href="/admin/gestion-des-crasc/agenda/ajouter-evenement"
+							className="inline-flex items-center gap-2 px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors"
+						>
+							<Plus className="w-4 h-4" />
+							Ajouter un événement
+						</Link>
+						<Link
+							href="/admin/gestion-des-crasc/agenda"
+							className="inline-flex items-center gap-2 px-4 py-2 border border-indigo-200 text-indigo-700 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-medium"
+						>
+							Gérer l'agenda
+							<ArrowRight className="w-4 h-4" />
+						</Link>
+					</div>
 				</div>
 			</div>
 

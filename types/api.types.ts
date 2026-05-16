@@ -102,6 +102,18 @@ export interface IOscDetail {
   financement_multilateral?: boolean | null;
 }
 
+// Interface for Agenda events
+export interface IEvenement {
+  id: number;
+  title: string;
+  description?: string | null;
+  date_debut: string;
+  date_fin?: string | null;
+  lieu?: string | null;
+  crasc_id?: number | null;
+  created_at?: string;
+}
+
 // Interface for Crasc region by slug with OSCs and Region CIVs
 export interface ICrascDetail {
   id: string;
@@ -112,6 +124,7 @@ export interface ICrascDetail {
   oscs?: IOsc[];
   regions?: IRegionCiv[];
   news?: INews[];
+  evenements?: IEvenement[];
 }
 
 // Interface for OscType
