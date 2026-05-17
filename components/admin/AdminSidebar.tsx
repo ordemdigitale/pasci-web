@@ -17,6 +17,7 @@ import {
   Heart,
   Phone,
   ShieldAlert,
+  Building2,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
@@ -47,6 +48,7 @@ export default function AdminSidebar({
   const pathname = usePathname();
   const { user } = useAuth();
   const isRedacteur = user?.is_redacteur && !user?.is_staff && !user?.is_superuser;
+  const isOscUser = !!user?.osc_id && !user?.is_staff && !user?.is_superuser;
 
   useEffect(() => {
     async function fetchPending() {
@@ -77,6 +79,12 @@ export default function AdminSidebar({
       icon: <LayoutDashboard size={20} />,
       label: "Tableau de bord",
       href: "/admin",
+    },
+    {
+      icon: <Building2 size={20} />,
+      label: "Mon OSC",
+      href: "/admin/mon-osc",
+      staffOnly: false,
     },
     { icon: <Users size={20} />, label: "Utilisateurs", href: "/admin/utilisateurs", staffOnly: true },
     {
@@ -141,9 +149,11 @@ export default function AdminSidebar({
     },
   ];
 
-  const navItems = isRedacteur
-    ? allNavItems.filter((item) => !item.staffOnly)
-    : allNavItems;
+  const navItems = isOscUser
+    ? allNavItems.filter((item) => item.href === "/admin" || item.href === "/admin/mon-osc")
+    : isRedacteur
+    ? allNavItems.filter((item) => !item.staffOnly && item.href !== "/admin/mon-osc")
+    : allNavItems.filter((item) => item.href !== "/admin/mon-osc");
 
   const isActiveLink = (href: string) => {
     if (href === "/admin") {
