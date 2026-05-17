@@ -19,8 +19,14 @@ import {
   Newspaper,
   FolderOpen,
   Eye,
+  Edit3,
+  UserCircle,
+  Target,
+  Heart,
 } from 'lucide-react';
-import { ICrasc, IJobs } from '@/types/api.types';
+import { ICrasc, IJobs, IOscDetail } from '@/types/api.types';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchWithAuth } from '@/lib/auth';
 
 interface DashboardStats {
   crasc: { total: number };
@@ -42,7 +48,94 @@ interface VisiteStats {
   par_jour: { date: string; visites: number }[];
 }
 
+function OscDashboard() {
+  const { user } = useAuth();
+  const [osc, setOsc] = useState<IOscDetail | null>(null);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+  useEffect(() => {
+    fetchWithAuth(`${API_BASE_URL}/api/v1/crasc/osc/me`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setOsc(data); })
+      .catch(() => {});
+  }, []);
+
+  const Stat = ({ label, value, color }: { label: string; value: any; color: string }) => (
+    <div className={`p-4 rounded-xl ${color}`}>
+      <p className="text-xs font-semibold text-gray-600 mb-1">{label}</p>
+      <p className="text-2xl font-bold text-gray-900">{value ?? "—"}</p>
+    </div>
+  );
+
+  return (
+    <div className="p-6 font-poppins space-y-6">
+      {/* Welcome */}
+      <div className="bg-gradient-to-r from-[#2A591D] to-[#3d7a28] rounded-2xl p-8 text-white shadow-xl">
+        <p className="text-white/70 text-sm mb-1">Bienvenue,</p>
+        <h1 className="text-2xl font-extrabold mb-1">{osc?.name || user?.email}</h1>
+        {osc?.crasc && (
+          <p className="text-white/70 text-sm">{osc.crasc.name}</p>
+        )}
+      </div>
+
+      {/* Stats OSC */}
+      {osc && (
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Users className="w-5 h-5 text-[#2A591D]" /> Aperçu de votre OSC
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <Stat label="Membres total" value={osc.nb_membres} color="bg-blue-50" />
+            <Stat label="Femmes membres" value={osc.nb_femmes_membres} color="bg-pink-50" />
+            <Stat label="Membres jeunes" value={osc.nb_membres_jeunes} color="bg-yellow-50" />
+            <Stat label="Personnes engagées" value={osc.nb_personnes_engagees} color="bg-green-50" />
+            <Stat label="Bénéficiaires" value={osc.nb_beneficiaires} color="bg-purple-50" />
+            <Stat label="Activités réalisées" value={osc.nb_activites} color="bg-orange-50" />
+          </div>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-gray-900 mb-4">Actions</h2>
+        <div className="flex flex-col gap-3">
+          <Link
+            href="/admin/mon-osc"
+            className="flex items-center gap-3 px-4 py-3 bg-green-50 text-[#2A591D] rounded-xl hover:bg-[#2A591D] hover:text-white transition-all group"
+          >
+            <Building2 className="w-5 h-5" />
+            <span className="font-semibold">Voir mon profil OSC</span>
+            <ArrowUpRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+          </Link>
+          <Link
+            href="/admin/mon-osc/modifier"
+            className="flex items-center gap-3 px-4 py-3 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-all group"
+          >
+            <Edit3 className="w-5 h-5" />
+            <span className="font-semibold">Modifier mon profil</span>
+            <ArrowUpRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+          </Link>
+          {osc?.slug && (
+            <Link
+              href={`/annuaire/annuaire-des-osc/${osc.slug}`}
+              target="_blank"
+              className="flex items-center gap-3 px-4 py-3 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-all group"
+            >
+              <Eye className="w-5 h-5" />
+              <span className="font-semibold">Voir mon profil public</span>
+              <ArrowUpRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
+  const { user } = useAuth();
+  const isOscUser = !!user?.osc_id && !user?.is_staff && !user?.is_superuser;
+
   const [crascData, setCrascData] = useState<ICrasc[] | null>(null);
   const [jobsData, setJobsData] = useState<IJobs[] | null>(null);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
@@ -51,6 +144,8 @@ export default function Dashboard() {
   const [error, setError] = useState(null);
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+  if (isOscUser) return <OscDashboard />;
 
   // fetch dashboard stats
   useEffect(() => {
