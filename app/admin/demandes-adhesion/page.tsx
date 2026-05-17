@@ -11,9 +11,21 @@ import {
   X,
   Loader2,
   ClipboardList,
+  Copy,
+  KeyRound,
+  Building2,
 } from "lucide-react";
+import { fetchWithAuth } from "@/lib/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+interface OscCredentials {
+  osc_id: number;
+  osc_name: string;
+  email: string;
+  username: string;
+  temp_password: string;
+}
 
 interface DemandeAdhesion {
   id: number;
@@ -31,6 +43,7 @@ interface DemandeAdhesion {
   note_admin: string | null;
   created_at: string;
   updated_at: string;
+  credentials?: OscCredentials | null;
 }
 
 const STATUT_LABELS: Record<string, string> = {
@@ -45,6 +58,83 @@ const STATUT_COLORS: Record<string, string> = {
   rejetee: "bg-red-100 text-red-800",
 };
 
+function CredentialsPanel({ creds, onClose }: { creds: OscCredentials; onClose: () => void }) {
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const copy = (text: string, key: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const CopyBtn = ({ value, id }: { value: string; id: string }) => (
+    <button
+      onClick={() => copy(value, id)}
+      className="ml-2 p-1 rounded text-gray-400 hover:text-[#2A591D] hover:bg-green-50 transition-colors"
+      title="Copier"
+    >
+      {copied === id ? <CheckCircle size={14} className="text-green-600" /> : <Copy size={14} />}
+    </button>
+  );
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
+      <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <KeyRound size={20} className="text-green-700" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900">Compte créé avec succès</h3>
+                <p className="text-xs text-gray-500">Transmettez ces identifiants à l'organisation</p>
+              </div>
+            </div>
+            <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100">
+              <X size={18} />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6 space-y-4">
+          <div className="flex items-center gap-2 p-3 bg-green-50 rounded-xl border border-green-200">
+            <Building2 size={16} className="text-green-700 flex-shrink-0" />
+            <span className="text-sm font-semibold text-green-800">{creds.osc_name}</span>
+          </div>
+
+          {[
+            { label: "Email de connexion", value: creds.email, id: "email" },
+            { label: "Nom d'utilisateur", value: creds.username, id: "username" },
+            { label: "Mot de passe temporaire", value: creds.temp_password, id: "password" },
+          ].map(({ label, value, id }) => (
+            <div key={id}>
+              <div className="text-xs text-gray-500 font-medium mb-1">{label}</div>
+              <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                <code className="text-sm font-mono text-gray-800 break-all">{value}</code>
+                <CopyBtn value={value} id={id} />
+              </div>
+            </div>
+          ))}
+
+          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
+            Notez bien ce mot de passe — il ne sera plus affiché. L'utilisateur devra le changer à sa première connexion.
+          </p>
+        </div>
+
+        <div className="px-6 pb-6">
+          <button
+            onClick={onClose}
+            className="w-full py-2.5 bg-[#2A591D] hover:bg-[#1e4015] text-white font-semibold rounded-xl transition-colors"
+          >
+            J'ai noté les identifiants
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DemandesAdhesionPage() {
   const [demandes, setDemandes] = useState<DemandeAdhesion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,6 +144,7 @@ export default function DemandesAdhesionPage() {
   const [noteAdmin, setNoteAdmin] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [pendingCredentials, setPendingCredentials] = useState<OscCredentials | null>(null);
 
   const loadDemandes = async () => {
     try {
@@ -99,9 +190,13 @@ export default function DemandesAdhesionPage() {
         body: JSON.stringify({ statut, note_admin: noteAdmin || null }),
       });
       if (res.ok) {
-        const updated = await res.json();
+        const updated: DemandeAdhesion = await res.json();
         setDemandes((prev) => prev.map((d) => (d.id === updated.id ? updated : d)));
         setSelected(updated);
+        // Afficher les credentials si une OSC vient d'être créée
+        if (statut === "approuvee" && updated.credentials) {
+          setPendingCredentials(updated.credentials);
+        }
       }
     } catch (e) {
       console.error(e);
@@ -158,6 +253,14 @@ export default function DemandesAdhesionPage() {
 
   return (
     <div className="p-6 font-poppins">
+      {/* Credentials modal */}
+      {pendingCredentials && (
+        <CredentialsPanel
+          creds={pendingCredentials}
+          onClose={() => setPendingCredentials(null)}
+        />
+      )}
+
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -368,7 +471,7 @@ export default function DemandesAdhesionPage() {
                   className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm transition-colors disabled:opacity-50"
                 >
                   {isUpdating ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
-                  Approuver
+                  {isUpdating ? "Création en cours..." : "Approuver & créer le compte"}
                 </button>
                 <button
                   onClick={() => handleUpdateStatut("rejetee")}
