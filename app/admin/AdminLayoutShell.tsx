@@ -11,6 +11,14 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 // Routes autorisées pour les utilisateurs OSC (lecture seule du dashboard + profil)
 const OSC_ALLOWED_ROUTES = ["/admin", "/admin/mon-osc"];
 
+// Routes autorisées pour les admins CRASC
+const CRASC_ADMIN_ALLOWED_PREFIXES = [
+  "/admin/gestion-des-crasc",
+  "/admin/formations",
+  "/admin/actualites",
+  "/admin/profile",
+];
+
 function OscRouteGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const pathname = usePathname();
@@ -27,6 +35,25 @@ function OscRouteGuard({ children }: { children: React.ReactNode }) {
       router.replace("/admin");
     }
   }, [loading, isOscUser, pathname, router]);
+
+  return <>{children}</>;
+}
+
+function CrascAdminRouteGuard({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
+
+  useEffect(() => {
+    if (loading || !isCrascAdmin) return;
+    if (pathname === "/admin") return;
+    const allowed = CRASC_ADMIN_ALLOWED_PREFIXES.some((prefix) =>
+      pathname.startsWith(prefix)
+    );
+    if (!allowed) router.replace("/admin");
+  }, [loading, isCrascAdmin, pathname, router]);
 
   return <>{children}</>;
 }
@@ -50,6 +77,7 @@ export default function AdminLayoutShell({
       ) : (
         <ProtectedRoute requireAdmin={true}>
           <OscRouteGuard>
+            <CrascAdminRouteGuard>
             <div className="flex h-screen overflow-hidden bg-cyan-50/50 font-poppins">
               <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
@@ -68,6 +96,7 @@ export default function AdminLayoutShell({
                 <AdminFooter />
               </div>
             </div>
+            </CrascAdminRouteGuard>
           </OscRouteGuard>
         </ProtectedRoute>
       )}

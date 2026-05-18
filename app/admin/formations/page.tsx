@@ -21,12 +21,16 @@ import {
 } from "lucide-react";
 import { fetchAllFormations, IFormation } from "@/lib/fetch-formations";
 import { fetchWithAuth } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const PAGE_SIZE = 24;
 
 export default function FormationsPage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
+
   const [formations, setFormations] = useState<IFormation[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,6 +47,7 @@ export default function FormationsPage() {
       try {
         const data = await fetchAllFormations({
           limit: 100,
+          ...(isCrascAdmin && user?.crasc_id ? { crasc_id: user.crasc_id } : {}),
         });
         setFormations(data);
       } catch (error) {
@@ -53,7 +58,7 @@ export default function FormationsPage() {
     };
 
     loadFormations();
-  }, []);
+  }, [isCrascAdmin, user?.crasc_id]);
 
   // Filtrage
   const filteredFormations = formations.filter((formation) => {

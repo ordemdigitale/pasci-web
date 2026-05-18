@@ -21,8 +21,12 @@ import {
 } from "lucide-react";
 import newsService, { INews } from "@/lib/services/news.service";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function ActualitesPage() {
+  const { user } = useAuth();
+  const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
+
   const [actualites, setActualites] = useState<INews[]>([]);
   const [filteredActualites, setFilteredActualites] = useState<INews[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,14 +38,17 @@ export default function ActualitesPage() {
   // Fetch articles from API
   useEffect(() => {
     fetchArticles();
-  }, []);
+  }, [isCrascAdmin, user?.crasc_id]);
 
   const fetchArticles = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const data = await newsService.getAll({ limit: 100 });
+      const data = await newsService.getAll({
+        limit: 100,
+        ...(isCrascAdmin && user?.crasc_id ? { crasc_id: user.crasc_id } : {}),
+      });
       setActualites(data);
       setFilteredActualites(data);
     } catch (err: any) {

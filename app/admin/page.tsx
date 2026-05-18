@@ -132,9 +132,107 @@ function OscDashboard() {
   );
 }
 
+function CrascAdminDashboard() {
+  const { user } = useAuth();
+  const [crascName, setCrascName] = useState<string | null>(null);
+  const [oscCount, setOscCount] = useState<number | null>(null);
+  const [newsCount, setNewsCount] = useState<number | null>(null);
+  const [formationsCount, setFormationsCount] = useState<number | null>(null);
+
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+  useEffect(() => {
+    if (!user?.crasc_id) return;
+    const crascId = user.crasc_id;
+
+    // Fetch CRASC list to find the matching one
+    fetch(`${API_BASE_URL}/api/v1/crasc/crasc`)
+      .then((r) => r.ok ? r.json() : [])
+      .then((list: any[]) => {
+        const mine = list.find((c) => c.id === crascId || Number(c.id) === crascId);
+        if (mine) {
+          setCrascName(mine.name);
+          setOscCount(mine.osc_count ?? null);
+        }
+      })
+      .catch(() => {});
+
+    // Fetch news count for this CRASC
+    fetchWithAuth(`${API_BASE_URL}/api/v1/news?crasc_id=${crascId}&limit=100`)
+      .then((r) => r.ok ? r.json() : [])
+      .then((data: any[]) => { if (Array.isArray(data)) setNewsCount(data.length); })
+      .catch(() => {});
+
+    // Fetch formations count for this CRASC
+    fetchWithAuth(`${API_BASE_URL}/api/v1/formations?crasc_id=${crascId}&limit=100`)
+      .then((r) => r.ok ? r.json() : [])
+      .then((data: any[]) => { if (Array.isArray(data)) setFormationsCount(data.length); })
+      .catch(() => {});
+  }, [user?.crasc_id]);
+
+  return (
+    <div className="p-6 font-poppins space-y-6">
+      {/* Welcome */}
+      <div className="bg-gradient-to-r from-[#2A591D] to-[#3d7a28] rounded-2xl p-8 text-white shadow-xl">
+        <p className="text-white/70 text-sm mb-1">Bienvenue,</p>
+        <h1 className="text-2xl font-extrabold mb-1">{user?.first_name || user?.email}</h1>
+        {crascName && <p className="text-white/70 text-sm">{crascName}</p>}
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <p className="text-xs text-gray-500 mb-1">OSC</p>
+          <p className="text-3xl font-bold text-gray-900">{oscCount ?? "—"}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <p className="text-xs text-gray-500 mb-1">Actualités</p>
+          <p className="text-3xl font-bold text-gray-900">{newsCount ?? "—"}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <p className="text-xs text-gray-500 mb-1">Formations</p>
+          <p className="text-3xl font-bold text-gray-900">{formationsCount ?? "—"}</p>
+        </div>
+      </div>
+
+      {/* Quick links */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-gray-900 mb-4">Accès rapides</h2>
+        <div className="flex flex-col gap-3">
+          <Link
+            href="/admin/gestion-des-crasc"
+            className="flex items-center gap-3 px-4 py-3 bg-green-50 text-[#2A591D] rounded-xl hover:bg-[#2A591D] hover:text-white transition-all group"
+          >
+            <Map className="w-5 h-5" />
+            <span className="font-semibold">Mon CRASC</span>
+            <ArrowUpRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+          </Link>
+          <Link
+            href="/admin/actualites"
+            className="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-600 hover:text-white transition-all group"
+          >
+            <Newspaper className="w-5 h-5" />
+            <span className="font-semibold">Actualités</span>
+            <ArrowUpRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+          </Link>
+          <Link
+            href="/admin/formations"
+            className="flex items-center gap-3 px-4 py-3 bg-orange-50 text-orange-700 rounded-xl hover:bg-orange-600 hover:text-white transition-all group"
+          >
+            <GraduationCap className="w-5 h-5" />
+            <span className="font-semibold">Formations</span>
+            <ArrowUpRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   const isOscUser = !!user?.osc_id && !user?.is_staff && !user?.is_superuser;
+  const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
 
   const [crascData, setCrascData] = useState<ICrasc[] | null>(null);
   const [jobsData, setJobsData] = useState<IJobs[] | null>(null);
@@ -146,6 +244,7 @@ export default function Dashboard() {
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   if (isOscUser) return <OscDashboard />;
+  if (isCrascAdmin) return <CrascAdminDashboard />;
 
   // fetch dashboard stats
   useEffect(() => {

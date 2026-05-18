@@ -6,6 +6,7 @@ import {
 	fetchAllNews
 } from "@/lib/fetch-crasc";
 import Link from "next/link";
+import CrascAdminRedirect from "./CrascAdminRedirect";
 import {
 	Building2,
 	Users,
@@ -30,6 +31,7 @@ export default async function AdminCrascPage() {
 
 	return (
 		<section className="max-w-7xl mx-auto font-poppins py-8 px-4">
+			<CrascAdminRedirect />
 			{/* Header */}
 			<div className="mb-8">
 				<div className="flex items-center justify-between mb-4">

@@ -15,6 +15,8 @@ interface AuthContextType {
   isAdmin: boolean;
   isSuperuser: boolean;
   isOscUser: boolean;
+  isCrascAdmin: boolean;
+  crascId: number | null;
   refreshUser: () => Promise<void>;
 }
 
@@ -91,6 +93,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAdmin: user !== null && (user.is_staff || user.is_superuser || user.is_redacteur || !!user.osc_id),
     isSuperuser: user !== null && user.is_superuser,
     isOscUser: user !== null && !!user.osc_id && !user.is_staff && !user.is_superuser,
+    isCrascAdmin: user !== null && !!user.is_staff && !user.is_superuser && !!user.crasc_id,
+    crascId: user?.crasc_id ?? null,
     refreshUser,
   };
 

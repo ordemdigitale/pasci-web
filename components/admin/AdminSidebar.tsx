@@ -49,6 +49,7 @@ export default function AdminSidebar({
   const { user } = useAuth();
   const isRedacteur = user?.is_redacteur && !user?.is_staff && !user?.is_superuser;
   const isOscUser = !!user?.osc_id && !user?.is_staff && !user?.is_superuser;
+  const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
 
   useEffect(() => {
     async function fetchPending() {
@@ -151,6 +152,26 @@ export default function AdminSidebar({
 
   const navItems = isOscUser
     ? allNavItems.filter((item) => item.href === "/admin" || item.href === "/admin/mon-osc")
+    : isCrascAdmin
+    ? allNavItems
+        .filter((item) =>
+          item.href === "/admin" ||
+          item.href === "/admin/gestion-des-crasc" ||
+          item.label === "Contenu"
+        )
+        .map((item) => {
+          if (item.label === "Contenu" && item.submenus) {
+            return {
+              ...item,
+              submenus: item.submenus.filter(
+                (s) =>
+                  s.href === "/admin/formations" ||
+                  s.href === "/admin/actualites"
+              ),
+            };
+          }
+          return item;
+        })
     : isRedacteur
     ? allNavItems.filter((item) => !item.staffOnly && item.href !== "/admin/mon-osc")
     : allNavItems.filter((item) => item.href !== "/admin/mon-osc");
