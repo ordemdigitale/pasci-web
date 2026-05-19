@@ -5,7 +5,9 @@ import { useParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { IPoleConcertation, IForumSujet } from "@/types/api.types";
-import { getToken } from "@/lib/auth";
+import { getToken, fetchWithAuth } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
+import { Lock } from "lucide-react";
 import {
   ArrowLeft,
   MessageSquare,
@@ -28,11 +30,14 @@ function formatDate(dateStr: string) {
   });
 }
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export default function PagePoleForum() {
   const params = useParams();
   const router = useRouter();
   const pathname = usePathname();
   const poleSlug = params.poleSlug as string;
+  const { user } = useAuth();
 
   const [pole, setPole] = useState<IPoleConcertation | null>(null);
   const [sujets, setSujets] = useState<IForumSujet[]>([]);
@@ -43,10 +48,27 @@ export default function PagePoleForum() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [token, setToken] = useState<string | null>(null);
+  const [oscPoleIds, setOscPoleIds] = useState<number[] | null>(null);
+
+  const isOscUser = !!user?.osc_id;
 
   useEffect(() => {
     setToken(getToken());
   }, []);
+
+  useEffect(() => {
+    if (!isOscUser) return;
+    fetchWithAuth(`${API_BASE}/api/v1/crasc/osc/me`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && Array.isArray(data.poles)) {
+          setOscPoleIds(data.poles.map((p: { id: number }) => p.id));
+        } else {
+          setOscPoleIds([]);
+        }
+      })
+      .catch(() => setOscPoleIds([]));
+  }, [isOscUser]);
 
   useEffect(() => {
     Promise.all([
@@ -269,13 +291,30 @@ export default function PagePoleForum() {
           {sujets.length} discussion{sujets.length !== 1 ? "s" : ""}
         </h2>
         {token ? (
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-full text-sm font-semibold hover:bg-[#C54415] transition-colors"
-          >
-            {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-            {showForm ? "Annuler" : "Nouveau sujet"}
-          </button>
+          (() => {
+            // OSC user who hasn't loaded their poles yet → loading state, allow
+            const oscRestricted = isOscUser && oscPoleIds !== null && pole && !oscPoleIds.includes(pole.id);
+            if (oscRestricted) {
+              return (
+                <div
+                  title="Ce pôle ne correspond pas à vos domaines prioritaires"
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-400 rounded-full text-sm font-semibold cursor-not-allowed select-none"
+                >
+                  <Lock className="w-4 h-4" />
+                  Accès non autorisé
+                </div>
+              );
+            }
+            return (
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-full text-sm font-semibold hover:bg-[#C54415] transition-colors"
+              >
+                {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                {showForm ? "Annuler" : "Nouveau sujet"}
+              </button>
+            );
+          })()
         ) : (
           <Link
             href={`/auth/login?redirect=${encodeURIComponent(pathname)}`}
@@ -333,14 +372,18 @@ export default function PagePoleForum() {
         <div className="text-center py-16 text-gray-400">
           <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-40" />
           <p>Aucune discussion pour l&apos;instant.</p>
-          {token && (
-            <button
-              onClick={() => setShowForm(true)}
-              className="mt-4 text-[#E05017] font-semibold hover:underline text-sm"
-            >
-              Soyez le premier à lancer une discussion !
-            </button>
-          )}
+          {token && (() => {
+            const oscRestricted = isOscUser && oscPoleIds !== null && pole && !oscPoleIds.includes(pole.id);
+            if (oscRestricted) return null;
+            return (
+              <button
+                onClick={() => setShowForm(true)}
+                className="mt-4 text-[#E05017] font-semibold hover:underline text-sm"
+              >
+                Soyez le premier à lancer une discussion !
+              </button>
+            );
+          })()}
         </div>
       ) : (
         <div className="space-y-3">

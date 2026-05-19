@@ -36,10 +36,6 @@ const oscSchema = z.object({
   niveau_couverture: z.string().optional(),
   zone_couverture: z.string().optional(),
   categorie: z.string().optional(),
-  domaine_prioritaire: z.string().optional(),
-  domaine_prioritaire_2: z.string().optional(),
-  domaine_prioritaire_3: z.string().optional(),
-  domaine_prioritaire_4: z.string().optional(),
   nb_membres: z.string().optional(),
   nb_femmes_membres: z.string().optional(),
   nb_membres_jeunes: z.string().optional(),
@@ -82,9 +78,13 @@ function FieldWrapper({ label, children, error }: { label: string; children: Rea
 const inputCls = "w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all text-sm";
 const textareaCls = inputCls + " resize-none";
 
+interface Pole { id: number; name: string; slug: string; }
+
 export default function MonOscModifierPage() {
   const router = useRouter();
   const [typeList, setTypeList] = useState<IOscType[]>([]);
+  const [allPoles, setAllPoles] = useState<Pole[]>([]);
+  const [selectedPoleIds, setSelectedPoleIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -101,7 +101,6 @@ export default function MonOscModifierPage() {
       email: "", phone: "", ville: "", address: "", latitude: "", longitude: "",
       website: "", reseaux_sociaux: "", date_creation: "", numero_recepisse: "",
       niveau_couverture: "", zone_couverture: "", categorie: "",
-      domaine_prioritaire: "", domaine_prioritaire_2: "", domaine_prioritaire_3: "", domaine_prioritaire_4: "",
       nb_membres: "", nb_femmes_membres: "", nb_membres_jeunes: "", nb_membres_be: "",
       nb_personnes_engagees: "", nb_beneficiaires: "", nb_activites: "",
       budget_annuel: "", type_financement: "", etat_cotisations: "", montant_cotisation: "",
@@ -113,12 +112,20 @@ export default function MonOscModifierPage() {
 
   useEffect(() => {
     fetchAllOscType().then(setTypeList).catch(console.error);
+    fetch(`${API_BASE}/api/v1/forum/poles?limit=50`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setAllPoles(Array.isArray(data) ? data : data.items ?? []))
+      .catch(console.error);
+
     fetchWithAuth(`${API_BASE}/api/v1/crasc/osc/me`)
       .then(r => { if (!r.ok) throw new Error("OSC introuvable"); return r.json(); })
       .then(osc => {
         setOscSlug(osc.slug);
         setCurrentThumbnailUrl(osc.thumbnail_url || null);
         setPreviewImage(osc.thumbnail_url || null);
+        if (Array.isArray(osc.poles)) {
+          setSelectedPoleIds(osc.poles.map((p: Pole) => p.id));
+        }
         const s = (v: any) => v != null ? String(v) : "";
         setValue("name", osc.name || "");
         setValue("description", osc.description || "");
@@ -136,10 +143,6 @@ export default function MonOscModifierPage() {
         setValue("niveau_couverture", osc.niveau_couverture || "");
         setValue("zone_couverture", osc.zone_couverture || "");
         setValue("categorie", osc.categorie || "");
-        setValue("domaine_prioritaire", osc.domaine_prioritaire || "");
-        setValue("domaine_prioritaire_2", osc.domaine_prioritaire_2 || "");
-        setValue("domaine_prioritaire_3", osc.domaine_prioritaire_3 || "");
-        setValue("domaine_prioritaire_4", osc.domaine_prioritaire_4 || "");
         setValue("nb_membres", s(osc.nb_membres));
         setValue("nb_femmes_membres", s(osc.nb_femmes_membres));
         setValue("nb_membres_jeunes", s(osc.nb_membres_jeunes));
@@ -201,10 +204,6 @@ export default function MonOscModifierPage() {
       append("niveau_couverture", values.niveau_couverture);
       append("zone_couverture", values.zone_couverture);
       append("categorie", values.categorie);
-      append("domaine_prioritaire", values.domaine_prioritaire);
-      append("domaine_prioritaire_2", values.domaine_prioritaire_2);
-      append("domaine_prioritaire_3", values.domaine_prioritaire_3);
-      append("domaine_prioritaire_4", values.domaine_prioritaire_4);
       append("nb_membres", values.nb_membres);
       append("nb_femmes_membres", values.nb_femmes_membres);
       append("nb_membres_jeunes", values.nb_membres_jeunes);
@@ -236,6 +235,12 @@ export default function MonOscModifierPage() {
       });
 
       if (res.ok) {
+        // Mettre à jour les pôles (domaines prioritaires)
+        await fetch(`${API_BASE}/api/v1/crasc/osc/${oscSlug}/poles`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify(selectedPoleIds),
+        });
         setSuccessMessage("Profil mis à jour avec succès !");
         setTimeout(() => router.push("/admin/mon-osc"), 1500);
       } else {
@@ -384,15 +389,32 @@ export default function MonOscModifierPage() {
           </div>
         </div>
 
-        {/* Domaines */}
+        {/* Domaines / Pôles de concertation */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <SectionTitle icon={<Tag className="w-5 h-5 text-indigo-600" />} title="Domaines prioritaires" />
-          <div className="grid md:grid-cols-2 gap-4">
-            {["domaine_prioritaire", "domaine_prioritaire_2", "domaine_prioritaire_3", "domaine_prioritaire_4"].map((field, i) => (
-              <FieldWrapper key={field} label={`Domaine ${i + 1}`}>
-                <input {...register(field as keyof OscForm)} className={inputCls} placeholder={`Domaine ${i + 1}`} />
-              </FieldWrapper>
-            ))}
+          <SectionTitle icon={<Tag className="w-5 h-5 text-indigo-600" />} title="Domaines prioritaires (Pôles de concertation)" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {allPoles.map(pole => {
+              const checked = selectedPoleIds.includes(pole.id);
+              return (
+                <label
+                  key={pole.id}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition-all text-sm font-medium
+                    ${checked ? "bg-indigo-50 border-indigo-400 text-indigo-800" : "border-gray-200 text-gray-700 hover:border-indigo-300"}`}
+                >
+                  <input
+                    type="checkbox"
+                    className="accent-indigo-600"
+                    checked={checked}
+                    onChange={() =>
+                      setSelectedPoleIds(prev =>
+                        checked ? prev.filter(id => id !== pole.id) : [...prev, pole.id]
+                      )
+                    }
+                  />
+                  {pole.name}
+                </label>
+              );
+            })}
           </div>
           <div className="grid md:grid-cols-1 gap-4 mt-4">
             <FieldWrapper label="Secteurs d'activités">

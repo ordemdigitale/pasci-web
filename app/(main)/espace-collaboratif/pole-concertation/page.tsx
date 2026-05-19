@@ -6,6 +6,8 @@ import { ImageWithFallback } from "@/lib/imageWithFallback";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { IPoleConcertation } from "@/types/api.types";
 import { Search, MessageSquare } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { fetchWithAuth } from "@/lib/auth";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -16,9 +18,13 @@ function getPoleImageUrl(imagePath?: string | null): string {
 }
 
 export default function PagePoleConcertation() {
+  const { user } = useAuth();
   const [poles, setPoles] = useState<IPoleConcertation[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [myPoleIds, setMyPoleIds] = useState<number[] | null>(null);
+
+  const isOscUser = !!user?.osc_id;
 
   useEffect(() => {
     fetch(API_ENDPOINTS.forum.poles)
@@ -30,6 +36,20 @@ export default function PagePoleConcertation() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!isOscUser) return;
+    fetchWithAuth(`${API_BASE}/api/v1/crasc/osc/me`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && Array.isArray(data.poles)) {
+          setMyPoleIds(data.poles.map((p: { id: number }) => p.id));
+        } else {
+          setMyPoleIds([]);
+        }
+      })
+      .catch(() => setMyPoleIds([]));
+  }, [isOscUser]);
 
   const filtered = poles.filter((p) =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -123,12 +143,27 @@ export default function PagePoleConcertation() {
                         </span>
                       </div>
 
-                      <Link
-                        href={`/espace-collaboratif/pole-concertation/${pole.slug}`}
-                        className="w-full text-center px-6 py-2 bg-[#E05017] text-white rounded-full text-sm font-semibold hover:bg-[#C54415] transition-colors"
-                      >
-                        Accéder au forum
-                      </Link>
+                      {(() => {
+                        const isAllowed = !isOscUser || myPoleIds === null || myPoleIds.includes(pole.id);
+                        if (isAllowed) {
+                          return (
+                            <Link
+                              href={`/espace-collaboratif/pole-concertation/${pole.slug}`}
+                              className="w-full text-center px-6 py-2 bg-[#E05017] text-white rounded-full text-sm font-semibold hover:bg-[#C54415] transition-colors"
+                            >
+                              Accéder au forum
+                            </Link>
+                          );
+                        }
+                        return (
+                          <span
+                            title="Ce pôle ne correspond pas à vos domaines prioritaires"
+                            className="w-full text-center px-6 py-2 bg-gray-200 text-gray-400 rounded-full text-sm font-semibold cursor-not-allowed select-none"
+                          >
+                            Accéder au forum
+                          </span>
+                        );
+                      })()}
                     </div>
                   </div>
                 );

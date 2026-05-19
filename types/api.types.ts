@@ -72,10 +72,13 @@ export interface IOscDetail {
   nb_personnes_engagees?: number | null;
   nb_beneficiaires?: number | null;
   nb_activites?: number | null;
+  // Domaines prioritaires (legacy — remplacés par poles)
   domaine_prioritaire?: string | null;
   domaine_prioritaire_2?: string | null;
   domaine_prioritaire_3?: string | null;
   domaine_prioritaire_4?: string | null;
+  // Many-to-many avec PoleConcertation
+  poles?: { id: number; name: string; slug: string }[];
   categorie?: string | null;
   niveau_couverture?: string | null;
   zone_couverture?: string | null;

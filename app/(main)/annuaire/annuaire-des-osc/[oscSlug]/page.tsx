@@ -79,13 +79,10 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
     );
   }
 
-  /* Domaines prioritaires */
-  const domaines = [
-    oscData.domaine_prioritaire,
-    oscData.domaine_prioritaire_2,
-    oscData.domaine_prioritaire_3,
-    oscData.domaine_prioritaire_4,
-  ].filter(Boolean) as string[];
+  /* Domaines prioritaires — depuis les pôles many-to-many */
+  const domaines = oscData.poles && oscData.poles.length > 0
+    ? oscData.poles.map(p => p.name)
+    : [oscData.domaine_prioritaire, oscData.domaine_prioritaire_2, oscData.domaine_prioritaire_3, oscData.domaine_prioritaire_4].filter(Boolean) as string[];
 
   /* Sources de financement actives */
   const financements: string[] = [];

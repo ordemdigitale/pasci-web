@@ -119,20 +119,22 @@ export default function MonOscPage() {
             </div>
           </div>
 
-          {/* Domaines */}
-          {(osc.domaine_prioritaire || osc.secteurs_activites) && (
+          {/* Domaines / Pôles */}
+          {((osc.poles && osc.poles.length > 0) || osc.secteurs_activites) && (
             <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
               <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <Target className="w-5 h-5 text-purple-600" /> Domaines &amp; secteurs
               </h2>
               <div className="space-y-3">
-                {[osc.domaine_prioritaire, osc.domaine_prioritaire_2, osc.domaine_prioritaire_3, osc.domaine_prioritaire_4]
-                  .filter(Boolean)
-                  .map((d, i) => (
-                    <span key={i} className="inline-flex items-center mr-2 mb-2 px-3 py-1 bg-purple-100 text-purple-800 text-sm font-semibold rounded-full">
-                      {d}
-                    </span>
-                  ))}
+                {osc.poles && osc.poles.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {osc.poles.map(p => (
+                      <span key={p.id} className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 text-sm font-semibold rounded-full">
+                        {p.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {osc.secteurs_activites && (
                   <p className="text-sm text-gray-700 mt-2">{osc.secteurs_activites}</p>
                 )}

@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import { Toaster } from "sonner";
 import PageTracker from "@/components/analytics/PageTracker";
 import TextReader from "@/components/accessibility/TextReader";
+import MainLayoutShell from "./MainLayoutShell";
 
 const karla = Karla({
   variable: "--font-karla",
@@ -35,7 +36,7 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <Navbar />
         <SubMenu />
-        {children}
+        <MainLayoutShell>{children}</MainLayoutShell>
         <Footer />
         <TextReader />
         <PageTracker />
