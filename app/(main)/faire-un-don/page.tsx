@@ -10,12 +10,24 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 export default function FaireUnDonPage() {
   const [montantChoisi, setMontantChoisi] = useState<number | null>(null);
   const [montantLibre, setMontantLibre] = useState("");
-  const [nom, setNom] = useState("");
-  const [email, setEmail] = useState("");
-  const [telephone, setTelephone] = useState("");
-  const [message, setMessage] = useState("");
+  const [formData, setFormData] = useState({
+    nom: "",
+    prenoms: "",
+    fonction: "",
+    sexe: "",
+    tranche_age: "",
+    email: "",
+    telephone: "",
+    pays: "",
+    lieu_residence: "",
+    message: "",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const montantFinal = montantChoisi ?? (montantLibre ? parseInt(montantLibre) : null);
 
@@ -31,11 +43,17 @@ export default function FaireUnDonPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          nom,
-          email,
-          telephone: telephone || null,
+          nom: formData.nom,
+          prenoms: formData.prenoms || null,
+          fonction: formData.fonction || null,
+          sexe: formData.sexe || null,
+          tranche_age: formData.tranche_age || null,
+          email: formData.email,
+          telephone: formData.telephone || null,
+          pays: formData.pays || null,
+          lieu_residence: formData.lieu_residence || null,
           montant: montantFinal,
-          message: message || null,
+          message: formData.message || null,
         }),
       });
 
@@ -144,54 +162,108 @@ export default function FaireUnDonPage() {
 
                 {/* Informations du donateur */}
                 <div className="grid sm:grid-cols-2 gap-4">
+                  {/* Nom & Prénoms */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">
-                      Nom complet <span className="text-red-500">*</span>
+                      Nom <span className="text-red-500">*</span>
                     </label>
                     <input
-                      type="text"
-                      required
-                      value={nom}
-                      onChange={(e) => setNom(e.target.value)}
+                      type="text" name="nom" required
+                      value={formData.nom} onChange={handleChange}
                       className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
                       placeholder="Votre nom"
                     />
                   </div>
                   <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Prénoms</label>
+                    <input
+                      type="text" name="prenoms"
+                      value={formData.prenoms} onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+                      placeholder="Vos prénoms"
+                    />
+                  </div>
+
+                  {/* Fonction */}
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Fonction</label>
+                    <input
+                      type="text" name="fonction"
+                      value={formData.fonction} onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+                      placeholder="Votre fonction"
+                    />
+                  </div>
+
+                  {/* Sexe & Tranche d'âge */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Sexe</label>
+                    <select name="sexe" value={formData.sexe} onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017] bg-white">
+                      <option value="">-- Sélectionner --</option>
+                      <option value="Homme">Homme</option>
+                      <option value="Femme">Femme</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Tranche d&apos;âge</label>
+                    <select name="tranche_age" value={formData.tranche_age} onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017] bg-white">
+                      <option value="">-- Sélectionner --</option>
+                      <option value="-18 ans">Moins de 18 ans</option>
+                      <option value="18 à 35 ans">18 à 35 ans</option>
+                      <option value="+35 ans">Plus de 35 ans</option>
+                    </select>
+                  </div>
+
+                  {/* Email & Contact */}
+                  <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">
                       Email <span className="text-red-500">*</span>
                     </label>
                     <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      type="email" name="email" required
+                      value={formData.email} onChange={handleChange}
                       className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
                       placeholder="votre@email.com"
                     />
                   </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
-                      Téléphone (Mobile Money)
-                    </label>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Contact (Mobile Money)</label>
                     <input
-                      type="tel"
-                      value={telephone}
-                      onChange={(e) => setTelephone(e.target.value)}
+                      type="tel" name="telephone"
+                      value={formData.telephone} onChange={handleChange}
                       className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
-                      placeholder="+225 07 00 00 00 00"
+                      placeholder="+225 XX XX XX XX XX"
+                    />
+                  </div>
+
+                  {/* Pays & Lieu de résidence */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Pays</label>
+                    <input
+                      type="text" name="pays"
+                      value={formData.pays} onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+                      placeholder="Votre pays"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Lieu de résidence</label>
+                    <input
+                      type="text" name="lieu_residence"
+                      value={formData.lieu_residence} onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+                      placeholder="Ville / Quartier"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    Message (optionnel)
-                  </label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Message (optionnel)</label>
                   <textarea
-                    rows={3}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    rows={3} name="message"
+                    value={formData.message} onChange={handleChange}
                     className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017] resize-none"
                     placeholder="Un mot d'encouragement..."
                   />
