@@ -4,31 +4,67 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { MapPin, Phone, Mail, Facebook, Linkedin } from 'lucide-react';
+import { MapPin, Phone, Mail, Facebook, Linkedin, CheckCircle, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from '@/lib/imageWithFallback';
 
-export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    fonction: '',
-    sexe: '',
-    tranche_age: '',
-    message: '',
-  });
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-  const handleSubmit = (e: React.FormEvent) => {
+const emptyForm = {
+  categorie_acteur: '',
+  nom: '',
+  prenoms: '',
+  fonction: '',
+  sexe: '',
+  tranche_age: '',
+  email: '',
+  contact: '',
+  pays: '',
+  lieu_residence: '',
+  motif: '',
+  message: '',
+};
+
+export default function ContactPage() {
+  const [formData, setFormData] = useState(emptyForm);
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Add your form submission logic here
-    alert('Message envoyé avec succès!');
+    setSubmitting(true);
+    setError('');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          categorie_acteur: formData.categorie_acteur || null,
+          fonction: formData.fonction || null,
+          sexe: formData.sexe || null,
+          tranche_age: formData.tranche_age || null,
+          contact: formData.contact || null,
+          pays: formData.pays || null,
+          lieu_residence: formData.lieu_residence || null,
+          message: formData.message || null,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || 'Erreur lors de l\'envoi.');
+      }
+      setSuccess(true);
+      setFormData(emptyForm);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
   return (
     <section className="mx-auto pt-12 font-poppins">
@@ -69,39 +105,67 @@ export default function ContactPage() {
                 Remplir le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais.
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Name Field */}
+              {success && (
+                <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800">
+                  <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                  <p className="text-sm font-medium">Votre message a bien été envoyé. Nous vous répondrons dans les plus brefs délais.</p>
+                </div>
+              )}
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+
+                {/* Catégorie d'acteurs */}
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-gray-700 font-medium">
-                    Votre nom
-                  </label>
-                  <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    placeholder="Entrer votre nom"
-                    value={formData.name}
+                  <label htmlFor="categorie_acteur" className="text-gray-700 font-medium">Catégorie d&apos;acteurs</label>
+                  <select
+                    id="categorie_acteur"
+                    name="categorie_acteur"
+                    value={formData.categorie_acteur}
                     onChange={handleChange}
-                    required
-                    className="bg-[#f5f5f5] border-gray-200 focus:border-[#ff8c42] focus:ring-[#ff8c42]"
-                  />
+                    className="w-full bg-[#f5f5f5] border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#ff8c42] focus:ring-1 focus:ring-[#ff8c42]"
+                  >
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Organisation de la Société Civile OSC">Organisation de la Société Civile OSC</option>
+                    <option value="Acteurs étatiques">Acteurs étatiques</option>
+                    <option value="Partenaires Techniques et Financiers PTF">Partenaires Techniques et Financiers (PTF)</option>
+                    <option value="Grand public">Grand public</option>
+                  </select>
                 </div>
 
-                {/* Email Field */}
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-gray-700 font-medium">
-                    Email
-                  </label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="Entrer votre adresse e-mail"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="bg-[#f5f5f5] border-gray-200 focus:border-[#ff8c42] focus:ring-[#ff8c42]"
-                  />
+                {/* Nom & Prénoms */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="nom" className="text-gray-700 font-medium">Nom <span className="text-red-500">*</span></label>
+                    <Input
+                      id="nom"
+                      name="nom"
+                      type="text"
+                      placeholder="Votre nom"
+                      value={formData.nom}
+                      onChange={handleChange}
+                      required
+                      className="bg-[#f5f5f5] border-gray-200 focus:border-[#ff8c42] focus:ring-[#ff8c42]"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="prenoms" className="text-gray-700 font-medium">Prénoms <span className="text-red-500">*</span></label>
+                    <Input
+                      id="prenoms"
+                      name="prenoms"
+                      type="text"
+                      placeholder="Vos prénoms"
+                      value={formData.prenoms}
+                      onChange={handleChange}
+                      required
+                      className="bg-[#f5f5f5] border-gray-200 focus:border-[#ff8c42] focus:ring-[#ff8c42]"
+                    />
+                  </div>
                 </div>
 
                 {/* Fonction */}
@@ -126,45 +190,119 @@ export default function ContactPage() {
                       id="sexe"
                       name="sexe"
                       value={formData.sexe}
-                      onChange={(e) => setFormData({ ...formData, sexe: e.target.value })}
+                      onChange={handleChange}
                       className="w-full bg-[#f5f5f5] border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#ff8c42] focus:ring-1 focus:ring-[#ff8c42]"
                     >
                       <option value="">-- Sélectionner --</option>
                       <option value="Homme">Homme</option>
                       <option value="Femme">Femme</option>
-                      <option value="Autre">Autre</option>
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="tranche_age" className="text-gray-700 font-medium">Tranche d'âge</label>
+                    <label htmlFor="tranche_age" className="text-gray-700 font-medium">Tranche d&apos;âge</label>
                     <select
                       id="tranche_age"
                       name="tranche_age"
                       value={formData.tranche_age}
-                      onChange={(e) => setFormData({ ...formData, tranche_age: e.target.value })}
+                      onChange={handleChange}
                       className="w-full bg-[#f5f5f5] border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#ff8c42] focus:ring-1 focus:ring-[#ff8c42]"
                     >
                       <option value="">-- Sélectionner --</option>
-                      <option value="-18 ans">-18 ans</option>
-                      <option value="18 à 35 ans">de 18 à 35 ans</option>
-                      <option value="+35 ans">+35 ans</option>
+                      <option value="-18 ans">Moins de 18 ans</option>
+                      <option value="18 à 35 ans">18 à 35 ans</option>
+                      <option value="+35 ans">Plus de 35 ans</option>
                     </select>
                   </div>
                 </div>
 
-                {/* Message Field */}
+                {/* Email & Contact */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="text-gray-700 font-medium">Email <span className="text-red-500">*</span></label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="votre@email.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="bg-[#f5f5f5] border-gray-200 focus:border-[#ff8c42] focus:ring-[#ff8c42]"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="contact" className="text-gray-700 font-medium">Contact</label>
+                    <Input
+                      id="contact"
+                      name="contact"
+                      type="tel"
+                      placeholder="+225 XX XX XX XX XX"
+                      value={formData.contact}
+                      onChange={handleChange}
+                      className="bg-[#f5f5f5] border-gray-200 focus:border-[#ff8c42] focus:ring-[#ff8c42]"
+                    />
+                  </div>
+                </div>
+
+                {/* Pays & Lieu de résidence */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="pays" className="text-gray-700 font-medium">Pays</label>
+                    <Input
+                      id="pays"
+                      name="pays"
+                      type="text"
+                      placeholder="Votre pays"
+                      value={formData.pays}
+                      onChange={handleChange}
+                      className="bg-[#f5f5f5] border-gray-200 focus:border-[#ff8c42] focus:ring-[#ff8c42]"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="lieu_residence" className="text-gray-700 font-medium">Lieu de résidence</label>
+                    <Input
+                      id="lieu_residence"
+                      name="lieu_residence"
+                      type="text"
+                      placeholder="Ville / Quartier"
+                      value={formData.lieu_residence}
+                      onChange={handleChange}
+                      className="bg-[#f5f5f5] border-gray-200 focus:border-[#ff8c42] focus:ring-[#ff8c42]"
+                    />
+                  </div>
+                </div>
+
+                {/* Motif (obligatoire) */}
                 <div className="space-y-2">
-                  <label htmlFor="message" className="text-gray-700 font-medium">
-                    Message
-                  </label>
+                  <label htmlFor="motif" className="text-gray-700 font-medium">Motif <span className="text-red-500">*</span></label>
+                  <select
+                    id="motif"
+                    name="motif"
+                    value={formData.motif}
+                    onChange={handleChange}
+                    required
+                    className="w-full bg-[#f5f5f5] border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-[#ff8c42] focus:ring-1 focus:ring-[#ff8c42]"
+                  >
+                    <option value="">-- Sélectionner un motif --</option>
+                    <option value="Renseignement">Renseignement</option>
+                    <option value="Formation">Formation</option>
+                    <option value="Bénévolat">Bénévolat</option>
+                    <option value="Recherche">Recherche</option>
+                    <option value="Adhésion">Adhésion</option>
+                    <option value="Autre">Autre</option>
+                  </select>
+                </div>
+
+                {/* Message */}
+                <div className="space-y-2">
+                  <label htmlFor="message" className="text-gray-700 font-medium">Message</label>
                   <Textarea
                     id="message"
                     name="message"
                     placeholder="Écrire votre message ici"
                     value={formData.message}
                     onChange={handleChange}
-                    required
-                    rows={6}
+                    rows={5}
                     className="bg-[#f5f5f5] border-gray-200 focus:border-[#ff8c42] focus:ring-[#ff8c42] resize-none"
                   />
                 </div>
@@ -172,9 +310,14 @@ export default function ContactPage() {
                 {/* Submit Button */}
                 <Button
                   type="submit"
-                  className="w-full border border-[#E05017] bg-[#E05017] text-white hover:text-[#e05017] hover:bg-white rounded-lg py-6"
+                  disabled={submitting}
+                  className="w-full border border-[#E05017] bg-[#E05017] text-white hover:text-[#e05017] hover:bg-white rounded-lg py-6 disabled:opacity-60"
                 >
-                  Envoyer le message
+                  {submitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" /> Envoi en cours...
+                    </span>
+                  ) : 'Envoyer le message'}
                 </Button>
               </form>
             </div>

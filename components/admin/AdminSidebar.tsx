@@ -140,6 +140,7 @@ export default function AdminSidebar({
     },
     { icon: <Heart size={20} />, label: "Dons", href: "/admin/dons", staffOnly: true },
     { icon: <Users size={20} />, label: "Volontaires", href: "/admin/volontaires", staffOnly: true },
+    { icon: <Megaphone size={20} />, label: "Messages de contact", href: "/admin/contact", staffOnly: true },
     { icon: <Phone size={20} />, label: "Numéros utiles", href: "/admin/numeros-utiles", staffOnly: true },
     { icon: <ShieldAlert size={20} />, label: "Modération", href: "/admin/moderation", badge: pendingCount, staffOnly: true },
     {
