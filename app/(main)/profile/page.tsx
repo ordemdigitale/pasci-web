@@ -216,6 +216,7 @@ export default function ProfilePage() {
                         value={profileData.phone}
                         onChange={handleProfileChange}
                         disabled={!isEditing}
+                        placeholder="+225 XX XX XX XX XX"
                         className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                       />
                     </div>

@@ -80,9 +80,11 @@ export default function FormationDetailPage() {
 
   // Inscription
   const [showInscription, setShowInscription] = useState(false);
-  const [inscriptionName, setInscriptionName] = useState("");
+  const [inscriptionNom, setInscriptionNom] = useState("");
+  const [inscriptionPrenoms, setInscriptionPrenoms] = useState("");
   const [inscriptionEmail, setInscriptionEmail] = useState("");
   const [inscriptionPhone, setInscriptionPhone] = useState("");
+  const [inscriptionCategorie, setInscriptionCategorie] = useState("");
   const [inscribing, setInscribing] = useState(false);
   const [inscriptionSuccess, setInscriptionSuccess] = useState(false);
   const [inscriptionError, setInscriptionError] = useState("");
@@ -192,18 +194,18 @@ export default function FormationDetailPage() {
     load();
   }, [formationSlug]);
 
-  async function inscrire(name: string, email: string, phone?: string) {
+  async function inscrire(nom: string, prenoms: string, email: string, phone?: string, categorie?: string) {
     setInscribing(true);
     setInscriptionError("");
     try {
       if (formation?.type === "payante") {
-        const paiement = await initierPaiement(formationSlug, name, email, phone);
+        const paiement = await initierPaiement(formationSlug, nom, prenoms, email, phone, categorie);
         const redirectUrl = paiement.cinetpay_configured
           ? paiement.payment_url
           : `${paiement.payment_url}&iid=${paiement.inscription_id}`;
         window.location.href = redirectUrl;
       } else {
-        await inscrireFormation(formationSlug, name, email);
+        await inscrireFormation(formationSlug, nom, prenoms, email, phone, categorie);
         setInscriptionSuccess(true);
         setAlreadyRegistered(true);
       }
@@ -217,13 +219,14 @@ export default function FormationDetailPage() {
   async function handleInscriptionConnecte() {
     const user = getStoredUser();
     if (!user) return;
-    const name = [user.first_name, user.last_name].filter(Boolean).join(" ") || user.username || user.email;
-    await inscrire(name, user.email);
+    const nom = user.first_name || user.username || user.email.split("@")[0];
+    const prenoms = user.last_name || "";
+    await inscrire(nom, prenoms, user.email);
   }
 
   async function handleInscription(e: React.FormEvent) {
     e.preventDefault();
-    await inscrire(inscriptionName, inscriptionEmail, inscriptionPhone || undefined);
+    await inscrire(inscriptionNom, inscriptionPrenoms, inscriptionEmail, inscriptionPhone || undefined, inscriptionCategorie || undefined);
   }
 
   async function handleSoumettrAvis(e: React.FormEvent) {
@@ -657,19 +660,53 @@ export default function FormationDetailPage() {
                     {inscriptionError && (
                       <p className="md:col-span-2 text-red-500 text-sm">{inscriptionError}</p>
                     )}
+                    {/* Catégorie d'acteurs */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Catégorie d&apos;acteurs {formation?.type === "payante" && <span className="text-red-500">*</span>}
+                      </label>
+                      <select
+                        value={inscriptionCategorie}
+                        onChange={(e) => setInscriptionCategorie(e.target.value)}
+                        required={formation?.type === "payante"}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017] bg-white"
+                      >
+                        <option value="">-- Sélectionnez une catégorie --</option>
+                        <option value="Organisation de la Société Civile OSC">Organisation de la Société Civile OSC</option>
+                        <option value="Acteurs étatiques">Acteurs étatiques</option>
+                        <option value="Partenaires Techniques et Financiers PTF">Partenaires Techniques et Financiers (PTF)</option>
+                        <option value="Grand public">Grand public</option>
+                      </select>
+                    </div>
+                    {/* Nom */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">
-                        Nom complet <span className="text-red-500">*</span>
+                        Nom <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         required
-                        value={inscriptionName}
-                        onChange={(e) => setInscriptionName(e.target.value)}
+                        value={inscriptionNom}
+                        onChange={(e) => setInscriptionNom(e.target.value)}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
-                        placeholder="Votre nom et prénom"
+                        placeholder="Votre nom"
                       />
                     </div>
+                    {/* Prénoms */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Prénoms <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={inscriptionPrenoms}
+                        onChange={(e) => setInscriptionPrenoms(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+                        placeholder="Vos prénoms"
+                      />
+                    </div>
+                    {/* Email */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">
                         Email <span className="text-red-500">*</span>
@@ -683,23 +720,23 @@ export default function FormationDetailPage() {
                         placeholder="votre@email.com"
                       />
                     </div>
-                    {formation?.type === "payante" && (
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-semibold text-gray-700 mb-1">
-                          Numéro de téléphone <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="tel"
-                          required
-                          value={inscriptionPhone}
-                          onChange={(e) => setInscriptionPhone(e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
-                          placeholder="+225 07 00 00 00 00"
-                        />
-                        <p className="text-xs font-bold text-gray-500 mt-1">Renseigner l&apos;indicatif du pays, Ex : +225 07 00</p>
+                    {/* Contact */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Contact {formation?.type === "payante" && <span className="text-red-500">*</span>}
+                      </label>
+                      <input
+                        type="tel"
+                        required={formation?.type === "payante"}
+                        value={inscriptionPhone}
+                        onChange={(e) => setInscriptionPhone(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+                        placeholder="+225 XX XX XX XX XX"
+                      />
+                      {formation?.type === "payante" && (
                         <p className="text-xs text-gray-500 mt-1">Requis pour le paiement mobile money</p>
-                      </div>
-                    )}
+                      )}
+                    </div>
                     <div className="md:col-span-2">
                       <button
                         type="submit"

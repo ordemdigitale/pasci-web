@@ -343,7 +343,7 @@ export default function AddPTFPage() {
                   {...register("phone")}
                   type="tel"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
-                  placeholder="+1 234 567 890"
+                  placeholder="+225 XX XX XX XX XX"
                 />
               </div>
 

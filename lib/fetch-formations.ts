@@ -162,15 +162,18 @@ export async function fetchAllRubriques(): Promise<IFormationRubrique[]> {
  */
 export async function inscrireFormation(
   formation_slug: string,
-  participant_name: string,
-  participant_email: string
+  participant_nom: string,
+  participant_prenoms: string,
+  participant_email: string,
+  participant_phone?: string,
+  categorie_acteur?: string,
 ): Promise<{ id: number; participant_name: string; participant_email: string }> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/formations/${formation_slug}/inscrire`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ participant_name, participant_email }),
+      body: JSON.stringify({ participant_nom, participant_prenoms, participant_email, participant_phone, categorie_acteur }),
     }
   );
   if (!response.ok) {

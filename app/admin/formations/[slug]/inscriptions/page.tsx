@@ -23,7 +23,11 @@ interface Inscription {
   id: number;
   formation_id: number;
   participant_name: string;
+  participant_nom: string | null;
+  participant_prenoms: string | null;
   participant_email: string;
+  participant_phone: string | null;
+  categorie_acteur: string | null;
   is_completed: boolean;
   completed_at: string | null;
   certificate_issued: boolean;
@@ -365,12 +369,18 @@ export default function InscriptionsPage() {
             <p style={{ fontSize: 16 }}>Aucune inscription pour cette formation.</p>
           </div>
         ) : (
-          <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e7eb", overflow: "hidden" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e7eb", overflowX: "auto" }}>
+            <table style={{ width: "100%", minWidth: 1000, borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid #e5e7eb", background: "#f9fafb" }}>
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: 13, fontWeight: 600, color: "#374151" }}>
                     Participant
+                  </th>
+                  <th style={{ padding: "12px 16px", textAlign: "left", fontSize: 13, fontWeight: 600, color: "#374151" }}>
+                    Catégorie
+                  </th>
+                  <th style={{ padding: "12px 16px", textAlign: "left", fontSize: 13, fontWeight: 600, color: "#374151" }}>
+                    Contact
                   </th>
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: 13, fontWeight: 600, color: "#374151" }}>
                     Inscription
@@ -401,11 +411,27 @@ export default function InscriptionsPage() {
                     {/* Participant */}
                     <td style={{ padding: "14px 16px" }}>
                       <div style={{ fontWeight: 600, color: "#111827", fontSize: 14 }}>
-                        {inscription.participant_name}
+                        {inscription.participant_nom && inscription.participant_prenoms
+                          ? `${inscription.participant_nom} ${inscription.participant_prenoms}`
+                          : inscription.participant_name}
                       </div>
                       <div style={{ color: "#6b7280", fontSize: 13, display: "flex", alignItems: "center", gap: 4 }}>
                         <Mail size={12} />
                         {inscription.participant_email}
+                      </div>
+                    </td>
+
+                    {/* Catégorie d'acteur */}
+                    <td style={{ padding: "14px 16px" }}>
+                      <div style={{ fontSize: 13, color: "#374151" }}>
+                        {inscription.categorie_acteur || <span style={{ color: "#d1d5db" }}>—</span>}
+                      </div>
+                    </td>
+
+                    {/* Contact */}
+                    <td style={{ padding: "14px 16px" }}>
+                      <div style={{ fontSize: 13, color: "#374151" }}>
+                        {inscription.participant_phone || <span style={{ color: "#d1d5db" }}>—</span>}
                       </div>
                     </td>
 

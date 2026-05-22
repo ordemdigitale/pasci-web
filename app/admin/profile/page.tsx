@@ -186,6 +186,7 @@ export default function AdminProfilePage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
+                  placeholder="+225 XX XX XX XX XX"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2a591d] focus:border-transparent"
                 />
               </div>

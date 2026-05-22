@@ -324,7 +324,7 @@ export default function PageRejoindre() {
                   <FormControl>
                     <Input
                       type="tel"
-                      placeholder="+237 6XX XXX XXX"
+                      placeholder="+225 XX XX XX XX XX"
                       className="border-gray-300"
                       {...field}
                     />
