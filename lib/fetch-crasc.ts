@@ -7,10 +7,11 @@ import {
   IOscDetail,
   INews,
   IEvenement,
+  ICrascVideo,
   SpotlightNews
 } from "@/types/api.types";
 
-export type { ICrasc, ICrascDetail, IRegionCiv, IOscType, IOsc, IOscDetail, INews, IEvenement, SpotlightNews };
+export type { ICrasc, ICrascDetail, IRegionCiv, IOscType, IOsc, IOscDetail, INews, IEvenement, ICrascVideo, SpotlightNews };
 
 // Get API base URL from environment variable
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -264,5 +265,43 @@ export async function deleteEvenement(id: number, token: string): Promise<void> 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
     throw new Error(err.detail || "Échec de la suppression de l'événement");
+  }
+}
+
+// Fetch videos for a CRASC
+export async function fetchCrascVideos(crasc_id: number): Promise<ICrascVideo[]> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/video?crasc_id=${crasc_id}`, {
+    cache: "no-store"
+  });
+  if (!response.ok) throw new Error("Échec du chargement des vidéos");
+  return response.json();
+}
+
+// Create a CRASC video (requires auth token)
+export async function createCrascVideo(
+  data: { crasc_id: number; titre: string; url: string; description?: string; ordre?: number },
+  token: string
+): Promise<ICrascVideo> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/video`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data)
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || "Échec de l'ajout de la vidéo");
+  }
+  return response.json();
+}
+
+// Delete a CRASC video (requires auth token)
+export async function deleteCrascVideo(id: number, token: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/video/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || "Échec de la suppression de la vidéo");
   }
 }

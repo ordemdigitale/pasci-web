@@ -105,6 +105,17 @@ export interface IOscDetail {
   financement_multilateral?: boolean | null;
 }
 
+// Interface for CRASC video
+export interface ICrascVideo {
+  id: number;
+  crasc_id: number;
+  titre: string;
+  url: string;
+  description?: string | null;
+  ordre: number;
+  created_at?: string;
+}
+
 // Interface for Agenda events
 export interface IEvenement {
   id: number;
@@ -128,6 +139,7 @@ export interface ICrascDetail {
   regions?: IRegionCiv[];
   news?: INews[];
   evenements?: IEvenement[];
+  videos?: ICrascVideo[];
 }
 
 // Interface for OscType

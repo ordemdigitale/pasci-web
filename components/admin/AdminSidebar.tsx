@@ -18,6 +18,7 @@ import {
   Phone,
   ShieldAlert,
   Building2,
+  Video,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
@@ -94,6 +95,7 @@ export default function AdminSidebar({
       href: "/admin/gestion-des-crasc",
       staffOnly: true,
     },
+    { icon: <Video size={20} />, label: "Vidéos CRASC", href: "/admin/gestion-des-crasc/videos", staffOnly: true },
     {
       icon: <FileText size={20} />,
       label: "Organisations",

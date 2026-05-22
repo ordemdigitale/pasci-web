@@ -2,11 +2,11 @@
 "use client";
 
 import React, { use, useState, useEffect } from "react";
-import { getCrascBySlug, fetchEvenements } from "@/lib/fetch-crasc";
+import { getCrascBySlug, fetchEvenements, fetchCrascVideos } from "@/lib/fetch-crasc";
 import { fetchAllNews } from "@/lib/fetch-news";
 import Link from "next/link";
 import { ImageWithFallback } from '@/lib/imageWithFallback';
-import { ICrascDetail, INews, IEvenement } from "@/types/api.types";
+import { ICrascDetail, INews, IEvenement, ICrascVideo } from "@/types/api.types";
 import { domainesIntervention } from "../page";
 import {
   Building2,
@@ -21,9 +21,28 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-  Clock
+  Clock,
+  Video,
 } from 'lucide-react';
 
+
+function getEmbedUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes("youtube.com") || u.hostname.includes("youtu.be")) {
+      const vid =
+        u.searchParams.get("v") ||
+        (u.hostname === "youtu.be" ? u.pathname.slice(1) : null) ||
+        u.pathname.split("/").pop();
+      if (vid) return `https://www.youtube.com/embed/${vid}`;
+    }
+    if (u.hostname.includes("vimeo.com")) {
+      const vid = u.pathname.split("/").filter(Boolean).pop();
+      if (vid) return `https://player.vimeo.com/video/${vid}`;
+    }
+  } catch {}
+  return null;
+}
 
 const CRASC_ZONE_COLORS: Record<string, { color: string; darkColor: string }> = {
   'crasc-nord':   { color: '#F59E42', darkColor: '#ff8c42' },
@@ -40,6 +59,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
   const zoneColors = CRASC_ZONE_COLORS[crascSlug] || DEFAULT_ZONE_COLORS;
   const [crascData, setCrascData] = useState<ICrascDetail | null>(null);
   const [evenements, setEvenements] = useState<IEvenement[]>([]);
+  const [videos, setVideos] = useState<ICrascVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [oscSearch, setOscSearch] = useState('');
@@ -58,13 +78,15 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
           setCrascData(data);
 
           if (data.id) {
-            const [newsData, evtData] = await Promise.all([
+            const [newsData, evtData, videoData] = await Promise.all([
               fetchAllNews({ crasc_id: parseInt(data.id) }),
               fetchEvenements(parseInt(data.id), false),
+              fetchCrascVideos(parseInt(data.id)),
             ]);
             if (isCurrent) {
               setCrascData(prev => prev ? { ...prev, news: newsData } : prev);
               setEvenements(evtData);
+              setVideos(videoData);
             }
           }
         }
@@ -401,6 +423,45 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
               <div className="bg-white rounded-2xl border-2 border-gray-200 p-12 text-center shadow-sm">
                 <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <p className="text-xl text-gray-500">Aucune actualité ajoutée pour le moment.</p>
+              </div>
+            )}
+
+            {/* ── Vidéos Section ── */}
+            {videos.length > 0 && (
+              <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${zoneColors.color}20` }}>
+                    <Video className="w-5 h-5" style={{ color: zoneColors.color }} />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">Vidéos</h2>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-6">
+                  {videos.map((video) => {
+                    const embedUrl = getEmbedUrl(video.url);
+                    return (
+                      <div key={video.id} className="space-y-2">
+                        <div className="rounded-xl overflow-hidden aspect-video bg-gray-100">
+                          {embedUrl ? (
+                            <iframe
+                              src={embedUrl}
+                              className="w-full h-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Video className="w-10 h-10 text-gray-400" />
+                            </div>
+                          )}
+                        </div>
+                        <p className="font-semibold text-gray-900 text-sm">{video.titre}</p>
+                        {video.description && (
+                          <p className="text-xs text-gray-500 line-clamp-2">{video.description}</p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
