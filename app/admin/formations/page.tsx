@@ -284,7 +284,13 @@ export default function FormationsPage() {
             </div>
           </div>
 
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex items-center justify-end gap-3">
+            <Link href="/admin/formations/catalogue">
+              <button className="flex items-center gap-2 px-5 py-3 border-2 border-[#E05017] text-[#E05017] rounded-lg hover:bg-[#E05017] hover:text-white transition-colors font-bold">
+                <BookOpen className="w-5 h-5" />
+                Catalogue
+              </button>
+            </Link>
             <Link href="/admin/formations/ajouter">
               <button className="flex items-center gap-2 px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold">
                 <Plus className="w-5 h-5" />

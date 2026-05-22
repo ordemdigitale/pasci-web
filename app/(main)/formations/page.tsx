@@ -2,12 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, Download, FileText } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback"
 import { fetchAllFormations, fetchAllRubriques, IFormation, IFormationRubrique } from '@/lib/fetch-formations';
 
 const FALLBACK_IMAGE = "/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+interface ICatalogue {
+  id: number;
+  titre: string;
+  description?: string | null;
+  fichier_url: string;
+  is_active: boolean;
+}
 
 export default function FormationsPage() {
   const [activeRubriqueId, setActiveRubriqueId] = useState<number | null>(null);
@@ -15,6 +23,7 @@ export default function FormationsPage() {
   const [visiblePrograms, setVisiblePrograms] = useState(9);
   const [formations, setFormations] = useState<IFormation[]>([]);
   const [rubriques, setRubriques] = useState<IFormationRubrique[]>([]);
+  const [catalogues, setCatalogues] = useState<ICatalogue[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [defaultImage, setDefaultImage] = useState(FALLBACK_IMAGE);
@@ -24,12 +33,14 @@ export default function FormationsPage() {
       setLoading(true);
       setError(null);
       try {
-        const [formationsData, rubriquesData] = await Promise.all([
+        const [formationsData, rubriquesData, cataloguesRes] = await Promise.all([
           fetchAllFormations({ published_only: true, limit: 100 }),
           fetchAllRubriques(),
+          fetch(`${API_BASE}/api/v1/formations/catalogue?active_only=true`).then(r => r.ok ? r.json() : []),
         ]);
         setFormations(formationsData);
         setRubriques(rubriquesData.filter((r) => r.is_active));
+        setCatalogues(cataloguesRes);
       } catch (err) {
         console.error("Erreur lors du chargement:", err);
         setError("Erreur lors du chargement des formations. Veuillez réessayer plus tard.");
@@ -232,6 +243,40 @@ export default function FormationsPage() {
             </div>
           </div>
         </div>
+
+        {/* Catalogue de formations */}
+        {catalogues.length > 0 && (
+          <div className="py-8">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h3 className="text-gray-800 text-2xl font-bold mb-6 flex items-center gap-3">
+                <FileText className="w-7 h-7 text-[#E05017]" />
+                Catalogue de Formations
+              </h3>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {catalogues.map((cat) => (
+                  <a
+                    key={cat.id}
+                    href={cat.fichier_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-4 bg-white border-2 border-gray-200 hover:border-[#E05017] rounded-xl p-5 shadow-sm hover:shadow-md transition-all"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-red-50 group-hover:bg-[#E05017]/10 flex items-center justify-center flex-shrink-0 transition-colors">
+                      <FileText className="w-6 h-6 text-red-500 group-hover:text-[#E05017]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-gray-900 line-clamp-1 group-hover:text-[#E05017] transition-colors">{cat.titre}</p>
+                      {cat.description && (
+                        <p className="text-sm text-gray-500 line-clamp-1 mt-0.5">{cat.description}</p>
+                      )}
+                    </div>
+                    <Download className="w-5 h-5 text-gray-400 group-hover:text-[#E05017] flex-shrink-0 transition-colors" />
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Prêt à se faire accompagner */}
         <div className="py-8">
