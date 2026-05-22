@@ -23,6 +23,9 @@ import {
   ChevronRight,
   Clock,
   Video,
+  Mail,
+  Send,
+  CheckCircle,
 } from 'lucide-react';
 
 
@@ -65,6 +68,42 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
   const [oscSearch, setOscSearch] = useState('');
   const [oscPage, setOscPage] = useState(1);
   const OSC_PER_PAGE = 6;
+
+  // Contact form state
+  const [contactForm, setContactForm] = useState({ nom: '', email: '', telephone: '', objet: '', message: '' });
+  const [contactSending, setContactSending] = useState(false);
+  const [contactSent, setContactSent] = useState(false);
+  const [contactError, setContactError] = useState<string | null>(null);
+
+  async function handleContactSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setContactSending(true);
+    setContactError(null);
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_BASE}/api/v1/crasc/crasc/${crascSlug}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nom: contactForm.nom,
+          email: contactForm.email,
+          telephone: contactForm.telephone || null,
+          objet: contactForm.objet,
+          message: contactForm.message,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || 'Une erreur est survenue.');
+      }
+      setContactSent(true);
+      setContactForm({ nom: '', email: '', telephone: '', objet: '', message: '' });
+    } catch (err: any) {
+      setContactError(err.message);
+    } finally {
+      setContactSending(false);
+    }
+  }
 
   useEffect(() => {
     if (!crascSlug) return;
@@ -546,6 +585,106 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                 </div>
               )}
             </div>
+
+            {/* ── Formulaire de contact ── */}
+            <div id="contact-crasc" className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${zoneColors.color}20` }}>
+                  <Mail className="w-5 h-5" style={{ color: zoneColors.color }} />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">Contacter le {crascData.name}</h2>
+              </div>
+
+              {contactSent ? (
+                <div className="text-center py-10">
+                  <CheckCircle className="w-14 h-14 text-green-500 mx-auto mb-4" />
+                  <p className="text-xl font-bold text-gray-900 mb-2">Message envoyé !</p>
+                  <p className="text-gray-600 mb-6">Votre message a bien été transmis. Vous recevrez une confirmation par email.</p>
+                  <button
+                    onClick={() => setContactSent(false)}
+                    className="px-6 py-2.5 rounded-xl font-semibold text-white transition-colors"
+                    style={{ backgroundColor: zoneColors.color }}
+                  >
+                    Envoyer un autre message
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleContactSubmit} className="space-y-4">
+                  {contactError && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{contactError}</div>
+                  )}
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">Nom complet <span className="text-red-500">*</span></label>
+                      <input
+                        type="text" required
+                        value={contactForm.nom}
+                        onChange={e => setContactForm({ ...contactForm, nom: e.target.value })}
+                        placeholder="Votre nom"
+                        className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">Email <span className="text-red-500">*</span></label>
+                      <input
+                        type="email" required
+                        value={contactForm.email}
+                        onChange={e => setContactForm({ ...contactForm, email: e.target.value })}
+                        placeholder="votre@email.com"
+                        className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">Téléphone</label>
+                      <input
+                        type="tel"
+                        value={contactForm.telephone}
+                        onChange={e => setContactForm({ ...contactForm, telephone: e.target.value })}
+                        placeholder="+225 XX XX XX XX XX"
+                        className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">Objet <span className="text-red-500">*</span></label>
+                      <input
+                        type="text" required
+                        value={contactForm.objet}
+                        onChange={e => setContactForm({ ...contactForm, objet: e.target.value })}
+                        placeholder="Objet de votre message"
+                        className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Message <span className="text-red-500">*</span></label>
+                    <textarea
+                      rows={4} required
+                      value={contactForm.message}
+                      onChange={e => setContactForm({ ...contactForm, message: e.target.value })}
+                      placeholder="Votre message..."
+                      className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 resize-none"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={contactSending}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-white disabled:opacity-50 transition-all hover:shadow-md"
+                    style={{ background: `linear-gradient(to right, ${zoneColors.color}, ${zoneColors.darkColor})` }}
+                  >
+                    {contactSending ? (
+                      <><Loader2 className="w-5 h-5 animate-spin" /> Envoi en cours...</>
+                    ) : (
+                      <><Send className="w-5 h-5" /> Envoyer le message</>
+                    )}
+                  </button>
+                  <p className="text-xs text-gray-400 text-center">
+                    Votre message sera transmis à l'équipe PDOC et au responsable du {crascData.name}.
+                  </p>
+                </form>
+              )}
+            </div>
           </div>
 
           {/* Sidebar */}
@@ -595,13 +734,14 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                   <CalendarDays className="w-4 h-4" />
                   Voir l'agenda
                 </a>
-                <Link
-                  href="/contact"
-                  className="block w-full text-center px-4 py-3 text-white font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+                <a
+                  href="#contact-crasc"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 text-white font-semibold rounded-lg hover:shadow-lg transition-all"
                   style={{ background: `linear-gradient(to right, ${zoneColors.color}, ${zoneColors.darkColor})` }}
                 >
+                  <Mail className="w-4 h-4" />
                   Contacter le CRASC
-                </Link>
+                </a>
               </div>
             </div>
           </div>
@@ -610,3 +750,4 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
     </div>
   );
 }
+

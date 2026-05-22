@@ -15,7 +15,8 @@ export function EditCrascForm({ crasc, onSuccess, onCancel }: EditCrascFormProps
     const [formData, setFormData] = useState({
         name: crasc.name || '',
         description: crasc.description || '',
-        osc_count: crasc.osc_count || 0
+        osc_count: crasc.osc_count || 0,
+        email_pca: (crasc as any).email_pca || '',
     });
 
     const [loading, setLoading] = useState(false);
@@ -136,6 +137,25 @@ export function EditCrascForm({ crasc, onSuccess, onCancel }: EditCrascFormProps
                     />
                     <p className="mt-2 text-xs text-gray-500">
                         Ce nombre sera automatiquement calculé en fonction des OSC associées
+                    </p>
+                </div>
+
+                {/* Email PCA Field */}
+                <div>
+                    <label htmlFor="email_pca" className="block text-sm font-semibold text-gray-700 mb-2">
+                        Email du PCA du CRASC
+                    </label>
+                    <input
+                        type="email"
+                        id="email_pca"
+                        name="email_pca"
+                        value={formData.email_pca}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#E05017] focus:ring-2 focus:ring-[#E05017]/20 outline-none transition-all"
+                        placeholder="pca-crasc@exemple.org"
+                    />
+                    <p className="mt-2 text-xs text-gray-500">
+                        Cet email recevra une copie des messages de contact envoyés via le site.
                     </p>
                 </div>
             </div>

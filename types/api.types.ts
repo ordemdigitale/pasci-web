@@ -135,6 +135,7 @@ export interface ICrascDetail {
   slug: string;
   description?: string;
   osc_count?: number;
+  email_pca?: string | null;
   oscs?: IOsc[];
   regions?: IRegionCiv[];
   news?: INews[];
