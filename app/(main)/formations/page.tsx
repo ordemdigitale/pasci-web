@@ -113,7 +113,7 @@ export default function FormationsPage() {
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
             {/* Left content */}
             <div className="">
-              <h2 className="text-[#2a591d] font-bold text-4xl">Explorez nos programmes de formation</h2>
+              <h2 className="text-[#2a591d] font-bold text-4xl">Développez vos compétences avec nos programmes de formation</h2>
               <p className="text-gray-600 text-md max-w-xl mt-6">
                 Découvrir une bibliothèque complète de cours, formations, vidéos, audios et tutoriels conçus pour enrichir vos connaissances et développer vos compétences.
               </p>
