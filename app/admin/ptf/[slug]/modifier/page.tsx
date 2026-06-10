@@ -12,6 +12,14 @@ import { IPTF } from "@/types/api.types";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 // Validation schema
+const PTF_CATEGORIES = [
+  "Institutions multilatérales",
+  "Bailleurs bilatéraux",
+  "Agences spécialisées",
+  "ONG internationales",
+  "Fondations",
+];
+
 const ptfSchema = z.object({
   name: z.string().min(3, "Le nom doit contenir au moins 3 caractères."),
   description: z.string().optional().nullable(),
@@ -23,7 +31,9 @@ const ptfSchema = z.object({
   address: z.string().optional().nullable(),
   pays: z.string().optional().nullable(),
   date_creation: z.string().optional().nullable(),
-  conseil: z.string().optional().nullable(),
+  categorie: z.string().optional().nullable(),
+  exigences_majeures: z.string().optional().nullable(),
+  nature_relations: z.string().optional().nullable(),
 });
 
 type PtfFormData = z.infer<typeof ptfSchema>;
@@ -77,7 +87,9 @@ export default function EditPTFPage() {
         setValue("address", data.address || "");
         setValue("pays", data.pays || "");
         setValue("date_creation", data.date_creation || "");
-        setValue("conseil", data.conseil || "");
+        setValue("categorie", data.categorie || "");
+        setValue("exigences_majeures", data.exigences_majeures || "");
+        setValue("nature_relations", data.nature_relations || "");
 
         // Set images
         if (data.thumbnail_url) {
@@ -150,7 +162,9 @@ export default function EditPTFPage() {
       if (data.address) formData.append("address", data.address);
       if (data.pays) formData.append("pays", data.pays);
       if (data.date_creation) formData.append("date_creation", data.date_creation);
-      if (data.conseil) formData.append("conseil", data.conseil);
+      if (data.categorie) formData.append("categorie", data.categorie);
+      if (data.exigences_majeures) formData.append("exigences_majeures", data.exigences_majeures);
+      if (data.nature_relations) formData.append("nature_relations", data.nature_relations);
       if (domaines.length > 0) formData.append("domaines", JSON.stringify(domaines));
       if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
       else if (removeThumbnail) formData.append("remove_thumbnail", "1");
@@ -496,13 +510,40 @@ export default function EditPTFPage() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Conseil
+                  Catégorie
+                </label>
+                <select
+                  {...register("categorie")}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017] bg-white"
+                >
+                  <option value="">-- Sélectionner une catégorie --</option>
+                  {PTF_CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Exigences majeures
                 </label>
                 <textarea
-                  {...register("conseil")}
+                  {...register("exigences_majeures")}
                   rows={3}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
-                  placeholder="Conseil associé au PTF..."
+                  placeholder="Exigences majeures du PTF..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Nature des relations avec les OSC
+                </label>
+                <textarea
+                  {...register("nature_relations")}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                  placeholder="Décrivez la nature des relations entre ce PTF et les OSC..."
                 />
               </div>
 

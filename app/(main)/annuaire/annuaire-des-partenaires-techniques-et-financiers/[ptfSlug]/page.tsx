@@ -120,6 +120,11 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
               {ptfData.description && (
                 <p className="text-gray-600">{ptfData.description}</p>
               )}
+              {ptfData.categorie && (
+                <span className="inline-block mt-2 px-3 py-1 text-xs font-bold bg-[#2a591d]/10 text-[#2a591d] rounded-full">
+                  {ptfData.categorie}
+                </span>
+              )}
               {(ptfData.pays || ptfData.date_creation) && (
                 <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-500">
                   {ptfData.pays && (
@@ -157,10 +162,20 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
               </div>
             )}
 
-            {ptfData.conseil && (
+            {ptfData.exigences_majeures && (
               <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Conseil</h2>
-                <p className="text-gray-700 whitespace-pre-wrap">{ptfData.conseil}</p>
+                <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Exigences majeures</h2>
+                <p className="text-gray-700 whitespace-pre-wrap">{ptfData.exigences_majeures}</p>
+              </div>
+            )}
+
+            {ptfData.nature_relations && (
+              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <h2 className="text-2xl font-bold text-[#2a591d] mb-4 flex items-center gap-2">
+                  <Building2 className="w-6 h-6 text-[#E05017]" />
+                  Nature des relations avec les OSC
+                </h2>
+                <p className="text-gray-700 whitespace-pre-wrap">{ptfData.nature_relations}</p>
               </div>
             )}
 

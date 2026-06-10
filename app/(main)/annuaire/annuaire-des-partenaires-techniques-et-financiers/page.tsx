@@ -119,6 +119,11 @@ export default function PageAnnuairePTF() {
                     )}
                   </div>
                   <div className="p-6 text-center">
+                    {ptf.categorie && (
+                      <span className="inline-block mb-2 px-2 py-0.5 text-xs font-bold bg-[#2a591d]/10 text-[#2a591d] rounded-full">
+                        {ptf.categorie}
+                      </span>
+                    )}
                     <h3 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-[#2a591d] transition-colors">
                       {ptf.name}
                     </h3>

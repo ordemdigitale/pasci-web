@@ -244,7 +244,9 @@ export interface IPTF {
   // General information
   pays?: string;
   date_creation?: string;
-  conseil?: string;
+  categorie?: string;
+  exigences_majeures?: string;
+  nature_relations?: string;
 
   // Domaines (JSON string and parsed list)
   domaines?: string;
