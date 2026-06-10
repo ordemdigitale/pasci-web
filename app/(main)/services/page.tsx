@@ -19,7 +19,7 @@ interface IService {
   id: number;
   icon: React.ReactNode;
   name: string;
-  content: string;
+  //content: string;
 }
 
 const services: IService[] = [
@@ -27,43 +27,43 @@ const services: IService[] = [
     id: 1,
     icon: <Speech size={24} color="#E05017" />,
     name: "Appui-Conseil",
-    content: "Des conseils stratégiques pour des décisions éclairées et une croissance durable."
+    //content: "Des conseils stratégiques pour des décisions éclairées et une croissance durable."
   },
   {
     id: 2,
     icon: <Users size={24} color="#E05017" />,
     name: "Accompagnement",
-    content: "Un soutien personnalisé à chaque étape de la mise en œuvre de vos projets."
+    //content: "Un soutien personnalisé à chaque étape de la mise en œuvre de vos projets."
   },
   {
     id: 3,
     icon: <FileText size={24} color="#E05017" />,
     name: "Soutien Administratif",
-    content: "Formalisation et mise en conformité pour une structure solide et transparente."
+    //content: "Formalisation et mise en conformité pour une structure solide et transparente."
   },
   {
     id: 4,
     icon: <PenLine size={24} color="#E05017" />,
     name: "Rédaction",
-    content: "Rédaction de documents professionnels : statuts, règlements, projets, manuels."
+    //content: "Rédaction de documents professionnels : statuts, règlements, projets, manuels."
   },
   {
     id: 5,
     icon: <GraduationCap size={24} color="#E05017" />,
     name: "Formation",
-    content: "un processus d'apprentissage structuré qui permet à un individu ou à un groupe d'acquérir des connaissances."
+    //content: "un processus d'apprentissage structuré qui permet à un individu ou à un groupe d'acquérir des connaissances."
   },
   {
     id: 6,
     icon: <CalendarCheck size={24} color="#E05017" />,
     name: "Suivi-évaluation",
-    content: "Mise en place d’outils et d’indicateurs de performance pour mesurer l’avancement et l’impact des actions menées."
+    //content: "Mise en place d’outils et d’indicateurs de performance pour mesurer l’avancement et l’impact des actions menées."
   },
   {
     id: 7,
     icon: <Info size={24} color="#E05017" />,
     name: "Information",
-    content: "Nous vous donnons des informations sur les opportunités de financements, de formation et de réseautage."
+    //content: "Nous vous donnons des informations sur les opportunités de financements, de formation et de réseautage."
   },
 ];
 
@@ -94,9 +94,13 @@ export default function ServicesPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
         {/* Left content */}
         <div className="">
-          <h2 className="font-bold text-4xl text-[#2a591d] leading-tight">Des Services Stratégiques <br />pour le Succès de <br /> Votre Projet</h2>
+          <h2 className="font-bold text-4xl text-[#2a591d] leading-tight">
+            DES SERVICES STRATÉGIQUES POUR LE SUCCÈS DE VOTRE PROJET
+          </h2>
           <p className="text-gray-600 text-md max-w-xl mt-6">
-            Au CRASC, nous vous offrons un accompagnement sur mesure, de l'appui-conseil à la rédaction de documents complexes, pour garantir la conformité et l'efficacité de vos initiatives.
+            Un accompagnement sur mesure, du conseil à la rédaction de documents complexes. <br />
+            Au CRASC, nous garantissons la conformité et l&apos;efficacité de vos initiatives.
+
           </p>
         </div>
         
@@ -127,7 +131,7 @@ export default function ServicesPage() {
                 {/* Name and Role */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">{service.name}</h3>
-                  <p className="text-sm font-medium text-gray-600 py-1 inline-block">{service.content}</p>
+                  {/* <p className="text-sm font-medium text-gray-600 py-1 inline-block">{service.content}</p> */}
                 </div>
               </div>
             ))}
