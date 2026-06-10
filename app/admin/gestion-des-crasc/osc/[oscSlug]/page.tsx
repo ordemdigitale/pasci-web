@@ -9,6 +9,7 @@ import {
   Edit, AlertTriangle, Newspaper, Users, Wallet, Calendar, FileText,
   BarChart2, CheckCircle, XCircle,
 } from "lucide-react";
+import { getToken } from "@/lib/auth";
 
 interface IOscDetail {
   id: number; name: string; slug: string;
@@ -102,7 +103,10 @@ export default function OscDetailPage() {
     if (!confirm("Supprimer cette OSC ? Cette action est irréversible.")) return;
     try {
       setDeleting(true);
-      const res = await fetch(`${API_BASE_URL}/api/v1/crasc/osc/${oscSlug}`, { method: "DELETE" });
+      const res = await fetch(`${API_BASE_URL}/api/v1/crasc/osc/${oscSlug}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
       if (res.ok) { router.push("/admin/gestion-des-crasc/osc"); router.refresh(); }
       else { const d = await res.json(); setError(d.detail || "Erreur lors de la suppression"); }
     } catch { setError("Erreur réseau lors de la suppression"); }

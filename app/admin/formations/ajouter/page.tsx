@@ -9,7 +9,7 @@ import * as z from "zod";
 import * as Select from "@radix-ui/react-select";
 import { ICrasc, IOsc } from "@/types/api.types";
 import { fetchAllCrasc, fetchAllOsc } from "@/lib/fetch-crasc";
-import { fetchAllRubriques, IFormationRubrique } from "@/lib/fetch-formations";
+import { fetchAllRubriques, IFormationRubrique, FORMATION_CATEGORIES } from "@/lib/fetch-formations";
 import {
   ArrowLeft,
   BookOpen,
@@ -23,6 +23,8 @@ import {
   Link as LinkIcon,
   Tag,
   DollarSign,
+  ImageIcon,
+  X,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 
@@ -46,6 +48,7 @@ const formationSchema = z.object({
   rubrique_id: z.string().optional().nullable(),
   crasc_id: z.string().optional().nullable(),
   osc_id: z.string().optional().nullable(),
+  categorie: z.string().optional().nullable(),
 });
 
 type FormationForm = z.infer<typeof formationSchema>;
@@ -57,7 +60,21 @@ export default function AdminAjoutFormation() {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const router = useRouter();
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setThumbnail(file);
+    setThumbnailPreview(URL.createObjectURL(file));
+  };
+
+  const removeThumbnail = () => {
+    setThumbnail(null);
+    setThumbnailPreview(null);
+  };
 
   // Récupérer les CRASC, OSC et rubriques
   useEffect(() => {
@@ -100,6 +117,7 @@ export default function AdminAjoutFormation() {
       rubrique_id: "",
       crasc_id: "",
       osc_id: "",
+      categorie: "",
     },
   });
 
@@ -133,6 +151,8 @@ export default function AdminAjoutFormation() {
       if (values.rubrique_id) formData.append("rubrique_id", values.rubrique_id);
       if (values.crasc_id) formData.append("crasc_id", values.crasc_id);
       if (values.osc_id) formData.append("osc_id", values.osc_id);
+      if (values.categorie) formData.append("categorie", values.categorie);
+      if (thumbnail) formData.append("thumbnail", thumbnail);
 
       console.log("Sending request to:", `${API_BASE_URL}/api/v1/formations`);
 
@@ -377,6 +397,20 @@ export default function AdminAjoutFormation() {
               />
             </div>
 
+            {/* Catégorie thématique */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Catégorie thématique</label>
+              <select
+                {...register("categorie")}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent"
+              >
+                <option value="">Sélectionnez une catégorie (optionnel)</option>
+                {FORMATION_CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
             {/* Statut de publication */}
             <div className="flex items-center gap-3">
               <input
@@ -587,6 +621,33 @@ export default function AdminAjoutFormation() {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Section: Photo illustrative */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+              <ImageIcon className="w-5 h-5 text-[#2A591D]" />
+              <h2 className="text-xl font-bold text-gray-900">Photo illustrative</h2>
+            </div>
+            {thumbnailPreview ? (
+              <div className="relative w-full max-w-sm">
+                <img src={thumbnailPreview} alt="Aperçu" className="w-full h-48 object-cover rounded-lg border border-gray-200" />
+                <button
+                  type="button"
+                  onClick={removeThumbnail}
+                  className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#2A591D] hover:bg-green-50 transition-all">
+                <ImageIcon className="w-10 h-10 text-gray-400 mb-2" />
+                <span className="text-sm text-gray-500">Cliquez pour choisir une image</span>
+                <span className="text-xs text-gray-400 mt-1">JPG, JPEG, PNG, WEBP</span>
+                <input type="file" accept="image/jpg,image/jpeg,image/png,image/webp" className="hidden" onChange={handleThumbnailChange} />
+              </label>
+            )}
           </div>
 
           {/* Boutons d'action */}

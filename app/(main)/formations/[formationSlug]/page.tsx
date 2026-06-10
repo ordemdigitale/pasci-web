@@ -337,6 +337,11 @@ export default function FormationDetailPage() {
                 <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-full">Complet</span>
               )}
             </div>
+            {(formation as any).categorie && (
+              <span className="inline-block px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200 mb-3">
+                {(formation as any).categorie}
+              </span>
+            )}
 
             {formation.start_date && (
               <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">

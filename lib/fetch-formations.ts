@@ -37,6 +37,7 @@ export interface IFormation {
   rubrique?: IFormationRubrique | null;
   crasc_id: number | null;
   osc_id: number | null;
+  categorie: string | null;
   crasc?: {
     id: number;
     name: string;
@@ -229,3 +230,20 @@ export async function registerToFormation(
 
   return response.json();
 }
+
+export const FORMATION_CATEGORIES = [
+  "Gouvernance et vie associative",
+  "Planification stratégique et opérationnelle",
+  "Gestion de projets et suivi-évaluation",
+  "Procédures internes et reporting",
+  "Communication et visibilité",
+  "Mobilisation des ressources",
+  "Mise en réseau et partenariats",
+  "Plaidoyer et influence",
+  "Prévention et résolution des conflits",
+  "Égalité et genre",
+  "Procédures européennes (PRAG)",
+  "Outils numériques",
+  "Théorie et histoire de la société civile",
+  "Autres",
+] as const;

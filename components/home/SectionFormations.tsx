@@ -25,7 +25,7 @@ export default function SectionFormations() {
   const [itemsPerView, setItemsPerView] = useState(3);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/v1/formations?limit=6&is_published=true`)
+    fetch(`${API_BASE_URL}/api/v1/formations?limit=6&published_only=true`)
       .then((r) => r.json())
       .then((data) => setFormations(Array.isArray(data) ? data : []))
       .catch(console.error)
