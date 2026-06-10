@@ -5,14 +5,14 @@ import Link from "next/link";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { IPoleConcertation } from "@/types/api.types";
-import { Search, MessageSquare } from "lucide-react";
+import { Search, MessageSquare, Layers } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchWithAuth } from "@/lib/auth";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-function getPoleImageUrl(imagePath?: string | null): string {
-  if (!imagePath) return "/images/placeholder.jpg";
+function getPoleImageUrl(imagePath?: string | null): string | null {
+  if (!imagePath) return null;
   if (imagePath.startsWith("http") || imagePath.startsWith("/")) return imagePath;
   return `${API_BASE}/static/${imagePath}`;
 }
@@ -120,11 +120,17 @@ export default function PagePoleConcertation() {
                     key={pole.id}
                     className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col"
                   >
-                    <ImageWithFallback
-                      src={getPoleImageUrl(pole.image_path)}
-                      alt={pole.name}
-                      className="w-full h-40 object-cover"
-                    />
+                    {getPoleImageUrl(pole.image_path) ? (
+                      <ImageWithFallback
+                        src={getPoleImageUrl(pole.image_path)!}
+                        alt={pole.name}
+                        className="w-full h-40 object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-40 bg-gradient-to-br from-[#2a591d] to-[#E05017] flex items-center justify-center">
+                        <Layers className="w-12 h-12 text-white opacity-60" />
+                      </div>
+                    )}
                     <div className="p-5 flex-1 flex flex-col">
                       <h3 className="text-base font-bold text-gray-900 mb-2">{pole.name}</h3>
 
