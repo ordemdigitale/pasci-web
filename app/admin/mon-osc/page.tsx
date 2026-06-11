@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { fetchWithAuth } from "@/lib/auth";
 import { IOscDetail } from "@/types/api.types";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
+import OscEvaluationBadge from "@/components/osc/OscEvaluationBadge";
 import {
   Building2, Edit3, Mail, Phone, MapPin, Globe, Users,
   Wallet, Target, BookOpen, Loader2, AlertCircle, ExternalLink,
@@ -81,6 +82,9 @@ export default function MonOscPage() {
             />
           </div>
           <div className="flex-1">
+            <div className="mb-3 rounded-full bg-white inline-flex">
+              <OscEvaluationBadge score={osc.score_autoevaluation} color={osc.couleur_autoevaluation} hex={osc.couleur_autoevaluation_hex} />
+            </div>
             <h1 className="text-3xl font-extrabold mb-1">{osc.name}</h1>
             {osc.crasc && (
               <p className="text-white/80 text-sm mb-2 flex items-center gap-1">

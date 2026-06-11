@@ -38,6 +38,12 @@ const oscSchema = z.object({
   address: z.string().optional(),
   latitude: z.string().optional(),
   longitude: z.string().optional(),
+  type_document_formalisation: z.string().optional(),
+  existence_siege: z.string().optional(),
+  manuel_procedures: z.string().optional(),
+  plan_action: z.string().optional(),
+  rapports_annuels: z.string().optional(),
+  adhesion_crasc: z.string().optional(),
   thumbnail: z
     .instanceof(File)
     .optional()
@@ -92,7 +98,13 @@ export default function AdminAjoutOsc() {
       ville: "",
       address: "",
       latitude: "",
-      longitude: ""
+      longitude: "",
+      type_document_formalisation: "",
+      existence_siege: "",
+      manuel_procedures: "",
+      plan_action: "",
+      rapports_annuels: "",
+      adhesion_crasc: "",
     },
   });
 
@@ -168,6 +180,10 @@ export default function AdminAjoutOsc() {
       if (values.longitude && values.longitude.trim() !== "") {
         formData.append("longitude", values.longitude);
       }
+      ["type_document_formalisation", "existence_siege", "manuel_procedures", "plan_action", "rapports_annuels", "adhesion_crasc"].forEach((key) => {
+        const value = values[key as keyof OscForm];
+        if (typeof value === "string" && value !== "") formData.append(key, value);
+      });
 
       if (values.thumbnail) {
         formData.append("thumbnail", values.thumbnail);
@@ -518,6 +534,43 @@ export default function AdminAjoutOsc() {
                 placeholder="-4.033333"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Autoévaluation */}
+        <div className="mb-8 pb-8 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-[#E05017]" /> Autoévaluation de l’OSC
+          </h2>
+          <p className="text-sm text-gray-500 mb-6">La note sur 20 et la couleur sont calculées automatiquement.</p>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Niveau de formalisation</label>
+              <select {...control.register("type_document_formalisation")} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
+                <option value="">Sélectionner</option>
+                <option value="statuts_reglement">Statuts et règlement — 1 point</option>
+                <option value="recepisse_depot">Récépissé de dépôt — 3 points</option>
+                <option value="recepisse_declaration">Récépissé de déclaration — 5 points</option>
+                <option value="agrement_decret">Agrément / décret — 5 points</option>
+                <option value="journal_officiel">Déclaration au journal officiel — 7 points</option>
+              </select>
+            </div>
+            {[
+              ["existence_siege", "Existence d’un siège — 3 points"],
+              ["manuel_procedures", "Manuel de procédures — 3 points"],
+              ["plan_action", "Plan d’action — 3 points"],
+              ["rapports_annuels", "Rapports annuels d’activités — 3 points"],
+              ["adhesion_crasc", "Adhésion au CRASC — 1 point"],
+            ].map(([name, label]) => (
+              <div key={name}>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
+                <select {...control.register(name as keyof OscForm)} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
+                  <option value="">Sélectionner</option>
+                  <option value="true">Oui</option>
+                  <option value="false">Non</option>
+                </select>
+              </div>
+            ))}
           </div>
         </div>
 

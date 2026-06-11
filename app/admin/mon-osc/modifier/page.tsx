@@ -52,6 +52,11 @@ const oscSchema = z.object({
   mode_designation_president: z.string().optional(),
   duree_mandat_be: z.string().optional(),
   adhesion_crasc: z.string().optional(),
+  type_document_formalisation: z.string().optional(),
+  existence_siege: z.string().optional(),
+  manuel_procedures: z.string().optional(),
+  plan_action: z.string().optional(),
+  rapports_annuels: z.string().optional(),
   reseau_appartenance: z.string().optional(),
   secteurs_activites: z.string().optional(),
   populations_cibles: z.string().optional(),
@@ -105,6 +110,7 @@ export default function MonOscModifierPage() {
       nb_personnes_engagees: "", nb_beneficiaires: "", nb_activites: "",
       budget_annuel: "", type_financement: "", etat_cotisations: "", montant_cotisation: "",
       nom_president: "", sexe_president: "", mode_designation_president: "", duree_mandat_be: "", adhesion_crasc: "",
+      type_document_formalisation: "", existence_siege: "", manuel_procedures: "", plan_action: "", rapports_annuels: "",
       reseau_appartenance: "", secteurs_activites: "", populations_cibles: "",
       savoir_faire: "", difficultes: "", recommandations: "",
     },
@@ -159,6 +165,11 @@ export default function MonOscModifierPage() {
         setValue("mode_designation_president", osc.mode_designation_president || "");
         setValue("duree_mandat_be", osc.duree_mandat_be || "");
         setValue("adhesion_crasc", osc.adhesion_crasc != null ? (osc.adhesion_crasc ? "true" : "false") : "");
+        setValue("type_document_formalisation", osc.type_document_formalisation || "");
+        setValue("existence_siege", osc.existence_siege != null ? (osc.existence_siege ? "true" : "false") : "");
+        setValue("manuel_procedures", osc.manuel_procedures != null ? (osc.manuel_procedures ? "true" : "false") : "");
+        setValue("plan_action", osc.plan_action != null ? (osc.plan_action ? "true" : "false") : "");
+        setValue("rapports_annuels", osc.rapports_annuels != null ? (osc.rapports_annuels ? "true" : "false") : "");
         setValue("reseau_appartenance", osc.reseau_appartenance || "");
         setValue("secteurs_activites", osc.secteurs_activites || "");
         setValue("populations_cibles", osc.populations_cibles || "");
@@ -220,6 +231,11 @@ export default function MonOscModifierPage() {
       append("mode_designation_president", values.mode_designation_president);
       append("duree_mandat_be", values.duree_mandat_be);
       append("adhesion_crasc", values.adhesion_crasc);
+      append("type_document_formalisation", values.type_document_formalisation);
+      append("existence_siege", values.existence_siege);
+      append("manuel_procedures", values.manuel_procedures);
+      append("plan_action", values.plan_action);
+      append("rapports_annuels", values.rapports_annuels);
       append("reseau_appartenance", values.reseau_appartenance);
       append("secteurs_activites", values.secteurs_activites);
       append("populations_cibles", values.populations_cibles);
@@ -386,6 +402,33 @@ export default function MonOscModifierPage() {
             <FieldWrapper label="Réseau d'appartenance">
               <input {...register("reseau_appartenance")} className={inputCls} />
             </FieldWrapper>
+          </div>
+        </div>
+
+        {/* Autoévaluation */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <SectionTitle icon={<FileText className="w-5 h-5 text-[#E05017]" />} title="Autoévaluation de mon OSC" />
+          <p className="text-sm text-gray-500 mb-4">La plateforme calcule automatiquement votre note sur 20 et la couleur correspondante.</p>
+          <div className="grid md:grid-cols-2 gap-4">
+            <FieldWrapper label="Niveau de formalisation">
+              <SelectField name="type_document_formalisation" placeholder="Sélectionner le document le plus avancé" options={[
+                { value: "statuts_reglement", label: "Statuts et règlement — 1 point" },
+                { value: "recepisse_depot", label: "Récépissé de dépôt — 3 points" },
+                { value: "recepisse_declaration", label: "Récépissé de déclaration — 5 points" },
+                { value: "agrement_decret", label: "Agrément / décret — 5 points" },
+                { value: "journal_officiel", label: "Déclaration au journal officiel — 7 points" },
+              ]} />
+            </FieldWrapper>
+            {[
+              ["existence_siege", "Existence d’un siège — 3 points"],
+              ["manuel_procedures", "Manuel de procédures — 3 points"],
+              ["plan_action", "Plan d’action — 3 points"],
+              ["rapports_annuels", "Rapports annuels d’activités — 3 points"],
+            ].map(([name, label]) => (
+              <FieldWrapper key={name} label={label}>
+                <SelectField name={name as keyof OscForm} placeholder="Sélectionner" options={[{ value: "true", label: "Oui" }, { value: "false", label: "Non" }]} />
+              </FieldWrapper>
+            ))}
           </div>
         </div>
 

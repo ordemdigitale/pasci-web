@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Search, MapPin, Users2, Building, Filter, ArrowRight, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from 'next/link';
+import OscEvaluationBadge from '@/components/osc/OscEvaluationBadge';
 
 interface IOSCType {
   id: number;
@@ -30,6 +31,9 @@ interface IOSC {
   email?: string | null;
   phone?: string | null;
   slug: string;
+  score_autoevaluation?: number;
+  couleur_autoevaluation?: string;
+  couleur_autoevaluation_hex?: string;
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -322,6 +326,13 @@ export default function AnnuaireOSCPage() {
                   </div>
 
                   <div className="p-5">
+                    <div className="mb-3">
+                      <OscEvaluationBadge
+                        score={osc.score_autoevaluation}
+                        color={osc.couleur_autoevaluation}
+                        hex={osc.couleur_autoevaluation_hex}
+                      />
+                    </div>
                     <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#E05017] transition-colors">
                       {osc.name}
                     </h3>

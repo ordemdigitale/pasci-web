@@ -11,6 +11,7 @@ import {
   Hash, Flag, BarChart3,
 } from 'lucide-react';
 import Link from 'next/link';
+import OscEvaluationBadge from '@/components/osc/OscEvaluationBadge';
 
 function fmt(n?: number | null) {
   if (n == null) return null;
@@ -140,6 +141,13 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
 
             {/* Infos principales */}
             <div className="flex-1">
+              <div className="mb-3">
+                <OscEvaluationBadge
+                  score={oscData.score_autoevaluation}
+                  color={oscData.couleur_autoevaluation}
+                  hex={oscData.couleur_autoevaluation_hex}
+                />
+              </div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{oscData.name}</h1>
               {oscData.categorie && (
                 <span className="inline-block px-3 py-0.5 bg-[#E05017]/10 text-[#E05017] rounded-md text-xs font-semibold mb-3">

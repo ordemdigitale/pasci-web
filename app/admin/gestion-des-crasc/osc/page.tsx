@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import { ChevronLeft, ChevronRight, Search, Loader2 } from "lucide-react";
+import OscEvaluationBadge from "@/components/osc/OscEvaluationBadge";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const PAGE_SIZE = 25;
@@ -15,6 +16,7 @@ interface IOsc {
   description?: string; thumbnail_url?: string;
   type?: IOscType; crasc?: ICrasc;
   ville?: string; email?: string; phone?: string;
+  score_autoevaluation?: number; couleur_autoevaluation?: string; couleur_autoevaluation_hex?: string;
 }
 
 export default function AdminOscPage() {
@@ -157,6 +159,9 @@ export default function AdminOscPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900 max-w-xs">{osc.name}</div>
+                    <div className="mt-1">
+                      <OscEvaluationBadge score={osc.score_autoevaluation} color={osc.couleur_autoevaluation} hex={osc.couleur_autoevaluation_hex} compact />
+                    </div>
                     {osc.description && (
                       <div className="text-xs text-gray-500 truncate max-w-xs">{osc.description}</div>
                     )}
