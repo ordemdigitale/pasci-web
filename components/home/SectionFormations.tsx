@@ -117,6 +117,7 @@ export default function SectionFormations() {
                           alt={formation.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
                         {formation.type && (
                           <div className="absolute top-3 right-3">
                             <span className="bg-[#E05017] text-white text-xs font-bold px-3 py-1 rounded-full">
@@ -124,6 +125,11 @@ export default function SectionFormations() {
                             </span>
                           </div>
                         )}
+                        <div className="absolute inset-x-0 bottom-0 p-4">
+                          <p className="text-white text-lg font-extrabold leading-tight line-clamp-2 drop-shadow">
+                            {formation.title}
+                          </p>
+                        </div>
                       </div>
                       <div className="p-6">
                         <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#E05017] transition-colors">
