@@ -17,7 +17,9 @@ import {
   AlertTriangle,
   Building2,
   Users,
-  MapPin
+  MapPin,
+  Plus,
+  Eye
 } from 'lucide-react';
 
 
@@ -236,10 +238,19 @@ export default function AdminCrascPage({ params }: { params: Promise<{ crascSlug
 
           {/* OSCs Section */}
           <div className="bg-white p-6 rounded-lg border-2 border-gray-200">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-600" />
-              OSC Membres ({crascData.oscs?.length || 0})
-            </h3>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <Users className="w-5 h-5 text-blue-600" />
+                OSC Membres ({crascData.oscs?.length || 0})
+              </h3>
+              <Link
+                href="/admin/gestion-des-crasc/osc/ajouter-osc"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors text-sm font-semibold"
+              >
+                <Plus className="w-4 h-4" />
+                Ajouter une OSC
+              </Link>
+            </div>
             {crascData.oscs?.length === 0 ? (
               <p className="text-center text-gray-500 py-8">Aucune OSC trouvée.</p>
             ) : (
@@ -248,6 +259,7 @@ export default function AdminCrascPage({ params }: { params: Promise<{ crascSlug
                   <div key={osc.id} className="bg-gray-50 rounded-lg overflow-hidden border border-gray-200 hover:border-[#2A591D] hover:shadow-md transition-all">
                     <div className="aspect-video overflow-hidden bg-gray-200">
                       <ImageWithFallback
+                        src={osc.thumbnail_url || "/images/default-osc-logo.png"}
                         alt={osc.name}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       />
@@ -264,6 +276,22 @@ export default function AdminCrascPage({ params }: { params: Promise<{ crascSlug
                           {osc.type.name}
                         </span>
                       )}
+                      <div className="grid grid-cols-2 gap-2 mt-4">
+                        <Link
+                          href={`/admin/gestion-des-crasc/osc/${osc.slug}`}
+                          className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm font-semibold"
+                        >
+                          <Eye className="w-4 h-4" />
+                          Afficher
+                        </Link>
+                        <Link
+                          href={`/admin/gestion-des-crasc/osc/${osc.slug}/modifier`}
+                          className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-sm font-semibold"
+                        >
+                          <Edit className="w-4 h-4" />
+                          Modifier
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ))}

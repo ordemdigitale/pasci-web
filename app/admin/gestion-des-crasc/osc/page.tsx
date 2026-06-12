@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
-import { ChevronLeft, ChevronRight, Search, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Loader2, Eye, Edit3 } from "lucide-react";
 import OscEvaluationBadge from "@/components/osc/OscEvaluationBadge";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -183,9 +183,22 @@ export default function AdminOscPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link href={`/admin/gestion-des-crasc/osc/${osc.slug}`} className="text-blue-600 hover:text-blue-900">
-                      Gérer
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/admin/gestion-des-crasc/osc/${osc.slug}`}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        Afficher
+                      </Link>
+                      <Link
+                        href={`/admin/gestion-des-crasc/osc/${osc.slug}/modifier`}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        Modifier
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -245,7 +258,8 @@ export default function AdminOscPage() {
         <div className="mt-6 text-sm text-gray-600 bg-white rounded-lg p-4 border border-gray-200">
           <p className="font-semibold mb-2">💡 Actions disponibles :</p>
           <ul className="list-disc list-inside space-y-1 text-xs">
-            <li>Cliquez sur "Gérer" pour modifier ou supprimer une OSC</li>
+            <li>Cliquez sur "Afficher" pour voir les détails d'une OSC</li>
+            <li>Cliquez sur "Modifier" pour mettre à jour une OSC</li>
             <li>Utilisez la barre de recherche pour filtrer par nom</li>
             <li>Utilisez "Ajouter une OSC" pour enregistrer une nouvelle organisation</li>
           </ul>

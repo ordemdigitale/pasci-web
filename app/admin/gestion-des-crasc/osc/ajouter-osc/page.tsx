@@ -88,7 +88,7 @@ export default function AdminAjoutOsc() {
       .catch(error => console.error("Erreur lors de la récupération des types d'OSC: ", error));
   }, []);
 
-  const { control, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<OscForm>({
+  const { control, handleSubmit, formState: { errors }, reset, setValue, watch, register } = useForm<OscForm>({
     resolver: zodResolver(oscSchema),
     defaultValues: {
       name: "",
@@ -209,7 +209,7 @@ export default function AdminAjoutOsc() {
 
           // Rediriger après 2 secondes
           setTimeout(() => {
-            router.push("/admin/gestion-des-crasc");
+            router.push("/admin/gestion-des-crasc/osc");
           }, 2000);
         } else {
           let errorMsg = "Une erreur est survenue lors de la création de l'OSC.";
@@ -319,7 +319,7 @@ export default function AdminAjoutOsc() {
               <input
                 id="name"
                 type="text"
-                {...control.register("name")}
+                {...register("name")}
                 className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all ${errors.name ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-[#2A591D]'
                   }`}
                 placeholder="Ex: Association pour le développement"
@@ -339,7 +339,7 @@ export default function AdminAjoutOsc() {
               </label>
               <textarea
                 id="description"
-                {...control.register("description")}
+                {...register("description")}
                 rows={3}
                 maxLength={500}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all resize-none"
@@ -488,7 +488,7 @@ export default function AdminAjoutOsc() {
               <input
                 id="email"
                 type="email"
-                {...control.register("email")}
+                {...register("email")}
                 className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all ${
                   errors.email ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-[#2A591D]'
                 }`}
@@ -510,7 +510,7 @@ export default function AdminAjoutOsc() {
               <input
                 id="phone"
                 type="tel"
-                {...control.register("phone")}
+                {...register("phone")}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
                 placeholder="+225 XX XX XX XX XX"
               />
@@ -524,7 +524,7 @@ export default function AdminAjoutOsc() {
               <input
                 id="ville"
                 type="text"
-                {...control.register("ville")}
+                {...register("ville")}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
                 placeholder="Abidjan"
               />
@@ -538,7 +538,7 @@ export default function AdminAjoutOsc() {
               <input
                 id="address"
                 type="text"
-                {...control.register("address")}
+                {...register("address")}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
                 placeholder="Cocody, Boulevard..."
               />
@@ -552,7 +552,7 @@ export default function AdminAjoutOsc() {
               <input
                 id="latitude"
                 type="text"
-                {...control.register("latitude")}
+                {...register("latitude")}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
                 placeholder="5.316667"
               />
@@ -566,7 +566,7 @@ export default function AdminAjoutOsc() {
               <input
                 id="longitude"
                 type="text"
-                {...control.register("longitude")}
+                {...register("longitude")}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
                 placeholder="-4.033333"
               />
@@ -583,7 +583,7 @@ export default function AdminAjoutOsc() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Niveau de formalisation</label>
-              <select {...control.register("type_document_formalisation")} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
+              <select {...register("type_document_formalisation")} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
                 <option value="">Sélectionner</option>
                 <option value="statuts_reglement">Statuts et règlement — 1 point</option>
                 <option value="recepisse_depot">Récépissé de dépôt — 3 points</option>
@@ -601,7 +601,7 @@ export default function AdminAjoutOsc() {
             ].map(([name, label]) => (
               <div key={name}>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
-                <select {...control.register(name as keyof OscForm)} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
+                <select {...register(name as keyof OscForm)} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
                   <option value="">Sélectionner</option>
                   <option value="true">Oui</option>
                   <option value="false">Non</option>
