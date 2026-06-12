@@ -356,6 +356,16 @@ export interface IForumSujetDetail extends IForumSujet {
   commentaires: IForumCommentaire[];
 }
 
+export interface IFaq {
+  id: number;
+  question: string;
+  answer: string;
+  ordre: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 // Offre Projet types
 export interface IOffreProjet {
   id: string;

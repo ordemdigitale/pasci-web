@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ImageWithFallback } from '@/lib/imageWithFallback'
 import {
   Users,
@@ -13,6 +13,8 @@ import {
   ChevronDown,
   Search
 } from 'lucide-react';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 
 interface IService {
@@ -67,25 +69,48 @@ const services: IService[] = [
   },
 ];
 
-const faqItems = [
-  { id: 1, title: "Comment puis-je postuler à une offre d'emploi ?", answer: "Pour postuler à une offre d'emploi, veuillez consulter les offres disponibles sur notre site et cliquez sur le bouton Postuler." },
-  { id: 2, title: "Quel est le processus de recrutement chez PASCI ?", answer: "Le processus de recrutement chez PASCI comprend plusieurs étapes : l'analyse de votre profil, un entretien technique, un entretien RH et enfin une proposition d'embauche." },
-  { id: 3, title: "Puis-je envoyer une candidature spontanée ?", answer: "Oui, vous pouvez envoyer une candidature spontanée à travers notre formulaire en ligne ou par email à pdoc@plateforme-osci.org." },
-  { id: 4, title: "Proposez-vous des stages ou des alternances ?", answer: "Oui, PASCI propose des stages et des alternances dans divers domaines techniques et administratifs. Consultez nos offres spécifiques pour plus d'informations." },
-  { id: 5, title: "Comment savoir si ma candidature a été reçue ?", answer: "Vous recevrez un email de confirmation dès que votre candidature aura été reçue. Si vous ne recevez pas cet email dans les 24 heures suivantes, veuillez nous contacter." },
-  { id: 6, title: "Quelles sont les valeurs du projet PASCI ?", answer: "Les valeurs du projet PASCI incluent l'innovation technologique, la collaboration interdisciplinaire et le respect de l'environnement." },
+interface IFaqItem {
+  id: number;
+  question: string;
+  answer: string;
+}
+
+const fallbackFaqItems: IFaqItem[] = [
+  { id: 1, question: "Comment puis-je postuler à une offre d'emploi ?", answer: "Pour postuler à une offre d'emploi, veuillez consulter les offres disponibles sur notre site et cliquez sur le bouton Postuler." },
+  { id: 2, question: "Quel est le processus de recrutement chez PASCI ?", answer: "Le processus de recrutement chez PASCI comprend plusieurs étapes : l'analyse de votre profil, un entretien technique, un entretien RH et enfin une proposition d'embauche." },
+  { id: 3, question: "Puis-je envoyer une candidature spontanée ?", answer: "Oui, vous pouvez envoyer une candidature spontanée à travers notre formulaire en ligne ou par email à pdoc@plateforme-osci.org." },
+  { id: 4, question: "Proposez-vous des stages ou des alternances ?", answer: "Oui, PASCI propose des stages et des alternances dans divers domaines techniques et administratifs. Consultez nos offres spécifiques pour plus d'informations." },
+  { id: 5, question: "Comment savoir si ma candidature a été reçue ?", answer: "Vous recevrez un email de confirmation dès que votre candidature aura été reçue. Si vous ne recevez pas cet email dans les 24 heures suivantes, veuillez nous contacter." },
+  { id: 6, question: "Quelles sont les valeurs du projet PASCI ?", answer: "Les valeurs du projet PASCI incluent l'innovation technologique, la collaboration interdisciplinaire et le respect de l'environnement." },
 ];
 
 export default function ServicesPage() {
   const [openFaqs, setOpenFaqs] = useState<number[]>([]);
   const [faqSearch, setFaqSearch] = useState("");
+  const [faqItems, setFaqItems] = useState<IFaqItem[]>(fallbackFaqItems);
+
+  useEffect(() => {
+    async function loadFaq() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/faq/`);
+        if (!response.ok) return;
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setFaqItems(data);
+        }
+      } catch {
+        // On garde la FAQ statique tant que l'API n'est pas disponible.
+      }
+    }
+    loadFaq();
+  }, []);
 
   const toggleFaq = (id: number) => {
     setOpenFaqs(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
   const filteredFaq = faqItems.filter(f =>
-    f.title.toLowerCase().includes(faqSearch.toLowerCase()) ||
+    f.question.toLowerCase().includes(faqSearch.toLowerCase()) ||
     f.answer.toLowerCase().includes(faqSearch.toLowerCase())
   );
 
@@ -212,7 +237,7 @@ export default function ServicesPage() {
                   onClick={() => toggleFaq(item.id)}
                   className="w-full flex items-center justify-between pb-4 text-left cursor-pointer"
                 >
-                  <span className="text-gray-800 font-medium">{item.title}</span>
+                  <span className="text-gray-800 font-medium">{item.question}</span>
                   <ChevronDown
                     className={`w-5 h-5 text-gray-600 flex-shrink-0 transition-transform ${openFaqs.includes(item.id) ? 'rotate-180' : ''}`}
                   />
