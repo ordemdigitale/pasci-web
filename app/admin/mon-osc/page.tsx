@@ -234,6 +234,7 @@ export default function MonOscPage() {
               <Info label="Catégorie" value={osc.categorie} />
               <Info label="Niveau de couverture" value={osc.niveau_couverture} />
               <Info label="Zone de couverture" value={osc.zone_couverture} />
+              <Info label="Niveau de regroupement" value={osc.niveau_regroupement} />
               <Info label="Réseau d'appartenance" value={osc.reseau_appartenance} />
             </div>
           </div>

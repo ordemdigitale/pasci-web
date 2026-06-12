@@ -21,6 +21,7 @@ const projetSchema = z.object({
   zone: z.string().min(2, "La zone est requise."),
   durée: z.string().min(1, "La durée est requise."),
   budget: z.string().min(1, "Le budget est requis."),
+  offre_url: z.string().url("Lien de l'offre invalide").or(z.literal("")).optional(),
   objectif: z.string().optional(),
   description: z.string().optional(),
   beneficiaires: z.string().optional(),
@@ -106,6 +107,7 @@ export default function EditProjetPage() {
         setValue("zone", data.zone);
         setValue("durée", data.durée);
         setValue("budget", data.budget);
+        setValue("offre_url", data.offre_url || "");
         setValue("statut", data.statut);
         setValue("progression", data.progression);
 
@@ -224,6 +226,7 @@ export default function EditProjetPage() {
       formData.append("zone", data.zone);
       formData.append("durée", data.durée);
       formData.append("budget", data.budget);
+      formData.append("offre_url", data.offre_url || "");
       formData.append("statut", data.statut);
       formData.append("progression", data.progression.toString());
 
@@ -429,6 +432,21 @@ export default function EditProjetPage() {
                     <p className="text-red-600 text-sm mt-1">{errors.budget.message}</p>
                   )}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Lien de l&apos;offre
+                </label>
+                <input
+                  {...register("offre_url")}
+                  type="url"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                  placeholder="https://exemple.org/offre"
+                />
+                {errors.offre_url && (
+                  <p className="text-red-600 text-sm mt-1">{errors.offre_url.message}</p>
+                )}
               </div>
             </div>
           </div>

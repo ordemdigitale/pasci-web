@@ -430,6 +430,9 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
                     <InfoRow label="Membres du bureau exécutif" value={String(oscData.nb_membres_be)} />
                   )}
                   <InfoRow label="État des cotisations" value={oscData.etat_cotisations} />
+                  {oscData.niveau_regroupement && (
+                    <InfoRow label="Niveau de regroupement" value={oscData.niveau_regroupement} />
+                  )}
                   {oscData.reseau_appartenance && (
                     <InfoRow label="Réseau d'appartenance" value={oscData.reseau_appartenance} />
                   )}

@@ -101,6 +101,7 @@ export interface IOscDetail {
   etat_cotisations?: string | null;
   montant_cotisation?: number | null;
   adhesion_crasc?: boolean | null;
+  niveau_regroupement?: "Réseau" | "Fédération" | "Plateforme" | "Confédération" | null;
   reseau_appartenance?: string | null;
   difficultes?: string | null;
   recommandations?: string | null;
@@ -365,6 +366,7 @@ export interface IOffreProjet {
   zone: string;
   durée: string;
   budget: string;
+  offre_url?: string | null;
   objectif?: string;
   description?: string;
   beneficiaires?: string;

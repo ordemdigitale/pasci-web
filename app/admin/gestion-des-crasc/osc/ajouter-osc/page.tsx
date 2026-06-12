@@ -11,6 +11,7 @@ import {
   fetchAllCrasc,
   fetchAllOscType
 } from "@/lib/fetch-crasc";
+import { getToken } from "@/lib/auth";
 import Image from "next/image";
 import {
   ArrowLeft,
@@ -44,6 +45,7 @@ const oscSchema = z.object({
   plan_action: z.string().optional(),
   rapports_annuels: z.string().optional(),
   adhesion_crasc: z.string().optional(),
+  niveau_regroupement: z.enum(["Réseau", "Fédération", "Plateforme", "Confédération"]).optional().or(z.literal("")),
   thumbnail: z
     .instanceof(File)
     .optional()
@@ -105,6 +107,7 @@ export default function AdminAjoutOsc() {
       plan_action: "",
       rapports_annuels: "",
       adhesion_crasc: "",
+      niveau_regroupement: "",
     },
   });
 
@@ -180,7 +183,7 @@ export default function AdminAjoutOsc() {
       if (values.longitude && values.longitude.trim() !== "") {
         formData.append("longitude", values.longitude);
       }
-      ["type_document_formalisation", "existence_siege", "manuel_procedures", "plan_action", "rapports_annuels", "adhesion_crasc"].forEach((key) => {
+      ["type_document_formalisation", "existence_siege", "manuel_procedures", "plan_action", "rapports_annuels", "adhesion_crasc", "niveau_regroupement"].forEach((key) => {
         const value = values[key as keyof OscForm];
         if (typeof value === "string" && value !== "") formData.append(key, value);
       });
@@ -247,6 +250,8 @@ export default function AdminAjoutOsc() {
       };
 
       xhr.open("POST", `${API_BASE_URL}/api/v1/crasc/osc`);
+      const token = getToken();
+      if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
       xhr.send(formData);
 
     } catch (error) {
@@ -431,6 +436,38 @@ export default function AdminAjoutOsc() {
                   {errors.type_id.message}
                 </p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Niveau de regroupement
+              </label>
+              <Controller
+                name="niveau_regroupement"
+                control={control}
+                render={({ field }) => (
+                  <Select.Root onValueChange={field.onChange} value={field.value}>
+                    <Select.Trigger className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-left flex items-center justify-between hover:border-[#2A591D] transition-all">
+                      <Select.Value placeholder="Sélectionnez un niveau" />
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    </Select.Trigger>
+                    <Select.Content className="bg-white border-2 border-gray-200 rounded-lg shadow-lg mt-1 overflow-hidden z-50">
+                      <Select.Viewport className="p-1">
+                        {[
+                          ["Réseau", "Réseau"],
+                          ["Fédération", "Fédération"],
+                          ["Plateforme", "Plateforme"],
+                          ["Confédération", "Confédération"],
+                        ].map(([value, label]) => (
+                          <Select.Item key={value} value={value} className="px-4 py-2 hover:bg-[#2A591D]/10 cursor-pointer rounded transition-colors outline-none">
+                            <Select.ItemText>{label}</Select.ItemText>
+                          </Select.Item>
+                        ))}
+                      </Select.Viewport>
+                    </Select.Content>
+                  </Select.Root>
+                )}
+              />
             </div>
           </div>
         </div>

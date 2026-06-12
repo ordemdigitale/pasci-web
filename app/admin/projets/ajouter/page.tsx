@@ -20,6 +20,7 @@ const projetSchema = z.object({
   zone: z.string().min(2, "La zone est requise."),
   durée: z.string().min(1, "La durée est requise."),
   budget: z.string().min(1, "Le budget est requis."),
+  offre_url: z.string().url("Lien de l'offre invalide").or(z.literal("")).optional(),
   objectif: z.string().optional(),
   description: z.string().optional(),
   beneficiaires: z.string().optional(),
@@ -80,6 +81,7 @@ export default function AddProjetPage() {
     defaultValues: {
       statut: "En attente",
       progression: 0,
+      offre_url: "",
     },
   });
 
@@ -161,6 +163,7 @@ export default function AddProjetPage() {
       formData.append("statut", data.statut);
       formData.append("progression", data.progression.toString());
 
+      if (data.offre_url) formData.append("offre_url", data.offre_url);
       if (data.objectif) formData.append("objectif", data.objectif);
       if (data.description) formData.append("description", data.description);
       if (data.beneficiaires) formData.append("beneficiaires", data.beneficiaires);
@@ -348,6 +351,21 @@ export default function AddProjetPage() {
                     <p className="text-red-600 text-sm mt-1">{errors.budget.message}</p>
                   )}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Lien de l&apos;offre
+                </label>
+                <input
+                  {...register("offre_url")}
+                  type="url"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                  placeholder="https://exemple.org/offre"
+                />
+                {errors.offre_url && (
+                  <p className="text-red-600 text-sm mt-1">{errors.offre_url.message}</p>
+                )}
               </div>
             </div>
           </div>

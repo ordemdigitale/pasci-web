@@ -57,6 +57,7 @@ const oscSchema = z.object({
   manuel_procedures: z.string().optional(),
   plan_action: z.string().optional(),
   rapports_annuels: z.string().optional(),
+  niveau_regroupement: z.string().optional(),
   reseau_appartenance: z.string().optional(),
   secteurs_activites: z.string().optional(),
   populations_cibles: z.string().optional(),
@@ -111,7 +112,7 @@ export default function MonOscModifierPage() {
       budget_annuel: "", type_financement: "", etat_cotisations: "", montant_cotisation: "",
       nom_president: "", sexe_president: "", mode_designation_president: "", duree_mandat_be: "", adhesion_crasc: "",
       type_document_formalisation: "", existence_siege: "", manuel_procedures: "", plan_action: "", rapports_annuels: "",
-      reseau_appartenance: "", secteurs_activites: "", populations_cibles: "",
+      niveau_regroupement: "", reseau_appartenance: "", secteurs_activites: "", populations_cibles: "",
       savoir_faire: "", difficultes: "", recommandations: "",
     },
   });
@@ -170,6 +171,7 @@ export default function MonOscModifierPage() {
         setValue("manuel_procedures", osc.manuel_procedures != null ? (osc.manuel_procedures ? "true" : "false") : "");
         setValue("plan_action", osc.plan_action != null ? (osc.plan_action ? "true" : "false") : "");
         setValue("rapports_annuels", osc.rapports_annuels != null ? (osc.rapports_annuels ? "true" : "false") : "");
+        setValue("niveau_regroupement", osc.niveau_regroupement || "");
         setValue("reseau_appartenance", osc.reseau_appartenance || "");
         setValue("secteurs_activites", osc.secteurs_activites || "");
         setValue("populations_cibles", osc.populations_cibles || "");
@@ -236,6 +238,7 @@ export default function MonOscModifierPage() {
       append("manuel_procedures", values.manuel_procedures);
       append("plan_action", values.plan_action);
       append("rapports_annuels", values.rapports_annuels);
+      append("niveau_regroupement", values.niveau_regroupement);
       append("reseau_appartenance", values.reseau_appartenance);
       append("secteurs_activites", values.secteurs_activites);
       append("populations_cibles", values.populations_cibles);
@@ -398,6 +401,14 @@ export default function MonOscModifierPage() {
             <FieldWrapper label="Adhésion CRASC">
               <SelectField name="adhesion_crasc" placeholder="Sélectionner"
                 options={[{ value: "true", label: "Oui" }, { value: "false", label: "Non" }]} />
+            </FieldWrapper>
+            <FieldWrapper label="Niveau de regroupement">
+              <SelectField name="niveau_regroupement" placeholder="Sélectionner" options={[
+                { value: "Réseau", label: "Réseau" },
+                { value: "Fédération", label: "Fédération" },
+                { value: "Plateforme", label: "Plateforme" },
+                { value: "Confédération", label: "Confédération" },
+              ]} />
             </FieldWrapper>
             <FieldWrapper label="Réseau d'appartenance">
               <input {...register("reseau_appartenance")} className={inputCls} />

@@ -34,7 +34,7 @@ interface IOscDetail {
   montant_cotisation?: number | null; sexe_president?: string | null;
   mode_designation_president?: string | null; duree_mandat_be?: string | null;
   nom_president?: string | null;
-  adhesion_crasc?: boolean | null; reseau_appartenance?: string | null;
+  adhesion_crasc?: boolean | null; niveau_regroupement?: string | null; reseau_appartenance?: string | null;
   secteurs_activites?: string | null; populations_cibles?: string | null;
   savoir_faire?: string | null; difficultes?: string | null;
   recommandations?: string | null;
@@ -227,6 +227,7 @@ export default function OscDetailPage() {
             <InfoRow label="Niveau de couverture" value={osc.niveau_couverture} />
             <InfoRow label="Zone de couverture" value={osc.zone_couverture} />
             <InfoRow label="Adhésion CRASC" value={<BoolBadge value={osc.adhesion_crasc} />} />
+            <InfoRow label="Niveau de regroupement" value={osc.niveau_regroupement} />
             <InfoRow label="Réseau d'appartenance" value={osc.reseau_appartenance} />
           </div>
 

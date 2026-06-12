@@ -20,6 +20,7 @@ import {
   CheckCircle,
   XCircle,
   FileText,
+  ExternalLink,
   TrendingUp,
   X,
   Award,
@@ -553,7 +554,7 @@ export default function ProjetsPage() {
                   )}
 
                 {/* Actions */}
-                <div className="flex gap-3 pt-4 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
                   <Link
                     href={`/admin/projets/${selectedProjet.slug}/modifier`}
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold"
@@ -568,6 +569,17 @@ export default function ProjetsPage() {
                     <FileText className="w-5 h-5" />
                     Voir la page publique
                   </Link>
+                  {selectedProjet.offre_url && (
+                    <a
+                      href={selectedProjet.offre_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-[#E05017] text-[#E05017] rounded-lg hover:bg-[#E05017]/5 transition-colors font-bold"
+                    >
+                      <ExternalLink className="w-5 h-5" />
+                      Voir l&apos;offre
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

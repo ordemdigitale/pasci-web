@@ -8,6 +8,7 @@ export interface IOffreProjet {
   zone: string;
   durée: string;
   budget: string;
+  offre_url?: string;
   objectif: string;
   description?: string;
   contexte?: string;
