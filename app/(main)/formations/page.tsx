@@ -181,14 +181,32 @@ export default function FormationsPage() {
               <div>
                 <h2 className="text-[#2a591d] font-bold text-4xl">Explorez nos programmes de formation</h2>
                 <p className="text-gray-600 text-md max-w-xl mt-6">
-                  Découvrir une bibliothèque complète de cours, formations, vidéos, audios et tutoriels conçus pour enrichir vos connaissances et développer vos compétences.
+                  Découvrez une <b>bibliothèque complète</b> de cours, formations, vidéos, audios et tutoriels conçus pour :
+                  <ul className="list-disc list-inside pl-5">
+                    <li><b>Enrichir vos connaissances</b> dans des domaines variés</li>
+                    <li><b>Développer vos compétences pratiques</b> grâce à des contenus interactifs</li>
+                    <li><b>Accéder à des ressources adaptées</b> à votre rythme et à vos besoins</li>
+                    <li><b>Apprendre en continu</b> avec des supports modernes et accessibles</li>
+                  </ul>
+                  <br />
+                  Que vous soyez débutant ou expert, notre plateforme vous accompagne pas à pas pour transformer vos ambitions en réussites.
+                  <br />
+                  <br />
+                  Déjà :
+                  <br />
+                  <ul className="list-disc list-inside pl-5">
+                    <li><b>3 553 OSC</b> formées aux critères de soumission aux appels à projet.</li>
+                    <li><b>1 056</b> Organisations formées aux <b>thématiques</b> : gestion de projets, communication digitale, égalité de genre, prévention et gestion des conflits.</li>
+                    <li><b>780</b> organisations &#40;femmes, jeunes, associations locales&#41; appuyées à la <b>création et à la formalisation</b>.</li>
+                    <li><b>20</b> organisations accompagnées techniquement et institutionnellement par semaine.</li>
+                  </ul>
                 </p>
               </div>
               <div>
                 <ImageWithFallback
                   src="/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg"
                   alt="image"
-                  className="w-full h-[300px] object-cover rounded-lg"
+                  className="w-full h-[700px] object-cover rounded-lg"
                 />
               </div>
             </div>

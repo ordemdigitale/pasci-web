@@ -69,7 +69,7 @@ export default function PageOffreEmploi() {
         <div className="">
           <h2 className="text-[#2a591d] font-bold text-4xl">Rejoindre l'équipe</h2>
           <p className="text-gray-600 text-md max-w-xl mt-6">
-            Découvrir les opportunités de carrière passionnantes et faites partie de notre mission de transformer l'avenir. Chez PASCI, nous construisons des solutions innovantes avec des talents exceptionnels.
+            Voici quelques exemples d&apos;offres d&apos;emploi selon des compétences et des expériences diverses
           </p>
         </div>
         

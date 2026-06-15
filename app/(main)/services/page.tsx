@@ -28,7 +28,7 @@ const services: IService[] = [
   {
     id: 1,
     icon: <Speech size={24} color="#E05017" />,
-    name: "Appui-Conseil",
+    name: "Conseil",
     //content: "Des conseils stratégiques pour des décisions éclairées et une croissance durable."
   },
   {
@@ -164,51 +164,63 @@ export default function ServicesPage() {
         </div>
       </div>
       
-      {/* Service Appui-Conseil */}
+      {/* Conseil */}
       <div className="py-8">
-        <p className="font-bold text-4xl text-center pb-4">Appui-Conseil</p>
+        <p className="font-bold text-4xl text-center pb-4">Conseil</p>
         <div className="max-w-5xl mx-auto bg-[#f0f9ff] p-6 sm:px-6 lg:px-8 border border-gray-200 rounded-lg space-y-6">
-          <p>Dans le cadre des appuis et conseils, le CERAP organisé une tournée d&apos;explication sur processus de soumission et les conditions d&apos;éligibilité aux microfinancements et aux subventions. À cette occasion, les équipes ont mis l’accent sur les erreurs à éviter.</p>
+          <p>
+            Nous venons vous expliquer comment déposer vos demandes de financement et quelles sont les conditions pour être accepté. On insiste aussi sur les erreurs à éviter pour mettre toutes les chances de votre côté.
+          </p>
         </div>
       </div>
 
-      {/* Service Accompagnement */}
+      {/* Accompagnement */}
       <div className="py-8">
         <p className="font-bold text-4xl text-center pb-4">Accompagnement</p>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg py-8 space-y-6">
-          <p>L'accompagnement de PASCI va au-delà du simple conseil. Nous marchons à vos côtés pour la mise en œuvre concrète de vos plans d'action. Cet accompagnement peut prendre la forme de coaching d'équipes, de renforcement des capacités, de mentorat pour les leaders ou de gestion déléguée de certaines fonctions clés. Notre objectif est de transférer des compétences et de garantir l'autonomie de vos structures à long terme.</p>          
+          <p>
+            Au CRASC, on ne se limite pas aux conseils. On reste à vos côtés pour mettre en pratique vos idées. Cela peut être du coaching, des formations pour vos équipes, du mentorat pour vos responsables, ou même la prise en charge de certaines tâches importantes. Le but : vous aider à devenir autonomes.
+          </p>
         </div>
       </div>
       
-      {/* Service Soutien Administratif */}
+      {/* Soutien Administratif */}
       <div className="py-8">
         <p className="font-bold text-4xl text-center pb-4">Soutien Administratif</p>
         <div className="max-w-5xl mx-auto bg-[#f0f9ff] p-6 sm:px-6 lg:px-8 border border-gray-200 rounded-lg space-y-6">
-          <p>Nous vous assistons dans la formalisation de vos statuts, la rédaction de vos règlements intérieurs et la mise en conformité avec les exigences légales et réglementaires. Notre objectif est de structurer votre organisation pour qu'elle opère en toute légalité et efficacité, en minimisant les risques.</p>
+          <p>
+            On vous aide à rédiger vos statuts, vos règlements et à respecter les règles légales. L&apos;objectif est que votre organisation fonctionne correctement et en toute sécurité.
+          </p>
         </div>
       </div>
 
-      {/* Service Formation */}
+      {/* Formation */}
       <div className="py-8">
         <p className="font-bold text-4xl text-center pb-4">Formation</p>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg py-8 space-y-6">
-          <p>En s'appuyant sur une démarche structurée, ce type d'apprentissage permet non seulement de transmettre des connaissances, mais aussi de développer l'esprit critique, l'autonomie et la capacité à appliquer les acquis dans des contextes réels. Il favorise également l'apprentissage collectif, en encourageant le partage d'expériences et la collaboration entre les participants.</p>
+          <p>
+            Nos formations ne servent pas seulement à apprendre des notions. Elles développent aussi l&pos;esprit critique, l&pos;autonomie et la capacité à appliquer ce qu&pos;on a appris dans la vraie vie. On encourage aussi le partage d&pos;expériences entre participants.
+          </p>
         </div>
       </div>
       
-      {/* Service Suivi-évaluation */}
+      {/* Suivi-évaluation */}
       <div className="py-8">
         <p className="font-bold text-4xl text-center pb-4">Suivi-Évaluation</p>
         <div className="max-w-5xl mx-auto bg-[#f0f9ff] p-6 sm:px-6 lg:px-8 border border-gray-200 rounded-lg space-y-6">
-          <p>Au-delà de la mesure, le suivi-évaluation constitue un véritable outil d'aide à la décision. Il permet d'ajuster les stratégies en temps réel, d'optimiser l'utilisation des ressources et de renforcer l'impact des interventions. En assurant une traçabilité des résultats et une évaluation rigoureuse des effets produits, ce service contribue à la transparence, à la redevabilité et à l&apos;amélioration continue des actions menées.</p>
+          <p>
+            Ce n&apos;est pas juste mesurer des résultats. C&apos;est un outil pour prendre de bonnes décisions, ajuster vos actions en cours de route et améliorer l&apos;impact de vos projets. Cela garantit aussi plus de transparence et de responsabilité.
+          </p>
         </div>
       </div>
 
-      {/* Service Information */}
+      {/* Information */}
       <div className="py-8">
         <p className="font-bold text-4xl text-center pb-4">Information</p>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg py-8 space-y-6">
-          <p>Nous vous donnons des informations sur les opportunités de financements, de formation et de réseautage. En centralisant et en diffusant ces informations stratégiques, nous permettons aux OSC membres du CRASC de saisir les occasions qui s'offrent à elles et de renforcer leur capacité d'action sur le terrain.</p>
+          <p>
+            Nous partageons avec vous les opportunités de financement, de formation et de réseautage. En diffusant ces infos, nous vous aidons à saisir les bonnes occasions et à renforcer vos actions sur le terrain.
+          </p>
         </div>
       </div>
 

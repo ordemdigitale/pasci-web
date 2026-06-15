@@ -181,10 +181,17 @@ export default function PageRessources() {
         <div className="">
           <h2 className="font-bold text-4xl text-[#2a591d] leading-tight">Ressources</h2>
           <p className="font-bold text-xl max-w-sm mt-6">
-            Documentation et Fiches Informatives
+            Documents et Fiches pratiques
           </p>
-          <p className="text-gray-600 text-md max-w-xl mt-2">
-            Accédez à une collection complète de documents, rapports, études, guides et fiches informatives du projet PASCI. Filtrez par type pour trouver rapidement l'information dont vous avez besoin.
+          <p className="font-bold text-xl max-w-sm mt-4">Besoin d'un guide ou d&apos;une fiche ? Tout est ici, à portée de clic !</p>
+          <p className="text-gray-600 text-md max-w-xl mt-4">
+            Tu trouveras dans cette section <b>pleine de documents utiles</b> du projet PASCI : rapports, études, guides et fiches pratiques.
+          </p>
+          <p className="text-gray-600 text-md max-w-xl mt-4">  
+            Tu peux <b>choisir par type</b> &#40;rapport, guide, fiche&#41; pour aller directement à ce qui t&apos;intéresse. Chaque ressource est <b>simple à consulter et à télécharger</b>.
+          </p>
+          <p className="text-gray-600 text-md max-w-xl mt-4">  
+            Le but est de rendre l&apos;information facile à utiliser pour tout le monde, afin que chacun puisse s&apos;en servir dans ses projets ou activités.
           </p>
         </div>
 

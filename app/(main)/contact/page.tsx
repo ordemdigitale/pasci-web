@@ -76,7 +76,8 @@ export default function ContactPage() {
             <h2 className="text-[#2a591d] font-bold text-5xl">Nous contacter</h2>
 
             <p className="text-gray-600 text-lg max-w-xl">
-              Nous sommes là pour répondre à vos questions et vous fournir toute l'assistance nécessaire. Ne pas hésiter à nous contacter.
+              Nous sommes à votre écoute pour répondre à toutes vos questions et vous accompagner dans vos démarches. <br />
+              N&apos;hésitez pas à nous écrire ou à nous appeler, notre équipe est disponible pour vous fournir toute l&apos;assistance nécessaire.
             </p>
           </div>
 
