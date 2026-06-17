@@ -76,8 +76,7 @@ export default function ContactPage() {
             <h2 className="text-[#2a591d] font-bold text-5xl">Nous contacter</h2>
 
             <p className="text-gray-600 text-lg max-w-xl">
-              Nous sommes à votre écoute pour répondre à toutes vos questions et vous accompagner dans vos démarches. <br />
-              N&apos;hésitez pas à nous écrire ou à nous appeler, notre équipe est disponible pour vous fournir toute l&apos;assistance nécessaire.
+              Vous avez une question, un besoin ou une idée ? Nous sommes à votre écoute pour vous accompagner et trouver ensemble des solutions. N'hésitez pas à nous écrire ou à nous appeler !
             </p>
           </div>
 
@@ -92,6 +91,28 @@ export default function ContactPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Faire un don</h4>
+        <p>
+          Ensemble, nous pouvons renforcer la société civile en Côte d'Ivoire. Chaque contribution, petite ou grande, aide les organisations de la société civile (OSC) à développer leurs capacités et à agir pour toutes et tous.
+        </p>
+
+        <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Être volontaire</h4>
+        <p>
+          Envie de vous engager ? Rejoignez notre réseau de volontaires et participez au renforcement de la société civile en Côte d'Ivoire. Chacun·(e), avec ses talents et ses expériences, peut faire la différence.
+        </p>
+        
+        <h4 className="font-bold text-lg pt-4 pb-2">Pourquoi s'engager ?</h4>
+        <ul className="list-disc ml-12">
+          <li>Mettre vos compétences au service de la société civile ;</li>
+          <li>Participer à des formations et à des événements ouverts à toutes et tous ;</li>
+          <li>Élargir votre réseau professionnel et humain ;</li>
+          <li>Contribuer au développement durable de la Côte d'Ivoire ;</li>
+          <li>Découvrir de nouvelles expériences de terrain enrichissantes.</li>
+        </ul>
+
       </div>
 
       {/* Contact Form and Info Section */}

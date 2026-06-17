@@ -47,7 +47,7 @@ export default function PageAnnuairePTF() {
       {/* Hero Section */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
         <h1 className="text-[#2a591d] font-extrabold text-2xl md:text-4xl text-center">
-          Annuaire des Partenaires Techniques<br />et Financiers (PTF)
+          Annuaire des Partenaires Techniques et Financiers (PTF)
         </h1>
       </div>
 
@@ -56,17 +56,9 @@ export default function PageAnnuairePTF() {
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           <div className="space-y-8">
             <div>
-              <h2 className="text-[#E05017] font-bold text-2xl md:text-3xl mb-6">
-                Ensemble, nous pouvons renforcer l'impact
-              </h2>
-              <p className="text-gray-600 text-base leading-relaxed">
-                Notre communauté est dédiée à la promotion de l'innovation et à la collaboration à travers des projets transformateurs. Nous croyons au pouvoir du partage des connaissances et des ressources pour résoudre des défis complexes.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-bold text-2xl text-gray-900 mb-4">Notre Mission</h3>
-              <p className="text-gray-600 text-base leading-relaxed">
-                Nous nous engageons à créer des solutions durables et accessibles qui ont un impact positif sur le monde. En favorisant un environnement inclusif, nous permettons aux acteurs de tous horizons de s'épanouir et de façonner un avenir meilleur pour tous.
+              <p className="text-gray-600 text-lg leading-relaxed">
+                Consultez la base de données des partenaires techniques et financiers sur la PdoC. <br />
+                Cette base vous aide à identifier et choisir les partenaires techniques et financiers adaptés à vos besoins. Vous y découvrirez leurs spécificités, leurs domaines de financement, leurs périodes et zones d'intervention et leurs orientations stratégiques.
               </p>
             </div>
           </div>

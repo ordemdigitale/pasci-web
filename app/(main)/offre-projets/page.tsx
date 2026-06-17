@@ -97,8 +97,10 @@ export default function PageOffreProjet() {
                 Offres de Projets
               </h1>
               <p className="text-white/90 text-lg leading-relaxed">
-                Découvrir des initiatives à fort impact social portées par les OSC en Côte d'Ivoire.
-                Facilitez l'accès à des projets structurés et alignés sur les priorités de développement durable.
+                La PdoC vous permet d'accéder facilement aux actualités relatives aux appels à projets et à de nombreuses opportunités de financement.
+                <ul className="ml-12">
+                  <li>&#x2714; « Des appels à projets, en un clic ! »</li>
+                </ul>
               </p>
             </div>
 
@@ -274,41 +276,64 @@ export default function PageOffreProjet() {
           <h2 className="font-extrabold text-3xl md:text-4xl text-center text-gray-900 mb-4">
             Pourquoi être membre du CRASC ?
           </h2>
-          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-            Rejoignez notre réseau et bénéficiez d'opportunités uniques pour développer vos projets
+          <p className="text-center mb-12 max-w-2xl mx-auto">
+            <b>Rejoignez la plateforme des OSC</b> et profitez de nombreux avantages :
           </p>
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-[#E05017]/10 rounded-2xl flex items-center justify-center mx-auto">
+              {/* <div className="w-16 h-16 bg-[#E05017]/10 rounded-2xl flex items-center justify-center mx-auto">
                 <CircleCheckBig className="w-8 h-8 text-[#E05017]" />
-              </div>
-              <h3 className="font-bold text-xl text-gray-900">Visibilité accrue</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Augmentez la portée de vos projets auprès d'un large réseau de partenaires et de financeurs potentiels, au niveau local et international.
+              </div> */}
+              {/* <h3 className="font-bold text-xl text-gray-900">Un accompagrment pratique</h3> */}
+              <p>
+                <b>Un accompagement pratique</b> pour vos projets grâce à la plateforme <b>PDOC</b>
               </p>
             </div>
 
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-[#E05017]/10 rounded-2xl flex items-center justify-center mx-auto">
+              {/* <div className="w-16 h-16 bg-[#E05017]/10 rounded-2xl flex items-center justify-center mx-auto">
                 <DollarSign className="w-8 h-8 text-[#E05017]" />
-              </div>
-              <h3 className="font-bold text-xl text-gray-900">Accès aux ressources</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Bénéficiez d'une plateforme centralisée pour soumettre vos initiatives et trouver les ressources nécessaires à leur concrétisation.
+              </div> */}
+              {/* <h3 className="font-bold text-xl text-gray-900">Accès aux ressources</h3> */}
+              <p>
+                <b>Des formations utiles</b> : apprendre à communiquer, gérer un projet, travailler en équipe, prévenir les conflits.
               </p>
             </div>
 
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-[#E05017]/10 rounded-2xl flex items-center justify-center mx-auto">
+              {/* <div className="w-16 h-16 bg-[#E05017]/10 rounded-2xl flex items-center justify-center mx-auto">
                 <Handshake className="w-8 h-8 text-[#E05017]" />
-              </div>
-              <h3 className="font-bold text-xl text-gray-900">Partenariats stratégiques</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Se connecter avec des organisations partageant les mêmes valeurs et construisez des collaborations solides pour un impact plus grand.
+              </div> */}
+              {/* <h3 className="font-bold text-xl text-gray-900">Partenariats stratégiques</h3> */}
+              <p>
+                <b>Un réseau solide</b> : rencontrer d'autres organisations, échanger des idées, créer des partenariats.
               </p>
             </div>
+
+            <div className="text-center space-y-4">
+              <p>
+                <b>Plus de visibilité</b> : faire connaître vos actions auprès des partenaires et des institutions
+              </p>
+            </div>
+
+            <div className="text-center space-y-4">
+              <p>
+                <b>Un rôle actif</b> : participer aux décisions locales et aux initiatives citoyennes
+              </p>
+            </div>
+            <div className="text-center space-y-4">
+              <p>
+                <b>Un appui officiel</b> : être reconnu et soutenu dans vos démarches administratives
+              </p>
+            </div>
+
           </div>
+
+          <p className="text-center mb-12 max-w-2xl mx-auto mt-6">
+            En devenant membre, votre organisation gagne en <b>force, en compétences et en reconnaissance</b> pour mieux agir dans la communauté.
+          </p>
+
         </div>
       </div>
     </section>
