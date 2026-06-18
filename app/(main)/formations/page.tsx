@@ -3,23 +3,16 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  Search, Loader2, Download, FileText, Calendar, MapPin, Users,
-  Clock, ChevronRight, Mail, Phone, Send, X, Lightbulb, CheckCircle,
+  Search, Loader2, Calendar, MapPin, Users,
+  Clock, ChevronRight, Mail, Phone, Send, Lightbulb, CheckCircle,
   AlertCircle, BookOpen, UserCheck, GraduationCap, Building2, BarChart3
 } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
-import { fetchAllFormations, fetchAllRubriques, IFormation, IFormationRubrique } from '@/lib/fetch-formations';
+import { fetchAllFormations, IFormation } from '@/lib/fetch-formations';
 
 const FALLBACK_IMAGE = "/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-interface ICatalogue {
-  id: number;
-  titre: string;
-  description?: string | null;
-  fichier_url: string;
-  is_active: boolean;
-}
 
 interface IFormationStats {
   total_formations: number;
@@ -47,12 +40,10 @@ function isUpcoming(dateStr: string | null | undefined) {
 }
 
 export default function FormationsPage() {
-  const [activeRubriqueId, setActiveRubriqueId] = useState<number | null>(null);
+  const [activeCategorie, setActiveCategorie] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [visiblePrograms, setVisiblePrograms] = useState(9);
   const [formations, setFormations] = useState<IFormation[]>([]);
-  const [rubriques, setRubriques] = useState<IFormationRubrique[]>([]);
-  const [catalogues, setCatalogues] = useState<ICatalogue[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [defaultImage, setDefaultImage] = useState(FALLBACK_IMAGE);
@@ -71,14 +62,8 @@ export default function FormationsPage() {
       setLoading(true);
       setError(null);
       try {
-        const [formationsData, rubriquesData, cataloguesRes] = await Promise.all([
-          fetchAllFormations({ published_only: true, limit: 100 }),
-          fetchAllRubriques(),
-          fetch(`${API_BASE}/api/v1/formations/catalogue?active_only=true`).then(r => r.ok ? r.json() : []),
-        ]);
+        const formationsData = await fetchAllFormations({ published_only: true, limit: 100 });
         setFormations(formationsData);
-        setRubriques(rubriquesData.filter((r) => r.is_active));
-        setCatalogues(cataloguesRes);
       } catch (err) {
         setError("Erreur lors du chargement des formations. Veuillez réessayer plus tard.");
       } finally {
@@ -98,11 +83,15 @@ export default function FormationsPage() {
       .catch(() => {});
   }, []);
 
+  const categories = Array.from(
+    new Set(formations.map(f => f.categorie).filter(Boolean))
+  ) as string[];
+
   const filteredFormations = formations.filter(formation => {
     const matchesSearch = formation.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (formation.description && formation.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesRubrique = activeRubriqueId === null || formation.rubrique_id === activeRubriqueId;
-    return matchesSearch && matchesRubrique;
+    const matchesCategorie = activeCategorie === null || formation.categorie === activeCategorie;
+    return matchesSearch && matchesCategorie;
   });
 
   const upcomingFormations = formations
@@ -140,118 +129,87 @@ export default function FormationsPage() {
   return (
     <section className="py-16 px-4 bg-white font-poppins">
       <div className="max-w-7xl mx-auto">
+
+        {/* Header — pleine largeur */}
+        <div className="border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
+          <div>
+            <h2 className="text-[#2a591d] font-bold text-4xl">Explorez nos programmes de formation</h2>
+            <p className="text-gray-600 text-md max-w-xl mt-6">
+              Découvrez une <b>bibliothèque complète</b> de cours, formations, vidéos, audios et tutoriels conçus pour :
+              <ul className="list-disc list-inside pl-5">
+                <li><b>Enrichir vos connaissances</b> dans des domaines variés</li>
+                <li><b>Développer vos compétences pratiques</b> grâce à des contenus interactifs</li>
+                <li><b>Accéder à des ressources adaptées</b> à votre rythme et à vos besoins</li>
+                <li><b>Apprendre en continu</b> avec des supports modernes et accessibles</li>
+              </ul>
+              <br />
+              Que vous soyez débutant ou expert, notre plateforme vous accompagne pas à pas pour transformer vos ambitions en réussites.
+              <br /><br />
+              Déjà :
+              <br />
+              <ul className="list-disc list-inside pl-5">
+                <li><b>3 553 OSC</b> formées aux critères de soumission aux appels à projet.</li>
+                <li><b>1 056</b> Organisations formées aux <b>thématiques</b> : gestion de projets, communication digitale, égalité de genre, prévention et gestion des conflits.</li>
+                <li><b>780</b> organisations &#40;femmes, jeunes, associations locales&#41; appuyées à la <b>création et à la formalisation</b>.</li>
+                <li><b>20</b> organisations accompagnées techniquement et institutionnellement par semaine.</li>
+              </ul>
+            </p>
+          </div>
+          <div>
+            <ImageWithFallback
+              src="/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg"
+              alt="image"
+              className="w-full h-[700px] object-cover rounded-lg"
+            />
+          </div>
+        </div>
+
+        {/* Search Bar — pleine largeur */}
+        <div className="relative mb-6">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Rechercher une formation..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          />
+        </div>
+
+        {/* Sidebar + Formations côte à côte */}
         <div className="flex gap-8">
 
           {/* Left Sidebar */}
-          {rubriques.length > 0 && (
-            <div className="hidden lg:block w-64 flex-shrink-0">
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="hidden lg:block w-64 flex-shrink-0 mt-20">
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <button
+                onClick={() => setActiveCategorie(null)}
+                className={`w-full text-left px-6 py-4 transition-colors rounded-t-lg ${activeCategorie === null ? 'text-white' : 'text-gray-700 hover:bg-gray-50'}`}
+                style={activeCategorie === null ? { backgroundColor: '#E05017' } : {}}
+              >
+                <span className="flex items-center gap-3">
+                  <span className="text-sm">•</span>
+                  <span>Toutes les formations</span>
+                </span>
+              </button>
+              {categories.map((cat, index) => (
                 <button
-                  onClick={() => setActiveRubriqueId(null)}
-                  className={`w-full text-left px-6 py-4 transition-colors rounded-t-lg ${activeRubriqueId === null ? 'text-white' : 'text-gray-700 hover:bg-gray-50'}`}
-                  style={activeRubriqueId === null ? { backgroundColor: '#E05017' } : {}}
+                  key={cat}
+                  onClick={() => setActiveCategorie(cat)}
+                  className={`w-full text-left px-6 py-4 transition-colors ${activeCategorie === cat ? 'text-white' : 'text-gray-700 hover:bg-gray-50'}`}
+                  style={activeCategorie === cat ? { backgroundColor: '#E05017' } : {}}
                 >
                   <span className="flex items-center gap-3">
-                    <span className="text-sm">•</span>
-                    <span>Toutes les formations</span>
+                    <span className="text-sm font-semibold">{index + 1}</span>
+                    <span>{cat}</span>
                   </span>
                 </button>
-                {rubriques.map((r, index) => (
-                  <button
-                    key={r.id}
-                    onClick={() => setActiveRubriqueId(r.id)}
-                    className={`w-full text-left px-6 py-4 transition-colors ${activeRubriqueId === r.id ? 'text-white' : 'text-gray-700 hover:bg-gray-50'}`}
-                    style={activeRubriqueId === r.id ? { backgroundColor: r.color || '#E05017' } : {}}
-                  >
-                    <span className="flex items-center gap-3">
-                      <span className="text-sm">{index + 1}</span>
-                      <span>{r.name}</span>
-                    </span>
-                  </button>
-                ))}
-              </div>
+              ))}
             </div>
-          )}
+          </div>
 
           {/* Main Content */}
           <div className="flex-1">
-
-            {/* Header */}
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
-              <div>
-                <h2 className="text-[#2a591d] font-bold text-4xl">Explorez nos programmes de formation</h2>
-                <p className="text-gray-600 text-md max-w-xl mt-6">
-                  Découvrez une <b>bibliothèque complète</b> de cours, formations, vidéos, audios et tutoriels conçus pour :
-                  <ul className="list-disc list-inside pl-5">
-                    <li><b>Enrichir vos connaissances</b> dans des domaines variés</li>
-                    <li><b>Développer vos compétences pratiques</b> grâce à des contenus interactifs</li>
-                    <li><b>Accéder à des ressources adaptées</b> à votre rythme et à vos besoins</li>
-                    <li><b>Apprendre en continu</b> avec des supports modernes et accessibles</li>
-                  </ul>
-                  <br />
-                  Que vous soyez débutant ou expert, notre plateforme vous accompagne pas à pas pour transformer vos ambitions en réussites.
-                  <br />
-                  <br />
-                  Déjà :
-                  <br />
-                  <ul className="list-disc list-inside pl-5">
-                    <li><b>3 553 OSC</b> formées aux critères de soumission aux appels à projet.</li>
-                    <li><b>1 056</b> Organisations formées aux <b>thématiques</b> : gestion de projets, communication digitale, égalité de genre, prévention et gestion des conflits.</li>
-                    <li><b>780</b> organisations &#40;femmes, jeunes, associations locales&#41; appuyées à la <b>création et à la formalisation</b>.</li>
-                    <li><b>20</b> organisations accompagnées techniquement et institutionnellement par semaine.</li>
-                  </ul>
-                </p>
-              </div>
-              <div>
-                <ImageWithFallback
-                  src="/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg"
-                  alt="image"
-                  className="w-full h-[700px] object-cover rounded-lg"
-                />
-              </div>
-            </div>
-
-            {/* Catalogue — au-dessus des formations */}
-            {catalogues.length > 0 && (
-              <div className="mb-10">
-                <h3 className="text-gray-800 text-2xl font-bold mb-6 flex items-center gap-3">
-                  <FileText className="w-7 h-7 text-[#E05017]" />
-                  Catalogue de Formations
-                </h3>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {catalogues.map((cat) => (
-                    <a
-                      key={cat.id}
-                      href={cat.fichier_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex items-center gap-4 bg-white border-2 border-gray-200 hover:border-[#E05017] rounded-xl p-5 shadow-sm hover:shadow-md transition-all"
-                    >
-                      <div className="w-12 h-12 rounded-xl bg-red-50 group-hover:bg-[#E05017]/10 flex items-center justify-center flex-shrink-0 transition-colors">
-                        <FileText className="w-6 h-6 text-red-500 group-hover:text-[#E05017]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-gray-900 line-clamp-1 group-hover:text-[#E05017] transition-colors">{cat.titre}</p>
-                        {cat.description && <p className="text-sm text-gray-500 line-clamp-1 mt-0.5">{cat.description}</p>}
-                      </div>
-                      <Download className="w-5 h-5 text-gray-400 group-hover:text-[#E05017] flex-shrink-0 transition-colors" />
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Search Bar */}
-            <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Rechercher une formation..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              />
-            </div>
 
             {/* Formations Grid */}
             <div className="mb-8">
@@ -394,7 +352,7 @@ export default function FormationsPage() {
                 <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
                   <h4 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
                     <Users className="w-5 h-5 text-[#E05017]" />
-                    OSC formées par catégorie d'acteurs
+                    OSC formées par catégorie d&apos;acteurs
                   </h4>
                   <div className="space-y-4">
                     {(() => {
@@ -482,7 +440,7 @@ export default function FormationsPage() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <h3 className="text-gray-800 text-2xl font-bold mb-2 flex items-center gap-3">
               <BookOpen className="w-7 h-7 text-[#2a591d]" />
-              Procédure d'inscription
+              Procédure d&apos;inscription
             </h3>
             <p className="text-gray-500 text-sm mb-8">Comment participer à nos formations</p>
 
@@ -490,7 +448,7 @@ export default function FormationsPage() {
               {/* Étapes */}
               <div>
                 <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-[#E05017]" /> Étapes d'inscription
+                  <UserCheck className="w-5 h-5 text-[#E05017]" /> Étapes d&apos;inscription
                 </h4>
                 <ol className="space-y-4">
                   {[
@@ -551,10 +509,10 @@ export default function FormationsPage() {
               {/* Contact */}
               <div className="bg-[#2a591d] rounded-2xl p-8 text-white">
                 <h3 className="text-xl font-bold mb-2 flex items-center gap-3">
-                  <Mail className="w-6 h-6" /> Plus d'informations ?
+                  <Mail className="w-6 h-6" /> Plus d&apos;informations ?
                 </h3>
                 <p className="text-white/80 text-sm mb-6">
-                  Notre équipe est disponible pour répondre à vos questions sur les formations, les modalités d'accès et les contenus pédagogiques.
+                  Notre équipe est disponible pour répondre à vos questions sur les formations, les modalités d&apos;accès et les contenus pédagogiques.
                 </p>
                 <div className="space-y-3 mb-6">
                   <a href="mailto:formation@plateforme-osci.org" className="flex items-center gap-3 text-white/90 hover:text-white transition-colors text-sm">
@@ -645,7 +603,7 @@ export default function FormationsPage() {
         <div className="py-8">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 bg-[#E05017] rounded-lg py-8 space-y-6 text-center text-white">
             <p className="font-bold text-4xl">Prêt à se faire accompagner ?</p>
-            <p className="max-w-2xl mx-auto">Nous contacter dès aujourd'hui pour discuter de vos besoins et découvrir comment nous pouvons vous aider à atteindre vos objectifs.</p>
+            <p className="max-w-2xl mx-auto">Nous contacter dès aujourd&apos;hui pour discuter de vos besoins et découvrir comment nous pouvons vous aider à atteindre vos objectifs.</p>
             <Link
               href="/contact"
               className="inline-block border border-transparent hover:border-white text-[#E05017] hover:text-white bg-white hover:bg-transparent rounded-lg px-6 py-2 transition-colors"
