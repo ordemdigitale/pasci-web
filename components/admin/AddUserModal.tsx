@@ -51,8 +51,8 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
       return;
     }
 
-    if (permissions.is_staff && !permissions.crasc_id) {
-      toast.error("Veuillez sélectionner un CRASC pour l'Admin CRASC");
+    if ((permissions.is_staff || permissions.is_redacteur) && !permissions.crasc_id) {
+      toast.error("Veuillez sélectionner un CRASC pour cet utilisateur");
       return;
     }
 
@@ -68,15 +68,15 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
           is_staff: permissions.is_staff,
           is_superuser: permissions.is_superuser,
           is_redacteur: permissions.is_redacteur,
-          crasc_id: permissions.is_staff ? permissions.crasc_id : null,
+          crasc_id: (permissions.is_staff || permissions.is_redacteur) ? permissions.crasc_id : null,
         });
       }
 
       toast.success("Utilisateur créé avec succès");
       onSuccess();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error creating user:", error);
-      toast.error(error.message || "Erreur lors de la création de l'utilisateur");
+      toast.error(error instanceof Error ? error.message : "Erreur lors de la création de l'utilisateur");
     } finally {
       setLoading(false);
     }
@@ -217,7 +217,7 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
                       setPermissions((prev) => ({
                         ...prev,
                         is_staff: e.target.checked,
-                        crasc_id: e.target.checked ? prev.crasc_id : null,
+                        crasc_id: (!e.target.checked && !prev.is_redacteur) ? null : prev.crasc_id,
                       }))
                     }
                     className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
@@ -225,13 +225,35 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
                   <div>
                     <p className="font-semibold text-gray-900">Admin CRASC</p>
                     <p className="text-sm text-gray-600">
-                      Accès à l'interface d'administration — limité à son CRASC
+                      Accès à l&apos;interface d&apos;administration — limité à son CRASC
                     </p>
                   </div>
                 </label>
 
-                {/* Sélecteur CRASC */}
-                {permissions.is_staff && (
+                {/* Rédacteur */}
+                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={permissions.is_redacteur}
+                    onChange={(e) =>
+                      setPermissions((prev) => ({
+                        ...prev,
+                        is_redacteur: e.target.checked,
+                        crasc_id: (!e.target.checked && !prev.is_staff) ? null : prev.crasc_id,
+                      }))
+                    }
+                    className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
+                  />
+                  <div>
+                    <p className="font-semibold text-gray-900">Rédacteur</p>
+                    <p className="text-sm text-gray-600">
+                      Peut créer du contenu — nécessite validation avant publication
+                    </p>
+                  </div>
+                </label>
+
+                {/* Sélecteur CRASC — visible si Admin CRASC ou Rédacteur */}
+                {(permissions.is_staff || permissions.is_redacteur) && (
                   <div className="ml-2 p-4 bg-green-50 border border-green-200 rounded-lg">
                     <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-[#2a591d]" />
@@ -255,31 +277,12 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
                       ))}
                     </select>
                     <p className="text-xs text-gray-500 mt-1">
-                      Cet admin ne verra que les données de ce CRASC.
+                      {permissions.is_staff
+                        ? "Cet admin ne verra que les données de ce CRASC."
+                        : "Ce rédacteur ne pourra publier que pour ce CRASC."}
                     </p>
                   </div>
                 )}
-
-                {/* Rédacteur */}
-                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={permissions.is_redacteur}
-                    onChange={(e) =>
-                      setPermissions((prev) => ({
-                        ...prev,
-                        is_redacteur: e.target.checked,
-                      }))
-                    }
-                    className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
-                  />
-                  <div>
-                    <p className="font-semibold text-gray-900">Rédacteur</p>
-                    <p className="text-sm text-gray-600">
-                      Peut créer du contenu — nécessite validation avant publication
-                    </p>
-                  </div>
-                </label>
 
                 {/* Superuser */}
                 <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">

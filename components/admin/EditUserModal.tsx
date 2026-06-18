@@ -69,9 +69,9 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
       await userService.updateUser(user.id, formData);
       toast.success("Utilisateur mis à jour avec succès");
       onSuccess();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating user:", error);
-      toast.error(error.message || "Erreur lors de la mise à jour de l'utilisateur");
+      toast.error(error instanceof Error ? error.message : "Erreur lors de la mise à jour de l'utilisateur");
     } finally {
       setLoading(false);
     }
@@ -96,7 +96,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
       <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">
-            Modifier l'utilisateur
+            Modifier l&apos;utilisateur
           </h2>
           <button
             onClick={onClose}
@@ -234,7 +234,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                     <div>
                       <p className="font-semibold text-gray-900">Compte actif</p>
                       <p className="text-sm text-gray-600">
-                        L'utilisateur peut se connecter et accéder à la plateforme
+                        L&apos;utilisateur peut se connecter et accéder à la plateforme
                       </p>
                     </div>
                   </div>
@@ -249,7 +249,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                       setFormData((prev) => ({
                         ...prev,
                         is_staff: newIsStaff,
-                        crasc_id: newIsStaff ? prev.crasc_id : null,
+                        crasc_id: (!newIsStaff && !prev.is_redacteur) ? null : prev.crasc_id,
                       }));
                     }}
                     className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
@@ -257,13 +257,35 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                   <div>
                     <p className="font-semibold text-gray-900">Admin CRASC</p>
                     <p className="text-sm text-gray-600">
-                      Accès à l'interface d'administration — limité à son CRASC
+                      Accès à l&apos;interface d&apos;administration — limité à son CRASC
                     </p>
                   </div>
                 </label>
 
-                {/* Sélecteur CRASC — visible uniquement si is_staff est coché */}
-                {formData.is_staff && (
+                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_redacteur ?? false}
+                    onChange={() => {
+                      const newIsRedacteur = !formData.is_redacteur;
+                      setFormData((prev) => ({
+                        ...prev,
+                        is_redacteur: newIsRedacteur,
+                        crasc_id: (!newIsRedacteur && !prev.is_staff) ? null : prev.crasc_id,
+                      }));
+                    }}
+                    className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
+                  />
+                  <div>
+                    <p className="font-semibold text-gray-900">Rédacteur</p>
+                    <p className="text-sm text-gray-600">
+                      Peut créer du contenu — nécessite validation du staff avant publication
+                    </p>
+                  </div>
+                </label>
+
+                {/* Sélecteur CRASC — visible si Admin CRASC ou Rédacteur */}
+                {(formData.is_staff || formData.is_redacteur) && (
                   <div className="ml-2 p-4 bg-green-50 border border-green-200 rounded-lg">
                     <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-[#2a591d]" />
@@ -287,25 +309,12 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                       ))}
                     </select>
                     <p className="text-xs text-gray-500 mt-1">
-                      Cet admin ne verra que les données de ce CRASC.
+                      {formData.is_staff
+                        ? "Cet admin ne verra que les données de ce CRASC."
+                        : "Ce rédacteur ne pourra publier que pour ce CRASC."}
                     </p>
                   </div>
                 )}
-
-                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_redacteur ?? false}
-                    onChange={() => handleCheckboxChange("is_redacteur" as keyof UpdateUserAdminData)}
-                    className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
-                  />
-                  <div>
-                    <p className="font-semibold text-gray-900">Rédacteur</p>
-                    <p className="text-sm text-gray-600">
-                      Peut créer du contenu — nécessite validation du staff avant publication
-                    </p>
-                  </div>
-                </label>
 
                 <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
                   <input

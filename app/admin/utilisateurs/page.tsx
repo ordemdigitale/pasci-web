@@ -18,7 +18,7 @@ import {
   Shield,
   Loader2,
 } from "lucide-react";
-import { userService } from "@/lib/services/user.service";
+import { userService, UpdateUserAdminData } from "@/lib/services/user.service";
 import { IUser } from "@/types/api.types";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -27,12 +27,23 @@ import EditUserModal from "@/components/admin/EditUserModal";
 
 const PAGE_SIZE = 25;
 
+function getUserRole(u: IUser): string {
+  if (u.is_superuser) return "superuser";
+  if (u.is_staff) return "admin_crasc";
+  if (u.is_redacteur) return "redacteur";
+  if (u.osc_id) return "osc";
+  return "utilisateur";
+}
+
+
 export default function UtilisateursPage() {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedRole, setSelectedRole] = useState("");
+  const [updatingRoleId, setUpdatingRoleId] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -58,7 +69,28 @@ export default function UtilisateursPage() {
   }, []);
 
   // Reset page on filter change
-  useEffect(() => { setCurrentPage(1); }, [searchQuery, selectedStatus]);
+  useEffect(() => { setCurrentPage(1); }, [searchQuery, selectedStatus, selectedRole]);
+
+  const handleRoleChange = async (targetUser: IUser, newRole: string) => {
+    setUpdatingRoleId(targetUser.id);
+    try {
+      const update: UpdateUserAdminData = {
+        is_superuser: false,
+        is_staff: false,
+        is_redacteur: false,
+      };
+      if (newRole === "superuser") { update.is_superuser = true; update.is_staff = true; }
+      else if (newRole === "admin_crasc") { update.is_staff = true; }
+      else if (newRole === "redacteur") { update.is_redacteur = true; }
+      await userService.updateUser(targetUser.id, update);
+      toast.success("Rôle mis à jour");
+      fetchUsers();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur lors de la mise à jour du rôle");
+    } finally {
+      setUpdatingRoleId(null);
+    }
+  };
 
   // Filter users
   const filteredUsers = users.filter((user) => {
@@ -73,7 +105,9 @@ export default function UtilisateursPage() {
       (selectedStatus === "active" && user.is_active) ||
       (selectedStatus === "inactive" && !user.is_active);
 
-    return matchSearch && matchStatus;
+    const matchRole = !selectedRole || getUserRole(user) === selectedRole;
+
+    return matchSearch && matchStatus && matchRole;
   });
 
   const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
@@ -98,8 +132,8 @@ export default function UtilisateursPage() {
       await userService.deleteUser(userId);
       toast.success("Utilisateur supprimé avec succès");
       fetchUsers();
-    } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la suppression");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erreur lors de la suppression");
     }
   };
 
@@ -112,8 +146,8 @@ export default function UtilisateursPage() {
         user.is_active ? "Utilisateur désactivé" : "Utilisateur activé"
       );
       fetchUsers();
-    } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la mise à jour");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erreur lors de la mise à jour");
     }
   };
 
@@ -224,7 +258,7 @@ export default function UtilisateursPage() {
 
         {/* Filters & Actions */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Search */}
             <div className="md:col-span-2">
               <div className="relative">
@@ -249,6 +283,22 @@ export default function UtilisateursPage() {
                 <option value="">Tous les statuts</option>
                 <option value="active">Actifs</option>
                 <option value="inactive">Inactifs</option>
+              </select>
+            </div>
+
+            {/* Filter by Role */}
+            <div>
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2a591d] focus:border-[#2a591d]"
+              >
+                <option value="">Tous les rôles</option>
+                <option value="superuser">Superuser</option>
+                <option value="admin_crasc">Admin CRASC</option>
+                <option value="redacteur">Rédacteur</option>
+                <option value="osc">Utilisateur OSC</option>
+                <option value="utilisateur">Utilisateur</option>
               </select>
             </div>
           </div>
@@ -282,7 +332,7 @@ export default function UtilisateursPage() {
                     Statut
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Date d'inscription
+                    Date d&apos;inscription
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Actions
@@ -306,28 +356,57 @@ export default function UtilisateursPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex flex-wrap gap-1">
-                        {user.is_superuser && (
-                          <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700">
-                            Superuser
-                          </span>
-                        )}
-                        {user.is_staff && !user.is_superuser && (
-                          <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">
-                            Admin CRASC
-                          </span>
-                        )}
-                        {(user as { is_redacteur?: boolean }).is_redacteur && !user.is_staff && !user.is_superuser && (
-                          <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700">
-                            Rédacteur
-                          </span>
-                        )}
-                        {!user.is_staff && !user.is_superuser && !(user as { is_redacteur?: boolean }).is_redacteur && (
-                          <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
-                            Utilisateur
-                          </span>
-                        )}
-                      </div>
+                      {currentUser?.is_superuser && user.id !== currentUser.id ? (
+                        <div className="relative">
+                          <select
+                            value={getUserRole(user)}
+                            disabled={updatingRoleId === user.id}
+                            onChange={(e) => handleRoleChange(user, e.target.value)}
+                            className={`text-xs font-semibold px-3 py-1.5 rounded-lg border cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#2a591d] ${
+                              getUserRole(user) === "superuser"
+                                ? "bg-purple-50 text-purple-700 border-purple-200"
+                                : getUserRole(user) === "admin_crasc"
+                                ? "bg-blue-50 text-blue-700 border-blue-200"
+                                : getUserRole(user) === "redacteur"
+                                ? "bg-orange-50 text-orange-700 border-orange-200"
+                                : getUserRole(user) === "osc"
+                                ? "bg-green-50 text-green-700 border-green-200"
+                                : "bg-gray-50 text-gray-700 border-gray-200"
+                            } ${updatingRoleId === user.id ? "opacity-50" : ""}`}
+                          >
+                            <option value="superuser">Superuser</option>
+                            <option value="admin_crasc">Admin CRASC</option>
+                            <option value="redacteur">Rédacteur</option>
+                            <option value="utilisateur">Utilisateur</option>
+                          </select>
+                          {updatingRoleId === user.id && (
+                            <Loader2 className="absolute right-6 top-1/2 -translate-y-1/2 w-3 h-3 animate-spin text-gray-500" />
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex flex-wrap gap-1">
+                          {user.is_superuser && (
+                            <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700">
+                              Superuser
+                            </span>
+                          )}
+                          {user.is_staff && !user.is_superuser && (
+                            <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">
+                              Admin CRASC
+                            </span>
+                          )}
+                          {user.is_redacteur && !user.is_staff && !user.is_superuser && (
+                            <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700">
+                              Rédacteur
+                            </span>
+                          )}
+                          {!user.is_staff && !user.is_superuser && !user.is_redacteur && (
+                            <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+                              {user.osc_id ? "Utilisateur OSC" : "Utilisateur"}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <span
@@ -464,7 +543,7 @@ export default function UtilisateursPage() {
             <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Détails de l'utilisateur
+                  Détails de l&apos;utilisateur
                 </h2>
                 <button
                   onClick={() => setIsModalOpen(false)}
@@ -530,7 +609,7 @@ export default function UtilisateursPage() {
                     <Calendar className="w-5 h-5 text-[#2a591d] mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">
-                        Date d'inscription
+                        Date d&apos;inscription
                       </p>
                       <p className="text-gray-900">
                         {formatDate(selectedUser.date_joined)}

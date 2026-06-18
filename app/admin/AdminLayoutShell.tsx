@@ -13,7 +13,27 @@ const OSC_ALLOWED_ROUTES = ["/admin", "/admin/mon-osc"];
 
 // Routes autorisées pour les admins CRASC
 const CRASC_ADMIN_ALLOWED_PREFIXES = [
+  "/admin/utilisateurs",
   "/admin/gestion-des-crasc",
+  "/admin/ptf",
+  "/admin/formations",
+  "/admin/projets",
+  "/admin/emplois",
+  "/admin/actualites",
+  "/admin/faq",
+  "/admin/annonces",
+  "/admin/hero-slides",
+  "/admin/forum",
+  "/admin/ressources",
+  "/admin/demandes-adhesion",
+  "/admin/dons",
+  "/admin/volontaires",
+  "/admin/contact",
+  "/admin/profile",
+];
+
+// Routes autorisées pour les rédacteurs CRASC
+const REDACTEUR_CRASC_ALLOWED_PREFIXES = [
   "/admin/formations",
   "/admin/actualites",
   "/admin/profile",
@@ -35,6 +55,25 @@ function OscRouteGuard({ children }: { children: React.ReactNode }) {
       router.replace("/admin");
     }
   }, [loading, isOscUser, pathname, router]);
+
+  return <>{children}</>;
+}
+
+function RedacteurCrascRouteGuard({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const isRedacteurCrasc = !!user?.is_redacteur && !!user?.crasc_id && !user?.is_staff && !user?.is_superuser;
+
+  useEffect(() => {
+    if (loading || !isRedacteurCrasc) return;
+    if (pathname === "/admin") return;
+    const allowed = REDACTEUR_CRASC_ALLOWED_PREFIXES.some((prefix) =>
+      pathname.startsWith(prefix)
+    );
+    if (!allowed) router.replace("/admin");
+  }, [loading, isRedacteurCrasc, pathname, router]);
 
   return <>{children}</>;
 }
@@ -77,6 +116,7 @@ export default function AdminLayoutShell({
       ) : (
         <ProtectedRoute requireAdmin={true}>
           <OscRouteGuard>
+            <RedacteurCrascRouteGuard>
             <CrascAdminRouteGuard>
             <div className="flex h-screen overflow-hidden bg-cyan-50/50 font-poppins">
               <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
@@ -97,6 +137,7 @@ export default function AdminLayoutShell({
               </div>
             </div>
             </CrascAdminRouteGuard>
+            </RedacteurCrascRouteGuard>
           </OscRouteGuard>
         </ProtectedRoute>
       )}

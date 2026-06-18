@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { fetchWithAuth } from "@/lib/auth";
@@ -16,6 +15,7 @@ import {
   Loader2,
   Pin,
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface IPoleConcertation {
   id: number;
@@ -31,7 +31,8 @@ interface IPoleConcertation {
 }
 
 export default function AdminForumPolesPage() {
-  const router = useRouter();
+  const { user } = useAuth();
+  const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
   const [poles, setPoles] = useState<IPoleConcertation[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -109,12 +110,14 @@ export default function AdminForumPolesPage() {
             </h1>
             <p className="text-gray-600">Gérez les pôles du forum collaboratif</p>
           </div>
-          <Link href="/admin/forum/poles/ajouter">
-            <button className="flex items-center gap-2 px-5 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold">
-              <Plus className="w-5 h-5" />
-              Nouveau pôle
-            </button>
-          </Link>
+          {!isCrascAdmin && (
+            <Link href="/admin/forum/poles/ajouter">
+              <button className="flex items-center gap-2 px-5 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold">
+                <Plus className="w-5 h-5" />
+                Nouveau pôle
+              </button>
+            </Link>
+          )}
         </div>
 
         {/* Stats */}
@@ -208,40 +211,44 @@ export default function AdminForumPolesPage() {
                       <Pin className="w-4 h-4" />
                     </button>
                   </Link>
-                  <Link href={`/admin/forum/poles/${pole.slug}/modifier`}>
-                    <button
-                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                      title="Modifier"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                  </Link>
-                  <button
-                    onClick={() => handleToggleActive(pole)}
-                    disabled={togglingSlug === pole.slug}
-                    className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
-                    title={pole.is_active ? "Désactiver" : "Activer"}
-                  >
-                    {togglingSlug === pole.slug ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : pole.is_active ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                  <button
-                    onClick={() => handleDelete(pole)}
-                    disabled={deletingSlug === pole.slug}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                    title="Supprimer"
-                  >
-                    {deletingSlug === pole.slug ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="w-4 h-4" />
-                    )}
-                  </button>
+                  {!isCrascAdmin && (
+                    <>
+                      <Link href={`/admin/forum/poles/${pole.slug}/modifier`}>
+                        <button
+                          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                          title="Modifier"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                      </Link>
+                      <button
+                        onClick={() => handleToggleActive(pole)}
+                        disabled={togglingSlug === pole.slug}
+                        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                        title={pole.is_active ? "Désactiver" : "Activer"}
+                      >
+                        {togglingSlug === pole.slug ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : pole.is_active ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(pole)}
+                        disabled={deletingSlug === pole.slug}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                        title="Supprimer"
+                      >
+                        {deletingSlug === pole.slug ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}

@@ -181,28 +181,42 @@ export default function FormationsPage() {
 
           {/* Left Sidebar */}
           <div className="hidden lg:block w-64 flex-shrink-0 mt-20">
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-md">
+              {/* Titre sidebar */}
+              <div className="bg-[#2a591d] px-5 py-4">
+                <p className="text-white font-bold text-sm uppercase tracking-widest">Catégories</p>
+              </div>
+
+              {/* Toutes les formations */}
               <button
                 onClick={() => setActiveCategorie(null)}
-                className={`w-full text-left px-6 py-4 transition-colors rounded-t-lg ${activeCategorie === null ? 'text-white' : 'text-gray-700 hover:bg-gray-50'}`}
-                style={activeCategorie === null ? { backgroundColor: '#E05017' } : {}}
+                className={`w-full text-left px-5 py-3.5 flex items-center gap-3 transition-all border-b border-gray-100 ${
+                  activeCategorie === null
+                    ? 'bg-[#E05017] text-white font-semibold'
+                    : 'bg-white text-gray-700 hover:bg-orange-50 hover:text-[#E05017]'
+                }`}
               >
-                <span className="flex items-center gap-3">
-                  <span className="text-sm">•</span>
-                  <span>Toutes les formations</span>
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${activeCategorie === null ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                  •
                 </span>
+                <span className="text-sm">Toutes les formations</span>
               </button>
+
+              {/* Catégories dynamiques */}
               {categories.map((cat, index) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategorie(cat)}
-                  className={`w-full text-left px-6 py-4 transition-colors ${activeCategorie === cat ? 'text-white' : 'text-gray-700 hover:bg-gray-50'}`}
-                  style={activeCategorie === cat ? { backgroundColor: '#E05017' } : {}}
+                  className={`w-full text-left px-5 py-3.5 flex items-center gap-3 transition-all border-b border-gray-100 last:border-b-0 ${
+                    activeCategorie === cat
+                      ? 'bg-[#E05017] text-white font-semibold'
+                      : 'bg-white text-gray-700 hover:bg-orange-50 hover:text-[#E05017]'
+                  }`}
                 >
-                  <span className="flex items-center gap-3">
-                    <span className="text-sm font-semibold">{index + 1}</span>
-                    <span>{cat}</span>
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${activeCategorie === cat ? 'bg-white/20 text-white' : 'bg-orange-100 text-[#E05017]'}`}>
+                    {index + 1}
                   </span>
+                  <span className="text-sm leading-snug">{cat}</span>
                 </button>
               ))}
             </div>

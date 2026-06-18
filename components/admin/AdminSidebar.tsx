@@ -48,9 +48,10 @@ export default function AdminSidebar({
   const [pendingCount, setPendingCount] = useState(0);
   const pathname = usePathname();
   const { user } = useAuth();
-  const isRedacteur = user?.is_redacteur && !user?.is_staff && !user?.is_superuser;
   const isOscUser = !!user?.osc_id && !user?.is_staff && !user?.is_superuser;
   const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
+  const isRedacteurCrasc = !!user?.is_redacteur && !!user?.crasc_id && !user?.is_staff && !user?.is_superuser;
+  const isRedacteur = !!user?.is_redacteur && !user?.crasc_id && !user?.is_staff && !user?.is_superuser;
 
   useEffect(() => {
     async function fetchPending() {
@@ -157,12 +158,23 @@ export default function AdminSidebar({
   const navItems = isOscUser
     ? allNavItems.filter((item) => item.href === "/admin" || item.href === "/admin/mon-osc")
     : isCrascAdmin
+    ? allNavItems.filter((item) =>
+        item.href === "/admin" ||
+        item.href === "/admin/utilisateurs" ||
+        item.href === "/admin/gestion-des-crasc" ||
+        item.href === "/admin/gestion-des-crasc/videos" ||
+        item.label === "Organisations" ||
+        item.label === "Contenu" ||
+        item.label === "Forum" ||
+        item.href === "/admin/ressources" ||
+        item.href === "/admin/demandes-adhesion" ||
+        item.href === "/admin/dons" ||
+        item.href === "/admin/volontaires" ||
+        item.href === "/admin/contact"
+      )
+    : isRedacteurCrasc
     ? allNavItems
-        .filter((item) =>
-          item.href === "/admin" ||
-          item.href === "/admin/gestion-des-crasc" ||
-          item.label === "Contenu"
-        )
+        .filter((item) => item.href === "/admin" || item.label === "Contenu")
         .map((item) => {
           if (item.label === "Contenu" && item.submenus) {
             return {
