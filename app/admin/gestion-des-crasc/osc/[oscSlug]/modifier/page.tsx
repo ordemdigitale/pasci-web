@@ -24,6 +24,10 @@ import {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+const supportingDocumentSchema = z.instanceof(File).optional()
+  .refine(f => !f || f.size <= FORMALISATION_FILE_MAX_SIZE, { message: "Max 10MB" })
+  .refine(isFormalisationFileAccepted, { message: "PDF, Word ou image uniquement" });
+
 const oscSchema = z.object({
   name: z.string().min(4, "Minimum 4 caractères").optional(),
   sigle: z.string().optional(),
@@ -81,15 +85,16 @@ const oscSchema = z.object({
   adhesion_crasc: z.string().optional(),
   adhesion_crasc_statut: z.string().optional(),
   type_document_formalisation: z.string().optional(),
-  document_formalisation_file: z.instanceof(File).optional()
-    .refine(f => !f || f.size <= FORMALISATION_FILE_MAX_SIZE, { message: "Max 10MB" })
-    .refine(isFormalisationFileAccepted, { message: "PDF, Word ou image uniquement" }),
+  document_formalisation_file: supportingDocumentSchema,
   existence_siege: z.string().optional(),
   manuel_procedures: z.string().optional(),
   plan_action_annee_cours: z.string().optional(),
   plan_action_annee_cours_details: z.string().optional(),
   plan_action: z.string().optional(),
+  plan_action_document_file: supportingDocumentSchema,
   rapports_annuels: z.string().optional(),
+  rapports_annuels_document_file: supportingDocumentSchema,
+  adhesion_crasc_document_file: supportingDocumentSchema,
   niveau_regroupement: z.string().optional(),
   reseau_appartenance: z.string().optional(),
   organes_gouvernance: z.string().optional(),
@@ -106,6 +111,7 @@ const oscSchema = z.object({
 });
 
 type OscForm = z.infer<typeof oscSchema>;
+type ProofFileField = "plan_action_document_file" | "rapports_annuels_document_file" | "adhesion_crasc_document_file";
 
 interface IOscDetail {
   id: number; name: string; slug: string; description: string | null;
@@ -142,6 +148,9 @@ interface IOscDetail {
   niveau_regroupement?: string | null; reseau_appartenance?: string | null;
   type_document_formalisation?: string | null;
   document_formalisation_path?: string | null; document_formalisation_url?: string | null;
+  plan_action_document_url?: string | null;
+  rapports_annuels_document_url?: string | null;
+  adhesion_crasc_document_url?: string | null;
   existence_siege?: boolean | null; manuel_procedures?: boolean | null;
   plan_action_annee_cours?: boolean | null; plan_action_annee_cours_details?: string | null;
   plan_action?: boolean | null; rapports_annuels?: boolean | null;
@@ -183,6 +192,9 @@ export default function ModifierOscPage() {
   const [osc, setOsc] = useState<IOscDetail | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const documentFormalisationInputRef = useRef<HTMLInputElement>(null);
+  const planActionDocumentInputRef = useRef<HTMLInputElement>(null);
+  const rapportsAnnuelsDocumentInputRef = useRef<HTMLInputElement>(null);
+  const adhesionCrascDocumentInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchAllCrasc().then(setCrascList).catch(console.error);
@@ -320,6 +332,64 @@ export default function ModifierOscPage() {
 
   const thumbnailFile = watch("thumbnail");
   const documentFormalisationFile = watch("document_formalisation_file");
+  const planActionValue = watch("plan_action");
+  const rapportsAnnuelsValue = watch("rapports_annuels");
+  const adhesionCrascStatutValue = watch("adhesion_crasc_statut");
+
+  const renderProofUpload = (
+    field: ProofFileField,
+    inputRef: React.RefObject<HTMLInputElement | null>,
+    label: string,
+    currentUrl?: string | null
+  ) => {
+    const selectedFile = watch(field);
+    return (
+      <div className="md:col-span-2 rounded-xl border border-dashed border-[#2A591D]/30 bg-[#2A591D]/5 p-4">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="w-full px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-left text-sm bg-white hover:border-[#2A591D] hover:bg-white transition-all"
+        >
+          <span className="flex items-center gap-2 text-gray-700">
+            <Upload className="w-4 h-4 text-[#2A591D]" />
+            {selectedFile?.name || "Remplacer ou déposer la preuve"}
+          </span>
+          <span className="mt-1 block text-xs text-gray-500">PDF, Word, JPG, PNG ou WebP • 10MB max</span>
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept={FORMALISATION_FILE_ACCEPT}
+          className="hidden"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) setValue(field, file);
+          }}
+        />
+        <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+          {currentUrl && (
+            <a href={currentUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#2A591D] hover:underline">
+              Voir la preuve actuelle
+            </a>
+          )}
+          {selectedFile && (
+            <button
+              type="button"
+              onClick={() => {
+                setValue(field, undefined);
+                if (inputRef.current) inputRef.current.value = "";
+              }}
+              className="font-semibold text-red-600 hover:text-red-700"
+            >
+              Retirer le fichier choisi
+            </button>
+          )}
+        </div>
+        {errors[field] && <p className="text-red-500 text-xs mt-1">{errors[field]?.message}</p>}
+      </div>
+    );
+  };
   useEffect(() => {
     if (thumbnailFile) {
       const reader = new FileReader();
@@ -409,6 +479,9 @@ export default function ModifierOscPage() {
       append("recommandations_2", values.recommandations_2);
       if (values.thumbnail) fd.append("thumbnail", values.thumbnail);
       if (values.document_formalisation_file) fd.append("document_formalisation_file", values.document_formalisation_file);
+      if (values.plan_action_document_file) fd.append("plan_action_document_file", values.plan_action_document_file);
+      if (values.rapports_annuels_document_file) fd.append("rapports_annuels_document_file", values.rapports_annuels_document_file);
+      if (values.adhesion_crasc_document_file) fd.append("adhesion_crasc_document_file", values.adhesion_crasc_document_file);
 
       const res = await fetchWithAuth(`${API_BASE_URL}/api/v1/crasc/osc/${oscSlug}`, { method: "PATCH", body: fd });
       if (res.ok) {
@@ -596,6 +669,8 @@ export default function ModifierOscPage() {
               <SelectField name="adhesion_crasc_statut" placeholder="Sélectionner"
                 options={[{ value: "oui", label: "Oui" }, { value: "non", label: "Non" }, { value: "en_cours", label: "En cours" }]} />
             </Field>
+            {adhesionCrascStatutValue === "oui" &&
+              renderProofUpload("adhesion_crasc_document_file", adhesionCrascDocumentInputRef, "Preuve d’adhésion au CRASC", osc?.adhesion_crasc_document_url)}
             <Field label="Niveau de regroupement">
               <SelectField name="niveau_regroupement" placeholder="Sélectionner" options={[
                 { value: "Simple", label: "Simple" },
@@ -676,13 +751,21 @@ export default function ModifierOscPage() {
               ["existence_siege", "Existence d’un siège — 3 points"],
               ["manuel_procedures", "Manuel de procédures — 3 points"],
               ["plan_action_annee_cours", "Plan d’action pour l’année en cours"],
-              ["plan_action", "Plan d’action — 3 points"],
-              ["rapports_annuels", "Rapports annuels d’activités — 3 points"],
             ].map(([name, label]) => (
               <Field key={name} label={label}>
                 <SelectField name={name as keyof OscForm} placeholder="Sélectionner" options={[{ value: "true", label: "Oui" }, { value: "false", label: "Non" }]} />
               </Field>
             ))}
+            <Field label="Plan d’action — 3 points">
+              <SelectField name="plan_action" placeholder="Sélectionner" options={[{ value: "true", label: "Oui" }, { value: "false", label: "Non" }]} />
+            </Field>
+            {planActionValue === "true" &&
+              renderProofUpload("plan_action_document_file", planActionDocumentInputRef, "Preuve du plan d’action", osc?.plan_action_document_url)}
+            <Field label="Rapports annuels d’activités — 3 points">
+              <SelectField name="rapports_annuels" placeholder="Sélectionner" options={[{ value: "true", label: "Oui" }, { value: "false", label: "Non" }]} />
+            </Field>
+            {rapportsAnnuelsValue === "true" &&
+              renderProofUpload("rapports_annuels_document_file", rapportsAnnuelsDocumentInputRef, "Preuve des rapports annuels", osc?.rapports_annuels_document_url)}
           </div>
           <div className="mt-4">
             <Field label="Plan d’action pour l’année en cours et activités/initiatives à venir">

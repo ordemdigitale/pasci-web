@@ -41,6 +41,9 @@ export interface IOsc {
   website?: string | null;
   address?: string | null;
   document_formalisation_url?: string | null;
+  plan_action_document_url?: string | null;
+  rapports_annuels_document_url?: string | null;
+  adhesion_crasc_document_url?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -111,7 +114,11 @@ export interface IOscDetail {
   existence_siege?: boolean | null;
   manuel_procedures?: boolean | null;
   plan_action?: boolean | null;
+  plan_action_document_path?: string | null;
+  plan_action_document_url?: string | null;
   rapports_annuels?: boolean | null;
+  rapports_annuels_document_path?: string | null;
+  rapports_annuels_document_url?: string | null;
   score_autoevaluation?: number;
   couleur_autoevaluation?: "gris" | "rouge" | "orange" | "jaune" | "bleu" | "vert";
   couleur_autoevaluation_hex?: string;
@@ -125,6 +132,8 @@ export interface IOscDetail {
   montant_cotisation?: number | null;
   adhesion_crasc?: boolean | null;
   adhesion_crasc_statut?: "oui" | "non" | "en_cours" | null;
+  adhesion_crasc_document_path?: string | null;
+  adhesion_crasc_document_url?: string | null;
   niveau_regroupement?: "Simple" | "Réseau" | "Fédération" | "Plateforme" | "Confédération" | null;
   reseau_appartenance?: string | null;
   organes_gouvernance?: string | null;

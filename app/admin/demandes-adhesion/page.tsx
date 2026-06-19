@@ -76,9 +76,12 @@ interface DemandeAdhesion {
   plan_action_annee_cours?: boolean | null;
   plan_action_annee_cours_details?: string | null;
   plan_action?: boolean | null;
+  plan_action_document_path?: string | null;
   nb_activites?: number | null;
   date_derniere_activite?: string | null;
   rapports_annuels?: boolean | null;
+  rapports_annuels_document_path?: string | null;
+  adhesion_crasc_document_path?: string | null;
   recommandations?: string | null;
   recommandations_2?: string | null;
   statut: "en_attente" | "approuvee" | "rejetee";
@@ -540,10 +543,49 @@ export default function DemandesAdhesionPage() {
                   { label: "Catégorie", value: selected.categorie },
                   { label: "Niveau de regroupement", value: selected.niveau_regroupement },
                   { label: "Adhésion CRASC", value: selected.adhesion_crasc_statut },
+                  {
+                    label: "Preuve adhésion CRASC",
+                    value: selected.adhesion_crasc_document_path ? (
+                      <a
+                        href={`${API_BASE_URL}/static/${selected.adhesion_crasc_document_path}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[#2A591D] hover:underline"
+                      >
+                        Voir le fichier
+                      </a>
+                    ) : null,
+                  },
                   { label: "Manuel de procédures", value: selected.manuel_procedures },
                   { label: "Plan d'action année en cours", value: selected.plan_action_annee_cours },
                   { label: "Plan d'action", value: selected.plan_action },
+                  {
+                    label: "Preuve plan d'action",
+                    value: selected.plan_action_document_path ? (
+                      <a
+                        href={`${API_BASE_URL}/static/${selected.plan_action_document_path}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[#2A591D] hover:underline"
+                      >
+                        Voir le fichier
+                      </a>
+                    ) : null,
+                  },
                   { label: "Rapports annuels", value: selected.rapports_annuels },
+                  {
+                    label: "Preuve rapports annuels",
+                    value: selected.rapports_annuels_document_path ? (
+                      <a
+                        href={`${API_BASE_URL}/static/${selected.rapports_annuels_document_path}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[#2A591D] hover:underline"
+                      >
+                        Voir le fichier
+                      </a>
+                    ) : null,
+                  },
                 ]}
               />
 

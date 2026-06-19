@@ -31,6 +31,18 @@ import {
   isFormalisationFileAccepted,
 } from '@/lib/formalisation-file';
 
+const supportingDocumentSchema = z
+  .instanceof(File)
+  .optional()
+  .refine(
+    (file) => !file || file.size <= FORMALISATION_FILE_MAX_SIZE,
+    'Le fichier ne doit pas dépasser 10 Mo'
+  )
+  .refine(
+    isFormalisationFileAccepted,
+    'Format invalide. Formats acceptés : PDF, DOC, DOCX, JPG, PNG ou WEBP'
+  );
+
 const registrationSchema = z.object({
   organizationName: z
     .string()
@@ -58,17 +70,7 @@ const registrationSchema = z.object({
     .min(1, 'Veuillez expliquer votre motivation')
     .min(10, 'La motivation doit contenir au moins 10 caractères'),
   typeDocumentFormalisation: z.string().optional(),
-  documentFormalisationFile: z
-    .instanceof(File)
-    .optional()
-    .refine(
-      (file) => !file || file.size <= FORMALISATION_FILE_MAX_SIZE,
-      'Le fichier ne doit pas dépasser 10 Mo'
-    )
-    .refine(
-      isFormalisationFileAccepted,
-      'Format invalide. Formats acceptés : PDF, DOC, DOCX, JPG, PNG ou WEBP'
-    ),
+  documentFormalisationFile: supportingDocumentSchema,
   existenceSiege: z.string().optional(),
   categorie: z.string().optional(),
   niveauRegroupement: z.string().optional(),
@@ -101,15 +103,23 @@ const registrationSchema = z.object({
   planActionAnneeCours: z.string().optional(),
   planActionAnneeCoursDetails: z.string().optional(),
   planAction: z.string().optional(),
+  planActionDocumentFile: supportingDocumentSchema,
   nbActivites: z.string().optional(),
   dateDerniereActivite: z.string().optional(),
   rapportsAnnuels: z.string().optional(),
+  rapportsAnnuelsDocumentFile: supportingDocumentSchema,
+  adhesionCrascDocumentFile: supportingDocumentSchema,
   recommandations: z.string().optional(),
   recommandations2: z.string().optional(),
 });
 
 type RegistrationFormValues = z.infer<typeof registrationSchema>;
-type TextFieldName = Exclude<keyof RegistrationFormValues, 'documentFormalisationFile'>;
+type FileFieldName =
+  | 'documentFormalisationFile'
+  | 'planActionDocumentFile'
+  | 'rapportsAnnuelsDocumentFile'
+  | 'adhesionCrascDocumentFile';
+type TextFieldName = Exclude<keyof RegistrationFormValues, FileFieldName>;
 
 const TYPE_OSC_OPTIONS = [
   { value: 'Association', label: 'Association' },
@@ -262,9 +272,12 @@ export default function PageRejoindre() {
       planActionAnneeCours: '',
       planActionAnneeCoursDetails: '',
       planAction: '',
+      planActionDocumentFile: undefined,
       nbActivites: '',
       dateDerniereActivite: '',
       rapportsAnnuels: '',
+      rapportsAnnuelsDocumentFile: undefined,
+      adhesionCrascDocumentFile: undefined,
       recommandations: '',
       recommandations2: '',
     },
@@ -342,6 +355,15 @@ export default function PageRejoindre() {
       });
       if (values.documentFormalisationFile) {
         formData.append('document_formalisation_file', values.documentFormalisationFile);
+      }
+      if (values.planActionDocumentFile) {
+        formData.append('plan_action_document_file', values.planActionDocumentFile);
+      }
+      if (values.rapportsAnnuelsDocumentFile) {
+        formData.append('rapports_annuels_document_file', values.rapportsAnnuelsDocumentFile);
+      }
+      if (values.adhesionCrascDocumentFile) {
+        formData.append('adhesion_crasc_document_file', values.adhesionCrascDocumentFile);
       }
 
       const res = await fetch(`${API_BASE_URL}/api/v1/adhesion`, {
@@ -445,7 +467,54 @@ export default function PageRejoindre() {
       )}
     />
   );
-  const documentFormalisationFile = form.watch('documentFormalisationFile');
+
+  const renderDocumentFile = (name: FileFieldName, label: string) => {
+    const selectedFile = form.watch(name);
+    return (
+      <FormField
+        control={form.control}
+        name={name}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-gray-700 font-semibold">{label}</FormLabel>
+            <FormControl>
+              <Input
+                key={`${name}-${fileInputKey}`}
+                type="file"
+                accept={FORMALISATION_FILE_ACCEPT}
+                className="border-gray-300 file:mr-4 file:rounded-md file:border-0 file:bg-[#2A591D] file:px-4 file:py-2 file:text-white file:font-semibold"
+                name={field.name}
+                ref={field.ref}
+                onBlur={field.onBlur}
+                onChange={(event) => field.onChange(event.target.files?.[0])}
+              />
+            </FormControl>
+            {selectedFile && (
+              <div className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm">
+                <span className="truncate text-gray-700">{selectedFile.name}</span>
+                <button
+                  type="button"
+                  className="text-xs font-semibold text-[#E05017] hover:underline"
+                  onClick={() => {
+                    form.setValue(name, undefined);
+                    setFileInputKey((key) => key + 1);
+                  }}
+                >
+                  Retirer
+                </button>
+              </div>
+            )}
+            <p className="text-xs text-gray-500">Formats acceptés : PDF, DOC, DOCX, JPG, PNG ou WEBP. Taille max : 10 Mo.</p>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    );
+  };
+
+  const planActionValue = form.watch('planAction');
+  const rapportsAnnuelsValue = form.watch('rapportsAnnuels');
+  const adhesionCrascStatutValue = form.watch('adhesionCrascStatut');
 
   return (
     <section className="w-full max-w-2xl mx-auto px-4 py-8 font-poppins">
@@ -641,51 +710,17 @@ export default function PageRejoindre() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {renderSelect('existenceSiege', "L'organisation a-t-elle un siège ?", 'Sélectionnez', BOOLEAN_OPTIONS)}
               {renderSelect('typeDocumentFormalisation', 'Document de formalisation', 'Sélectionnez un document', FORMALISATION_OPTIONS)}
-              <FormField
-                control={form.control}
-                name="documentFormalisationFile"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700 font-semibold">Justificatif de formalisation</FormLabel>
-                    <FormControl>
-                      <Input
-                        key={fileInputKey}
-                        type="file"
-                        accept={FORMALISATION_FILE_ACCEPT}
-                        className="border-gray-300 file:mr-4 file:rounded-md file:border-0 file:bg-[#2A591D] file:px-4 file:py-2 file:text-white file:font-semibold"
-                        name={field.name}
-                        ref={field.ref}
-                        onBlur={field.onBlur}
-                        onChange={(event) => field.onChange(event.target.files?.[0])}
-                      />
-                    </FormControl>
-                    {documentFormalisationFile && (
-                      <div className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm">
-                        <span className="truncate text-gray-700">{documentFormalisationFile.name}</span>
-                        <button
-                          type="button"
-                          className="text-xs font-semibold text-[#E05017] hover:underline"
-                          onClick={() => {
-                            form.setValue('documentFormalisationFile', undefined);
-                            setFileInputKey((key) => key + 1);
-                          }}
-                        >
-                          Retirer
-                        </button>
-                      </div>
-                    )}
-                    <p className="text-xs text-gray-500">Formats acceptés : PDF, DOC, DOCX, JPG, PNG ou WEBP. Taille max : 10 Mo.</p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {renderDocumentFile('documentFormalisationFile', 'Justificatif de formalisation')}
               {renderSelect('categorie', "Catégorie d'organisation", 'Sélectionnez une catégorie', CATEGORIE_OPTIONS)}
               {renderSelect('niveauRegroupement', "Niveau de regroupement de l'organisation", 'Sélectionnez un niveau', NIVEAU_REGROUPEMENT_OPTIONS)}
               {renderSelect('adhesionCrascStatut', 'Adhésion au CRASC', 'Sélectionnez un statut', ADHESION_CRASC_OPTIONS)}
+              {adhesionCrascStatutValue === 'oui' && renderDocumentFile('adhesionCrascDocumentFile', 'Preuve d’adhésion au CRASC')}
               {renderSelect('manuelProcedures', 'Existence de manuel de procédures', 'Sélectionnez', BOOLEAN_OPTIONS)}
               {renderSelect('planActionAnneeCours', "Plan d'action pour l'année en cours ?", 'Sélectionnez', BOOLEAN_OPTIONS)}
               {renderSelect('planAction', "L'organisation a-t-elle un plan d'action ?", 'Sélectionnez', BOOLEAN_OPTIONS)}
+              {planActionValue === 'true' && renderDocumentFile('planActionDocumentFile', "Preuve du plan d'action")}
               {renderSelect('rapportsAnnuels', "Rédigez-vous des rapports annuels d'activités ?", 'Sélectionnez', BOOLEAN_OPTIONS)}
+              {rapportsAnnuelsValue === 'true' && renderDocumentFile('rapportsAnnuelsDocumentFile', "Preuve des rapports annuels d'activités")}
             </div>
             <div className="mt-6">
               {renderTextarea('planActionAnneeCoursDetails', "Plan d'action pour l'année en cours et activités/initiatives à venir", 'Décrivez le plan et les activités à venir...')}

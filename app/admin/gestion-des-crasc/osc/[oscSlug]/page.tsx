@@ -23,6 +23,13 @@ interface IOscDetail {
   website?: string | null; reseaux_sociaux?: string | null;
   date_creation?: string | null; numero_recepisse?: string | null;
   document_formalisation_url?: string | null;
+  plan_action_document_url?: string | null;
+  rapports_annuels_document_url?: string | null;
+  adhesion_crasc_document_url?: string | null;
+  existence_siege?: boolean | null;
+  manuel_procedures?: boolean | null;
+  plan_action?: boolean | null;
+  rapports_annuels?: boolean | null;
   niveau_couverture?: string | null; zone_couverture?: string | null;
   categorie?: string | null;
   domaine_prioritaire?: string | null; domaine_prioritaire_2?: string | null;
@@ -243,7 +250,35 @@ export default function OscDetailPage() {
             <InfoRow label="Catégorie" value={osc.categorie} />
             <InfoRow label="Niveau de couverture" value={osc.niveau_couverture} />
             <InfoRow label="Zone de couverture" value={osc.zone_couverture} />
+            <InfoRow label="Existence d’un siège" value={<BoolBadge value={osc.existence_siege} />} />
+            <InfoRow label="Manuel de procédures" value={<BoolBadge value={osc.manuel_procedures} />} />
+            <InfoRow label="Plan d’action" value={<BoolBadge value={osc.plan_action} />} />
+            <InfoRow
+              label="Preuve plan d’action"
+              value={osc.plan_action_document_url ? (
+                <a href={osc.plan_action_document_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                  Voir le fichier
+                </a>
+              ) : null}
+            />
+            <InfoRow label="Rapports annuels" value={<BoolBadge value={osc.rapports_annuels} />} />
+            <InfoRow
+              label="Preuve rapports annuels"
+              value={osc.rapports_annuels_document_url ? (
+                <a href={osc.rapports_annuels_document_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                  Voir le fichier
+                </a>
+              ) : null}
+            />
             <InfoRow label="Adhésion CRASC" value={<CrascAdhesionBadge statut={osc.adhesion_crasc_statut} fallback={osc.adhesion_crasc} />} />
+            <InfoRow
+              label="Preuve adhésion CRASC"
+              value={osc.adhesion_crasc_document_url ? (
+                <a href={osc.adhesion_crasc_document_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                  Voir le fichier
+                </a>
+              ) : null}
+            />
             <InfoRow label="Niveau de regroupement" value={osc.niveau_regroupement} />
             <InfoRow label="Réseau d'appartenance" value={osc.reseau_appartenance} />
           </div>

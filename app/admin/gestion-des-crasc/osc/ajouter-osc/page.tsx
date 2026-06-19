@@ -36,6 +36,16 @@ type ApiFieldError = {
   message?: string;
 };
 
+const supportingDocumentSchema = z
+  .instanceof(File)
+  .optional()
+  .refine((file) => !file || file.size <= FORMALISATION_FILE_MAX_SIZE, {
+    message: "Le fichier doit être inférieur à 10MB",
+  })
+  .refine(isFormalisationFileAccepted, {
+    message: "Format non supporté. Utilisez PDF, Word, JPG, PNG ou WebP",
+  });
+
 // Schema de validation pour le formulaire d'ajout d'OSC
 const oscSchema = z.object({
   name: z.string().min(4, "Le nom de l'OSC doit contenir au moins 4 caractères."),
@@ -55,23 +65,18 @@ const oscSchema = z.object({
   latitude: z.string().optional(),
   longitude: z.string().optional(),
   type_document_formalisation: z.string().optional(),
-  document_formalisation_file: z
-    .instanceof(File)
-    .optional()
-    .refine((file) => !file || file.size <= FORMALISATION_FILE_MAX_SIZE, {
-      message: "Le fichier doit être inférieur à 10MB",
-    })
-    .refine(isFormalisationFileAccepted, {
-      message: "Format non supporté. Utilisez PDF, Word, JPG, PNG ou WebP",
-    }),
+  document_formalisation_file: supportingDocumentSchema,
   existence_siege: z.string().optional(),
   manuel_procedures: z.string().optional(),
   plan_action_annee_cours: z.string().optional(),
   plan_action_annee_cours_details: z.string().optional(),
   plan_action: z.string().optional(),
+  plan_action_document_file: supportingDocumentSchema,
   rapports_annuels: z.string().optional(),
+  rapports_annuels_document_file: supportingDocumentSchema,
   adhesion_crasc: z.string().optional(),
   adhesion_crasc_statut: z.string().optional(),
+  adhesion_crasc_document_file: supportingDocumentSchema,
   niveau_regroupement: z.enum(["Simple", "Réseau", "Fédération", "Plateforme", "Confédération"]).optional().or(z.literal("")),
   categorie: z.string().optional(),
   domaine_prioritaire: z.string().optional(),
@@ -116,6 +121,7 @@ const oscSchema = z.object({
 });
 
 type OscForm = z.infer<typeof oscSchema>;
+type ProofFileField = "plan_action_document_file" | "rapports_annuels_document_file" | "adhesion_crasc_document_file";
 
 export default function AdminAjoutOsc() {
   const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
@@ -127,6 +133,9 @@ export default function AdminAjoutOsc() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const documentFormalisationInputRef = useRef<HTMLInputElement>(null);
+  const planActionDocumentInputRef = useRef<HTMLInputElement>(null);
+  const rapportsAnnuelsDocumentInputRef = useRef<HTMLInputElement>(null);
+  const adhesionCrascDocumentInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -207,6 +216,65 @@ export default function AdminAjoutOsc() {
 
   const thumbnailFile = watch("thumbnail");
   const documentFormalisationFile = watch("document_formalisation_file");
+  const planActionValue = watch("plan_action");
+  const rapportsAnnuelsValue = watch("rapports_annuels");
+  const adhesionCrascStatutValue = watch("adhesion_crasc_statut");
+
+  const renderProofUpload = (
+    field: ProofFileField,
+    inputRef: React.RefObject<HTMLInputElement | null>,
+    label: string
+  ) => {
+    const selectedFile = watch(field);
+    return (
+      <div className="md:col-span-2 rounded-xl border border-dashed border-[#2A591D]/30 bg-[#2A591D]/5 p-4">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className={`w-full px-4 py-3 border-2 border-dashed rounded-lg text-left transition-all ${
+            errors[field]
+              ? "border-red-300 bg-red-50"
+              : "border-gray-300 bg-white hover:border-[#2A591D] hover:bg-white"
+          }`}
+        >
+          <span className="flex items-center gap-2 text-gray-700">
+            <Upload className="w-4 h-4 text-[#2A591D]" />
+            {selectedFile?.name || "Déposer la preuve"}
+          </span>
+          <span className="mt-1 block text-xs text-gray-500">PDF, Word, JPG, PNG ou WebP • 10MB max</span>
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept={FORMALISATION_FILE_ACCEPT}
+          className="hidden"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) setValue(field, file);
+          }}
+        />
+        {selectedFile && (
+          <button
+            type="button"
+            onClick={() => {
+              setValue(field, undefined);
+              if (inputRef.current) inputRef.current.value = "";
+            }}
+            className="mt-2 text-sm font-semibold text-red-600 hover:text-red-700"
+          >
+            Retirer le fichier
+          </button>
+        )}
+        {errors[field] && (
+          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+            <AlertCircle className="w-3 h-3" />
+            {errors[field]?.message}
+          </p>
+        )}
+      </div>
+    );
+  };
 
   // Gestion du preview de l'image
   useEffect(() => {
@@ -346,6 +414,15 @@ export default function AdminAjoutOsc() {
       if (values.document_formalisation_file) {
         formData.append("document_formalisation_file", values.document_formalisation_file);
       }
+      if (values.plan_action_document_file) {
+        formData.append("plan_action_document_file", values.plan_action_document_file);
+      }
+      if (values.rapports_annuels_document_file) {
+        formData.append("rapports_annuels_document_file", values.rapports_annuels_document_file);
+      }
+      if (values.adhesion_crasc_document_file) {
+        formData.append("adhesion_crasc_document_file", values.adhesion_crasc_document_file);
+      }
 
       const xhr = new XMLHttpRequest();
 
@@ -362,6 +439,9 @@ export default function AdminAjoutOsc() {
           reset();
           setPreviewImage(null);
           if (documentFormalisationInputRef.current) documentFormalisationInputRef.current.value = "";
+          if (planActionDocumentInputRef.current) planActionDocumentInputRef.current.value = "";
+          if (rapportsAnnuelsDocumentInputRef.current) rapportsAnnuelsDocumentInputRef.current.value = "";
+          if (adhesionCrascDocumentInputRef.current) adhesionCrascDocumentInputRef.current.value = "";
 
           // Rediriger après 2 secondes
           setTimeout(() => {
@@ -882,8 +962,6 @@ export default function AdminAjoutOsc() {
               ["existence_siege", "Existence d’un siège — 3 points"],
               ["manuel_procedures", "Manuel de procédures — 3 points"],
               ["plan_action_annee_cours", "Plan d’action pour l’année en cours"],
-              ["plan_action", "Plan d’action — 3 points"],
-              ["rapports_annuels", "Rapports annuels d’activités — 3 points"],
             ].map(([name, label]) => (
               <div key={name}>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
@@ -895,6 +973,26 @@ export default function AdminAjoutOsc() {
               </div>
             ))}
             <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Plan d’action — 3 points</label>
+              <select {...register("plan_action")} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
+                <option value="">Sélectionner</option>
+                <option value="true">Oui</option>
+                <option value="false">Non</option>
+              </select>
+            </div>
+            {planActionValue === "true" &&
+              renderProofUpload("plan_action_document_file", planActionDocumentInputRef, "Preuve du plan d’action")}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Rapports annuels d’activités — 3 points</label>
+              <select {...register("rapports_annuels")} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
+                <option value="">Sélectionner</option>
+                <option value="true">Oui</option>
+                <option value="false">Non</option>
+              </select>
+            </div>
+            {rapportsAnnuelsValue === "true" &&
+              renderProofUpload("rapports_annuels_document_file", rapportsAnnuelsDocumentInputRef, "Preuve des rapports annuels")}
+            <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Adhésion au CRASC — 1 point si Oui</label>
               <select {...register("adhesion_crasc_statut")} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
                 <option value="">Sélectionner</option>
@@ -903,6 +1001,8 @@ export default function AdminAjoutOsc() {
                 <option value="en_cours">En cours</option>
               </select>
             </div>
+            {adhesionCrascStatutValue === "oui" &&
+              renderProofUpload("adhesion_crasc_document_file", adhesionCrascDocumentInputRef, "Preuve d’adhésion au CRASC")}
           </div>
           <div className="mt-6">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Plan d’action pour l’année en cours et activités/initiatives à venir</label>
