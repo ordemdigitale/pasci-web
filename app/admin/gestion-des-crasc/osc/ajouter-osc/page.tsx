@@ -361,7 +361,6 @@ export default function AdminAjoutOsc() {
         "type_document_formalisation",
         "existence_siege",
         "manuel_procedures",
-        "plan_action_annee_cours",
         "plan_action_annee_cours_details",
         "plan_action",
         "rapports_annuels",
@@ -399,6 +398,9 @@ export default function AdminAjoutOsc() {
         const value = values[key as keyof OscForm];
         if (typeof value === "string" && value !== "") formData.append(key, value);
       });
+      if (values.plan_action) {
+        formData.set("plan_action_annee_cours", values.plan_action);
+      }
       if (values.adhesion_crasc_statut) {
         formData.append("adhesion_crasc_statut", values.adhesion_crasc_statut);
         if (values.adhesion_crasc_statut === "oui") {
@@ -902,14 +904,14 @@ export default function AdminAjoutOsc() {
           <p className="text-sm text-gray-500 mb-6">La note sur 20 et la couleur sont calculées automatiquement.</p>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Niveau de formalisation</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Type de document de formalisation</label>
               <select {...register("type_document_formalisation")} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
                 <option value="">Sélectionner</option>
-                <option value="statuts_reglement">Statuts et règlement — 1 point</option>
-                <option value="recepisse_depot">Récépissé de dépôt — 3 points</option>
-                <option value="recepisse_declaration">Récépissé de déclaration — 5 points</option>
-                <option value="agrement_decret">Agrément / décret — 5 points</option>
-                <option value="journal_officiel">Déclaration au journal officiel — 7 points</option>
+                <option value="statuts_reglement">Statut et règlement intérieur</option>
+                <option value="recepisse_depot">Récépissé de dépôt</option>
+                <option value="recepisse_declaration">Récépissé de déclaration</option>
+                <option value="agrement_decret">Agrément / décret</option>
+                <option value="journal_officiel">Déclaration Journal Officiel de la République de Côte d&apos;Ivoire</option>
               </select>
             </div>
             <div>
@@ -959,9 +961,8 @@ export default function AdminAjoutOsc() {
               )}
             </div>
             {[
-              ["existence_siege", "Existence d’un siège — 3 points"],
-              ["manuel_procedures", "Manuel de procédures — 3 points"],
-              ["plan_action_annee_cours", "Plan d’action pour l’année en cours"],
+              ["existence_siege", "Existence d’un siège"],
+              ["manuel_procedures", "Manuel de procédures"],
             ].map(([name, label]) => (
               <div key={name}>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
@@ -973,7 +974,7 @@ export default function AdminAjoutOsc() {
               </div>
             ))}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Plan d’action — 3 points</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">L&apos;organisation a-t-elle un plan d&apos;action ?</label>
               <select {...register("plan_action")} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
                 <option value="">Sélectionner</option>
                 <option value="true">Oui</option>
@@ -983,7 +984,7 @@ export default function AdminAjoutOsc() {
             {planActionValue === "true" &&
               renderProofUpload("plan_action_document_file", planActionDocumentInputRef, "Preuve du plan d’action")}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Rapports annuels d’activités — 3 points</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Rédigez-vous des rapports annuels d’activités ?</label>
               <select {...register("rapports_annuels")} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
                 <option value="">Sélectionner</option>
                 <option value="true">Oui</option>
@@ -993,7 +994,7 @@ export default function AdminAjoutOsc() {
             {rapportsAnnuelsValue === "true" &&
               renderProofUpload("rapports_annuels_document_file", rapportsAnnuelsDocumentInputRef, "Preuve des rapports annuels")}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Adhésion au CRASC — 1 point si Oui</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Adhésion au CRASC</label>
               <select {...register("adhesion_crasc_statut")} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
                 <option value="">Sélectionner</option>
                 <option value="oui">Oui</option>

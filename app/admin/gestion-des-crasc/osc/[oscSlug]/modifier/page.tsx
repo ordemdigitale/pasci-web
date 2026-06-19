@@ -314,9 +314,11 @@ export default function ModifierOscPage() {
     setValue("type_document_formalisation", osc.type_document_formalisation || "");
     setValue("existence_siege", osc.existence_siege != null ? (osc.existence_siege ? "true" : "false") : "");
     setValue("manuel_procedures", osc.manuel_procedures != null ? (osc.manuel_procedures ? "true" : "false") : "");
-    setValue("plan_action_annee_cours", osc.plan_action_annee_cours != null ? (osc.plan_action_annee_cours ? "true" : "false") : "");
+    const planActionValue = osc.plan_action ?? osc.plan_action_annee_cours;
+    const planActionString = planActionValue != null ? (planActionValue ? "true" : "false") : "";
+    setValue("plan_action_annee_cours", planActionString);
     setValue("plan_action_annee_cours_details", osc.plan_action_annee_cours_details || "");
-    setValue("plan_action", osc.plan_action != null ? (osc.plan_action ? "true" : "false") : "");
+    setValue("plan_action", planActionString);
     setValue("rapports_annuels", osc.rapports_annuels != null ? (osc.rapports_annuels ? "true" : "false") : "");
     setValue("niveau_regroupement", osc.niveau_regroupement || "");
     setValue("reseau_appartenance", osc.reseau_appartenance || "");
@@ -463,7 +465,7 @@ export default function ModifierOscPage() {
       append("type_document_formalisation", values.type_document_formalisation);
       append("existence_siege", values.existence_siege);
       append("manuel_procedures", values.manuel_procedures);
-      append("plan_action_annee_cours", values.plan_action_annee_cours);
+      append("plan_action_annee_cours", values.plan_action);
       append("plan_action_annee_cours_details", values.plan_action_annee_cours_details);
       append("plan_action", values.plan_action);
       append("rapports_annuels", values.rapports_annuels);
@@ -656,8 +658,14 @@ export default function ModifierOscPage() {
             <Field label="Date de création">
               <input {...register("date_creation")} className={inputCls} placeholder="2010-01-15" />
             </Field>
-            <Field label="N° récépissé">
-              <input {...register("numero_recepisse")} className={inputCls} />
+            <Field label="Type de document de formalisation">
+              <SelectField name="type_document_formalisation" placeholder="Sélectionner un document" options={[
+                { value: "statuts_reglement", label: "Statut et règlement intérieur" },
+                { value: "recepisse_depot", label: "Récépissé de dépôt" },
+                { value: "recepisse_declaration", label: "Récépissé de déclaration" },
+                { value: "agrement_decret", label: "Agrément / décret" },
+                { value: "journal_officiel", label: "Déclaration Journal Officiel de la République de Côte d'Ivoire" },
+              ]} />
             </Field>
             <Field label="Niveau de couverture">
               <input {...register("niveau_couverture")} className={inputCls} placeholder="National, Régional..." />
@@ -691,15 +699,6 @@ export default function ModifierOscPage() {
           <SectionTitle icon={<FileText className="w-5 h-5 text-[#E05017]" />} title="Autoévaluation de l’OSC" />
           <p className="text-sm text-gray-500 mb-4">Ces réponses déterminent automatiquement la note sur 20 et la couleur de l’OSC.</p>
           <div className="grid md:grid-cols-2 gap-4">
-            <Field label="Niveau de formalisation">
-              <SelectField name="type_document_formalisation" placeholder="Sélectionner le document le plus avancé" options={[
-                { value: "statuts_reglement", label: "Statuts et règlement — 1 point" },
-                { value: "recepisse_depot", label: "Récépissé de dépôt — 3 points" },
-                { value: "recepisse_declaration", label: "Récépissé de déclaration — 5 points" },
-                { value: "agrement_decret", label: "Agrément / décret — 5 points" },
-                { value: "journal_officiel", label: "Déclaration au journal officiel — 7 points" },
-              ]} />
-            </Field>
             <Field label="Justificatif de formalisation" error={errors.document_formalisation_file?.message}>
               <button
                 type="button"
@@ -748,20 +747,19 @@ export default function ModifierOscPage() {
               </div>
             </Field>
             {[
-              ["existence_siege", "Existence d’un siège — 3 points"],
-              ["manuel_procedures", "Manuel de procédures — 3 points"],
-              ["plan_action_annee_cours", "Plan d’action pour l’année en cours"],
+              ["existence_siege", "Existence d’un siège"],
+              ["manuel_procedures", "Manuel de procédures"],
             ].map(([name, label]) => (
               <Field key={name} label={label}>
                 <SelectField name={name as keyof OscForm} placeholder="Sélectionner" options={[{ value: "true", label: "Oui" }, { value: "false", label: "Non" }]} />
               </Field>
             ))}
-            <Field label="Plan d’action — 3 points">
+            <Field label={"L'organisation a-t-elle un plan d'action ?"}>
               <SelectField name="plan_action" placeholder="Sélectionner" options={[{ value: "true", label: "Oui" }, { value: "false", label: "Non" }]} />
             </Field>
             {planActionValue === "true" &&
               renderProofUpload("plan_action_document_file", planActionDocumentInputRef, "Preuve du plan d’action", osc?.plan_action_document_url)}
-            <Field label="Rapports annuels d’activités — 3 points">
+            <Field label="Rédigez-vous des rapports annuels d’activités ?">
               <SelectField name="rapports_annuels" placeholder="Sélectionner" options={[{ value: "true", label: "Oui" }, { value: "false", label: "Non" }]} />
             </Field>
             {rapportsAnnuelsValue === "true" &&

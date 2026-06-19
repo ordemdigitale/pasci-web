@@ -139,11 +139,11 @@ const BOOLEAN_OPTIONS = [
 ];
 
 const FORMALISATION_OPTIONS = [
-  { value: 'statuts_reglement', label: 'Statut et règlement' },
+  { value: 'statuts_reglement', label: 'Statut et règlement intérieur' },
   { value: 'recepisse_depot', label: 'Récépissé de dépôt' },
   { value: 'recepisse_declaration', label: 'Récépissé de déclaration' },
   { value: 'agrement_decret', label: 'Agrément / décret' },
-  { value: 'journal_officiel', label: 'Déclaration au journal officiel' },
+  { value: 'journal_officiel', label: "Déclaration Journal Officiel de la République de Côte d'Ivoire" },
 ];
 
 const CATEGORIE_OPTIONS = [
@@ -338,7 +338,7 @@ export default function PageRejoindre() {
         date_designation_responsable: emptyToNull(values.dateDesignationResponsable),
         date_prochaine_designation: emptyToNull(values.dateProchaineDesignation),
         manuel_procedures: toBool(values.manuelProcedures),
-        plan_action_annee_cours: toBool(values.planActionAnneeCours),
+        plan_action_annee_cours: toBool(values.planAction),
         plan_action_annee_cours_details: emptyToNull(values.planActionAnneeCoursDetails),
         plan_action: toBool(values.planAction),
         nb_activites: toNumber(values.nbActivites),
@@ -709,14 +709,13 @@ export default function PageRejoindre() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">Formalisation et autoévaluation</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {renderSelect('existenceSiege', "L'organisation a-t-elle un siège ?", 'Sélectionnez', BOOLEAN_OPTIONS)}
-              {renderSelect('typeDocumentFormalisation', 'Document de formalisation', 'Sélectionnez un document', FORMALISATION_OPTIONS)}
+              {renderSelect('typeDocumentFormalisation', 'Type de document de formalisation', 'Sélectionnez un document', FORMALISATION_OPTIONS)}
               {renderDocumentFile('documentFormalisationFile', 'Justificatif de formalisation')}
               {renderSelect('categorie', "Catégorie d'organisation", 'Sélectionnez une catégorie', CATEGORIE_OPTIONS)}
               {renderSelect('niveauRegroupement', "Niveau de regroupement de l'organisation", 'Sélectionnez un niveau', NIVEAU_REGROUPEMENT_OPTIONS)}
               {renderSelect('adhesionCrascStatut', 'Adhésion au CRASC', 'Sélectionnez un statut', ADHESION_CRASC_OPTIONS)}
               {adhesionCrascStatutValue === 'oui' && renderDocumentFile('adhesionCrascDocumentFile', 'Preuve d’adhésion au CRASC')}
               {renderSelect('manuelProcedures', 'Existence de manuel de procédures', 'Sélectionnez', BOOLEAN_OPTIONS)}
-              {renderSelect('planActionAnneeCours', "Plan d'action pour l'année en cours ?", 'Sélectionnez', BOOLEAN_OPTIONS)}
               {renderSelect('planAction', "L'organisation a-t-elle un plan d'action ?", 'Sélectionnez', BOOLEAN_OPTIONS)}
               {planActionValue === 'true' && renderDocumentFile('planActionDocumentFile', "Preuve du plan d'action")}
               {renderSelect('rapportsAnnuels', "Rédigez-vous des rapports annuels d'activités ?", 'Sélectionnez', BOOLEAN_OPTIONS)}
