@@ -366,10 +366,10 @@ export default function AdminOscPage() {
         <div className="mt-6 text-sm text-gray-600 bg-white rounded-lg p-4 border border-gray-200">
           <p className="font-semibold mb-2">💡 Actions disponibles :</p>
           <ul className="list-disc list-inside space-y-1 text-xs">
-            <li>Cliquez sur "Afficher" pour voir les détails d'une OSC</li>
-            <li>Cliquez sur "Modifier" pour mettre à jour une OSC</li>
+            <li>Cliquez sur Afficher pour voir les détails d&apos;une OSC</li>
+            <li>Cliquez sur Modifier pour mettre à jour une OSC</li>
             <li>Utilisez la barre de recherche et les filtres pour trier les OSC par formalisation</li>
-            <li>Utilisez "Ajouter une OSC" pour enregistrer une nouvelle organisation</li>
+            <li>Utilisez Ajouter une OSC pour enregistrer une nouvelle organisation</li>
           </ul>
         </div>
       )}
