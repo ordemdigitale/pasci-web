@@ -22,6 +22,7 @@ interface IOscDetail {
   // Champs complémentaires
   website?: string | null; reseaux_sociaux?: string | null;
   date_creation?: string | null; numero_recepisse?: string | null;
+  type_document_formalisation?: string | null;
   document_formalisation_url?: string | null;
   plan_action_document_url?: string | null;
   rapports_annuels_document_url?: string | null;
@@ -54,6 +55,17 @@ interface IOscDetail {
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+const FORMALISATION_OPTIONS = [
+  { value: "statuts_reglement", label: "Statut et règlement intérieur" },
+  { value: "recepisse_depot", label: "Récépissé de dépôt" },
+  { value: "recepisse_declaration", label: "Récépissé de déclaration" },
+  { value: "agrement_decret", label: "Agrément / décret" },
+  { value: "journal_officiel", label: "Déclaration Journal Officiel de la République de Côte d'Ivoire" },
+];
+
+const formalisationLabel = (value?: string | null) =>
+  FORMALISATION_OPTIONS.find((option) => option.value === value)?.label || value || null;
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   if (value === null || value === undefined || value === "") return null;
@@ -238,7 +250,7 @@ export default function OscDetailPage() {
               <FileText className="w-5 h-5 text-purple-600" />Identité juridique
             </h2>
             <InfoRow label="Date de création" value={osc.date_creation} />
-            <InfoRow label="N° récépissé" value={osc.numero_recepisse} />
+            <InfoRow label="Type de document de formalisation" value={formalisationLabel(osc.type_document_formalisation)} />
             <InfoRow
               label="Justificatif de formalisation"
               value={osc.document_formalisation_url ? (

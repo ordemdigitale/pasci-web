@@ -18,6 +18,17 @@ function fmt(n?: number | null) {
   return n.toLocaleString('fr-FR');
 }
 
+const FORMALISATION_OPTIONS = [
+  { value: "statuts_reglement", label: "Statut et règlement intérieur" },
+  { value: "recepisse_depot", label: "Récépissé de dépôt" },
+  { value: "recepisse_declaration", label: "Récépissé de déclaration" },
+  { value: "agrement_decret", label: "Agrément / décret" },
+  { value: "journal_officiel", label: "Déclaration Journal Officiel de la République de Côte d'Ivoire" },
+];
+
+const formalisationLabel = (value?: string | null) =>
+  FORMALISATION_OPTIONS.find((option) => option.value === value)?.label || value || null;
+
 function InfoRow({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
   return (
@@ -189,10 +200,10 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
                     <span><span className="font-semibold">Couverture :</span> {oscData.niveau_couverture}</span>
                   </div>
                 )}
-                {oscData.numero_recepisse && (
+                {oscData.type_document_formalisation && (
                   <div className="flex items-center gap-2 text-gray-600">
                     <Hash className="w-4 h-4 text-[#E05017] flex-shrink-0" />
-                    <span><span className="font-semibold">N° récépissé :</span> {oscData.numero_recepisse}</span>
+                    <span><span className="font-semibold">Type de document de formalisation :</span> {formalisationLabel(oscData.type_document_formalisation)}</span>
                   </div>
                 )}
               </div>

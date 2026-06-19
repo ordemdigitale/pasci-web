@@ -18,6 +18,17 @@ import {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+const FORMALISATION_OPTIONS = [
+  { value: "statuts_reglement", label: "Statut et règlement intérieur" },
+  { value: "recepisse_depot", label: "Récépissé de dépôt" },
+  { value: "recepisse_declaration", label: "Récépissé de déclaration" },
+  { value: "agrement_decret", label: "Agrément / décret" },
+  { value: "journal_officiel", label: "Déclaration Journal Officiel de la République de Côte d'Ivoire" },
+];
+
+const formalisationLabel = (value?: string | null) =>
+  FORMALISATION_OPTIONS.find((option) => option.value === value)?.label || value || null;
+
 interface OscCredentials {
   osc_id: number;
   osc_name: string;
@@ -525,7 +536,7 @@ export default function DemandesAdhesionPage() {
               <DetailBlock
                 title="Formalisation et autoévaluation"
                 rows={[
-                  { label: "Document de formalisation", value: selected.type_document_formalisation },
+                  { label: "Type de document de formalisation", value: formalisationLabel(selected.type_document_formalisation) },
                   {
                     label: "Justificatif",
                     value: selected.document_formalisation_path ? (

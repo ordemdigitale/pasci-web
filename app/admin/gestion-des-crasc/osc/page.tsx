@@ -10,11 +10,11 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const PAGE_SIZE = 25;
 
 const FORMALISATION_OPTIONS = [
-  { value: "statuts_reglement", label: "Statut et règlement" },
+  { value: "statuts_reglement", label: "Statut et règlement intérieur" },
   { value: "recepisse_depot", label: "Récépissé de dépôt" },
   { value: "recepisse_declaration", label: "Récépissé de déclaration" },
   { value: "agrement_decret", label: "Agrément / décret" },
-  { value: "journal_officiel", label: "Déclaration au journal officiel" },
+  { value: "journal_officiel", label: "Déclaration Journal Officiel de la République de Côte d'Ivoire" },
 ];
 
 const formalisationLabel = (value?: string | null) =>
@@ -154,13 +154,13 @@ export default function AdminOscPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
           <label className="text-xs font-semibold text-gray-600">
-            Niveau de formalisation
+            Type de document de formalisation
             <select
               value={typeDocumentFormalisation}
               onChange={(event) => { setTypeDocumentFormalisation(event.target.value); setPage(1); }}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
             >
-              <option value="all">Tous les niveaux</option>
+              <option value="all">Tous les types</option>
               {FORMALISATION_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
@@ -188,7 +188,7 @@ export default function AdminOscPage() {
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
             >
               <option value="name">Nom</option>
-              <option value="type_document_formalisation">Niveau de formalisation</option>
+              <option value="type_document_formalisation">Type de document de formalisation</option>
               <option value="document_formalisation">Justificatif de formalisation</option>
             </select>
           </label>

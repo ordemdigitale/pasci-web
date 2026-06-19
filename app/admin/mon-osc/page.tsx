@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchWithAuth } from "@/lib/auth";
@@ -8,12 +8,42 @@ import { IOscDetail } from "@/types/api.types";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import OscEvaluationBadge from "@/components/osc/OscEvaluationBadge";
 import {
-  Building2, Edit3, Mail, Phone, MapPin, Globe, Users,
+  Edit3, Mail, Phone, MapPin, Globe, Users,
   Wallet, Target, BookOpen, Loader2, AlertCircle, ExternalLink,
-  Calendar, FileText, Award,
+  FileText, Award,
 } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+const FORMALISATION_OPTIONS = [
+  { value: "statuts_reglement", label: "Statut et règlement intérieur" },
+  { value: "recepisse_depot", label: "Récépissé de dépôt" },
+  { value: "recepisse_declaration", label: "Récépissé de déclaration" },
+  { value: "agrement_decret", label: "Agrément / décret" },
+  { value: "journal_officiel", label: "Déclaration Journal Officiel de la République de Côte d'Ivoire" },
+];
+
+const formalisationLabel = (value?: string | null) =>
+  FORMALISATION_OPTIONS.find((option) => option.value === value)?.label || value || null;
+
+function Stat({ label, value, color }: { label: string; value?: string | number | null; color: string }) {
+  return (
+    <div className={`p-4 rounded-xl ${color}`}>
+      <p className="text-xs font-semibold text-gray-600 mb-1">{label}</p>
+      <p className="text-2xl font-bold text-gray-900">{value ?? "—"}</p>
+    </div>
+  );
+}
+
+function Info({ label, value }: { label: string; value?: string | null }) {
+  if (!value) return null;
+  return (
+    <div>
+      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-0.5">{label}</p>
+      <p className="text-sm text-gray-800 font-medium">{value}</p>
+    </div>
+  );
+}
 
 export default function MonOscPage() {
   const { user } = useAuth();
@@ -23,8 +53,8 @@ export default function MonOscPage() {
 
   useEffect(() => {
     if (!user?.osc_id) {
-      setLoading(false);
-      return;
+      const timeout = setTimeout(() => setLoading(false), 0);
+      return () => clearTimeout(timeout);
     }
     fetchWithAuth(`${API_BASE}/api/v1/crasc/osc/me`)
       .then(r => {
@@ -53,21 +83,6 @@ export default function MonOscPage() {
       </div>
     );
   }
-
-  const Stat = ({ label, value, color }: { label: string; value: any; color: string }) => (
-    <div className={`p-4 rounded-xl ${color}`}>
-      <p className="text-xs font-semibold text-gray-600 mb-1">{label}</p>
-      <p className="text-2xl font-bold text-gray-900">{value ?? "—"}</p>
-    </div>
-  );
-
-  const Info = ({ label, value }: { label: string; value?: string | null }) =>
-    value ? (
-      <div>
-        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-0.5">{label}</p>
-        <p className="text-sm text-gray-800 font-medium">{value}</p>
-      </div>
-    ) : null;
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 font-poppins space-y-6">
@@ -230,7 +245,7 @@ export default function MonOscPage() {
             </h3>
             <div className="space-y-3">
               <Info label="Date de création" value={osc.date_creation} />
-              <Info label="N° récépissé" value={osc.numero_recepisse} />
+              <Info label="Type de document de formalisation" value={formalisationLabel(osc.type_document_formalisation)} />
               <Info label="Catégorie" value={osc.categorie} />
               <Info label="Niveau de couverture" value={osc.niveau_couverture} />
               <Info label="Zone de couverture" value={osc.zone_couverture} />
