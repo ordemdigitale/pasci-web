@@ -12,6 +12,11 @@ import {
   fetchAllOscType
 } from "@/lib/fetch-crasc";
 import { getToken } from "@/lib/auth";
+import {
+  FORMALISATION_FILE_ACCEPT,
+  FORMALISATION_FILE_MAX_SIZE,
+  isFormalisationFileAccepted,
+} from "@/lib/formalisation-file";
 import Image from "next/image";
 import {
   ArrowLeft,
@@ -26,26 +31,77 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 
+type ApiFieldError = {
+  field?: string;
+  message?: string;
+};
+
 // Schema de validation pour le formulaire d'ajout d'OSC
 const oscSchema = z.object({
   name: z.string().min(4, "Le nom de l'OSC doit contenir au moins 4 caractères."),
+  sigle: z.string().optional(),
   description: z.string().max(500, "La description ne peut pas dépasser 500 caractères.").optional(),
   crasc_id: z.string().min(1, "Veuillez sélectionner un CRASC."),
   type_id: z.string().min(1, "Veuillez sélectionner un type d'OSC."),
   // Informations de contact
   email: z.string().email("Email invalide").optional().or(z.literal("")),
   phone: z.string().optional(),
+  region_nom: z.string().optional(),
+  departement: z.string().optional(),
+  sous_prefecture: z.string().optional(),
   ville: z.string().optional(),
+  origine_organisation: z.string().optional(),
   address: z.string().optional(),
   latitude: z.string().optional(),
   longitude: z.string().optional(),
   type_document_formalisation: z.string().optional(),
+  document_formalisation_file: z
+    .instanceof(File)
+    .optional()
+    .refine((file) => !file || file.size <= FORMALISATION_FILE_MAX_SIZE, {
+      message: "Le fichier doit être inférieur à 10MB",
+    })
+    .refine(isFormalisationFileAccepted, {
+      message: "Format non supporté. Utilisez PDF, Word, JPG, PNG ou WebP",
+    }),
   existence_siege: z.string().optional(),
   manuel_procedures: z.string().optional(),
+  plan_action_annee_cours: z.string().optional(),
+  plan_action_annee_cours_details: z.string().optional(),
   plan_action: z.string().optional(),
   rapports_annuels: z.string().optional(),
   adhesion_crasc: z.string().optional(),
-  niveau_regroupement: z.enum(["Réseau", "Fédération", "Plateforme", "Confédération"]).optional().or(z.literal("")),
+  adhesion_crasc_statut: z.string().optional(),
+  niveau_regroupement: z.enum(["Simple", "Réseau", "Fédération", "Plateforme", "Confédération"]).optional().or(z.literal("")),
+  categorie: z.string().optional(),
+  domaine_prioritaire: z.string().optional(),
+  domaine_prioritaire_2: z.string().optional(),
+  domaine_prioritaire_3: z.string().optional(),
+  domaine_prioritaire_4: z.string().optional(),
+  domaine_prioritaire_5: z.string().optional(),
+  nb_membres: z.string().optional(),
+  nb_femmes_membres: z.string().optional(),
+  nb_hommes_membres: z.string().optional(),
+  nb_membres_jeunes: z.string().optional(),
+  nb_membres_handicap: z.string().optional(),
+  nb_membres_be: z.string().optional(),
+  nombre_mandats_be: z.string().optional(),
+  duree_mandat_be: z.string().optional(),
+  nb_personnes_engagees: z.string().optional(),
+  nb_cdi: z.string().optional(),
+  nb_cdd: z.string().optional(),
+  nb_beneficiaires: z.string().optional(),
+  nb_femmes_beneficiaires: z.string().optional(),
+  nb_jeunes_beneficiaires: z.string().optional(),
+  nb_beneficiaires_handicap: z.string().optional(),
+  organes_gouvernance: z.string().optional(),
+  pays_couverture: z.string().optional(),
+  date_designation_responsable: z.string().optional(),
+  date_prochaine_designation: z.string().optional(),
+  nb_activites: z.string().optional(),
+  date_derniere_activite: z.string().optional(),
+  recommandations: z.string().optional(),
+  recommandations_2: z.string().optional(),
   thumbnail: z
     .instanceof(File)
     .optional()
@@ -70,6 +126,7 @@ export default function AdminAjoutOsc() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const documentFormalisationInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -92,26 +149,64 @@ export default function AdminAjoutOsc() {
     resolver: zodResolver(oscSchema),
     defaultValues: {
       name: "",
+      sigle: "",
       description: "",
       crasc_id: "",
       type_id: "",
       email: "",
       phone: "",
+      region_nom: "",
+      departement: "",
+      sous_prefecture: "",
       ville: "",
+      origine_organisation: "",
       address: "",
       latitude: "",
       longitude: "",
       type_document_formalisation: "",
       existence_siege: "",
       manuel_procedures: "",
+      plan_action_annee_cours: "",
+      plan_action_annee_cours_details: "",
       plan_action: "",
       rapports_annuels: "",
       adhesion_crasc: "",
+      adhesion_crasc_statut: "",
       niveau_regroupement: "",
+      categorie: "",
+      domaine_prioritaire: "",
+      domaine_prioritaire_2: "",
+      domaine_prioritaire_3: "",
+      domaine_prioritaire_4: "",
+      domaine_prioritaire_5: "",
+      nb_membres: "",
+      nb_femmes_membres: "",
+      nb_hommes_membres: "",
+      nb_membres_jeunes: "",
+      nb_membres_handicap: "",
+      nb_membres_be: "",
+      nombre_mandats_be: "",
+      duree_mandat_be: "",
+      nb_personnes_engagees: "",
+      nb_cdi: "",
+      nb_cdd: "",
+      nb_beneficiaires: "",
+      nb_femmes_beneficiaires: "",
+      nb_jeunes_beneficiaires: "",
+      nb_beneficiaires_handicap: "",
+      organes_gouvernance: "",
+      pays_couverture: "",
+      date_designation_responsable: "",
+      date_prochaine_designation: "",
+      nb_activites: "",
+      date_derniere_activite: "",
+      recommandations: "",
+      recommandations_2: "",
     },
   });
 
   const thumbnailFile = watch("thumbnail");
+  const documentFormalisationFile = watch("document_formalisation_file");
 
   // Gestion du preview de l'image
   useEffect(() => {
@@ -152,7 +247,14 @@ export default function AdminAjoutOsc() {
 
     try {
       const formData = new FormData();
+      const appendIfFilled = (key: keyof OscForm, apiKey: string = key) => {
+        const value = values[key];
+        if (typeof value === "string" && value.trim() !== "") {
+          formData.append(apiKey, value);
+        }
+      };
       formData.append("name", values.name);
+      appendIfFilled("sigle");
 
       if (values.description && values.description.trim() !== "") {
         formData.append("description", values.description);
@@ -171,9 +273,13 @@ export default function AdminAjoutOsc() {
       if (values.phone && values.phone.trim() !== "") {
         formData.append("phone", values.phone);
       }
+      appendIfFilled("region_nom");
+      appendIfFilled("departement");
+      appendIfFilled("sous_prefecture");
       if (values.ville && values.ville.trim() !== "") {
         formData.append("ville", values.ville);
       }
+      appendIfFilled("origine_organisation");
       if (values.address && values.address.trim() !== "") {
         formData.append("address", values.address);
       }
@@ -183,13 +289,62 @@ export default function AdminAjoutOsc() {
       if (values.longitude && values.longitude.trim() !== "") {
         formData.append("longitude", values.longitude);
       }
-      ["type_document_formalisation", "existence_siege", "manuel_procedures", "plan_action", "rapports_annuels", "adhesion_crasc", "niveau_regroupement"].forEach((key) => {
+      [
+        "type_document_formalisation",
+        "existence_siege",
+        "manuel_procedures",
+        "plan_action_annee_cours",
+        "plan_action_annee_cours_details",
+        "plan_action",
+        "rapports_annuels",
+        "niveau_regroupement",
+        "categorie",
+        "domaine_prioritaire",
+        "domaine_prioritaire_2",
+        "domaine_prioritaire_3",
+        "domaine_prioritaire_4",
+        "domaine_prioritaire_5",
+        "nb_membres",
+        "nb_femmes_membres",
+        "nb_hommes_membres",
+        "nb_membres_jeunes",
+        "nb_membres_handicap",
+        "nb_membres_be",
+        "nombre_mandats_be",
+        "duree_mandat_be",
+        "nb_personnes_engagees",
+        "nb_cdi",
+        "nb_cdd",
+        "nb_beneficiaires",
+        "nb_femmes_beneficiaires",
+        "nb_jeunes_beneficiaires",
+        "nb_beneficiaires_handicap",
+        "organes_gouvernance",
+        "pays_couverture",
+        "date_designation_responsable",
+        "date_prochaine_designation",
+        "nb_activites",
+        "date_derniere_activite",
+        "recommandations",
+        "recommandations_2",
+      ].forEach((key) => {
         const value = values[key as keyof OscForm];
         if (typeof value === "string" && value !== "") formData.append(key, value);
       });
+      if (values.adhesion_crasc_statut) {
+        formData.append("adhesion_crasc_statut", values.adhesion_crasc_statut);
+        if (values.adhesion_crasc_statut === "oui") {
+          formData.append("adhesion_crasc", "true");
+        } else if (values.adhesion_crasc_statut === "non") {
+          formData.append("adhesion_crasc", "false");
+        }
+      }
 
       if (values.thumbnail) {
         formData.append("thumbnail", values.thumbnail);
+      }
+      if (values.document_formalisation_file) {
+        formData.append("document_formalisation_file", values.document_formalisation_file);
       }
 
       const xhr = new XMLHttpRequest();
@@ -206,6 +361,7 @@ export default function AdminAjoutOsc() {
           setSuccessMessage("OSC créée avec succès!");
           reset();
           setPreviewImage(null);
+          if (documentFormalisationInputRef.current) documentFormalisationInputRef.current.value = "";
 
           // Rediriger après 2 secondes
           setTimeout(() => {
@@ -220,20 +376,20 @@ export default function AdminAjoutOsc() {
               if (typeof response.detail === 'string') {
                 errorMsg = response.detail;
               } else if (response.detail.type === 'duplicate_error' && response.detail.errors) {
-                response.detail.errors.forEach((error: any) => {
+                response.detail.errors.forEach((error: ApiFieldError) => {
                   if (error.field === 'name') {
-                    errorMsg = error.message;
+                    errorMsg = error.message || errorMsg;
                   }
                 });
               } else if (response.detail.type === 'validation_error' && response.detail.errors) {
-                response.detail.errors.forEach((error: any) => {
+                response.detail.errors.forEach((error: ApiFieldError) => {
                   if (error.field === 'thumbnail') {
-                    errorMsg = error.message;
+                    errorMsg = error.message || errorMsg;
                   }
                 });
               }
             }
-          } catch (e) {
+          } catch {
             errorMsg = `Erreur ${xhr.status}: ${xhr.statusText}`;
           }
 
@@ -314,7 +470,7 @@ export default function AdminAjoutOsc() {
             {/* Nom */}
             <div>
               <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                Nom de l'OSC <span className="text-red-500">*</span>
+                Nom de l&apos;OSC <span className="text-red-500">*</span>
               </label>
               <input
                 id="name"
@@ -330,6 +486,19 @@ export default function AdminAjoutOsc() {
                   {errors.name.message}
                 </p>
               )}
+            </div>
+
+            <div>
+              <label htmlFor="sigle" className="block text-sm font-semibold text-gray-700 mb-2">
+                Sigle ou abréviation
+              </label>
+              <input
+                id="sigle"
+                type="text"
+                {...register("sigle")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="Ex: APD"
+              />
             </div>
 
             {/* Description */}
@@ -402,7 +571,7 @@ export default function AdminAjoutOsc() {
             {/* Type d'OSC */}
             <div>
               <label htmlFor="type_id" className="block text-sm font-semibold text-gray-700 mb-2">
-                Type d'OSC <span className="text-red-500">*</span>
+                Type d&apos;OSC <span className="text-red-500">*</span>
               </label>
               <Controller
                 name="type_id"
@@ -454,6 +623,7 @@ export default function AdminAjoutOsc() {
                     <Select.Content className="bg-white border-2 border-gray-200 rounded-lg shadow-lg mt-1 overflow-hidden z-50">
                       <Select.Viewport className="p-1">
                         {[
+                          ["Simple", "Simple"],
                           ["Réseau", "Réseau"],
                           ["Fédération", "Fédération"],
                           ["Plateforme", "Plateforme"],
@@ -468,6 +638,22 @@ export default function AdminAjoutOsc() {
                   </Select.Root>
                 )}
               />
+            </div>
+
+            <div>
+              <label htmlFor="categorie" className="block text-sm font-semibold text-gray-700 mb-2">
+                Catégorie d&apos;organisation
+              </label>
+              <select
+                id="categorie"
+                {...register("categorie")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+              >
+                <option value="">Sélectionner</option>
+                <option value="organisation_jeune">Organisation de jeune (ODJ)</option>
+                <option value="organisation_femme">Organisation de femme</option>
+                <option value="organisation_mixte">Organisation mixte</option>
+              </select>
             </div>
           </div>
         </div>
@@ -514,6 +700,60 @@ export default function AdminAjoutOsc() {
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
                 placeholder="+225 XX XX XX XX XX"
               />
+            </div>
+
+            <div>
+              <label htmlFor="region_nom" className="block text-sm font-semibold text-gray-700 mb-2">
+                Région
+              </label>
+              <input
+                id="region_nom"
+                type="text"
+                {...register("region_nom")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="Région"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="departement" className="block text-sm font-semibold text-gray-700 mb-2">
+                Département
+              </label>
+              <input
+                id="departement"
+                type="text"
+                {...register("departement")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="Département"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="sous_prefecture" className="block text-sm font-semibold text-gray-700 mb-2">
+                Sous-préfecture
+              </label>
+              <input
+                id="sous_prefecture"
+                type="text"
+                {...register("sous_prefecture")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="Sous-préfecture"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="origine_organisation" className="block text-sm font-semibold text-gray-700 mb-2">
+                L&apos;organisation est née où ?
+              </label>
+              <select
+                id="origine_organisation"
+                {...register("origine_organisation")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+              >
+                <option value="">Sélectionner</option>
+                <option value="cote_ivoire">Côte d&apos;Ivoire</option>
+                <option value="etranger">À l&apos;étranger</option>
+              </select>
             </div>
 
             {/* Ville */}
@@ -592,12 +832,58 @@ export default function AdminAjoutOsc() {
                 <option value="journal_officiel">Déclaration au journal officiel — 7 points</option>
               </select>
             </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Justificatif de formalisation</label>
+              <button
+                type="button"
+                onClick={() => documentFormalisationInputRef.current?.click()}
+                className={`w-full px-4 py-3 border-2 border-dashed rounded-lg text-left transition-all ${
+                  errors.document_formalisation_file
+                    ? "border-red-300 bg-red-50"
+                    : "border-gray-300 hover:border-[#2A591D] hover:bg-[#2A591D]/5"
+                }`}
+              >
+                <span className="flex items-center gap-2 text-gray-700">
+                  <Upload className="w-4 h-4 text-[#2A591D]" />
+                  {documentFormalisationFile?.name || "Déposer le fichier justificatif"}
+                </span>
+                <span className="mt-1 block text-xs text-gray-500">PDF, Word, JPG, PNG ou WebP • 10MB max</span>
+              </button>
+              <input
+                ref={documentFormalisationInputRef}
+                type="file"
+                accept={FORMALISATION_FILE_ACCEPT}
+                className="hidden"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) setValue("document_formalisation_file", file);
+                }}
+              />
+              {documentFormalisationFile && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setValue("document_formalisation_file", undefined);
+                    if (documentFormalisationInputRef.current) documentFormalisationInputRef.current.value = "";
+                  }}
+                  className="mt-2 text-sm font-semibold text-red-600 hover:text-red-700"
+                >
+                  Retirer le fichier
+                </button>
+              )}
+              {errors.document_formalisation_file && (
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.document_formalisation_file.message}
+                </p>
+              )}
+            </div>
             {[
               ["existence_siege", "Existence d’un siège — 3 points"],
               ["manuel_procedures", "Manuel de procédures — 3 points"],
+              ["plan_action_annee_cours", "Plan d’action pour l’année en cours"],
               ["plan_action", "Plan d’action — 3 points"],
               ["rapports_annuels", "Rapports annuels d’activités — 3 points"],
-              ["adhesion_crasc", "Adhésion au CRASC — 1 point"],
             ].map(([name, label]) => (
               <div key={name}>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
@@ -608,6 +894,128 @@ export default function AdminAjoutOsc() {
                 </select>
               </div>
             ))}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Adhésion au CRASC — 1 point si Oui</label>
+              <select {...register("adhesion_crasc_statut")} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] outline-none">
+                <option value="">Sélectionner</option>
+                <option value="oui">Oui</option>
+                <option value="non">Non</option>
+                <option value="en_cours">En cours</option>
+              </select>
+            </div>
+          </div>
+          <div className="mt-6">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Plan d’action pour l’année en cours et activités/initiatives à venir</label>
+            <textarea
+              {...register("plan_action_annee_cours_details")}
+              rows={3}
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all resize-none"
+              placeholder="Décrivez le plan et les activités à venir..."
+            />
+          </div>
+        </div>
+
+        {/* Domaines prioritaires */}
+        <div className="mb-8 pb-8 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-[#2A591D]" />
+            Domaines prioritaires
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {[
+              ["domaine_prioritaire", "1er domaine prioritaire"],
+              ["domaine_prioritaire_2", "2ème domaine prioritaire"],
+              ["domaine_prioritaire_3", "3ème domaine prioritaire"],
+              ["domaine_prioritaire_4", "4ème domaine prioritaire"],
+              ["domaine_prioritaire_5", "5ème domaine prioritaire"],
+            ].map(([name, label]) => (
+              <div key={name}>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
+                <input {...register(name as keyof OscForm)} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Membres et bénéficiaires */}
+        <div className="mb-8 pb-8 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-[#2A591D]" />
+            Membres et bénéficiaires
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              ["nb_membres", "Nombre total de membres"],
+              ["nb_femmes_membres", "Nombre de femmes membres"],
+              ["nb_hommes_membres", "Nombre d’hommes membres"],
+              ["nb_membres_jeunes", "Nombre de membres jeunes"],
+              ["nb_membres_handicap", "Nombre de membres en situation de handicap"],
+              ["nb_membres_be", "Nombre de membres du BE"],
+              ["nb_personnes_engagees", "Nombre total de personnes engagées"],
+              ["nb_cdi", "Nombre de personnes sous CDI"],
+              ["nb_cdd", "Nombre de personnes sous CDD"],
+              ["nb_beneficiaires", "Nombre total de bénéficiaires"],
+              ["nb_femmes_beneficiaires", "Nombre de femmes bénéficiaires"],
+              ["nb_jeunes_beneficiaires", "Nombre de jeunes bénéficiaires"],
+              ["nb_beneficiaires_handicap", "Nombre de bénéficiaires en situation de handicap"],
+            ].map(([name, label]) => (
+              <div key={name}>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
+                <input {...register(name as keyof OscForm)} type="number" min="0" className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Gouvernance et activités */}
+        <div className="mb-8 pb-8 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-[#2A591D]" />
+            Gouvernance et activités
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre de mandat du BE ou DE actuel</label>
+              <input {...register("nombre_mandats_be")} type="number" min="0" className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Durée de mandat du BE ou DE actuel</label>
+              <input {...register("duree_mandat_be")} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all" placeholder="Ex: 3 ans" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Date de désignation du/de la responsable actuel(le)</label>
+              <input {...register("date_designation_responsable")} type="date" className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Prochaine date de désignation</label>
+              <input {...register("date_prochaine_designation")} type="date" className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre d’activités réalisées dans les 12 derniers mois</label>
+              <input {...register("nb_activites")} type="number" min="0" className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Date de la dernière activité réalisée</label>
+              <input {...register("date_derniere_activite")} type="date" className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all" />
+            </div>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6 mt-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Organes de gouvernance</label>
+              <textarea {...register("organes_gouvernance")} rows={3} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all resize-none" placeholder="AG, CA, BE, CC, DE, CG, CS..." />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Pays de couverture en plus de la Côte d’Ivoire</label>
+              <textarea {...register("pays_couverture")} rows={3} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all resize-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Première recommandation</label>
+              <textarea {...register("recommandations")} rows={3} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all resize-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Deuxième recommandation</label>
+              <textarea {...register("recommandations_2")} rows={3} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all resize-none" />
+            </div>
           </div>
         </div>
 
@@ -656,7 +1064,7 @@ export default function AdminAjoutOsc() {
                     className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
                     <X className="w-4 h-4" />
-                    Supprimer l'image
+                    Supprimer l&apos;image
                   </button>
                 </div>
               ) : (
@@ -715,7 +1123,7 @@ export default function AdminAjoutOsc() {
             ) : (
               <>
                 <Check className="w-5 h-5" />
-                Créer l'OSC
+                Créer l&apos;OSC
               </>
             )}
           </button>

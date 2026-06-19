@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { isValidElement, useState, useEffect } from "react";
 import {
   Search,
   Trash2,
@@ -15,7 +15,6 @@ import {
   KeyRound,
   Building2,
 } from "lucide-react";
-import { fetchWithAuth } from "@/lib/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -30,15 +29,58 @@ interface OscCredentials {
 interface DemandeAdhesion {
   id: number;
   nom_organisation: string;
+  sigle?: string | null;
   type_organisation: string;
   crasc_nom: string | null;
   type_osc: string | null;
   region: string;
+  departement?: string | null;
+  sous_prefecture?: string | null;
   ville: string | null;
+  origine_organisation?: string | null;
   email: string;
   telephone: string;
   description: string | null;
   motivation: string;
+  type_document_formalisation?: string | null;
+  document_formalisation_path?: string | null;
+  existence_siege?: boolean | null;
+  categorie?: string | null;
+  niveau_regroupement?: string | null;
+  domaine_prioritaire?: string | null;
+  domaine_prioritaire_2?: string | null;
+  domaine_prioritaire_3?: string | null;
+  domaine_prioritaire_4?: string | null;
+  domaine_prioritaire_5?: string | null;
+  nb_membres?: number | null;
+  nb_femmes_membres?: number | null;
+  nb_hommes_membres?: number | null;
+  nb_membres_jeunes?: number | null;
+  nb_membres_handicap?: number | null;
+  nb_membres_be?: number | null;
+  nombre_mandats_be?: number | null;
+  duree_mandat_be?: string | null;
+  nb_beneficiaires?: number | null;
+  nb_femmes_beneficiaires?: number | null;
+  nb_jeunes_beneficiaires?: number | null;
+  nb_beneficiaires_handicap?: number | null;
+  adhesion_crasc_statut?: string | null;
+  organes_gouvernance?: string | null;
+  pays_couverture?: string | null;
+  nb_personnes_engagees?: number | null;
+  nb_cdi?: number | null;
+  nb_cdd?: number | null;
+  date_designation_responsable?: string | null;
+  date_prochaine_designation?: string | null;
+  manuel_procedures?: boolean | null;
+  plan_action_annee_cours?: boolean | null;
+  plan_action_annee_cours_details?: string | null;
+  plan_action?: boolean | null;
+  nb_activites?: number | null;
+  date_derniere_activite?: string | null;
+  rapports_annuels?: boolean | null;
+  recommandations?: string | null;
+  recommandations_2?: string | null;
   statut: "en_attente" | "approuvee" | "rejetee";
   note_admin: string | null;
   created_at: string;
@@ -57,6 +99,38 @@ const STATUT_COLORS: Record<string, string> = {
   approuvee: "bg-green-100 text-green-800",
   rejetee: "bg-red-100 text-red-800",
 };
+
+function formatValue(value: unknown) {
+  if (value === null || value === undefined || value === "") return "—";
+  if (typeof value === "boolean") return value ? "Oui" : "Non";
+  if (typeof value === "number") return value.toLocaleString("fr-FR");
+  if (value === "oui") return "Oui";
+  if (value === "non") return "Non";
+  if (value === "en_cours") return "En cours";
+  if (value === "cote_ivoire") return "Côte d'Ivoire";
+  if (value === "etranger") return "À l'étranger";
+  return String(value);
+}
+
+function DetailBlock({ title, rows }: { title: string; rows: { label: string; value: unknown }[] }) {
+  const visibleRows = rows.filter((row) => row.value !== null && row.value !== undefined && row.value !== "");
+  if (visibleRows.length === 0) return null;
+  return (
+    <div>
+      <h3 className="text-sm font-bold text-gray-900 mb-2">{title}</h3>
+      <div className="grid grid-cols-2 gap-3 text-sm">
+        {visibleRows.map((row) => (
+          <div key={row.label}>
+            <div className="text-gray-500 text-xs mb-0.5">{row.label}</div>
+            <div className="font-medium whitespace-pre-line">
+              {isValidElement(row.value) ? row.value : formatValue(row.value)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function CredentialsPanel({ creds, onClose }: { creds: OscCredentials; onClose: () => void }) {
   const [copied, setCopied] = useState<string | null>(null);
@@ -88,7 +162,7 @@ function CredentialsPanel({ creds, onClose }: { creds: OscCredentials; onClose: 
               </div>
               <div>
                 <h3 className="font-bold text-gray-900">Compte créé avec succès</h3>
-                <p className="text-xs text-gray-500">Transmettez ces identifiants à l'organisation</p>
+                <p className="text-xs text-gray-500">Transmettez ces identifiants à l&apos;organisation</p>
               </div>
             </div>
             <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100">
@@ -118,7 +192,7 @@ function CredentialsPanel({ creds, onClose }: { creds: OscCredentials; onClose: 
           ))}
 
           <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
-            Notez bien ce mot de passe — il ne sera plus affiché. L'utilisateur devra le changer à sa première connexion.
+            Notez bien ce mot de passe — il ne sera plus affiché. L&apos;utilisateur devra le changer à sa première connexion.
           </p>
         </div>
 
@@ -127,7 +201,7 @@ function CredentialsPanel({ creds, onClose }: { creds: OscCredentials; onClose: 
             onClick={onClose}
             className="w-full py-2.5 bg-[#2A591D] hover:bg-[#1e4015] text-white font-semibold rounded-xl transition-colors"
           >
-            J'ai noté les identifiants
+            J&apos;ai noté les identifiants
           </button>
         </div>
       </div>
@@ -265,10 +339,10 @@ export default function DemandesAdhesionPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
           <ClipboardList size={24} className="text-[#2a591d]" />
-          Demandes d'adhésion
+          Demandes d&apos;adhésion
         </h1>
         <p className="text-gray-500 text-sm mt-1">
-          Gérer les demandes d'adhésion soumises via le formulaire
+          Gérer les demandes d&apos;adhésion soumises via le formulaire
         </p>
       </div>
 
@@ -406,6 +480,12 @@ export default function DemandesAdhesionPage() {
             {/* Modal body */}
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
+                {selected.sigle && (
+                  <div>
+                    <div className="text-gray-500 text-xs mb-0.5">Sigle</div>
+                    <div className="font-medium">{selected.sigle}</div>
+                  </div>
+                )}
                 {selected.crasc_nom && (
                   <div>
                     <div className="text-gray-500 text-xs mb-0.5">CRASC</div>
@@ -413,7 +493,7 @@ export default function DemandesAdhesionPage() {
                   </div>
                 )}
                 <div>
-                  <div className="text-gray-500 text-xs mb-0.5">Type d'OSC</div>
+                  <div className="text-gray-500 text-xs mb-0.5">Type d&apos;OSC</div>
                   <div className="font-medium">{selected.type_osc || selected.type_organisation}</div>
                 </div>
                 <div>
@@ -430,6 +510,94 @@ export default function DemandesAdhesionPage() {
                 </div>
               </div>
 
+              <DetailBlock
+                title="Localisation"
+                rows={[
+                  { label: "Département", value: selected.departement },
+                  { label: "Sous-préfecture", value: selected.sous_prefecture },
+                  { label: "Naissance de l'organisation", value: selected.origine_organisation },
+                ]}
+              />
+
+              <DetailBlock
+                title="Formalisation et autoévaluation"
+                rows={[
+                  { label: "Document de formalisation", value: selected.type_document_formalisation },
+                  {
+                    label: "Justificatif",
+                    value: selected.document_formalisation_path ? (
+                      <a
+                        href={`${API_BASE_URL}/static/${selected.document_formalisation_path}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[#2A591D] hover:underline"
+                      >
+                        Voir le fichier
+                      </a>
+                    ) : null,
+                  },
+                  { label: "Siège", value: selected.existence_siege },
+                  { label: "Catégorie", value: selected.categorie },
+                  { label: "Niveau de regroupement", value: selected.niveau_regroupement },
+                  { label: "Adhésion CRASC", value: selected.adhesion_crasc_statut },
+                  { label: "Manuel de procédures", value: selected.manuel_procedures },
+                  { label: "Plan d'action année en cours", value: selected.plan_action_annee_cours },
+                  { label: "Plan d'action", value: selected.plan_action },
+                  { label: "Rapports annuels", value: selected.rapports_annuels },
+                ]}
+              />
+
+              <DetailBlock
+                title="Domaines prioritaires"
+                rows={[
+                  { label: "1er domaine", value: selected.domaine_prioritaire },
+                  { label: "2ème domaine", value: selected.domaine_prioritaire_2 },
+                  { label: "3ème domaine", value: selected.domaine_prioritaire_3 },
+                  { label: "4ème domaine", value: selected.domaine_prioritaire_4 },
+                  { label: "5ème domaine", value: selected.domaine_prioritaire_5 },
+                ]}
+              />
+
+              <DetailBlock
+                title="Membres et bénéficiaires"
+                rows={[
+                  { label: "Membres", value: selected.nb_membres },
+                  { label: "Femmes membres", value: selected.nb_femmes_membres },
+                  { label: "Hommes membres", value: selected.nb_hommes_membres },
+                  { label: "Membres jeunes", value: selected.nb_membres_jeunes },
+                  { label: "Membres handicap", value: selected.nb_membres_handicap },
+                  { label: "Membres BE", value: selected.nb_membres_be },
+                  { label: "Personnes engagées", value: selected.nb_personnes_engagees },
+                  { label: "CDI", value: selected.nb_cdi },
+                  { label: "CDD", value: selected.nb_cdd },
+                  { label: "Bénéficiaires", value: selected.nb_beneficiaires },
+                  { label: "Femmes bénéficiaires", value: selected.nb_femmes_beneficiaires },
+                  { label: "Jeunes bénéficiaires", value: selected.nb_jeunes_beneficiaires },
+                  { label: "Bénéficiaires handicap", value: selected.nb_beneficiaires_handicap },
+                ]}
+              />
+
+              <DetailBlock
+                title="Gouvernance et activités"
+                rows={[
+                  { label: "Nombre de mandats BE/DE", value: selected.nombre_mandats_be },
+                  { label: "Durée mandat BE/DE", value: selected.duree_mandat_be },
+                  { label: "Date désignation responsable", value: selected.date_designation_responsable },
+                  { label: "Prochaine désignation", value: selected.date_prochaine_designation },
+                  { label: "Activités 12 derniers mois", value: selected.nb_activites },
+                  { label: "Dernière activité", value: selected.date_derniere_activite },
+                  { label: "Organes de gouvernance", value: selected.organes_gouvernance },
+                  { label: "Pays de couverture", value: selected.pays_couverture },
+                ]}
+              />
+
+              {selected.plan_action_annee_cours_details && (
+                <div>
+                  <div className="text-gray-500 text-xs mb-1">Plan d&apos;action et activités à venir</div>
+                  <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3 whitespace-pre-line">{selected.plan_action_annee_cours_details}</p>
+                </div>
+              )}
+
               {selected.description && (
                 <div>
                   <div className="text-gray-500 text-xs mb-1">Description</div>
@@ -442,9 +610,19 @@ export default function DemandesAdhesionPage() {
                 <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{selected.motivation}</p>
               </div>
 
+              {(selected.recommandations || selected.recommandations_2) && (
+                <div>
+                  <div className="text-gray-500 text-xs mb-1">Recommandations</div>
+                  <div className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3 space-y-2">
+                    {selected.recommandations && <p className="whitespace-pre-line">{selected.recommandations}</p>}
+                    {selected.recommandations_2 && <p className="whitespace-pre-line">{selected.recommandations_2}</p>}
+                  </div>
+                </div>
+              )}
+
               {/* Note admin */}
               <div>
-                <label className="text-gray-500 text-xs mb-1 block">Note de l'administrateur</label>
+                <label className="text-gray-500 text-xs mb-1 block">Note de l&apos;administrateur</label>
                 <textarea
                   value={noteAdmin}
                   onChange={(e) => setNoteAdmin(e.target.value)}

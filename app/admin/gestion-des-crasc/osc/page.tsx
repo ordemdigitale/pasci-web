@@ -9,6 +9,17 @@ import OscEvaluationBadge from "@/components/osc/OscEvaluationBadge";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const PAGE_SIZE = 25;
 
+const FORMALISATION_OPTIONS = [
+  { value: "statuts_reglement", label: "Statut et règlement" },
+  { value: "recepisse_depot", label: "Récépissé de dépôt" },
+  { value: "recepisse_declaration", label: "Récépissé de déclaration" },
+  { value: "agrement_decret", label: "Agrément / décret" },
+  { value: "journal_officiel", label: "Déclaration au journal officiel" },
+];
+
+const formalisationLabel = (value?: string | null) =>
+  FORMALISATION_OPTIONS.find((option) => option.value === value)?.label || "—";
+
 interface IOscType { id: number; name: string; }
 interface ICrasc    { id: number; name: string; }
 interface IOsc {
@@ -16,6 +27,8 @@ interface IOsc {
   description?: string; thumbnail_url?: string;
   type?: IOscType; crasc?: ICrasc;
   ville?: string; email?: string; phone?: string;
+  type_document_formalisation?: string | null;
+  document_formalisation_url?: string | null;
   score_autoevaluation?: number; couleur_autoevaluation?: string; couleur_autoevaluation_hex?: string;
 }
 
@@ -26,6 +39,10 @@ export default function AdminOscPage() {
   const [page, setPage]           = useState(1);
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch]       = useState('');
+  const [typeDocumentFormalisation, setTypeDocumentFormalisation] = useState("all");
+  const [hasDocumentFormalisation, setHasDocumentFormalisation] = useState("all");
+  const [sortBy, setSortBy] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc");
   const [loading, setLoading]     = useState(true);
 
   const fetchOscs = useCallback(async () => {
@@ -33,6 +50,14 @@ export default function AdminOscPage() {
     try {
       const params = new URLSearchParams({ page: String(page), size: String(PAGE_SIZE) });
       if (search) params.set('search', search);
+      if (typeDocumentFormalisation !== "all") {
+        params.set("type_document_formalisation", typeDocumentFormalisation);
+      }
+      if (hasDocumentFormalisation !== "all") {
+        params.set("has_document_formalisation", hasDocumentFormalisation === "with" ? "true" : "false");
+      }
+      params.set("sort_by", sortBy);
+      params.set("sort_order", sortOrder);
       const res  = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?${params}`);
       const data = await res.json();
       setOscs(data.items);
@@ -43,11 +68,20 @@ export default function AdminOscPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search]);
+  }, [page, search, typeDocumentFormalisation, hasDocumentFormalisation, sortBy, sortOrder]);
 
   useEffect(() => { fetchOscs(); }, [fetchOscs]);
 
   const applySearch = () => { setSearch(searchInput); setPage(1); };
+  const resetFilters = () => {
+    setSearch('');
+    setSearchInput('');
+    setTypeDocumentFormalisation("all");
+    setHasDocumentFormalisation("all");
+    setSortBy("name");
+    setSortOrder("asc");
+    setPage(1);
+  };
 
   const goToPage = (p: number) => {
     if (p < 1 || p > totalPages) return;
@@ -88,8 +122,9 @@ export default function AdminOscPage() {
         {totalPages > 1 && ` — page ${page} / ${totalPages}`}
       </p>
 
-      {/* Search */}
-      <div className="flex gap-2 mb-6">
+      {/* Search and filters */}
+      <div className="flex flex-col gap-3 mb-6 rounded-xl border border-gray-200 bg-white p-4">
+        <div className="flex flex-col lg:flex-row gap-2">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
@@ -107,14 +142,69 @@ export default function AdminOscPage() {
         >
           Rechercher
         </button>
-        {search && (
+        {(search || typeDocumentFormalisation !== "all" || hasDocumentFormalisation !== "all" || sortBy !== "name" || sortOrder !== "asc") && (
           <button
-            onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }}
+            onClick={resetFilters}
             className="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-100 transition-colors"
           >
             Effacer
           </button>
         )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+          <label className="text-xs font-semibold text-gray-600">
+            Niveau de formalisation
+            <select
+              value={typeDocumentFormalisation}
+              onChange={(event) => { setTypeDocumentFormalisation(event.target.value); setPage(1); }}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
+            >
+              <option value="all">Tous les niveaux</option>
+              {FORMALISATION_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="text-xs font-semibold text-gray-600">
+            Justificatif
+            <select
+              value={hasDocumentFormalisation}
+              onChange={(event) => { setHasDocumentFormalisation(event.target.value); setPage(1); }}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
+            >
+              <option value="all">Tous les justificatifs</option>
+              <option value="with">Avec justificatif</option>
+              <option value="without">Sans justificatif</option>
+            </select>
+          </label>
+
+          <label className="text-xs font-semibold text-gray-600">
+            Trier par
+            <select
+              value={sortBy}
+              onChange={(event) => { setSortBy(event.target.value); setPage(1); }}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
+            >
+              <option value="name">Nom</option>
+              <option value="type_document_formalisation">Niveau de formalisation</option>
+              <option value="document_formalisation">Justificatif de formalisation</option>
+            </select>
+          </label>
+
+          <label className="text-xs font-semibold text-gray-600">
+            Ordre
+            <select
+              value={sortOrder}
+              onChange={(event) => { setSortOrder(event.target.value); setPage(1); }}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
+            >
+              <option value="asc">Ascendant</option>
+              <option value="desc">Descendant</option>
+            </select>
+          </label>
+        </div>
       </div>
 
       {/* Table */}
@@ -127,6 +217,7 @@ export default function AdminOscPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">CRASC</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ville</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Formalisation</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
             </tr>
@@ -134,14 +225,14 @@ export default function AdminOscPage() {
           <tbody className="bg-white divide-y divide-gray-200">
             {loading ? (
               <tr>
-                <td colSpan={7} className="px-6 py-16 text-center">
+                <td colSpan={8} className="px-6 py-16 text-center">
                   <Loader2 className="w-8 h-8 text-[#2A591D] animate-spin mx-auto mb-2" />
                   <p className="text-sm text-gray-500">Chargement...</p>
                 </td>
               </tr>
             ) : oscs.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
                   Aucune OSC trouvée.
                 </td>
               </tr>
@@ -174,6 +265,23 @@ export default function AdminOscPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {osc.ville || "—"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{formalisationLabel(osc.type_document_formalisation)}</div>
+                    {osc.document_formalisation_url ? (
+                      <a
+                        href={osc.document_formalisation_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 inline-flex rounded-full bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700 hover:underline"
+                      >
+                        Justificatif déposé
+                      </a>
+                    ) : (
+                      <span className="mt-1 inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">
+                        Sans justificatif
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-xs space-y-1 max-w-[200px]">
@@ -260,7 +368,7 @@ export default function AdminOscPage() {
           <ul className="list-disc list-inside space-y-1 text-xs">
             <li>Cliquez sur "Afficher" pour voir les détails d'une OSC</li>
             <li>Cliquez sur "Modifier" pour mettre à jour une OSC</li>
-            <li>Utilisez la barre de recherche pour filtrer par nom</li>
+            <li>Utilisez la barre de recherche et les filtres pour trier les OSC par formalisation</li>
             <li>Utilisez "Ajouter une OSC" pour enregistrer une nouvelle organisation</li>
           </ul>
         </div>

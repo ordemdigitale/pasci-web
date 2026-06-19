@@ -18,14 +18,16 @@ interface IOscDetail {
   crasc?: { id: number; name: string; slug: string };
   ville: string | null; email: string | null; phone: string | null;
   address: string | null; latitude: number | null; longitude: number | null;
-  news_items?: any[];
+  news_items?: Array<unknown>;
   // Champs complémentaires
   website?: string | null; reseaux_sociaux?: string | null;
   date_creation?: string | null; numero_recepisse?: string | null;
+  document_formalisation_url?: string | null;
   niveau_couverture?: string | null; zone_couverture?: string | null;
   categorie?: string | null;
   domaine_prioritaire?: string | null; domaine_prioritaire_2?: string | null;
   domaine_prioritaire_3?: string | null; domaine_prioritaire_4?: string | null;
+  domaine_prioritaire_5?: string | null;
   nb_membres?: number | null; nb_femmes_membres?: number | null;
   nb_membres_jeunes?: number | null; nb_membres_be?: number | null;
   nb_personnes_engagees?: number | null; nb_beneficiaires?: number | null;
@@ -34,7 +36,7 @@ interface IOscDetail {
   montant_cotisation?: number | null; sexe_president?: string | null;
   mode_designation_president?: string | null; duree_mandat_be?: string | null;
   nom_president?: string | null;
-  adhesion_crasc?: boolean | null; niveau_regroupement?: string | null; reseau_appartenance?: string | null;
+  adhesion_crasc?: boolean | null; adhesion_crasc_statut?: string | null; niveau_regroupement?: string | null; reseau_appartenance?: string | null;
   secteurs_activites?: string | null; populations_cibles?: string | null;
   savoir_faire?: string | null; difficultes?: string | null;
   recommandations?: string | null;
@@ -61,6 +63,13 @@ function BoolBadge({ value }: { value: boolean | null | undefined }) {
   return value
     ? <span className="inline-flex items-center gap-1 text-green-700 text-sm"><CheckCircle className="w-4 h-4" />Oui</span>
     : <span className="inline-flex items-center gap-1 text-red-600 text-sm"><XCircle className="w-4 h-4" />Non</span>;
+}
+
+function CrascAdhesionBadge({ statut, fallback }: { statut?: string | null; fallback?: boolean | null }) {
+  if (statut === "oui") return <span className="inline-flex items-center gap-1 text-green-700 text-sm"><CheckCircle className="w-4 h-4" />Oui</span>;
+  if (statut === "non") return <span className="inline-flex items-center gap-1 text-red-600 text-sm"><XCircle className="w-4 h-4" />Non</span>;
+  if (statut === "en_cours") return <span className="inline-flex items-center gap-1 text-orange-600 text-sm">En cours</span>;
+  return <BoolBadge value={fallback} />;
 }
 
 function Stat({ label, value }: { label: string; value: number | null | undefined }) {
@@ -130,7 +139,7 @@ export default function OscDetailPage() {
 
   if (!osc) return null;
 
-  const domaines = [osc.domaine_prioritaire, osc.domaine_prioritaire_2, osc.domaine_prioritaire_3, osc.domaine_prioritaire_4].filter(Boolean);
+  const domaines = [osc.domaine_prioritaire, osc.domaine_prioritaire_2, osc.domaine_prioritaire_3, osc.domaine_prioritaire_4, osc.domaine_prioritaire_5].filter(Boolean);
   const sources = [
     osc.financement_cotisation && "Cotisations",
     osc.financement_dons && "Dons",
@@ -223,10 +232,18 @@ export default function OscDetailPage() {
             </h2>
             <InfoRow label="Date de création" value={osc.date_creation} />
             <InfoRow label="N° récépissé" value={osc.numero_recepisse} />
+            <InfoRow
+              label="Justificatif de formalisation"
+              value={osc.document_formalisation_url ? (
+                <a href={osc.document_formalisation_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                  Voir le fichier
+                </a>
+              ) : null}
+            />
             <InfoRow label="Catégorie" value={osc.categorie} />
             <InfoRow label="Niveau de couverture" value={osc.niveau_couverture} />
             <InfoRow label="Zone de couverture" value={osc.zone_couverture} />
-            <InfoRow label="Adhésion CRASC" value={<BoolBadge value={osc.adhesion_crasc} />} />
+            <InfoRow label="Adhésion CRASC" value={<CrascAdhesionBadge statut={osc.adhesion_crasc_statut} fallback={osc.adhesion_crasc} />} />
             <InfoRow label="Niveau de regroupement" value={osc.niveau_regroupement} />
             <InfoRow label="Réseau d'appartenance" value={osc.reseau_appartenance} />
           </div>
@@ -276,7 +293,7 @@ export default function OscDetailPage() {
 
           {osc.secteurs_activites && (
             <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Secteurs d'activités</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Secteurs d&apos;activités</h2>
               <p className="text-sm text-gray-800 whitespace-pre-line">{osc.secteurs_activites}</p>
             </div>
           )}
@@ -334,7 +351,7 @@ export default function OscDetailPage() {
 
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-          <p className="text-yellow-800 text-sm">La suppression d'une OSC est irréversible. Toutes les données associées seront affectées.</p>
+          <p className="text-yellow-800 text-sm">La suppression d&apos;une OSC est irréversible. Toutes les données associées seront affectées.</p>
         </div>
       </div>
     </div>

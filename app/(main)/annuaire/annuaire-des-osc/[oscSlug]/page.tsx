@@ -71,9 +71,9 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
         <div className="text-center">
           <Users2 className="w-24 h-24 text-gray-300 mx-auto mb-4" />
           <h2 className="text-3xl font-bold text-gray-800 mb-2">OSC non trouvée</h2>
-          <p className="text-gray-600 mb-6">Cette organisation n'existe pas ou a été supprimée.</p>
+          <p className="text-gray-600 mb-6">Cette organisation n&apos;existe pas ou a été supprimée.</p>
           <Link href="/annuaire/annuaire-des-osc" className="inline-block px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors">
-            Retour à l'annuaire
+            Retour à l&apos;annuaire
           </Link>
         </div>
       </div>
@@ -83,7 +83,7 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
   /* Domaines prioritaires — depuis les pôles many-to-many */
   const domaines = oscData.poles && oscData.poles.length > 0
     ? oscData.poles.map(p => p.name)
-    : [oscData.domaine_prioritaire, oscData.domaine_prioritaire_2, oscData.domaine_prioritaire_3, oscData.domaine_prioritaire_4].filter(Boolean) as string[];
+    : [oscData.domaine_prioritaire, oscData.domaine_prioritaire_2, oscData.domaine_prioritaire_3, oscData.domaine_prioritaire_4, oscData.domaine_prioritaire_5].filter(Boolean) as string[];
 
   /* Sources de financement actives */
   const financements: string[] = [];
@@ -445,7 +445,7 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
         {/* Retour */}
         <div className="mt-12 text-center">
           <Link href="/annuaire/annuaire-des-osc" className="inline-flex items-center gap-2 text-[#E05017] hover:underline font-semibold text-sm">
-            <ChevronRight className="w-4 h-4 rotate-180" /> Retour à l'annuaire des OSC
+            <ChevronRight className="w-4 h-4 rotate-180" /> Retour à l&apos;annuaire des OSC
           </Link>
         </div>
       </div>

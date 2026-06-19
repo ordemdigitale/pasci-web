@@ -23,6 +23,7 @@ export interface IRegionCiv {
 export interface IOsc {
   id: string;
   name: string;
+  sigle?: string | null;
   description: string;
   crascRegionId: string;
   crasc: ICrasc;
@@ -31,10 +32,15 @@ export interface IOsc {
   thumbnail_url?: string;
   thumbnail_path?: string;
   ville?: string | null;
+  region_nom?: string | null;
+  departement?: string | null;
+  sous_prefecture?: string | null;
+  origine_organisation?: string | null;
   email?: string | null;
   phone?: string | null;
   website?: string | null;
   address?: string | null;
+  document_formalisation_url?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -61,22 +67,37 @@ export interface IOscDetail {
   crasc: ICrasc;
   news_items?: INews[];
   // Champs étendus
+  sigle?: string | null;
+  region_nom?: string | null;
+  departement?: string | null;
+  sous_prefecture?: string | null;
+  origine_organisation?: string | null;
   nom_president?: string | null;
   sexe_president?: string | null;
   mode_designation_president?: string | null;
   duree_mandat_be?: string | null;
   nb_membres?: number | null;
   nb_femmes_membres?: number | null;
+  nb_hommes_membres?: number | null;
   nb_membres_jeunes?: number | null;
+  nb_membres_handicap?: number | null;
   nb_membres_be?: number | null;
+  nombre_mandats_be?: number | null;
   nb_personnes_engagees?: number | null;
+  nb_cdi?: number | null;
+  nb_cdd?: number | null;
   nb_beneficiaires?: number | null;
+  nb_femmes_beneficiaires?: number | null;
+  nb_jeunes_beneficiaires?: number | null;
+  nb_beneficiaires_handicap?: number | null;
   nb_activites?: number | null;
+  date_derniere_activite?: string | null;
   // Domaines prioritaires (legacy — remplacés par poles)
   domaine_prioritaire?: string | null;
   domaine_prioritaire_2?: string | null;
   domaine_prioritaire_3?: string | null;
   domaine_prioritaire_4?: string | null;
+  domaine_prioritaire_5?: string | null;
   // Many-to-many avec PoleConcertation
   poles?: { id: number; name: string; slug: string }[];
   categorie?: string | null;
@@ -85,6 +106,8 @@ export interface IOscDetail {
   date_creation?: string | null;
   numero_recepisse?: string | null;
   type_document_formalisation?: string | null;
+  document_formalisation_path?: string | null;
+  document_formalisation_url?: string | null;
   existence_siege?: boolean | null;
   manuel_procedures?: boolean | null;
   plan_action?: boolean | null;
@@ -101,10 +124,18 @@ export interface IOscDetail {
   etat_cotisations?: string | null;
   montant_cotisation?: number | null;
   adhesion_crasc?: boolean | null;
-  niveau_regroupement?: "Réseau" | "Fédération" | "Plateforme" | "Confédération" | null;
+  adhesion_crasc_statut?: "oui" | "non" | "en_cours" | null;
+  niveau_regroupement?: "Simple" | "Réseau" | "Fédération" | "Plateforme" | "Confédération" | null;
   reseau_appartenance?: string | null;
+  organes_gouvernance?: string | null;
+  pays_couverture?: string | null;
+  date_designation_responsable?: string | null;
+  date_prochaine_designation?: string | null;
+  plan_action_annee_cours?: boolean | null;
+  plan_action_annee_cours_details?: string | null;
   difficultes?: string | null;
   recommandations?: string | null;
+  recommandations_2?: string | null;
   financement_cotisation?: boolean | null;
   financement_dons?: boolean | null;
   financement_legs?: boolean | null;
