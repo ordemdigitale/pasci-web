@@ -7,7 +7,7 @@ import { ImageWithFallback } from "@/lib/imageWithFallback";
 import {
   ArrowLeft, Building2, Mail, Phone, MapPin, Globe, Tag, Trash2,
   Edit, AlertTriangle, Newspaper, Users, Wallet, Calendar, FileText,
-  BarChart2, CheckCircle, XCircle,
+  BarChart2, CheckCircle, XCircle, UserPlus, KeyRound, UserX,
 } from "lucide-react";
 import { getToken } from "@/lib/auth";
 
@@ -111,6 +111,14 @@ export default function OscDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Gestion du compte utilisateur OSC
+  const [oscUser, setOscUser] = useState<{ id: string; email: string; username: string | null; first_name: string | null; last_name: string | null; is_active: boolean } | null | undefined>(undefined);
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [userForm, setUserForm] = useState({ email: "", username: "", password: "", first_name: "", last_name: "" });
+  const [userFormError, setUserFormError] = useState<string | null>(null);
+  const [userFormLoading, setUserFormLoading] = useState(false);
+  const [removingUser, setRemovingUser] = useState(false);
+
   useEffect(() => {
     const fetchOsc = async () => {
       try {
@@ -126,6 +134,54 @@ export default function OscDetailPage() {
     };
     if (oscSlug) fetchOsc();
   }, [oscSlug]);
+
+  useEffect(() => {
+    const fetchOscUser = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/v1/crasc/osc/${oscSlug}/user`, {
+          headers: { Authorization: `Bearer ${getToken()}` },
+          cache: "no-store",
+        });
+        if (res.status === 404 || res.status === 401) { setOscUser(null); return; }
+        if (res.ok) { const data = await res.json(); setOscUser(data); }
+        else { setOscUser(null); }
+      } catch { setOscUser(null); }
+    };
+    if (oscSlug) fetchOscUser();
+  }, [oscSlug]);
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUserFormError(null);
+    setUserFormLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/crasc/osc/${oscSlug}/user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify(userForm),
+      });
+      const data = await res.json();
+      if (!res.ok) { setUserFormError(data.detail || "Erreur lors de la création"); return; }
+      setOscUser(data);
+      setShowUserForm(false);
+      setUserForm({ email: "", username: "", password: "", first_name: "", last_name: "" });
+    } catch { setUserFormError("Erreur réseau"); }
+    finally { setUserFormLoading(false); }
+  };
+
+  const handleRemoveUser = async () => {
+    if (!confirm("Supprimer le compte utilisateur de cette OSC ?")) return;
+    setRemovingUser(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/crasc/osc/${oscSlug}/user`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (res.ok) setOscUser(null);
+      else { const d = await res.json(); setError(d.detail || "Erreur lors de la suppression"); }
+    } catch { setError("Erreur réseau"); }
+    finally { setRemovingUser(false); }
+  };
 
   const handleDelete = async () => {
     if (!confirm("Supprimer cette OSC ? Cette action est irréversible.")) return;
@@ -383,6 +439,103 @@ export default function OscDetailPage() {
             </div>
           </div>
         )}
+
+        {/* Compte utilisateur OSC */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <KeyRound className="w-5 h-5 text-[#2a591d]" />Compte utilisateur
+          </h2>
+
+          {oscUser === undefined && (
+            <p className="text-sm text-gray-400">Chargement...</p>
+          )}
+
+          {oscUser === null && !showUserForm && (
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-500">Aucun compte utilisateur rattaché à cette OSC.</p>
+              <button onClick={() => {
+                // Pré-remplir avec les données de l'OSC
+                const nameParts = (osc?.nom_president || osc?.name || "").split(" ");
+                const firstName = nameParts[0] || "";
+                const lastName = nameParts.slice(1).join(" ") || "";
+                const slug = osc?.slug || "";
+                setUserForm({
+                  email: osc?.email || "",
+                  username: slug,
+                  password: "",
+                  first_name: firstName,
+                  last_name: lastName,
+                });
+                setShowUserForm(true);
+              }}
+                className="flex items-center gap-2 px-4 py-2 bg-[#2a591d] text-white rounded-lg hover:bg-[#1f4315] text-sm font-semibold">
+                <UserPlus className="w-4 h-4" />Créer un compte
+              </button>
+            </div>
+          )}
+
+          {oscUser && (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">{oscUser.first_name} {oscUser.last_name}</p>
+                <p className="text-sm text-gray-500">{oscUser.email}</p>
+                {oscUser.username && <p className="text-xs text-gray-400">@{oscUser.username}</p>}
+                <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold ${oscUser.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                  {oscUser.is_active ? "Actif" : "Inactif"}
+                </span>
+              </div>
+              <button onClick={handleRemoveUser} disabled={removingUser}
+                className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 text-sm font-semibold disabled:opacity-50">
+                <UserX className="w-4 h-4" />{removingUser ? "Suppression..." : "Supprimer le compte"}
+              </button>
+            </div>
+          )}
+
+          {showUserForm && (
+            <form onSubmit={handleCreateUser} className="space-y-3 mt-2">
+              {userFormError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">{userFormError}</div>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Prénom</label>
+                  <input type="text" value={userForm.first_name} onChange={e => setUserForm(f => ({ ...f, first_name: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2a591d]" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Nom</label>
+                  <input type="text" value={userForm.last_name} onChange={e => setUserForm(f => ({ ...f, last_name: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2a591d]" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Email *</label>
+                  <input type="email" required value={userForm.email} onChange={e => setUserForm(f => ({ ...f, email: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2a591d]" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Nom d&apos;utilisateur</label>
+                  <input type="text" value={userForm.username} onChange={e => setUserForm(f => ({ ...f, username: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2a591d]" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Mot de passe *</label>
+                  <input type="password" required minLength={8} value={userForm.password} onChange={e => setUserForm(f => ({ ...f, password: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2a591d]" />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button type="submit" disabled={userFormLoading}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#2a591d] text-white rounded-lg hover:bg-[#1f4315] text-sm font-semibold disabled:opacity-50">
+                  <UserPlus className="w-4 h-4" />{userFormLoading ? "Création..." : "Créer le compte"}
+                </button>
+                <button type="button" onClick={() => { setShowUserForm(false); setUserFormError(null); }}
+                  className="px-5 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                  Annuler
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
