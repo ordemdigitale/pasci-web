@@ -269,7 +269,7 @@ export default function OscDetailPage() {
                 {osc.ville && <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold flex items-center gap-1"><MapPin className="w-3 h-3" />{osc.ville}</span>}
                 {osc.categorie && <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold">{osc.categorie}</span>}
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${osc.is_visible !== false ? "bg-green-400/30 text-white" : "bg-red-400/30 text-white"}`}>
-                  {osc.is_visible !== false ? <><Eye className="w-3 h-3" />Visible</> : <><EyeOff className="w-3 h-3" />Masquée</>}
+                  {osc.is_visible !== false ? <><Eye className="w-3 h-3" />Publiée</> : <><EyeOff className="w-3 h-3" />Non publiée</>}
                 </span>
               </div>
             </div>
@@ -575,7 +575,7 @@ export default function OscDetailPage() {
             }`}
           >
             {osc.is_visible !== false ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-            {togglingVisibility ? "..." : osc.is_visible !== false ? "Masquer dans l'annuaire" : "Afficher dans l'annuaire"}
+            {togglingVisibility ? "..." : osc.is_visible !== false ? "Dépublier" : "Publier"}
           </button>
           <button onClick={handleDelete} disabled={deleting}
             className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold disabled:opacity-50 flex items-center justify-center gap-2">

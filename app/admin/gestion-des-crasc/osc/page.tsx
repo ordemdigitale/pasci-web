@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
-import { ChevronLeft, ChevronRight, Search, Loader2, Eye, Edit3 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Loader2, Eye, Edit3, EyeOff } from "lucide-react";
+import { getToken } from "@/lib/auth";
 import OscEvaluationBadge from "@/components/osc/OscEvaluationBadge";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -45,6 +46,7 @@ export default function AdminOscPage() {
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
   const [loading, setLoading]     = useState(true);
+  const [togglingId, setTogglingId] = useState<number | null>(null);
 
   const fetchOscs = useCallback(async () => {
     setLoading(true);
@@ -72,6 +74,22 @@ export default function AdminOscPage() {
   }, [page, search, typeDocumentFormalisation, hasDocumentFormalisation, sortBy, sortOrder]);
 
   useEffect(() => { fetchOscs(); }, [fetchOscs]);
+
+  const handleTogglePublish = async (osc: IOsc) => {
+    setTogglingId(osc.id);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/crasc/osc/${osc.slug}/visibility`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setOscs(prev => prev.map(o => o.id === osc.id ? { ...o, is_visible: updated.is_visible } : o));
+      }
+    } finally {
+      setTogglingId(null);
+    }
+  };
 
   const applySearch = () => { setSearch(searchInput); setPage(1); };
   const resetFilters = () => {
@@ -253,8 +271,8 @@ export default function AdminOscPage() {
                     <div className="flex items-center gap-2">
                       <div className="text-sm font-medium text-gray-900 max-w-xs">{osc.name}</div>
                       {osc.is_visible === false && (
-                        <span className="inline-flex items-center gap-0.5 text-xs px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded-full font-medium" title="Masquée de l'annuaire public">
-                          Masquée
+                        <span className="inline-flex items-center gap-0.5 text-xs px-1.5 py-0.5 bg-orange-100 text-orange-600 rounded-full font-medium" title="Non publiée dans l'annuaire public">
+                          Non publiée
                         </span>
                       )}
                     </div>
@@ -305,7 +323,7 @@ export default function AdminOscPage() {
                         className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
                       >
                         <Eye className="w-3.5 h-3.5" />
-                        Afficher
+                        Voir
                       </Link>
                       <Link
                         href={`/admin/gestion-des-crasc/osc/${osc.slug}/modifier`}
@@ -314,6 +332,21 @@ export default function AdminOscPage() {
                         <Edit3 className="w-3.5 h-3.5" />
                         Modifier
                       </Link>
+                      <button
+                        onClick={() => handleTogglePublish(osc)}
+                        disabled={togglingId === osc.id}
+                        title={osc.is_visible !== false ? "Dépublier" : "Publier"}
+                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 ${
+                          osc.is_visible !== false
+                            ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            : "bg-orange-50 text-orange-700 hover:bg-orange-100"
+                        }`}
+                      >
+                        {osc.is_visible !== false
+                          ? <><EyeOff className="w-3.5 h-3.5" />Dépublier</>
+                          : <><Eye className="w-3.5 h-3.5" />Publier</>
+                        }
+                      </button>
                     </div>
                   </td>
                 </tr>
