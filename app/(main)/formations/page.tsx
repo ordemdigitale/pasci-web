@@ -41,6 +41,9 @@ function isUpcoming(dateStr: string | null | undefined) {
 
 export default function FormationsPage() {
   const [activeCategorie, setActiveCategorie] = useState<string | null>(null);
+  const [filterType, setFilterType] = useState<'all' | 'gratuite' | 'payante'>('all');
+  const [filterMode, setFilterMode] = useState<'all' | 'en_ligne' | 'presentiel'>('all');
+  const [filterStatut, setFilterStatut] = useState<'all' | 'actif' | 'termine'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [visiblePrograms, setVisiblePrograms] = useState(9);
   const [formations, setFormations] = useState<IFormation[]>([]);
@@ -91,7 +94,11 @@ export default function FormationsPage() {
     const matchesSearch = formation.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (formation.description && formation.description.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesCategorie = activeCategorie === null || formation.categorie === activeCategorie;
-    return matchesSearch && matchesCategorie;
+    const matchesType = filterType === 'all' || formation.type === filterType;
+    const isEnLigne = !formation.location || formation.location.toLowerCase().includes('ligne') || formation.location.toLowerCase().includes('online') || formation.location.toLowerCase().includes('distance');
+    const matchesMode = filterMode === 'all' || (filterMode === 'en_ligne' ? isEnLigne : !isEnLigne);
+    const matchesStatut = filterStatut === 'all' || (filterStatut === 'actif' ? !formation.is_completed : formation.is_completed);
+    return matchesSearch && matchesCategorie && matchesType && matchesMode && matchesStatut;
   });
 
   const upcomingFormations = formations
@@ -229,6 +236,44 @@ export default function FormationsPage() {
             <div className="mb-8">
               <h3 className="text-gray-800 text-3xl font-bold my-6">Programmes de Formations</h3>
 
+              {/* Filtres */}
+              <div className="flex flex-wrap gap-3 mb-6">
+                {/* Type */}
+                <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
+                  {([['all', 'Tous'], ['gratuite', 'Gratuit'], ['payante', 'Payant']] as const).map(([val, label]) => (
+                    <button key={val} onClick={() => setFilterType(val)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${filterType === val ? 'bg-green-600 text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {/* Mode */}
+                <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
+                  {([['all', 'Tous modes'], ['en_ligne', 'En ligne'], ['presentiel', 'Présentiel']] as const).map(([val, label]) => (
+                    <button key={val} onClick={() => setFilterMode(val)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${filterMode === val ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {/* Statut */}
+                <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
+                  {([['all', 'Tous statuts'], ['actif', 'Actif'], ['termine', 'Terminé']] as const).map(([val, label]) => (
+                    <button key={val} onClick={() => setFilterStatut(val)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${filterStatut === val ? 'bg-[#E05017] text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {/* Reset si filtres actifs */}
+                {(filterType !== 'all' || filterMode !== 'all' || filterStatut !== 'all') && (
+                  <button onClick={() => { setFilterType('all'); setFilterMode('all'); setFilterStatut('all'); }}
+                    className="px-3 py-1 rounded-full text-xs font-semibold text-gray-500 border border-gray-300 hover:bg-gray-100 transition-all">
+                    Réinitialiser
+                  </button>
+                )}
+              </div>
+
               {loading && (
                 <div className="flex justify-center items-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-[#E05107]" />
@@ -332,7 +377,7 @@ export default function FormationsPage() {
                     icon: <GraduationCap className="w-8 h-8 text-white" />,
                     value: stats.total_inscrits.toLocaleString('fr-FR'),
                     label: 'Personnes formées',
-                    sublabel: 'Total des inscrits toutes formations',
+                    sublabel: 'Total des inscrits à toutes les formations',
                     bg: 'from-[#2a591d] to-[#3d7a28]',
                   },
                   {
