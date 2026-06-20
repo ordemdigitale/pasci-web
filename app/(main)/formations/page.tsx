@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Search, Loader2, Calendar, MapPin, Users,
-  Clock, ChevronRight, Mail, Phone, Send, Lightbulb, CheckCircle,
+  Clock, ChevronRight, ChevronLeft, Mail, Phone, Send, Lightbulb, CheckCircle,
   AlertCircle, BookOpen, UserCheck, GraduationCap, Building2, BarChart3
 } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
@@ -12,6 +12,7 @@ import { fetchAllFormations, IFormation } from '@/lib/fetch-formations';
 
 const FALLBACK_IMAGE = "/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const PAGE_SIZE = 9;
 
 
 interface IFormationStats {
@@ -45,7 +46,7 @@ export default function FormationsPage() {
   const [filterMode, setFilterMode] = useState<'all' | 'en_ligne' | 'presentiel'>('all');
   const [filterStatut, setFilterStatut] = useState<'all' | 'actif' | 'termine'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [visiblePrograms, setVisiblePrograms] = useState(9);
+  const [currentPage, setCurrentPage] = useState(1);
   const [formations, setFormations] = useState<IFormation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -100,6 +101,16 @@ export default function FormationsPage() {
     const matchesStatut = filterStatut === 'all' || (filterStatut === 'actif' ? !formation.is_completed : formation.is_completed);
     return matchesSearch && matchesCategorie && matchesType && matchesMode && matchesStatut;
   });
+
+  const totalPages = Math.ceil(filteredFormations.length / PAGE_SIZE);
+  const paginatedFormations = filteredFormations.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  // Reset page when filters change
+  const setCategorie = (cat: string | null) => { setActiveCategorie(cat); setCurrentPage(1); };
+  const setType = (v: 'all' | 'gratuite' | 'payante') => { setFilterType(v); setCurrentPage(1); };
+  const setMode = (v: 'all' | 'en_ligne' | 'presentiel') => { setFilterMode(v); setCurrentPage(1); };
+  const setStatut = (v: 'all' | 'actif' | 'termine') => { setFilterStatut(v); setCurrentPage(1); };
+  const resetFilters = () => { setFilterType('all'); setFilterMode('all'); setFilterStatut('all'); setCurrentPage(1); };
 
   const upcomingFormations = formations
     .filter(f => isUpcoming(f.start_date))
@@ -178,7 +189,7 @@ export default function FormationsPage() {
             type="text"
             placeholder="Rechercher une formation..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
             className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           />
         </div>
@@ -196,7 +207,7 @@ export default function FormationsPage() {
 
               {/* Toutes les formations */}
               <button
-                onClick={() => setActiveCategorie(null)}
+                onClick={() => setCategorie(null)}
                 className={`w-full text-left px-5 py-3.5 flex items-center gap-3 transition-all border-b border-gray-100 ${
                   activeCategorie === null
                     ? 'bg-[#E05017] text-white font-semibold'
@@ -213,7 +224,7 @@ export default function FormationsPage() {
               {categories.map((cat, index) => (
                 <button
                   key={cat}
-                  onClick={() => setActiveCategorie(cat)}
+                  onClick={() => setCategorie(cat)}
                   className={`w-full text-left px-5 py-3.5 flex items-center gap-3 transition-all border-b border-gray-100 last:border-b-0 ${
                     activeCategorie === cat
                       ? 'bg-[#E05017] text-white font-semibold'
@@ -241,7 +252,7 @@ export default function FormationsPage() {
                 {/* Type */}
                 <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
                   {([['all', 'Tous'], ['gratuite', 'Gratuit'], ['payante', 'Payant']] as const).map(([val, label]) => (
-                    <button key={val} onClick={() => setFilterType(val)}
+                    <button key={val} onClick={() => setType(val)}
                       className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${filterType === val ? 'bg-green-600 text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}>
                       {label}
                     </button>
@@ -250,7 +261,7 @@ export default function FormationsPage() {
                 {/* Mode */}
                 <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
                   {([['all', 'Tous modes'], ['en_ligne', 'En ligne'], ['presentiel', 'Présentiel']] as const).map(([val, label]) => (
-                    <button key={val} onClick={() => setFilterMode(val)}
+                    <button key={val} onClick={() => setMode(val)}
                       className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${filterMode === val ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}>
                       {label}
                     </button>
@@ -259,7 +270,7 @@ export default function FormationsPage() {
                 {/* Statut */}
                 <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
                   {([['all', 'Tous statuts'], ['actif', 'Actif'], ['termine', 'Terminé']] as const).map(([val, label]) => (
-                    <button key={val} onClick={() => setFilterStatut(val)}
+                    <button key={val} onClick={() => setStatut(val)}
                       className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${filterStatut === val ? 'bg-[#E05017] text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}>
                       {label}
                     </button>
@@ -267,7 +278,7 @@ export default function FormationsPage() {
                 </div>
                 {/* Reset si filtres actifs */}
                 {(filterType !== 'all' || filterMode !== 'all' || filterStatut !== 'all') && (
-                  <button onClick={() => { setFilterType('all'); setFilterMode('all'); setFilterStatut('all'); }}
+                  <button onClick={resetFilters}
                     className="px-3 py-1 rounded-full text-xs font-semibold text-gray-500 border border-gray-300 hover:bg-gray-100 transition-all">
                     Réinitialiser
                   </button>
@@ -293,8 +304,12 @@ export default function FormationsPage() {
 
               {!loading && !error && filteredFormations.length > 0 && (
                 <>
+                  <p className="text-sm text-gray-500 mb-4">
+                    {filteredFormations.length} formation{filteredFormations.length > 1 ? 's' : ''} trouvée{filteredFormations.length > 1 ? 's' : ''}
+                    {totalPages > 1 && ` — Page ${currentPage} / ${totalPages}`}
+                  </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                    {filteredFormations.slice(0, visiblePrograms).map((formation) => (
+                    {paginatedFormations.map((formation) => (
                       <div key={formation.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                         <div className="relative h-48">
                           <ImageWithFallback
@@ -344,16 +359,53 @@ export default function FormationsPage() {
                       </div>
                     ))}
                   </div>
-                  <div className="flex flex-wrap gap-3 justify-end">
-                    {visiblePrograms < filteredFormations.length && (
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 mt-4">
                       <button
-                        onClick={() => setVisiblePrograms(prev => Math.min(prev + 5, filteredFormations.length))}
-                        className="px-6 py-2 border border-[#E05107] text-[#E05107] rounded-lg hover:bg-[#E05107] hover:text-white transition-colors"
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        aria-label="Page précédente"
                       >
-                        Voir plus
+                        <ChevronLeft className="w-4 h-4" />
                       </button>
-                    )}
-                  </div>
+
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                        const isActive = page === currentPage;
+                        const isNearCurrent = Math.abs(page - currentPage) <= 1 || page === 1 || page === totalPages;
+                        if (!isNearCurrent) {
+                          if (page === currentPage - 2 || page === currentPage + 2) {
+                            return <span key={page} className="text-gray-400 px-1">…</span>;
+                          }
+                          return null;
+                        }
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors ${
+                              isActive
+                                ? 'bg-[#E05017] text-white'
+                                : 'border border-gray-300 text-gray-700 hover:bg-gray-100'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      })}
+
+                      <button
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        aria-label="Page suivante"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+
                 </>
               )}
             </div>
