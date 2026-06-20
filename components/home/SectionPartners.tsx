@@ -1,51 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ImageWithFallback } from "@/lib/imageWithFallback"
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
-interface IPartenaires {
+interface IPartenaire {
   id: number;
-  name: string;
-  imageUrl: string;
-  description?: string;
-  website?: string;
+  image_url: string;
+  ordre: number;
+  is_active: boolean;
+  type: string;
 }
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function Partners() {
   const [hoveredPartner, setHoveredPartner] = useState<number | null>(null);
+  const [partners, setPartners] = useState<IPartenaire[]>([]);
 
-  const partners: IPartenaires[] = [
-    {
-      id: 1,
-      name: 'Save The Children',
-      imageUrl: "/images/partenaires/save-the-children.png",
-      description: "Protection de l'enfance",
-      website: "#"
-    },
-    {
-      id: 2,
-      name: 'CERAP',
-      imageUrl: '/images/partenaires/cerap.png',
-      description: "Recherche et formation",
-      website: "#"
-    },
-    {
-      id: 3,
-      name: 'Social Justice',
-      imageUrl: '/images/partenaires/social-justice.png',
-      description: "Justice sociale",
-      website: "#"
-    },
-    {
-      id: 4,
-      name: 'Union Européenne',
-      imageUrl: '/images/partenaires/union-europeenne.png',
-      description: "Coopération internationale",
-      website: "#"
-    },
-  ];
+  useEffect(() => {
+    fetch(`${API_BASE}/api/v1/hero-slides?active_only=true&type=bas`)
+      .then((r) => r.ok ? r.json() : [])
+      .then(setPartners)
+      .catch(() => setPartners([]));
+  }, []);
+
+  if (partners.length === 0) return null;
 
   return (
     <section className="py-12 bg-white font-poppins">
@@ -74,38 +55,11 @@ export default function Partners() {
                 {/* Logo Container */}
                 <div className="w-full h-24 flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
                   <ImageWithFallback
-                    src={partner.imageUrl}
-                    alt={partner.name}
+                    src={partner.image_url}
+                    alt={`Partenaire ${partner.ordre + 1}`}
                     className="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-300"
                   />
                 </div>
-
-                {/* Partner Name */}
-                <h3 className="text-sm font-bold text-gray-900 text-center mb-2 group-hover:text-[#E05017] transition-colors duration-300">
-                  {partner.name}
-                </h3>
-
-                {/* Description - visible on hover */}
-                {partner.description && (
-                  <p className={`text-xs text-gray-500 text-center mb-3 transition-all duration-300 ${
-                    hoveredPartner === partner.id ? 'opacity-100 max-h-20' : 'opacity-0 max-h-0'
-                  }`}>
-                    {partner.description}
-                  </p>
-                )}
-
-                {/* External Link Icon - visible on hover */}
-                {/* {partner.website && (
-                  <Link
-                    href={partner.website}
-                    className={`flex items-center gap-1 text-xs font-semibold text-[#E05017] transition-all duration-300 ${
-                      hoveredPartner === partner.id ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-                    }`}
-                  >
-                    <span>Visiter</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </Link>
-                )} */}
               </div>
 
               {/* Decorative corner */}
@@ -120,13 +74,13 @@ export default function Partners() {
             Adhésion au CRASC
           </h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Votre organisation souhaite intégrer le réseau des OSC membres du CRASC ? Soumettez votre demande d'adhésion et bénéficiez de l'accompagnement de la plateforme PDOC.
+            Votre organisation souhaite intégrer le réseau des OSC membres du CRASC ? Soumettez votre demande d&apos;adhésion et bénéficiez de l&apos;accompagnement de la plateforme PDOC.
           </p>
           <Link
             href="/rejoindre"
             className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-[#E05017] to-[#d04010] text-white font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
           >
-            Demande d'adhésion
+            Demande d&apos;adhésion
             <ExternalLink className="w-4 h-4" />
           </Link>
         </div>

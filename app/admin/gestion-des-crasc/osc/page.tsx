@@ -30,6 +30,7 @@ interface IOsc {
   type_document_formalisation?: string | null;
   document_formalisation_url?: string | null;
   score_autoevaluation?: number; couleur_autoevaluation?: string; couleur_autoevaluation_hex?: string;
+  is_visible?: boolean;
 }
 
 export default function AdminOscPage() {
@@ -249,7 +250,14 @@ export default function AdminOscPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900 max-w-xs">{osc.name}</div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-sm font-medium text-gray-900 max-w-xs">{osc.name}</div>
+                      {osc.is_visible === false && (
+                        <span className="inline-flex items-center gap-0.5 text-xs px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded-full font-medium" title="Masquée de l'annuaire public">
+                          Masquée
+                        </span>
+                      )}
+                    </div>
                     <div className="mt-1">
                       <OscEvaluationBadge score={osc.score_autoevaluation} color={osc.couleur_autoevaluation} hex={osc.couleur_autoevaluation_hex} compact />
                     </div>

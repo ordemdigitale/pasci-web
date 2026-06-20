@@ -13,6 +13,7 @@ export default function AjouterHeroSlidePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [type, setType] = useState("haut");
   const [ordre, setOrdre] = useState(0);
   const [isActive, setIsActive] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -31,6 +32,7 @@ export default function AjouterHeroSlidePage() {
     try {
       const fd = new FormData();
       fd.append("image", image);
+      fd.append("type", type);
       fd.append("ordre", String(ordre));
       fd.append("is_active", String(isActive));
       const res = await fetchWithAuth(`${API_BASE}/api/v1/hero-slides`, { method: "POST", body: fd });
@@ -90,6 +92,18 @@ export default function AjouterHeroSlidePage() {
             className="hidden"
             onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
           />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Section</label>
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]/30 focus:border-[#E05017]"
+          >
+            <option value="haut">Slider CRASC (haut de page)</option>
+            <option value="bas">Partenaires (bas de page)</option>
+          </select>
         </div>
 
         <div className="grid grid-cols-2 gap-4">

@@ -11,6 +11,7 @@ interface IHeroSlide {
   image_url: string;
   ordre: number;
   is_active: boolean;
+  type: string;
 }
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -94,6 +95,74 @@ export default function HeroSlidesPage() {
     }
   };
 
+  const slidesHaut = slides.filter((s) => s.type === "haut");
+  const slidesBas = slides.filter((s) => s.type === "bas");
+
+  const SlideGrid = ({ items }: { items: IHeroSlide[] }) => (
+    items.length === 0 ? (
+      <div className="text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+        <Images className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+        <p className="text-gray-400 text-sm">Aucune image pour cette section</p>
+      </div>
+    ) : (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {items.map((slide) => (
+          <div
+            key={slide.id}
+            className={`relative rounded-lg overflow-hidden border-2 group transition-all ${
+              slide.is_active ? "border-gray-200" : "border-gray-100 opacity-50"
+            }`}
+          >
+            <div className="aspect-video">
+              <ImageWithFallback
+                src={slide.image_url}
+                alt={`Slide ${slide.id}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Ordre badge */}
+            <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
+              #{slide.ordre}
+            </div>
+
+            {/* Status badge */}
+            <div className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full font-medium ${
+              slide.is_active ? "bg-green-500 text-white" : "bg-gray-500 text-white"
+            }`}>
+              {slide.is_active ? "Active" : "Inactive"}
+            </div>
+
+            {/* Actions overlay */}
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+              <button
+                onClick={() => handleToggle(slide)}
+                disabled={togglingId === slide.id}
+                className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                title={slide.is_active ? "Désactiver" : "Activer"}
+              >
+                {slide.is_active ? <EyeOff className="w-4 h-4 text-gray-700" /> : <Eye className="w-4 h-4 text-gray-700" />}
+              </button>
+              <Link
+                href={`/admin/hero-slides/${slide.id}/modifier`}
+                className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <GripVertical className="w-4 h-4 text-gray-700" />
+              </Link>
+              <button
+                onClick={() => handleDelete(slide.id)}
+                disabled={deletingId === slide.id}
+                className="p-2 bg-white rounded-full hover:bg-red-50 transition-colors"
+              >
+                <Trash2 className="w-4 h-4 text-red-600" />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  );
+
   return (
     <div className="p-6 font-poppins">
       <div className="flex items-center justify-between mb-6">
@@ -102,8 +171,8 @@ export default function HeroSlidesPage() {
             <Images className="w-6 h-6 text-[#E05017]" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Slider CRASC</h1>
-            <p className="text-sm text-gray-500">Images du slider sur la page d&apos;accueil</p>
+            <h1 className="text-2xl font-bold text-gray-900">Gestion des slides</h1>
+            <p className="text-sm text-gray-500">Images du slider de la page d&apos;accueil</p>
           </div>
         </div>
         <Link
@@ -117,7 +186,7 @@ export default function HeroSlidesPage() {
 
       {/* Texte de la section */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6 space-y-4">
-        <h2 className="text-base font-semibold text-gray-800">Texte de la section</h2>
+        <h2 className="text-base font-semibold text-gray-800">Texte de la section CRASC</h2>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Titre</label>
           <input
@@ -154,67 +223,35 @@ export default function HeroSlidesPage() {
             <div key={i} className="bg-gray-200 rounded-lg aspect-video animate-pulse" />
           ))}
         </div>
-      ) : slides.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-lg border border-dashed border-gray-300">
-          <Images className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 font-medium">Aucune image</p>
-          <p className="text-gray-400 text-sm mt-1">Ajoutez des images pour le slider de la page d&apos;accueil</p>
-        </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {slides.map((slide) => (
-            <div
-              key={slide.id}
-              className={`relative rounded-lg overflow-hidden border-2 group transition-all ${
-                slide.is_active ? "border-gray-200" : "border-gray-100 opacity-50"
-              }`}
-            >
-              <div className="aspect-video">
-                <ImageWithFallback
-                  src={slide.image_url}
-                  alt={`Slide ${slide.id}`}
-                  className="w-full h-full object-cover"
-                />
+        <div className="space-y-8">
+          {/* Section slides du haut */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">Slider CRASC (haut)</h2>
+                <p className="text-xs text-gray-500 mt-0.5">Images affichées dans le slider principal en haut de la page d&apos;accueil</p>
               </div>
-
-              {/* Ordre badge */}
-              <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
-                #{slide.ordre}
-              </div>
-
-              {/* Status badge */}
-              <div className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full font-medium ${
-                slide.is_active ? "bg-green-500 text-white" : "bg-gray-500 text-white"
-              }`}>
-                {slide.is_active ? "Active" : "Inactive"}
-              </div>
-
-              {/* Actions overlay */}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                <button
-                  onClick={() => handleToggle(slide)}
-                  disabled={togglingId === slide.id}
-                  className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
-                  title={slide.is_active ? "Désactiver" : "Activer"}
-                >
-                  {slide.is_active ? <EyeOff className="w-4 h-4 text-gray-700" /> : <Eye className="w-4 h-4 text-gray-700" />}
-                </button>
-                <Link
-                  href={`/admin/hero-slides/${slide.id}/modifier`}
-                  className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
-                >
-                  <GripVertical className="w-4 h-4 text-gray-700" />
-                </Link>
-                <button
-                  onClick={() => handleDelete(slide.id)}
-                  disabled={deletingId === slide.id}
-                  className="p-2 bg-white rounded-full hover:bg-red-50 transition-colors"
-                >
-                  <Trash2 className="w-4 h-4 text-red-600" />
-                </button>
-              </div>
+              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+                {slidesHaut.length} image{slidesHaut.length !== 1 ? "s" : ""}
+              </span>
             </div>
-          ))}
+            <SlideGrid items={slidesHaut} />
+          </div>
+
+          {/* Section slides du bas (partenaires) */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">Partenaires (bas)</h2>
+                <p className="text-xs text-gray-500 mt-0.5">Logos affichés dans la section &quot;Nos partenaires&quot; en bas de la page d&apos;accueil</p>
+              </div>
+              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                {slidesBas.length} image{slidesBas.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+            <SlideGrid items={slidesBas} />
+          </div>
         </div>
       )}
     </div>

@@ -7,7 +7,7 @@ import { ImageWithFallback } from "@/lib/imageWithFallback";
 import {
   ArrowLeft, Building2, Mail, Phone, MapPin, Globe, Tag, Trash2,
   Edit, AlertTriangle, Newspaper, Users, Wallet, Calendar, FileText,
-  BarChart2, CheckCircle, XCircle, UserPlus, KeyRound, UserX,
+  BarChart2, CheckCircle, XCircle, UserPlus, KeyRound, UserX, Eye, EyeOff,
 } from "lucide-react";
 import { getToken } from "@/lib/auth";
 
@@ -52,6 +52,7 @@ interface IOscDetail {
   financement_legs?: boolean | null; financement_collectivites?: boolean | null;
   financement_fonds_propres?: boolean | null; financement_ong_intl?: boolean | null;
   financement_multilateral?: boolean | null;
+  is_visible?: boolean;
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -110,6 +111,7 @@ export default function OscDetailPage() {
   const [osc, setOsc] = useState<IOscDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [togglingVisibility, setTogglingVisibility] = useState(false);
 
   // Gestion du compte utilisateur OSC
   const [oscUser, setOscUser] = useState<{ id: string; email: string; username: string | null; first_name: string | null; last_name: string | null; is_active: boolean } | null | undefined>(undefined);
@@ -183,6 +185,25 @@ export default function OscDetailPage() {
     finally { setRemovingUser(false); }
   };
 
+  const handleToggleVisibility = async () => {
+    if (!osc) return;
+    setTogglingVisibility(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/crasc/osc/${oscSlug}/visibility`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setOsc((prev) => prev ? { ...prev, is_visible: updated.is_visible } : prev);
+      } else {
+        const d = await res.json();
+        setError(d.detail || "Erreur lors de la mise à jour de la visibilité");
+      }
+    } catch { setError("Erreur réseau"); }
+    finally { setTogglingVisibility(false); }
+  };
+
   const handleDelete = async () => {
     if (!confirm("Supprimer cette OSC ? Cette action est irréversible.")) return;
     try {
@@ -247,6 +268,9 @@ export default function OscDetailPage() {
                 {osc.crasc && <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold flex items-center gap-1"><Building2 className="w-3 h-3" />{osc.crasc.name}</span>}
                 {osc.ville && <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold flex items-center gap-1"><MapPin className="w-3 h-3" />{osc.ville}</span>}
                 {osc.categorie && <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold">{osc.categorie}</span>}
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${osc.is_visible !== false ? "bg-green-400/30 text-white" : "bg-red-400/30 text-white"}`}>
+                  {osc.is_visible !== false ? <><Eye className="w-3 h-3" />Visible</> : <><EyeOff className="w-3 h-3" />Masquée</>}
+                </span>
               </div>
             </div>
           </div>
@@ -543,6 +567,16 @@ export default function OscDetailPage() {
             className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold flex items-center justify-center gap-2">
             <Edit className="w-5 h-5" />Modifier cette OSC
           </Link>
+          <button onClick={handleToggleVisibility} disabled={togglingVisibility}
+            className={`flex-1 px-6 py-3 rounded-lg font-semibold disabled:opacity-50 flex items-center justify-center gap-2 transition-colors ${
+              osc.is_visible !== false
+                ? "bg-gray-600 text-white hover:bg-gray-700"
+                : "bg-green-600 text-white hover:bg-green-700"
+            }`}
+          >
+            {osc.is_visible !== false ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            {togglingVisibility ? "..." : osc.is_visible !== false ? "Masquer dans l'annuaire" : "Afficher dans l'annuaire"}
+          </button>
           <button onClick={handleDelete} disabled={deleting}
             className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold disabled:opacity-50 flex items-center justify-center gap-2">
             <Trash2 className="w-5 h-5" />{deleting ? "Suppression..." : "Supprimer cette OSC"}
