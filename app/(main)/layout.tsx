@@ -22,8 +22,43 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Plateforme Digitale des OSC membres du CRASC ( PDOC )",
-  description: "Plateforme Digitale des OSC membres du CRASC ( PDOC )",
+  title: {
+    default: "PDOC — Plateforme Digitale des OSC de Côte d'Ivoire",
+    template: "%s | PDOC",
+  },
+  description: "PDOC est la plateforme officielle des Organisations de la Société Civile (OSC) membres des CRASC en Côte d'Ivoire. Annuaire des OSC, formations, actualités, offres de projets et espace collaboratif.",
+  keywords: [
+    "OSC Côte d'Ivoire", "société civile ivoirienne", "CRASC", "PDOC", "PASCI",
+    "organisations société civile", "annuaire OSC", "formations OSC", "appui société civile",
+    "partenaires techniques financiers", "offres de projets", "espace collaboratif OSC",
+    "plateforme digitale OSC", "société civile Abidjan", "ONG Côte d'Ivoire",
+    "développement communautaire", "formalisation OSC", "renforcement capacités",
+  ],
+  authors: [{ name: "PASCI — Programme d'Appui à la Société Civile Ivoirienne" }],
+  creator: "PASCI",
+  publisher: "PASCI",
+  metadataBase: new URL("https://plateforme-osci.org"),
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "fr_CI",
+    url: "https://plateforme-osci.org",
+    siteName: "PDOC — Plateforme Digitale des OSC de Côte d'Ivoire",
+    title: "PDOC — Plateforme Digitale des OSC de Côte d'Ivoire",
+    description: "La plateforme officielle des OSC membres des CRASC en Côte d'Ivoire : annuaire, formations, actualités et offres de projets.",
+    images: [{ url: "/images/og-default.jpg", width: 1200, height: 630, alt: "PDOC — Plateforme Digitale des OSC" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PDOC — Plateforme Digitale des OSC de Côte d'Ivoire",
+    description: "La plateforme officielle des OSC membres des CRASC en Côte d'Ivoire.",
+    images: ["/images/og-default.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large", "max-video-preview": -1 },
+  },
 };
 
 export default function RootLayout({
@@ -32,7 +67,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${karla.variable} ${poppins.variable} antialiased`}>
+    <html lang="fr" className={`${karla.variable} ${poppins.variable} antialiased`}>
       <body suppressHydrationWarning>
         <Navbar />
         <SubMenu />
