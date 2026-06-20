@@ -101,8 +101,8 @@ export default function AjouterHeroSlidePage() {
             onChange={(e) => setType(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]/30 focus:border-[#E05017]"
           >
-            <option value="haut">Slider CRASC (haut de page)</option>
-            <option value="bas">Partenaires (bas de page)</option>
+            <option value="haut">Slider Héro (section héro, haut)</option>
+            <option value="bas">Slider CRASC (section pleine largeur, bas)</option>
           </select>
         </div>
 

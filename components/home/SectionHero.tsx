@@ -30,7 +30,7 @@ export default function SectionHero() {
 
   useEffect(() => {
     const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-    fetch(`${API_BASE}/api/v1/hero-slides?active_only=true`)
+    fetch(`${API_BASE}/api/v1/hero-slides?active_only=true&type=haut`)
       .then((r) => r.ok ? r.json() : [])
       .then((data) => {
         if (Array.isArray(data) && data.length > 0)

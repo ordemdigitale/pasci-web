@@ -105,8 +105,8 @@ export default function ActualitesPage() {
     });
   };
 
-  const truncateContent = (html: string, maxLength: number = 100) => {
-    const text = html.replace(/<[^>]*>/g, ''); // Remove HTML tags
+  const truncateContent = (html: string | null | undefined, maxLength: number = 100) => {
+    const text = (html || '').replace(/<[^>]*>/g, ''); // Remove HTML tags
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 

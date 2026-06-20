@@ -229,8 +229,8 @@ export default function HeroSlidesPage() {
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-base font-semibold text-gray-800">Slider CRASC (haut)</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Images affichées dans le slider principal en haut de la page d&apos;accueil</p>
+                <h2 className="text-base font-semibold text-gray-800">Slider Héro (haut)</h2>
+                <p className="text-xs text-gray-500 mt-0.5">Images du carousel dans la section héro (à gauche, en haut de la page d&apos;accueil)</p>
               </div>
               <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
                 {slidesHaut.length} image{slidesHaut.length !== 1 ? "s" : ""}
@@ -243,8 +243,8 @@ export default function HeroSlidesPage() {
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-base font-semibold text-gray-800">Partenaires (bas)</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Logos affichés dans la section &quot;Nos partenaires&quot; en bas de la page d&apos;accueil</p>
+                <h2 className="text-base font-semibold text-gray-800">Slider CRASC (bas)</h2>
+                <p className="text-xs text-gray-500 mt-0.5">Images du grand carousel pleine largeur sous les actualités</p>
               </div>
               <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
                 {slidesBas.length} image{slidesBas.length !== 1 ? "s" : ""}
