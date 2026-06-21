@@ -55,7 +55,6 @@ export default function FormationsPage() {
   const [stats, setStats] = useState<IFormationStats | null>(null);
 
   // Suggestion modal
-  const [showSuggestion, setShowSuggestion] = useState(false);
   const [suggestion, setSuggestion] = useState<SuggestionForm>({ nom: '', prenoms: '', email: '', contact: '', message: '' });
   const [suggestionLoading, setSuggestionLoading] = useState(false);
   const [suggestionSuccess, setSuggestionSuccess] = useState(false);
@@ -68,7 +67,7 @@ export default function FormationsPage() {
       try {
         const formationsData = await fetchAllFormations({ published_only: true, limit: 100 });
         setFormations(formationsData);
-      } catch (err) {
+      } catch {
         setError("Erreur lors du chargement des formations. Veuillez réessayer plus tard.");
       } finally {
         setLoading(false);
@@ -334,14 +333,6 @@ export default function FormationsPage() {
                               </span>
                             )}
                           </div>
-                          {/* Ligne 2 : catégorie thématique */}
-                          {formation.categorie && (
-                            <div className="mb-2">
-                              <span className="inline-block px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200 truncate max-w-full">
-                                {formation.categorie}
-                              </span>
-                            </div>
-                          )}
                           <h4 className="text-gray-800 text-xl font-semibold mb-3">{formation.title}</h4>
                           <p className="text-gray-600 text-sm mb-4 line-clamp-3">{formation.description || "Aucune description disponible."}</p>
                           {formation.start_date && (
@@ -415,7 +406,9 @@ export default function FormationsPage() {
         {/* ── STATISTIQUES ── */}
         {stats && (
           <div className="py-12 border-t border-gray-100">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex gap-8">
+              <div className="hidden lg:block w-64 flex-shrink-0" />
+              <div className="flex-1">
               <h3 className="text-gray-800 text-2xl font-bold mb-2 flex items-center gap-3">
                 <BarChart3 className="w-7 h-7 text-[#2a591d]" />
                 Nos formations en chiffres
@@ -493,12 +486,15 @@ export default function FormationsPage() {
               )}
             </div>
           </div>
+        </div>
         )}
 
         {/* ── AGENDA ── */}
         {upcomingFormations.length > 0 && (
           <div className="py-12 border-t border-gray-100">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex gap-8">
+              <div className="hidden lg:block w-64 flex-shrink-0" />
+              <div className="flex-1">
               <h3 className="text-gray-800 text-2xl font-bold mb-2 flex items-center gap-3">
                 <Calendar className="w-7 h-7 text-[#2a591d]" />
                 Agenda des Formations
@@ -544,11 +540,14 @@ export default function FormationsPage() {
               </div>
             </div>
           </div>
+        </div>
         )}
 
         {/* ── PROCÉDURE D'INSCRIPTION ── */}
         <div className="py-12 border-t border-gray-100">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-8">
+            <div className="hidden lg:block w-64 flex-shrink-0" />
+            <div className="flex-1">
             <h3 className="text-gray-800 text-2xl font-bold mb-2 flex items-center gap-3">
               <BookOpen className="w-7 h-7 text-[#2a591d]" />
               Procédure d&apos;inscription
@@ -611,10 +610,13 @@ export default function FormationsPage() {
             </div>
           </div>
         </div>
+        </div>
 
         {/* ── CONTACT & SUGGESTION ── */}
         <div className="py-12 border-t border-gray-100">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-8">
+            <div className="hidden lg:block w-64 flex-shrink-0" />
+            <div className="flex-1">
             <div className="grid md:grid-cols-2 gap-8">
 
               {/* Contact */}
@@ -709,10 +711,13 @@ export default function FormationsPage() {
             </div>
           </div>
         </div>
+        </div>
 
         {/* CTA final */}
         <div className="py-8">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 bg-[#E05017] rounded-lg py-8 space-y-6 text-center text-white">
+          <div className="flex gap-8">
+            <div className="hidden lg:block w-64 flex-shrink-0" />
+            <div className="flex-1 bg-[#E05017] rounded-lg py-8 space-y-6 text-center text-white">
             <p className="font-bold text-4xl">Prêt à se faire accompagner ?</p>
             <p className="max-w-2xl mx-auto">Nous contacter dès aujourd&apos;hui pour discuter de vos besoins et découvrir comment nous pouvons vous aider à atteindre vos objectifs.</p>
             <Link
@@ -721,6 +726,7 @@ export default function FormationsPage() {
             >
               Prendre Contact
             </Link>
+            </div>
           </div>
         </div>
       </div>
