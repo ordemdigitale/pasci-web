@@ -429,22 +429,17 @@ export default function MonOscModifierPage() {
       if (values.plan_action_document_file) fd.append("plan_action_document_file", values.plan_action_document_file);
       if (values.rapports_annuels_document_file) fd.append("rapports_annuels_document_file", values.rapports_annuels_document_file);
       if (values.adhesion_crasc_document_file) fd.append("adhesion_crasc_document_file", values.adhesion_crasc_document_file);
+      fd.append("pole_ids", JSON.stringify(selectedPoleIds));
 
-      const res = await fetch(`${API_BASE}/api/v1/crasc/osc/${oscSlug}`, {
-        method: "PATCH",
+      const res = await fetch(`${API_BASE}/api/v1/crasc/osc/${oscSlug}/modification-requests`, {
+        method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
       });
 
       if (res.ok) {
-        // Mettre à jour les pôles (domaines prioritaires)
-        await fetch(`${API_BASE}/api/v1/crasc/osc/${oscSlug}/poles`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify(selectedPoleIds),
-        });
-        setSuccessMessage("Profil mis à jour avec succès !");
-        setTimeout(() => router.push("/admin/mon-osc"), 1500);
+        setSuccessMessage("Votre demande de modification a été envoyée en modération. Elle sera visible après validation par un administrateur.");
+        setTimeout(() => router.push("/admin/mon-osc"), 2500);
       } else {
         const d = await res.json();
         setErrorMessage(typeof d.detail === "string" ? d.detail : "Erreur lors de la modification.");
