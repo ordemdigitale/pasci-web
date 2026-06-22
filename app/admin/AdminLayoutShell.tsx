@@ -20,6 +20,7 @@ const CRASC_ADMIN_ALLOWED_PREFIXES = [
   "/admin/projets",
   "/admin/emplois",
   "/admin/actualites",
+  "/admin/gestion-des-actualites",
   "/admin/faq",
   "/admin/annonces",
   "/admin/hero-slides",
@@ -36,6 +37,7 @@ const CRASC_ADMIN_ALLOWED_PREFIXES = [
 const REDACTEUR_CRASC_ALLOWED_PREFIXES = [
   "/admin/formations",
   "/admin/actualites",
+  "/admin/gestion-des-actualites",
   "/admin/profile",
 ];
 
