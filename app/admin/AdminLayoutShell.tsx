@@ -38,6 +38,7 @@ const REDACTEUR_CRASC_ALLOWED_PREFIXES = [
   "/admin/formations",
   "/admin/actualites",
   "/admin/gestion-des-actualites",
+  "/admin/gestion-des-crasc/articles",
   "/admin/profile",
 ];
 

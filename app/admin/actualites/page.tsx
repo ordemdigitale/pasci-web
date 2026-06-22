@@ -26,6 +26,8 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function ActualitesPage() {
   const { user } = useAuth();
   const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
+  const isRedacteurCrasc = !!user?.is_redacteur && !!user?.crasc_id && !user?.is_staff && !user?.is_superuser;
+  const restrictToCrasc = (isCrascAdmin || isRedacteurCrasc) && !!user?.crasc_id;
 
   const [actualites, setActualites] = useState<INews[]>([]);
   const [filteredActualites, setFilteredActualites] = useState<INews[]>([]);
@@ -38,7 +40,7 @@ export default function ActualitesPage() {
   // Fetch articles from API
   useEffect(() => {
     fetchArticles();
-  }, [isCrascAdmin, user?.crasc_id]);
+  }, [restrictToCrasc, user?.crasc_id]);
 
   const fetchArticles = async () => {
     setLoading(true);
@@ -47,7 +49,7 @@ export default function ActualitesPage() {
     try {
       const data = await newsService.getAll({
         limit: 100,
-        ...(isCrascAdmin && user?.crasc_id ? { crasc_id: user.crasc_id } : {}),
+        ...(restrictToCrasc ? { crasc_id: user!.crasc_id! } : {}),
       });
       setActualites(data);
       setFilteredActualites(data);
