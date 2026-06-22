@@ -114,13 +114,6 @@ export default async function AdminCrascPage() {
 							<p className="text-sm text-gray-600">Centres régionaux d'appui</p>
 						</div>
 					</div>
-					<Link
-						href="/admin/gestion-des-crasc/ajouter-crasc"
-						className="inline-flex items-center gap-2 px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors"
-					>
-						<Plus className="w-4 h-4" />
-						Ajouter un CRASC
-					</Link>
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
