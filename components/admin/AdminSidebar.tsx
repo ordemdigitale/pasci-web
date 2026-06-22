@@ -19,6 +19,7 @@ import {
   ShieldAlert,
   Building2,
   Video,
+  CreditCard,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
@@ -143,6 +144,7 @@ export default function AdminSidebar({
       staffOnly: true,
     },
     { icon: <Heart size={20} />, label: "Dons", href: "/admin/dons", staffOnly: true },
+    { icon: <CreditCard size={20} />, label: "Paiements formations", href: "/admin/formations/paiements", staffOnly: true },
     { icon: <Users size={20} />, label: "Volontaires", href: "/admin/volontaires", staffOnly: true },
     { icon: <Megaphone size={20} />, label: "Messages de contact", href: "/admin/contact", staffOnly: true },
     { icon: <Phone size={20} />, label: "Numéros utiles", href: "/admin/numeros-utiles", staffOnly: true },
