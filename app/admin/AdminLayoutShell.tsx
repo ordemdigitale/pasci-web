@@ -30,6 +30,7 @@ const CRASC_ADMIN_ALLOWED_PREFIXES = [
   "/admin/dons",
   "/admin/volontaires",
   "/admin/contact",
+  "/admin/moderation",
   "/admin/profile",
 ];
 

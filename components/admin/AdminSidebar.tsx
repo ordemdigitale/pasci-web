@@ -172,7 +172,8 @@ export default function AdminSidebar({
         item.href === "/admin/demandes-adhesion" ||
         item.href === "/admin/dons" ||
         item.href === "/admin/volontaires" ||
-        item.href === "/admin/contact"
+        item.href === "/admin/contact" ||
+        item.href === "/admin/moderation"
       )
     : isRedacteurCrasc
     ? allNavItems
