@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { IUser, ILoginRequest } from "@/types/api.types";
-import { authService, getStoredUser } from "@/lib/auth";
+import { authService, getStoredUser, getToken, isTokenExpiringSoon } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
 interface AuthContextType {
@@ -34,7 +34,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const storedUser = getStoredUser();
       if (storedUser) {
         setUser(storedUser);
-        // Try to refresh user data from API
+        // Rafraîchir le token si proche de l'expiration avant d'appeler l'API
+        const token = getToken();
+        if (token && isTokenExpiringSoon(token)) {
+          await authService.refreshAccessToken();
+        }
         try {
           const currentUser = await authService.getCurrentUser();
           setUser(currentUser);
@@ -48,6 +52,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     initAuth();
   }, []);
+
+  // Auto-refresh du token toutes les 4 minutes
+  useEffect(() => {
+    if (!user) return;
+    const interval = setInterval(async () => {
+      const token = getToken();
+      if (token && isTokenExpiringSoon(token, 5 * 60)) {
+        const refreshed = await authService.refreshAccessToken();
+        if (!refreshed) {
+          authService.logout();
+          setUser(null);
+          router.push("/admin/login");
+        }
+      }
+    }, 4 * 60 * 1000); // toutes les 4 minutes
+    return () => clearInterval(interval);
+  }, [user, router]);
 
   const login = async (credentials: ILoginRequest) => {
     setLoading(true);

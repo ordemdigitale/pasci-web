@@ -7,7 +7,11 @@ const API_URL = `${API_BASE_URL}/api/v1`;
 
 // Token management
 export const TOKEN_KEY = "pasci_access_token";
+export const REFRESH_TOKEN_KEY = "pasci_refresh_token";
 export const USER_KEY = "pasci_user";
+
+// Durée de vie de l'access token en secondes (doit correspondre à ACCESS_TOKEN_EXPIRE_MINUTES côté API)
+const ACCESS_TOKEN_MAX_AGE = 8 * 60 * 60; // 8 heures
 
 export const getToken = (): string | null => {
   if (typeof window !== "undefined") {
@@ -19,17 +23,48 @@ export const getToken = (): string | null => {
 export const setToken = (token: string): void => {
   if (typeof window !== "undefined") {
     localStorage.setItem(TOKEN_KEY, token);
-    // Cookie lisible par le middleware Next.js pour la protection des routes
-    document.cookie = `auth_token=${token}; path=/; SameSite=Lax`;
+    // Cookie avec Max-Age pour survivre à la fermeture de l'onglet/inactivité
+    document.cookie = `auth_token=${token}; path=/; SameSite=Lax; Max-Age=${ACCESS_TOKEN_MAX_AGE}`;
   }
 };
 
 export const removeToken = (): void => {
   if (typeof window !== "undefined") {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     // Supprimer aussi le cookie
     document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
   }
+};
+
+export const getRefreshToken = (): string | null => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  }
+  return null;
+};
+
+export const setRefreshToken = (token: string): void => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(REFRESH_TOKEN_KEY, token);
+  }
+};
+
+/** Décode le payload JWT sans vérifier la signature (côté client, lecture seule) */
+export const getTokenExpiry = (token: string): number | null => {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return typeof payload.exp === "number" ? payload.exp : null;
+  } catch {
+    return null;
+  }
+};
+
+/** Retourne true si le token expire dans moins de `marginSeconds` secondes */
+export const isTokenExpiringSoon = (token: string, marginSeconds = 300): boolean => {
+  const exp = getTokenExpiry(token);
+  if (!exp) return true;
+  return Date.now() / 1000 > exp - marginSeconds;
 };
 
 export const getStoredUser = (): IUser | null => {
@@ -85,6 +120,7 @@ export const authService = {
 
     const data: ILoginResponse = await response.json();
     setToken(data.access_token);
+    if (data.refresh_token) setRefreshToken(data.refresh_token);
     return data;
   },
 
@@ -140,6 +176,30 @@ export const authService = {
     const user: IUser = await response.json();
     setStoredUser(user);
     return user;
+  },
+
+  /**
+   * Refresh access token using refresh token
+   */
+  async refreshAccessToken(): Promise<boolean> {
+    const refreshToken = getRefreshToken();
+    if (!refreshToken) return false;
+    try {
+      const response = await fetch(`${API_URL}/auth/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+      if (!response.ok) return false;
+      const data = await response.json();
+      if (data.access_token) {
+        setToken(data.access_token);
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
   },
 
   /**
