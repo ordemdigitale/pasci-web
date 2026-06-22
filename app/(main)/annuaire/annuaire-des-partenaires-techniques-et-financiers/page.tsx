@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react';
 import { ImageWithFallback } from '@/lib/imageWithFallback'
 import { IPTF } from '@/types/api.types';
 import Link from 'next/link';
-import { Loader2, Building2 } from 'lucide-react';
+import { Loader2, Building2, Search } from 'lucide-react';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function PageAnnuairePTF() {
   const [ptfData, setPtfData] = useState<IPTF[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,6 +78,20 @@ export default function PageAnnuairePTF() {
       {/* PTF Cards */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
+        {/* Barre de recherche */}
+        {ptfData.length > 0 && (
+          <div className="relative mb-8 max-w-xl mx-auto">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Rechercher un partenaire par nom ou description..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2a591d] focus:border-transparent"
+            />
+          </div>
+        )}
+
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
             <p className="text-red-800 text-sm">⚠️ {error}</p>
@@ -90,46 +105,65 @@ export default function PageAnnuairePTF() {
           </div>
         )}
 
-        {ptfData.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {ptfData.map((ptf) => (
-              <Link
-                key={ptf.id}
-                href={`/annuaire/annuaire-des-partenaires-techniques-et-financiers/${ptf.slug}`}
-                className="group"
-              >
-                <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden hover:shadow-2xl hover:border-[#2a591d]/30 transition-all duration-300">
-                  <div className="aspect-square bg-gray-50 flex items-center justify-center p-8 border-b-2 border-gray-200 group-hover:bg-gray-100 transition-colors">
-                    {ptf.thumbnail_url ? (
-                      <ImageWithFallback
-                        src={ptf.thumbnail_url}
-                        alt={ptf.name}
-                        className="w-full h-full object-contain"
-                      />
-                    ) : (
-                      <Building2 className="w-16 h-16 text-gray-300" />
-                    )}
-                  </div>
-                  <div className="p-6 text-center">
-                    {ptf.categorie && (
-                      <span className="inline-block mb-2 px-2 py-0.5 text-xs font-bold bg-[#2a591d]/10 text-[#2a591d] rounded-full">
-                        {ptf.categorie}
-                      </span>
-                    )}
-                    <h3 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-[#2a591d] transition-colors">
-                      {ptf.name}
-                    </h3>
-                    {ptf.description && (
-                      <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
-                        {ptf.description}
-                      </p>
-                    )}
-                  </div>
+        {ptfData.length > 0 && (() => {
+          const filtered = ptfData.filter(ptf => {
+            const q = searchQuery.toLowerCase();
+            return (
+              ptf.name.toLowerCase().includes(q) ||
+              (ptf.description || '').toLowerCase().includes(q) ||
+              (ptf.categorie || '').toLowerCase().includes(q)
+            );
+          });
+          return (
+            <>
+              {filtered.length === 0 ? (
+                <div className="text-center py-16">
+                  <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">Aucun résultat pour &quot;{searchQuery}&quot;</p>
                 </div>
-              </Link>
-            ))}
-          </div>
-        )}
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {filtered.map((ptf) => (
+                    <Link
+                      key={ptf.id}
+                      href={`/annuaire/annuaire-des-partenaires-techniques-et-financiers/${ptf.slug}`}
+                      className="group"
+                    >
+                      <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden hover:shadow-2xl hover:border-[#2a591d]/30 transition-all duration-300">
+                        <div className="aspect-square bg-gray-50 flex items-center justify-center p-8 border-b-2 border-gray-200 group-hover:bg-gray-100 transition-colors">
+                          {ptf.thumbnail_url ? (
+                            <ImageWithFallback
+                              src={ptf.thumbnail_url}
+                              alt={ptf.name}
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <Building2 className="w-16 h-16 text-gray-300" />
+                          )}
+                        </div>
+                        <div className="p-6 text-center">
+                          {ptf.categorie && (
+                            <span className="inline-block mb-2 px-2 py-0.5 text-xs font-bold bg-[#2a591d]/10 text-[#2a591d] rounded-full">
+                              {ptf.categorie}
+                            </span>
+                          )}
+                          <h3 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-[#2a591d] transition-colors">
+                            {ptf.name}
+                          </h3>
+                          {ptf.description && (
+                            <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+                              {ptf.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
+          );
+        })()}
       </div>
 
     </section>
