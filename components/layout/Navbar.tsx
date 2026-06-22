@@ -306,9 +306,11 @@ export default function Navbar() {
               "✦ Rejoindre le Pôle de concertation des OSC membres des CRASC",
               "✦ Nouvelles offres d'emploi disponibles — Consulter l'espace collaboratif",
             ];
-        // Répéter assez pour garantir que chaque moitié dépasse l'écran
         const repeat = Math.max(1, Math.ceil(8 / baseItems.length));
         const tickerItems = Array(repeat).fill(baseItems).flat();
+        // ~8 caractères par pixel à 14px, 80px/s → durée proportionnelle au texte total
+        const totalChars = tickerItems.reduce((s, t) => s + t.length + 20, 0); // +20 pour le padding
+        const duration = Math.max(20, Math.round(totalChars * 0.12)); // ~0.12s par caractère
         return (
           <div className="bg-[#052838] text-white py-2 overflow-hidden font-poppins flex items-center">
             <span className="bg-[#E05017] text-white text-xs font-bold px-3 py-1 shrink-0 z-10 mr-3 self-stretch flex items-center">
@@ -317,7 +319,7 @@ export default function Navbar() {
             <div className="overflow-hidden flex-1">
               <div
                 className="flex whitespace-nowrap"
-                style={{ animation: "ticker 70s linear infinite", width: "max-content" }}
+                style={{ animation: `ticker ${duration}s linear infinite`, width: "max-content" }}
               >
                 {[0, 1].map((copy) => (
                   <div key={copy} className="flex whitespace-nowrap">
