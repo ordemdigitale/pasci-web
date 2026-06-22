@@ -200,7 +200,7 @@ export default function FormationsPage() {
           <div className="hidden lg:block w-64 flex-shrink-0 mt-20">
             <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-md">
               {/* Titre sidebar */}
-              <div className="bg-[#2a591d] px-5 py-4">
+              <div className="bg-[#E05017] px-5 py-4">
                 <p className="text-white font-bold text-sm uppercase tracking-widest">Catégories</p>
               </div>
 

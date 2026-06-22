@@ -284,7 +284,9 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                       <Users className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900">OSC Membres</h2>
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        OSC Membres <span className="text-gray-400 font-semibold">({crascData.oscs.length})</span>
+                      </h2>
                       <p className="text-xs text-gray-500">
                         {crascData.oscs.filter(o => o.name.toLowerCase().includes(oscSearch.toLowerCase())).length} / {crascData.oscs.length} organisation{crascData.oscs.length > 1 ? 's' : ''}
                       </p>

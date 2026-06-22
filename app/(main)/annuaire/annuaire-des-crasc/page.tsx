@@ -187,6 +187,7 @@ export default function PageAnnuaireCrasc() {
   const [dashboardStats, setDashboardStats] = useState<{ osc: number; crasc: number; regions: number } | null>(null);
   const [crascData, setCrascData] = useState<ICrasc[]>([]);
   const [oscData, setOscData] = useState<IOsc[]>([]);
+  const [oscTotal, setOscTotal] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [spotlightNewsData, setSpotlightNewsData] = useState<SpotlightNews[]>(mockNews);
   const [newsLoading, setNewsLoading] = useState(true);
@@ -218,6 +219,7 @@ export default function PageAnnuaireCrasc() {
         const osc = await fetchAllOsc();
         console.log("Page annuaire des OSC: ", osc);
         setOscData(osc.items);
+        setOscTotal(osc.total);
       }
       catch (error) {
         console.error("Error fetching OSC data: ", error);
@@ -466,9 +468,9 @@ export default function PageAnnuaireCrasc() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-3xl font-extrabold text-gray-900">
             OSC membres
-            {oscData.length > 0 && (
+            {oscTotal > 0 && (
               <span className="ml-3 text-base font-semibold text-gray-400">
-                ({oscData.filter(o => o.name.toLowerCase().includes(oscSearch.toLowerCase())).length})
+                ({oscTotal})
               </span>
             )}
           </h2>

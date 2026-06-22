@@ -20,10 +20,10 @@ import {
   Shield,
   MapPin,
   Calendar,
+  Smartphone,
 } from 'lucide-react';
 import Link from 'next/link';
 import { getFormationBySlug, inscrireFormation, verifierCertificat, IFormation } from '@/lib/fetch-formations';
-import { initierPaiement } from '@/lib/cinetpay';
 import { getStoredUser, fetchWithAuth, getToken } from '@/lib/auth';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -88,6 +88,16 @@ export default function FormationDetailPage() {
   const [inscribing, setInscribing] = useState(false);
   const [inscriptionSuccess, setInscriptionSuccess] = useState(false);
   const [inscriptionError, setInscriptionError] = useState("");
+
+  // Paiement manuel
+  const [inscriptionId, setInscriptionId] = useState<number | null>(null);
+  const [paiementMontant, setPaiementMontant] = useState<number>(0);
+  const [showPaiement, setShowPaiement] = useState(false);
+  const [transactionId, setTransactionId] = useState("");
+  const [operateur, setOperateur] = useState("");
+  const [soumettreLoading, setSoumettreLoading] = useState(false);
+  const [soumettreError, setSoumettreError] = useState("");
+  const [soumettreSuccess, setSoumettreSuccess] = useState(false);
 
   // Certificat
   const [certCode, setCertCode] = useState("");
@@ -198,21 +208,44 @@ export default function FormationDetailPage() {
     setInscribing(true);
     setInscriptionError("");
     try {
+      const insc = await inscrireFormation(formationSlug, nom, prenoms, email, phone, categorie);
       if (formation?.type === "payante") {
-        const paiement = await initierPaiement(formationSlug, nom, prenoms, email, phone, categorie);
-        const redirectUrl = paiement.cinetpay_configured
-          ? paiement.payment_url
-          : `${paiement.payment_url}&iid=${paiement.inscription_id}`;
-        window.location.href = redirectUrl;
+        // Paiement manuel : afficher les instructions de paiement
+        setInscriptionId(insc.id);
+        setPaiementMontant(formation.price || 0);
+        setShowPaiement(true);
+        setShowInscription(false);
       } else {
-        await inscrireFormation(formationSlug, nom, prenoms, email, phone, categorie);
         setInscriptionSuccess(true);
         setAlreadyRegistered(true);
       }
-    } catch (err: any) {
-      setInscriptionError(err.message);
+    } catch (err: unknown) {
+      setInscriptionError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
       setInscribing(false);
+    }
+  }
+
+  async function handleSoumettreTransaction(e: React.FormEvent) {
+    e.preventDefault();
+    setSoumettreError("");
+    if (!transactionId.trim()) { setSoumettreError("Veuillez saisir votre code de transaction."); return; }
+    setSoumettreLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/formations/inscriptions/${inscriptionId}/soumettre-paiement`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transaction_id: transactionId.trim(), operateur: operateur || null }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || "Une erreur est survenue.");
+      }
+      setSoumettreSuccess(true);
+    } catch (err: unknown) {
+      setSoumettreError(err instanceof Error ? err.message : "Une erreur est survenue.");
+    } finally {
+      setSoumettreLoading(false);
     }
   }
 
@@ -643,6 +676,86 @@ export default function FormationDetailPage() {
                 <p className="text-green-800 font-medium text-sm">
                   Inscription confirmée ! Vous recevrez une confirmation par email.
                 </p>
+              </div>
+            )}
+
+            {/* ── Paiement manuel (formation payante) ── */}
+            {showPaiement && (
+              <div id="paiement" className="mb-8 bg-white rounded-xl border border-orange-200 shadow-sm overflow-hidden">
+                <div className="bg-[#E05017] px-6 py-4">
+                  <h2 className="text-white font-bold text-lg">Instructions de paiement</h2>
+                  <p className="text-white/80 text-sm">Effectuez le paiement pour confirmer votre inscription</p>
+                </div>
+                <div className="p-6">
+                  {soumettreSuccess ? (
+                    <div className="flex flex-col items-center text-center py-4">
+                      <CheckCircle className="w-12 h-12 text-green-500 mb-3" />
+                      <p className="font-bold text-gray-900 mb-1">Code soumis avec succès !</p>
+                      <p className="text-sm text-gray-500">Notre équipe va vérifier votre paiement dans les 24 heures. Vous recevrez un email de confirmation.</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Numéros */}
+                      <div className="grid sm:grid-cols-2 gap-3 mb-4">
+                        <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl p-4">
+                          <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Smartphone className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-blue-800">Wave</p>
+                            <p className="font-mono font-bold text-blue-900">+225 07 09 51 88 75</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 bg-orange-50 border border-orange-200 rounded-xl p-4">
+                          <div className="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Smartphone className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-orange-800">Orange Money</p>
+                            <p className="font-mono font-bold text-orange-900">+225 07 09 51 88 75</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Montant */}
+                      <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 mb-5">
+                        <p className="text-sm text-gray-600">Montant à envoyer</p>
+                        <p className="text-xl font-bold text-[#E05017]">{paiementMontant.toLocaleString("fr-FR")} FCFA</p>
+                      </div>
+
+                      {/* Formulaire code transaction */}
+                      <form onSubmit={handleSoumettreTransaction} className="space-y-3">
+                        <p className="text-sm font-semibold text-gray-700">Après paiement, soumettez votre code de transaction :</p>
+                        <input
+                          type="text"
+                          required
+                          value={transactionId}
+                          onChange={e => setTransactionId(e.target.value)}
+                          placeholder="Ex : WAVE123456789"
+                          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+                        />
+                        <select
+                          value={operateur}
+                          onChange={e => setOperateur(e.target.value)}
+                          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017] bg-white"
+                        >
+                          <option value="">-- Opérateur --</option>
+                          <option value="wave">Wave</option>
+                          <option value="orange_money">Orange Money</option>
+                        </select>
+                        {soumettreError && <p className="text-red-600 text-sm">{soumettreError}</p>}
+                        <button
+                          type="submit"
+                          disabled={soumettreLoading}
+                          className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#2a591d] text-white rounded-lg font-bold text-sm hover:bg-[#1e4215] disabled:opacity-50 transition-colors"
+                        >
+                          {soumettreLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                          Confirmer mon paiement
+                        </button>
+                      </form>
+                    </>
+                  )}
+                </div>
               </div>
             )}
 
