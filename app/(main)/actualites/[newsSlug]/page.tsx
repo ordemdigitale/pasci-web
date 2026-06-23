@@ -160,7 +160,7 @@ export default function PageActu({ params }: { params: Promise<{ newsSlug: strin
                     <User className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-gray-900">Rédaction PASCI</p>
+                    <p className="text-sm font-bold text-gray-900">Rédaction PdoC</p>
                     <p className="text-xs text-gray-500">Équipe éditoriale</p>
                   </div>
                 </div>
@@ -205,7 +205,7 @@ export default function PageActu({ params }: { params: Promise<{ newsSlug: strin
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute bottom-4 right-4 bg-black/60 text-white text-[10px] px-2 py-1 rounded backdrop-blur-md">
-                  Photo : PASCI Media
+                  Photo : PdoC Média
                 </div>
               </div>
             )}

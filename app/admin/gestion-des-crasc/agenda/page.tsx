@@ -9,6 +9,7 @@ import {
   CalendarDays,
   Plus,
   Trash2,
+  Pencil,
   MapPin,
   Clock,
   ArrowLeft,
@@ -210,13 +211,21 @@ function EventCard({
           )}
         </div>
       </div>
-      <button
-        onClick={() => onDelete(evt.id)}
-        disabled={deleting === evt.id}
-        className="flex-shrink-0 p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
-      >
-        {deleting === evt.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-      </button>
+      <div className="flex items-center gap-1 flex-shrink-0">
+        <Link
+          href={`/admin/gestion-des-crasc/agenda/${evt.id}/modifier`}
+          className="p-2 rounded-lg text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+        >
+          <Pencil className="w-4 h-4" />
+        </Link>
+        <button
+          onClick={() => onDelete(evt.id)}
+          disabled={deleting === evt.id}
+          className="p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
+        >
+          {deleting === evt.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+        </button>
+      </div>
     </div>
   );
 }

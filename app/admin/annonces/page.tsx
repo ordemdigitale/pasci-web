@@ -10,6 +10,7 @@ interface Iannonce {
   texte: string;
   is_active: boolean;
   ordre: number;
+  date_fin: string | null;
   created_at: string;
 }
 
@@ -114,6 +115,15 @@ export default function AnnoncesPage() {
 
               {/* Text */}
               <p className="flex-1 text-sm text-gray-800 line-clamp-1">{annonce.texte}</p>
+
+              {/* Expiration */}
+              {annonce.date_fin && (
+                <span className={`text-xs font-medium px-2 py-1 rounded-full shrink-0 ${
+                  new Date(annonce.date_fin) < new Date() ? "bg-red-100 text-red-600" : "bg-orange-100 text-orange-600"
+                }`}>
+                  {new Date(annonce.date_fin) < new Date() ? "Expirée" : `Exp. ${new Date(annonce.date_fin).toLocaleDateString("fr-FR")}`}
+                </span>
+              )}
 
               {/* Status */}
               <span className={`text-xs font-medium px-2 py-1 rounded-full shrink-0 ${

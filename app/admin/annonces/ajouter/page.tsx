@@ -13,6 +13,7 @@ export default function AjouterAnnoncePage() {
   const [texte, setTexte] = useState("");
   const [ordre, setOrdre] = useState(0);
   const [isActive, setIsActive] = useState(true);
+  const [dateFin, setDateFin] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,7 +26,7 @@ export default function AjouterAnnoncePage() {
       const res = await fetchWithAuth(`${API_BASE}/api/v1/annonces`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ texte: texte.trim(), ordre, is_active: isActive }),
+        body: JSON.stringify({ texte: texte.trim(), ordre, is_active: isActive, date_fin: dateFin || null }),
       });
       if (!res.ok) throw new Error("Erreur lors de la création.");
       router.push("/admin/annonces");
@@ -89,6 +90,17 @@ export default function AjouterAnnoncePage() {
               <option value="false">Inactive</option>
             </select>
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Date d&apos;expiration</label>
+          <input
+            type="datetime-local"
+            value={dateFin}
+            onChange={(e) => setDateFin(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]/30 focus:border-[#E05017]"
+          />
+          <p className="text-xs text-gray-400 mt-1">Laisser vide pour aucune expiration automatique</p>
         </div>
 
         <div className="flex justify-end gap-3 pt-2">

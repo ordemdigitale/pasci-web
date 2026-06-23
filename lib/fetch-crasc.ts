@@ -256,6 +256,24 @@ export async function createEvenement(
   return response.json();
 }
 
+// Update an event (requires auth token)
+export async function updateEvenement(
+  id: number,
+  data: { title?: string; description?: string; date_debut?: string; date_fin?: string; lieu?: string; crasc_id?: number },
+  token: string
+): Promise<IEvenement> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/evenement/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data)
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || "Échec de la mise à jour de l'événement");
+  }
+  return response.json();
+}
+
 // Delete an event (requires auth token)
 export async function deleteEvenement(id: number, token: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/api/v1/crasc/evenement/${id}`, {

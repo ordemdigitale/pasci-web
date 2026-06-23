@@ -166,7 +166,7 @@ export default function AdminLoginPage() {
           <div className="px-8 py-6 bg-gray-50 border-t border-gray-200">
             <div className="text-center">
               <p className="text-sm text-gray-600">
-                Accès réservé aux administrateurs PASCI
+                Accès réservé au Comité de Gestion
               </p>
               {/*<p className="text-xs text-gray-500 mt-2">
                 Identifiants par défaut: admin / admin123
