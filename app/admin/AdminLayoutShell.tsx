@@ -16,6 +16,9 @@ const CRASC_ADMIN_BLOCKED_PREFIXES = [
   "/admin/hero-slides",
   "/admin/settings",
   "/admin/mon-osc",
+  "/admin/dons",
+  "/admin/volontaires",
+  "/admin/contact",
 ];
 
 // Routes autorisées pour les rédacteurs CRASC
