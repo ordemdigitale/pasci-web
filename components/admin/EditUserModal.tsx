@@ -218,6 +218,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
               </h3>
 
               <div className="space-y-3">
+                {/* Compte actif — visible pour tous les staff */}
                 <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
                   <input
                     type="checkbox"
@@ -240,28 +241,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                   </div>
                 </label>
 
-                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_staff}
-                    onChange={() => {
-                      const newIsStaff = !formData.is_staff;
-                      setFormData((prev) => ({
-                        ...prev,
-                        is_staff: newIsStaff,
-                        crasc_id: (!newIsStaff && !prev.is_redacteur) ? null : prev.crasc_id,
-                      }));
-                    }}
-                    className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
-                  />
-                  <div>
-                    <p className="font-semibold text-gray-900">Admin CRASC</p>
-                    <p className="text-sm text-gray-600">
-                      Accès à l&apos;interface d&apos;administration — limité à son CRASC
-                    </p>
-                  </div>
-                </label>
-
+                {/* Rédacteur — visible pour tous les staff */}
                 <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
                   <input
                     type="checkbox"
@@ -284,30 +264,36 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                   </div>
                 </label>
 
-                {/* Sélecteur CRASC — visible si Admin CRASC ou Rédacteur */}
+                {/* Sélecteur CRASC — admin CRASC : valeur fixée, superuser : libre */}
                 {(formData.is_staff || formData.is_redacteur) && (
                   <div className="ml-2 p-4 bg-green-50 border border-green-200 rounded-lg">
                     <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-[#2a591d]" />
-                      CRASC rattaché <span className="text-red-500">*</span>
+                      CRASC rattaché {currentUser.is_superuser && <span className="text-red-500">*</span>}
                     </label>
-                    <select
-                      value={formData.crasc_id ?? ""}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          crasc_id: e.target.value ? Number(e.target.value) : null,
-                        }))
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2a591d] focus:border-[#2a591d] bg-white"
-                    >
-                      <option value="">-- Choisir un CRASC --</option>
-                      {crascs.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
+                    {currentUser.is_superuser ? (
+                      <select
+                        value={formData.crasc_id ?? ""}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            crasc_id: e.target.value ? Number(e.target.value) : null,
+                          }))
+                        }
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2a591d] focus:border-[#2a591d] bg-white"
+                      >
+                        <option value="">-- Choisir un CRASC --</option>
+                        {crascs.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <p className="text-sm font-medium text-gray-700">
+                        {crascs.find((c) => c.id === currentUser.crasc_id)?.name ?? `CRASC #${currentUser.crasc_id}`}
+                      </p>
+                    )}
                     <p className="text-xs text-gray-500 mt-1">
                       {formData.is_staff
                         ? "Cet admin ne verra que les données de ce CRASC."
@@ -316,20 +302,47 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                   </div>
                 )}
 
-                <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_superuser}
-                    onChange={() => handleCheckboxChange("is_superuser")}
-                    className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
-                  />
-                  <div>
-                    <p className="font-semibold text-gray-900">Superuser</p>
-                    <p className="text-sm text-gray-600">
-                      Accès complet à toutes les fonctionnalités
-                    </p>
-                  </div>
-                </label>
+                {/* Admin CRASC & Superuser — superuser uniquement */}
+                {currentUser.is_superuser && (
+                  <>
+                    <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={formData.is_staff}
+                        onChange={() => {
+                          const newIsStaff = !formData.is_staff;
+                          setFormData((prev) => ({
+                            ...prev,
+                            is_staff: newIsStaff,
+                            crasc_id: (!newIsStaff && !prev.is_redacteur) ? null : prev.crasc_id,
+                          }));
+                        }}
+                        className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
+                      />
+                      <div>
+                        <p className="font-semibold text-gray-900">Admin CRASC</p>
+                        <p className="text-sm text-gray-600">
+                          Accès à l&apos;interface d&apos;administration — limité à son CRASC
+                        </p>
+                      </div>
+                    </label>
+
+                    <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={formData.is_superuser}
+                        onChange={() => handleCheckboxChange("is_superuser")}
+                        className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
+                      />
+                      <div>
+                        <p className="font-semibold text-gray-900">Superuser</p>
+                        <p className="text-sm text-gray-600">
+                          Accès complet à toutes les fonctionnalités
+                        </p>
+                      </div>
+                    </label>
+                  </>
+                )}
               </div>
             </div>
           )}
