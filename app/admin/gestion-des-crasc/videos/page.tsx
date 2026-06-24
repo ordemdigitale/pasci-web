@@ -38,7 +38,9 @@ function getEmbedUrl(url: string): string | null {
 
 export default function AdminCrascVideosPage() {
   const { user } = useAuth();
-  const isRedacteurCrasc = !!user?.is_redacteur && !!user?.crasc_id && !user?.is_staff && !user?.is_superuser;
+  const lockToCrasc = !!user?.is_redacteur && !!user?.crasc_id && !user?.is_staff && !user?.is_superuser;
+  const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
+  const lockToCrasc = lockToCrasc || isCrascAdmin;
 
   const [crascs, setCrascs] = useState<ICrasc[]>([]);
   const [selectedCrascId, setSelectedCrascId] = useState<number | null>(null);
@@ -51,8 +53,7 @@ export default function AdminCrascVideosPage() {
   const [form, setForm] = useState({ titre: "", url: "", description: "", ordre: "0" });
 
   useEffect(() => {
-    if (isRedacteurCrasc && user?.crasc_id) {
-      // Rédacteur CRASC : forcer son propre CRASC
+    if (lockToCrasc && user?.crasc_id) {
       setSelectedCrascId(user.crasc_id);
       setLoading(false);
     } else {
@@ -64,7 +65,7 @@ export default function AdminCrascVideosPage() {
         .catch(() => setError("Impossible de charger les CRASC."))
         .finally(() => setLoading(false));
     }
-  }, [isRedacteurCrasc, user?.crasc_id]);
+  }, [lockToCrasc, user?.crasc_id]);
 
   useEffect(() => {
     if (!selectedCrascId) return;
@@ -153,7 +154,7 @@ export default function AdminCrascVideosPage() {
 
       <div className="grid md:grid-cols-4 gap-6">
         {/* CRASC Selector — masqué pour le rédacteur CRASC */}
-        {!isRedacteurCrasc && (
+        {!lockToCrasc && (
           <div className="md:col-span-1">
             <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -180,7 +181,7 @@ export default function AdminCrascVideosPage() {
         )}
 
         {/* Videos Section */}
-        <div className={isRedacteurCrasc ? "md:col-span-4 space-y-4" : "md:col-span-3 space-y-4"}>
+        <div className={lockToCrasc ? "md:col-span-4 space-y-4" : "md:col-span-3 space-y-4"}>
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-900">
               Vidéos {selectedCrasc ? `— ${selectedCrasc.name}` : ""}
