@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { fetchAllCrasc, createEvenement } from "@/lib/fetch-crasc";
 import { getToken } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { ICrasc } from "@/types/api.types";
 import {
   CalendarDays,
@@ -22,7 +23,11 @@ import {
 function AjouterEvenementForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const preselectedCrascId = searchParams.get("crasc_id");
+  const { user: currentUser } = useAuth();
+  const isCrascAdmin = !!currentUser?.is_staff && !currentUser?.is_superuser && !!currentUser?.crasc_id;
+  const preselectedCrascId = isCrascAdmin
+    ? String(currentUser!.crasc_id)
+    : searchParams.get("crasc_id") || "";
 
   const [crascs, setCrascs] = useState<ICrasc[]>([]);
   const [loading, setLoading] = useState(false);
@@ -35,12 +40,14 @@ function AjouterEvenementForm() {
     date_debut: "",
     date_fin: "",
     lieu: "",
-    crasc_id: preselectedCrascId || "",
+    crasc_id: preselectedCrascId,
   });
 
   useEffect(() => {
-    fetchAllCrasc().then(setCrascs).catch(console.error);
-  }, []);
+    if (!isCrascAdmin) {
+      fetchAllCrasc().then(setCrascs).catch(console.error);
+    }
+  }, [isCrascAdmin]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -204,26 +211,28 @@ function AjouterEvenementForm() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <Building2 className="inline w-4 h-4 mr-1" />
-                CRASC associé
-              </label>
-              <div className="relative">
-                <select
-                  name="crasc_id"
-                  value={form.crasc_id}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent appearance-none transition-all"
-                >
-                  <option value="">Sélectionnez un CRASC</option>
-                  {crascs.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+            {!isCrascAdmin && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <Building2 className="inline w-4 h-4 mr-1" />
+                  CRASC associé
+                </label>
+                <div className="relative">
+                  <select
+                    name="crasc_id"
+                    value={form.crasc_id}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent appearance-none transition-all"
+                  >
+                    <option value="">Sélectionnez un CRASC</option>
+                    {crascs.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 

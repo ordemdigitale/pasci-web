@@ -20,6 +20,7 @@ import {
   Building2,
   Video,
   CreditCard,
+  CalendarDays,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
@@ -98,6 +99,7 @@ export default function AdminSidebar({
       staffOnly: true,
     },
     { icon: <Video size={20} />, label: "Vidéos CRASC", href: "/admin/gestion-des-crasc/videos", staffOnly: true },
+    { icon: <CalendarDays size={20} />, label: "Agenda CRASC", href: "/admin/gestion-des-crasc/agenda", staffOnly: true },
     {
       icon: <FileText size={20} />,
       label: "Organisations",

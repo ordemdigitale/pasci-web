@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { fetchAllCrasc, fetchEvenements, deleteEvenement } from "@/lib/fetch-crasc";
 import { getToken } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { ICrasc, IEvenement } from "@/types/api.types";
 import {
   CalendarDays,
@@ -19,6 +20,9 @@ import {
 } from "lucide-react";
 
 export default function AdminAgendaPage() {
+  const { user: currentUser } = useAuth();
+  const isCrascAdmin = !!currentUser?.is_staff && !currentUser?.is_superuser && !!currentUser?.crasc_id;
+
   const [crascs, setCrascs] = useState<ICrasc[]>([]);
   const [selectedCrascId, setSelectedCrascId] = useState<number | null>(null);
   const [evenements, setEvenements] = useState<IEvenement[]>([]);
@@ -27,6 +31,12 @@ export default function AdminAgendaPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isCrascAdmin && currentUser?.crasc_id) {
+      // Admin CRASC : auto-sélectionner son propre CRASC
+      setSelectedCrascId(currentUser.crasc_id);
+      setLoading(false);
+      return;
+    }
     fetchAllCrasc()
       .then((data) => {
         setCrascs(data);
@@ -34,7 +44,7 @@ export default function AdminAgendaPage() {
       })
       .catch(() => setError("Impossible de charger les CRASC."))
       .finally(() => setLoading(false));
-  }, []);
+  }, [isCrascAdmin, currentUser?.crasc_id]);
 
   useEffect(() => {
     if (!selectedCrascId) return;
@@ -92,34 +102,36 @@ export default function AdminAgendaPage() {
         </div>
       )}
 
-      <div className="grid md:grid-cols-4 gap-6">
-        {/* CRASC Selector */}
-        <div className="md:col-span-1">
-          <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-            <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-[#2A591D]" />
-              CRASC
-            </h3>
-            <div className="space-y-1">
-              {crascs.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setSelectedCrascId(parseInt(c.id))}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedCrascId === parseInt(c.id)
-                      ? "bg-[#2A591D] text-white"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
-                >
-                  {c.name}
-                </button>
-              ))}
+      <div className={`grid ${isCrascAdmin ? "" : "md:grid-cols-4"} gap-6`}>
+        {/* CRASC Selector — superuser uniquement */}
+        {!isCrascAdmin && (
+          <div className="md:col-span-1">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-[#2A591D]" />
+                CRASC
+              </h3>
+              <div className="space-y-1">
+                {crascs.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => setSelectedCrascId(parseInt(c.id))}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      selectedCrascId === parseInt(c.id)
+                        ? "bg-[#2A591D] text-white"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    {c.name}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Events List */}
-        <div className="md:col-span-3 space-y-6">
+        <div className={`${isCrascAdmin ? "" : "md:col-span-3"} space-y-6`}>
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-900">
               Événements {selectedCrascId ? `— ${crascs.find(c => parseInt(c.id) === selectedCrascId)?.name}` : ""}
