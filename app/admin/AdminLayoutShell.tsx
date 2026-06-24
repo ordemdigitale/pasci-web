@@ -19,6 +19,7 @@ const CRASC_ADMIN_BLOCKED_PREFIXES = [
   "/admin/dons",
   "/admin/volontaires",
   "/admin/contact",
+  "/admin/ptf",
 ];
 
 // Routes autorisées pour les rédacteurs CRASC
