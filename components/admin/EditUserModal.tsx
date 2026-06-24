@@ -291,7 +291,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                       </select>
                     ) : (
                       <p className="text-sm font-medium text-gray-700">
-                        {crascs.find((c) => c.id === currentUser.crasc_id)?.name ?? `CRASC #${currentUser.crasc_id}`}
+                        {crascs.find((c) => Number(c.id) === currentUser.crasc_id)?.name ?? `CRASC #${currentUser.crasc_id}`}
                       </p>
                     )}
                     <p className="text-xs text-gray-500 mt-1">
