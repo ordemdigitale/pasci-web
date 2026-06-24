@@ -161,23 +161,13 @@ export default function AdminSidebar({
     ? allNavItems.filter((item) => item.href === "/admin" || item.href === "/admin/mon-osc")
     : isCrascAdmin
     ? allNavItems.filter((item) =>
-        item.href === "/admin" ||
-        item.href === "/admin/utilisateurs" ||
-        item.href === "/admin/gestion-des-crasc" ||
-        item.href === "/admin/gestion-des-crasc/videos" ||
-        item.label === "Organisations" ||
-        item.label === "Contenu" ||
-        item.label === "Forum" ||
-        item.href === "/admin/ressources" ||
-        item.href === "/admin/demandes-adhesion" ||
-        item.href === "/admin/dons" ||
-        item.href === "/admin/volontaires" ||
-        item.href === "/admin/contact" ||
-        item.href === "/admin/moderation"
+        item.href !== "/admin/mon-osc" &&
+        item.href !== "/admin/settings" &&
+        item.href !== "/admin/hero-slides"
       )
     : isRedacteurCrasc
     ? allNavItems
-        .filter((item) => item.href === "/admin" || item.label === "Contenu")
+        .filter((item) => item.href === "/admin" || item.label === "Contenu" || item.href === "/admin/gestion-des-crasc/videos")
         .map((item) => {
           if (item.label === "Contenu" && item.submenus) {
             return {

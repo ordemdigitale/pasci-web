@@ -17,9 +17,9 @@ const projetSchema = z.object({
   nom: z.string().min(5, "Le nom doit contenir au moins 5 caractères."),
   osc: z.string().min(2, "L'OSC porteuse est requise."),
   domaine: z.string().min(1, "Le domaine est requis."),
-  zone: z.string().min(2, "La zone est requise."),
-  durée: z.string().min(1, "La durée est requise."),
-  budget: z.string().min(1, "Le budget est requis."),
+  zone: z.string().optional(),
+  durée: z.string().optional(),
+  budget: z.string().optional(),
   offre_url: z.string().url("Lien de l'offre invalide").or(z.literal("")).optional(),
   objectif: z.string().optional(),
   description: z.string().optional(),
@@ -41,16 +41,9 @@ const domaines = [
 ];
 
 const zones = [
-  "Abidjan",
-  "Bouaké",
-  "Yamoussoukro",
-  "Korhogo",
-  "San-Pédro",
-  "Daloa",
-  "Région du Nord",
-  "Région du Sud",
-  "Région de l'Ouest",
-  "Région du Centre",
+  "Sous-régional",
+  "National",
+  "International",
 ];
 
 export default function AddProjetPage() {
@@ -157,9 +150,9 @@ export default function AddProjetPage() {
       formData.append("nom", data.nom);
       formData.append("osc", data.osc);
       formData.append("domaine", data.domaine);
-      formData.append("zone", data.zone);
-      formData.append("durée", data.durée);
-      formData.append("budget", data.budget);
+      if (data.zone) formData.append("zone", data.zone);
+      if (data.durée) formData.append("durée", data.durée);
+      if (data.budget) formData.append("budget", data.budget);
       formData.append("statut", data.statut);
       formData.append("progression", data.progression.toString());
 
@@ -302,7 +295,7 @@ export default function AddProjetPage() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Zone *
+                    Zone
                   </label>
                   <select
                     {...register("zone")}
@@ -315,16 +308,13 @@ export default function AddProjetPage() {
                       </option>
                     ))}
                   </select>
-                  {errors.zone && (
-                    <p className="text-red-600 text-sm mt-1">{errors.zone.message}</p>
-                  )}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Durée *
+                    Durée
                   </label>
                   <input
                     {...register("durée")}
@@ -332,14 +322,11 @@ export default function AddProjetPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
                     placeholder="Ex: 24 mois"
                   />
-                  {errors.durée && (
-                    <p className="text-red-600 text-sm mt-1">{errors.durée.message}</p>
-                  )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Budget *
+                    Budget
                   </label>
                   <input
                     {...register("budget")}
@@ -347,9 +334,6 @@ export default function AddProjetPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
                     placeholder="Ex: 250 millions FCFA"
                   />
-                  {errors.budget && (
-                    <p className="text-red-600 text-sm mt-1">{errors.budget.message}</p>
-                  )}
                 </div>
               </div>
 

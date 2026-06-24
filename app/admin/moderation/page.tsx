@@ -13,7 +13,7 @@ interface ItemEnAttente {
   title?: string;
   nom?: string;
   created_at: string;
-  type: "actualite" | "emploi" | "formation" | "projet";
+  type: "actualite" | "emploi" | "formation" | "projet" | "video";
 }
 
 const TYPE_CONFIG = {
@@ -21,6 +21,7 @@ const TYPE_CONFIG = {
   emploi:     { label: "Offre d'emploi",  icon: Briefcase,  color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200", adminPath: "/admin/emplois" },
   formation:  { label: "Formation",       icon: BookOpen,   color: "text-green-600",  bg: "bg-green-50",  border: "border-green-200", adminPath: "/admin/formations" },
   projet:     { label: "Offre de projet", icon: FolderOpen, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", adminPath: "/admin/projets" },
+  video:      { label: "Vidéo CRASC",     icon: CheckCircle, color: "text-teal-600",  bg: "bg-teal-50",  border: "border-teal-200",  adminPath: "/admin/gestion-des-crasc/videos" },
 };
 
 export default function AdminModerationPage() {
@@ -31,11 +32,12 @@ export default function AdminModerationPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [newsRes, jobsRes, formRes, projRes] = await Promise.allSettled([
+      const [newsRes, jobsRes, formRes, projRes, videoRes] = await Promise.allSettled([
         fetchWithAuth(`${API_BASE}/api/v1/news/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/jobs/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/formations/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/offre-projets/admin/en-attente`),
+        fetchWithAuth(`${API_BASE}/api/v1/crasc/video/admin/en-attente`),
       ]);
 
       const parse = async (r: PromiseSettledResult<Response>, type: ItemEnAttente["type"]) => {
@@ -44,7 +46,7 @@ export default function AdminModerationPage() {
         return (Array.isArray(data) ? data : []).map((d: Record<string, unknown>) => ({
           id: d.id as number | string,
           slug: (d.slug as string) ?? String(d.id),
-          title: (d.title as string) || (d.nom as string),
+          title: (d.title as string) || (d.nom as string) || (d.titre as string),
           created_at: d.created_at as string,
           type,
         }));
@@ -55,6 +57,7 @@ export default function AdminModerationPage() {
         ...(await parse(jobsRes, "emploi")),
         ...(await parse(formRes, "formation")),
         ...(await parse(projRes, "projet")),
+        ...(await parse(videoRes, "video")),
       ];
 
       all.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
@@ -75,6 +78,7 @@ export default function AdminModerationPage() {
         emploi:    `${API_BASE}/api/v1/jobs/${item.slug}/valider?action=${action}`,
         formation: `${API_BASE}/api/v1/formations/${item.slug}/valider?action=${action}`,
         projet:    `${API_BASE}/api/v1/offre-projets/${item.slug}/valider?action=${action}`,
+        video:     `${API_BASE}/api/v1/crasc/video/${item.id}/valider?action=${action}`,
       };
       await fetchWithAuth(urlMap[item.type], { method: "PATCH" });
       setItems((prev) => prev.filter((i) => !(i.slug === item.slug && i.type === item.type)));

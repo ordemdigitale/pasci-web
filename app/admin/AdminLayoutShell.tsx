@@ -11,27 +11,11 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 // Routes autorisées pour les utilisateurs OSC (lecture seule du dashboard + profil)
 const OSC_ALLOWED_ROUTES = ["/admin", "/admin/mon-osc"];
 
-// Routes autorisées pour les admins CRASC
-const CRASC_ADMIN_ALLOWED_PREFIXES = [
-  "/admin/utilisateurs",
-  "/admin/gestion-des-crasc",
-  "/admin/ptf",
-  "/admin/formations",
-  "/admin/projets",
-  "/admin/emplois",
-  "/admin/actualites",
-  "/admin/gestion-des-actualites",
-  "/admin/faq",
-  "/admin/annonces",
+// Routes NON autorisées pour les admins CRASC (paramètres globaux plateforme)
+const CRASC_ADMIN_BLOCKED_PREFIXES = [
   "/admin/hero-slides",
-  "/admin/forum",
-  "/admin/ressources",
-  "/admin/demandes-adhesion",
-  "/admin/dons",
-  "/admin/volontaires",
-  "/admin/contact",
-  "/admin/moderation",
-  "/admin/profile",
+  "/admin/settings",
+  "/admin/mon-osc",
 ];
 
 // Routes autorisées pour les rédacteurs CRASC
@@ -40,6 +24,7 @@ const REDACTEUR_CRASC_ALLOWED_PREFIXES = [
   "/admin/actualites",
   "/admin/gestion-des-actualites",
   "/admin/gestion-des-crasc/articles",
+  "/admin/gestion-des-crasc/videos",
   "/admin/profile",
 ];
 
@@ -92,10 +77,10 @@ function CrascAdminRouteGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading || !isCrascAdmin) return;
     if (pathname === "/admin") return;
-    const allowed = CRASC_ADMIN_ALLOWED_PREFIXES.some((prefix) =>
+    const blocked = CRASC_ADMIN_BLOCKED_PREFIXES.some((prefix) =>
       pathname.startsWith(prefix)
     );
-    if (!allowed) router.replace("/admin");
+    if (blocked) router.replace("/admin");
   }, [loading, isCrascAdmin, pathname, router]);
 
   return <>{children}</>;

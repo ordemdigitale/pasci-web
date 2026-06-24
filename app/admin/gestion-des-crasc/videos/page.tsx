@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { fetchAllCrasc, fetchCrascVideos, createCrascVideo, deleteCrascVideo } from "@/lib/fetch-crasc";
 import { getToken } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { ICrasc, ICrascVideo } from "@/types/api.types";
 import {
   Video,
@@ -36,6 +37,9 @@ function getEmbedUrl(url: string): string | null {
 }
 
 export default function AdminCrascVideosPage() {
+  const { user } = useAuth();
+  const isRedacteurCrasc = !!user?.is_redacteur && !!user?.crasc_id && !user?.is_staff && !user?.is_superuser;
+
   const [crascs, setCrascs] = useState<ICrasc[]>([]);
   const [selectedCrascId, setSelectedCrascId] = useState<number | null>(null);
   const [videos, setVideos] = useState<ICrascVideo[]>([]);
@@ -47,14 +51,20 @@ export default function AdminCrascVideosPage() {
   const [form, setForm] = useState({ titre: "", url: "", description: "", ordre: "0" });
 
   useEffect(() => {
-    fetchAllCrasc()
-      .then((data) => {
-        setCrascs(data);
-        if (data.length > 0) setSelectedCrascId(parseInt(data[0].id));
-      })
-      .catch(() => setError("Impossible de charger les CRASC."))
-      .finally(() => setLoading(false));
-  }, []);
+    if (isRedacteurCrasc && user?.crasc_id) {
+      // Rédacteur CRASC : forcer son propre CRASC
+      setSelectedCrascId(user.crasc_id);
+      setLoading(false);
+    } else {
+      fetchAllCrasc()
+        .then((data) => {
+          setCrascs(data);
+          if (data.length > 0) setSelectedCrascId(parseInt(data[0].id));
+        })
+        .catch(() => setError("Impossible de charger les CRASC."))
+        .finally(() => setLoading(false));
+    }
+  }, [isRedacteurCrasc, user?.crasc_id]);
 
   useEffect(() => {
     if (!selectedCrascId) return;
@@ -142,33 +152,35 @@ export default function AdminCrascVideosPage() {
       )}
 
       <div className="grid md:grid-cols-4 gap-6">
-        {/* CRASC Selector */}
-        <div className="md:col-span-1">
-          <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-            <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-[#2A591D]" />
-              CRASC
-            </h3>
-            <div className="space-y-1">
-              {crascs.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => { setSelectedCrascId(parseInt(c.id)); setShowForm(false); }}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedCrascId === parseInt(c.id)
-                      ? "bg-[#2A591D] text-white"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
-                >
-                  {c.name}
-                </button>
-              ))}
+        {/* CRASC Selector — masqué pour le rédacteur CRASC */}
+        {!isRedacteurCrasc && (
+          <div className="md:col-span-1">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-[#2A591D]" />
+                CRASC
+              </h3>
+              <div className="space-y-1">
+                {crascs.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => { setSelectedCrascId(parseInt(c.id)); setShowForm(false); }}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      selectedCrascId === parseInt(c.id)
+                        ? "bg-[#2A591D] text-white"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    {c.name}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Videos Section */}
-        <div className="md:col-span-3 space-y-4">
+        <div className={isRedacteurCrasc ? "md:col-span-4 space-y-4" : "md:col-span-3 space-y-4"}>
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-900">
               Vidéos {selectedCrasc ? `— ${selectedCrasc.name}` : ""}
