@@ -38,9 +38,9 @@ function getEmbedUrl(url: string): string | null {
 
 export default function AdminCrascVideosPage() {
   const { user } = useAuth();
-  const lockToCrasc = !!user?.is_redacteur && !!user?.crasc_id && !user?.is_staff && !user?.is_superuser;
+  const isRedacteurCrasc = !!user?.is_redacteur && !!user?.crasc_id && !user?.is_staff && !user?.is_superuser;
   const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
-  const lockToCrasc = lockToCrasc || isCrascAdmin;
+  const lockToCrasc = isRedacteurCrasc || isCrascAdmin;
 
   const [crascs, setCrascs] = useState<ICrasc[]>([]);
   const [selectedCrascId, setSelectedCrascId] = useState<number | null>(null);
