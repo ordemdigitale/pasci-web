@@ -312,6 +312,24 @@ export async function createCrascVideo(
   return response.json();
 }
 
+// Update a CRASC video (requires auth token)
+export async function updateCrascVideo(
+  id: number,
+  data: { titre?: string; url?: string; description?: string; ordre?: number },
+  token: string
+): Promise<ICrascVideo> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/video/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || "Échec de la mise à jour de la vidéo");
+  }
+  return response.json();
+}
+
 // Delete a CRASC video (requires auth token)
 export async function deleteCrascVideo(id: number, token: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/api/v1/crasc/video/${id}`, {
