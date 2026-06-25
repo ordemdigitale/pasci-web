@@ -68,6 +68,8 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
   const [oscSearch, setOscSearch] = useState('');
   const [oscPage, setOscPage] = useState(1);
   const OSC_PER_PAGE = 6;
+  const [videoPage, setVideoPage] = useState(1);
+  const VIDEOS_PER_PAGE = 6;
 
   // Contact form state
   const [contactForm, setContactForm] = useState({ nom: '', email: '', telephone: '', objet: '', message: '' });
@@ -474,35 +476,94 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${zoneColors.color}20` }}>
                     <Video className="w-5 h-5" style={{ color: zoneColors.color }} />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">Vidéos</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Vidéos <span className="text-gray-400 font-semibold text-lg">({videos.length})</span>
+                  </h2>
                 </div>
-                <div className="grid sm:grid-cols-2 gap-6">
-                  {videos.map((video) => {
-                    const embedUrl = getEmbedUrl(video.url);
-                    return (
-                      <div key={video.id} className="space-y-2">
-                        <div className="rounded-xl overflow-hidden aspect-video bg-gray-100">
-                          {embedUrl ? (
-                            <iframe
-                              src={embedUrl}
-                              className="w-full h-full"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Video className="w-10 h-10 text-gray-400" />
+                {(() => {
+                  const totalVideoPages = Math.ceil(videos.length / VIDEOS_PER_PAGE);
+                  const paginatedVideos = videos.slice((videoPage - 1) * VIDEOS_PER_PAGE, videoPage * VIDEOS_PER_PAGE);
+                  return (
+                    <>
+                      <div className="grid sm:grid-cols-2 gap-6 mb-4">
+                        {paginatedVideos.map((video) => {
+                          const embedUrl = getEmbedUrl(video.url);
+                          return (
+                            <div key={video.id} className="space-y-2">
+                              <div className="rounded-xl overflow-hidden aspect-video bg-gray-100">
+                                {embedUrl ? (
+                                  <iframe
+                                    src={embedUrl}
+                                    className="w-full h-full"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <Video className="w-10 h-10 text-gray-400" />
+                                  </div>
+                                )}
+                              </div>
+                              <p className="font-semibold text-gray-900 text-sm">{video.titre}</p>
+                              {video.description && (
+                                <p className="text-xs text-gray-500 line-clamp-2">{video.description}</p>
+                              )}
                             </div>
-                          )}
-                        </div>
-                        <p className="font-semibold text-gray-900 text-sm">{video.titre}</p>
-                        {video.description && (
-                          <p className="text-xs text-gray-500 line-clamp-2">{video.description}</p>
-                        )}
+                          );
+                        })}
                       </div>
-                    );
-                  })}
-                </div>
+                      {totalVideoPages > 1 && (
+                        <div className="flex items-center justify-center gap-1 pt-4 border-t border-gray-100 flex-wrap">
+                          <button
+                            onClick={() => setVideoPage(p => Math.max(1, p - 1))}
+                            disabled={videoPage === 1}
+                            className="p-2 rounded-lg border border-gray-200 hover:border-current disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            style={{ color: zoneColors.color }}
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+                          {Array.from({ length: totalVideoPages }, (_, i) => i + 1)
+                            .filter(page =>
+                              page === 1 ||
+                              page === totalVideoPages ||
+                              (page >= videoPage - 1 && page <= videoPage + 1)
+                            )
+                            .reduce<(number | '...')[]>((acc, page, idx, arr) => {
+                              if (idx > 0 && page - (arr[idx - 1] as number) > 1) acc.push('...');
+                              acc.push(page);
+                              return acc;
+                            }, [])
+                            .map((item, idx) =>
+                              item === '...' ? (
+                                <span key={`vellipsis-${idx}`} className="w-8 text-center text-gray-400 text-sm">…</span>
+                              ) : (
+                                <button
+                                  key={item}
+                                  onClick={() => setVideoPage(item as number)}
+                                  className={`w-8 h-8 rounded-lg text-sm font-semibold transition-colors ${
+                                    item === videoPage
+                                      ? 'text-white'
+                                      : 'border border-gray-200 text-gray-700 hover:border-current'
+                                  }`}
+                                  style={item === videoPage ? { backgroundColor: zoneColors.color } : { color: item !== videoPage ? undefined : zoneColors.color }}
+                                >
+                                  {item}
+                                </button>
+                              )
+                            )}
+                          <button
+                            onClick={() => setVideoPage(p => Math.min(totalVideoPages, p + 1))}
+                            disabled={videoPage === totalVideoPages}
+                            className="p-2 rounded-lg border border-gray-200 hover:border-current disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            style={{ color: zoneColors.color }}
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             )}
 
