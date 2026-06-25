@@ -116,7 +116,7 @@ export default function OscDetailPage() {
   // Gestion du compte utilisateur OSC
   const [oscUser, setOscUser] = useState<{ id: string; email: string; username: string | null; first_name: string | null; last_name: string | null; is_active: boolean } | null | undefined>(undefined);
   const [showUserForm, setShowUserForm] = useState(false);
-  const [userForm, setUserForm] = useState({ email: "", username: "", password: "", first_name: "", last_name: "" });
+  const [userForm, setUserForm] = useState({ email: "", username: "", first_name: "", last_name: "" });
   const [userFormError, setUserFormError] = useState<string | null>(null);
   const [userFormLoading, setUserFormLoading] = useState(false);
   const [removingUser, setRemovingUser] = useState(false);
@@ -166,7 +166,7 @@ export default function OscDetailPage() {
       if (!res.ok) { setUserFormError(data.detail || "Erreur lors de la création"); return; }
       setOscUser(data);
       setShowUserForm(false);
-      setUserForm({ email: "", username: "", password: "", first_name: "", last_name: "" });
+      setUserForm({ email: "", username: "", first_name: "", last_name: "" });
     } catch { setUserFormError("Erreur réseau"); }
     finally { setUserFormLoading(false); }
   };
@@ -486,7 +486,6 @@ export default function OscDetailPage() {
                 setUserForm({
                   email: osc?.email || "",
                   username: slug,
-                  password: "",
                   first_name: firstName,
                   last_name: lastName,
                 });
@@ -542,9 +541,10 @@ export default function OscDetailPage() {
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2a591d]" />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Mot de passe *</label>
-                  <input type="password" required minLength={8} value={userForm.password} onChange={e => setUserForm(f => ({ ...f, password: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2a591d]" />
+                  <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Un mot de passe sécurisé sera généré automatiquement et envoyé par email avec les identifiants.
+                  </div>
                 </div>
               </div>
               <div className="flex gap-3 pt-1">
