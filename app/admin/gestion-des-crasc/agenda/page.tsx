@@ -28,6 +28,7 @@ const EVENT_STATUS_META: Record<string, { label: string; className: string }> = 
 export default function AdminAgendaPage() {
   const { user: currentUser } = useAuth();
   const isCrascAdmin = !!currentUser?.is_staff && !currentUser?.is_superuser && !!currentUser?.crasc_id;
+  const isRedacteurCrasc = !!currentUser?.is_redacteur && !!currentUser?.crasc_id && !currentUser?.is_staff && !currentUser?.is_superuser;
 
   const [crascs, setCrascs] = useState<ICrasc[]>([]);
   const [selectedCrascId, setSelectedCrascId] = useState<number | null>(null);
@@ -37,8 +38,8 @@ export default function AdminAgendaPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isCrascAdmin && currentUser?.crasc_id) {
-      // Admin CRASC : auto-sélectionner son propre CRASC
+    if ((isCrascAdmin || isRedacteurCrasc) && currentUser?.crasc_id) {
+      // Admin CRASC / Rédacteur CRASC : auto-sélectionner son propre CRASC
       setSelectedCrascId(currentUser.crasc_id);
       setLoading(false);
       return;
@@ -50,7 +51,7 @@ export default function AdminAgendaPage() {
       })
       .catch(() => setError("Impossible de charger les CRASC."))
       .finally(() => setLoading(false));
-  }, [isCrascAdmin, currentUser?.crasc_id]);
+  }, [isCrascAdmin, isRedacteurCrasc, currentUser?.crasc_id]);
 
   useEffect(() => {
     if (!selectedCrascId) return;
@@ -108,9 +109,9 @@ export default function AdminAgendaPage() {
         </div>
       )}
 
-      <div className={`grid ${isCrascAdmin ? "" : "md:grid-cols-4"} gap-6`}>
+      <div className={`grid ${isCrascAdmin || isRedacteurCrasc ? "" : "md:grid-cols-4"} gap-6`}>
         {/* CRASC Selector — superuser uniquement */}
-        {!isCrascAdmin && (
+        {!isCrascAdmin && !isRedacteurCrasc && (
           <div className="md:col-span-1">
             <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -137,7 +138,7 @@ export default function AdminAgendaPage() {
         )}
 
         {/* Events List */}
-        <div className={`${isCrascAdmin ? "" : "md:col-span-3"} space-y-6`}>
+        <div className={`${isCrascAdmin || isRedacteurCrasc ? "" : "md:col-span-3"} space-y-6`}>
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-900">
               Événements {selectedCrascId ? `— ${crascs.find(c => parseInt(c.id) === selectedCrascId)?.name}` : ""}

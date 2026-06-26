@@ -182,7 +182,7 @@ export default function AdminSidebar({
       })
     : isRedacteurCrasc
     ? allNavItems
-        .filter((item) => item.href === "/admin" || item.label === "Contenu" || item.href === "/admin/gestion-des-crasc/videos")
+        .filter((item) => item.href === "/admin" || item.label === "Contenu" || item.href === "/admin/gestion-des-crasc/videos" || item.href === "/admin/gestion-des-crasc/agenda")
         .map((item) => {
           if (item.label === "Contenu" && item.submenus) {
             return {
