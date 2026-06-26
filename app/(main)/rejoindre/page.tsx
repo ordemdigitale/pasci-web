@@ -30,6 +30,7 @@ import {
   FORMALISATION_FILE_MAX_SIZE,
   isFormalisationFileAccepted,
 } from '@/lib/formalisation-file';
+import { DOMAINE_PRIORITAIRE_OPTIONS } from '@/lib/osc-domaines';
 
 const supportingDocumentSchema = z
   .instanceof(File)
@@ -729,11 +730,11 @@ export default function PageRejoindre() {
           <div className="border-t border-gray-200 pt-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Domaines prioritaires</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {renderInput('domainePrioritaire', '1er domaine prioritaire', 'Domaine prioritaire')}
-              {renderInput('domainePrioritaire2', '2ème domaine prioritaire', 'Domaine prioritaire')}
-              {renderInput('domainePrioritaire3', '3ème domaine prioritaire', 'Domaine prioritaire')}
-              {renderInput('domainePrioritaire4', '4ème domaine prioritaire', 'Domaine prioritaire')}
-              {renderInput('domainePrioritaire5', '5ème domaine prioritaire', 'Domaine prioritaire')}
+              {renderSelect('domainePrioritaire', '1er domaine prioritaire', 'Sélectionnez un domaine', DOMAINE_PRIORITAIRE_OPTIONS)}
+              {renderSelect('domainePrioritaire2', '2ème domaine prioritaire', 'Sélectionnez un domaine', DOMAINE_PRIORITAIRE_OPTIONS)}
+              {renderSelect('domainePrioritaire3', '3ème domaine prioritaire', 'Sélectionnez un domaine', DOMAINE_PRIORITAIRE_OPTIONS)}
+              {renderSelect('domainePrioritaire4', '4ème domaine prioritaire', 'Sélectionnez un domaine', DOMAINE_PRIORITAIRE_OPTIONS)}
+              {renderSelect('domainePrioritaire5', '5ème domaine prioritaire', 'Sélectionnez un domaine', DOMAINE_PRIORITAIRE_OPTIONS)}
             </div>
           </div>
 
