@@ -63,7 +63,7 @@ export default function SectionHero() {
   return (
     <section className="py-8 font-poppins">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-[#2a591d] font-bold text-xl sm:text-2xl lg:text-3xl text-center pb-8 sm:pb-[50px]">Plateforme Digitale des Organisations de la Société Civile - PDOC</p>
+        <p className="text-[#2a591d] font-bold text-xl sm:text-2xl lg:text-3xl text-center pb-8 sm:pb-[50px]">Plateforme Digitale des Organisations de la Société Civile - PdoC</p>
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
 
           {/* Left side */}
@@ -140,7 +140,7 @@ export default function SectionHero() {
           <div className="space-y-6">
             {/* Title */}
             <h2 className="text-gray-900 text-center font-bold">
-              Cliquer sur une zone CRASC sur la carte
+              Centre Régional d'Appuis à la Société Civile - CRASC
             </h2>
 
             {/* Right side card */}

@@ -71,7 +71,7 @@ export default function Stats() {
             gradient: "from-green-500 to-green-600",
           },
           {
-            label: "OSC",
+            label: "OSC inscrites",
             value: data.osc?.total ?? 0,
             icon: Users,
             bg: "bg-blue-50",
