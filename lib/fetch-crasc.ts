@@ -241,7 +241,7 @@ export async function fetchEvenements(crasc_id?: number, a_venir = true): Promis
 
 // Create an event (requires auth token)
 export async function createEvenement(
-  data: { title: string; description?: string; date_debut: string; date_fin?: string; lieu?: string; crasc_id?: number },
+  data: { title: string; description?: string; date_debut: string; date_fin?: string; lieu?: string; statut?: string; crasc_id?: number },
   token: string
 ): Promise<IEvenement> {
   const response = await fetch(`${API_BASE_URL}/api/v1/crasc/evenement`, {
@@ -259,7 +259,7 @@ export async function createEvenement(
 // Update an event (requires auth token)
 export async function updateEvenement(
   id: number,
-  data: { title?: string; description?: string; date_debut?: string; date_fin?: string; lieu?: string; crasc_id?: number },
+  data: { title?: string; description?: string; date_debut?: string; date_fin?: string; lieu?: string; statut?: string; crasc_id?: number },
   token: string
 ): Promise<IEvenement> {
   const response = await fetch(`${API_BASE_URL}/api/v1/crasc/evenement/${id}`, {

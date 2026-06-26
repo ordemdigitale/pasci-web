@@ -5,6 +5,7 @@ import { Search, MapPin, Users2, Building, Filter, ArrowRight, Loader2, ChevronL
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from 'next/link';
 import OscEvaluationBadge from '@/components/osc/OscEvaluationBadge';
+import { DOMAINE_PRIORITAIRE_OPTIONS } from '@/lib/osc-domaines';
 
 interface IOSCType {
   id: number;
@@ -27,6 +28,9 @@ interface IOSC {
   description: string;
   type?: IOSCType;
   crasc?: ICRASC;
+  region_nom?: string | null;
+  sous_prefecture?: string | null;
+  categorie?: string | null;
   ville: string | null;
   email?: string | null;
   phone?: string | null;
@@ -39,11 +43,24 @@ interface IOSC {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const PAGE_SIZE = 12;
 
+const CATEGORIE_OPTIONS = [
+  { value: 'organisation_jeune', label: 'Organisation de jeune (ODJ)' },
+  { value: 'organisation_femme', label: 'Organisation de femme (ODF)' },
+  { value: 'organisation_mixte', label: 'Organisation mixte' },
+];
+
+const categorieLabel = (value?: string | null) =>
+  CATEGORIE_OPTIONS.find((option) => option.value === value)?.label || value || '';
+
 export default function AnnuaireOSCPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [selectedTypeId, setSelectedTypeId] = useState<string>('');
   const [selectedCrascId, setSelectedCrascId] = useState<string>('');
+  const [selectedDomaine, setSelectedDomaine] = useState<string>('');
+  const [regionQuery, setRegionQuery] = useState<string>('');
+  const [sousPrefectureQuery, setSousPrefectureQuery] = useState<string>('');
+  const [selectedCategorie, setSelectedCategorie] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
 
   const [oscData, setOscData] = useState<IOSC[]>([]);
@@ -78,6 +95,10 @@ export default function AnnuaireOSCPage() {
       if (searchQuery) params.set('search', searchQuery);
       if (selectedTypeId) params.set('type_id', selectedTypeId);
       if (selectedCrascId) params.set('crasc_id', selectedCrascId);
+      if (selectedDomaine) params.set('domaine_activite', selectedDomaine);
+      if (regionQuery) params.set('region_nom', regionQuery);
+      if (sousPrefectureQuery) params.set('sous_prefecture', sousPrefectureQuery);
+      if (selectedCategorie) params.set('categorie', selectedCategorie);
 
       const res = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?${params}`);
       const data = await res.json();
@@ -89,7 +110,7 @@ export default function AnnuaireOSCPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchQuery, selectedTypeId, selectedCrascId]);
+  }, [currentPage, searchQuery, selectedTypeId, selectedCrascId, selectedDomaine, regionQuery, sousPrefectureQuery, selectedCategorie]);
 
   useEffect(() => {
     fetchOscs();
@@ -111,11 +132,35 @@ export default function AnnuaireOSCPage() {
     setCurrentPage(1);
   };
 
+  const handleDomaineChange = (val: string) => {
+    setSelectedDomaine(val);
+    setCurrentPage(1);
+  };
+
+  const handleRegionChange = (val: string) => {
+    setRegionQuery(val);
+    setCurrentPage(1);
+  };
+
+  const handleSousPrefectureChange = (val: string) => {
+    setSousPrefectureQuery(val);
+    setCurrentPage(1);
+  };
+
+  const handleCategorieChange = (val: string) => {
+    setSelectedCategorie(val);
+    setCurrentPage(1);
+  };
+
   const resetFilters = () => {
     setSearchInput('');
     setSearchQuery('');
     setSelectedTypeId('');
     setSelectedCrascId('');
+    setSelectedDomaine('');
+    setRegionQuery('');
+    setSousPrefectureQuery('');
+    setSelectedCategorie('');
     setCurrentPage(1);
   };
 
@@ -139,7 +184,7 @@ export default function AnnuaireOSCPage() {
     return pages;
   };
 
-  const hasFilters = searchQuery || selectedTypeId || selectedCrascId;
+  const hasFilters = searchQuery || selectedTypeId || selectedCrascId || selectedDomaine || regionQuery || sousPrefectureQuery || selectedCategorie;
 
   return (
     <section className="py-12 bg-gradient-to-b from-gray-50 to-white font-poppins">
@@ -179,7 +224,7 @@ export default function AnnuaireOSCPage() {
                 {oscTypes.length}
               </div>
               <div className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/80 transition-colors">
-                Types d'Organisation
+	                Types d&apos;Organisation
               </div>
             </div>
           </div>
@@ -208,7 +253,7 @@ export default function AnnuaireOSCPage() {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Rechercher une OSC par nom ou description..."
+	                  placeholder="Rechercher par nom, description, région, sous-préfecture, domaine..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && applySearch()}
@@ -224,7 +269,7 @@ export default function AnnuaireOSCPage() {
             </div>
 
             {/* Filter Dropdowns */}
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
                 <select
@@ -251,6 +296,56 @@ export default function AnnuaireOSCPage() {
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
+              </div>
+
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
+                <select
+                  value={selectedDomaine}
+                  onChange={(e) => handleDomaineChange(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent appearance-none cursor-pointer"
+                >
+                  <option value="">Tous les domaines</option>
+                  {DOMAINE_PRIORITAIRE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="relative">
+                <Users2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
+                <select
+                  value={selectedCategorie}
+                  onChange={(e) => handleCategorieChange(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent appearance-none cursor-pointer"
+                >
+                  <option value="">Toutes les catégories</option>
+                  {CATEGORIE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
+                <input
+                  type="text"
+                  value={regionQuery}
+                  onChange={(e) => handleRegionChange(e.target.value)}
+                  placeholder="Région de l’OSC"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
+                />
+              </div>
+
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
+                <input
+                  type="text"
+                  value={sousPrefectureQuery}
+                  onChange={(e) => handleSousPrefectureChange(e.target.value)}
+                  placeholder="Sous-préfecture de l’OSC"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
+                />
               </div>
             </div>
 
@@ -341,16 +436,22 @@ export default function AnnuaireOSCPage() {
                     </p>
 
                     <div className="space-y-2">
-                      {osc.type && (
+	                      {osc.type && (
                         <div className="flex items-center gap-2 text-sm">
                           <Building className="w-4 h-4 text-[#E05017] flex-shrink-0" />
-                          <span className="font-semibold text-gray-700">{osc.type.name}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <MapPin className="w-4 h-4 text-[#E05017] flex-shrink-0" />
-                        <span>{osc.ville || "Non spécifié"}</span>
-                      </div>
+	                          <span className="font-semibold text-gray-700">{osc.type.name}</span>
+	                        </div>
+	                      )}
+	                      {osc.categorie && (
+	                        <div className="flex items-center gap-2 text-sm text-gray-600">
+	                          <Users2 className="w-4 h-4 text-[#E05017] flex-shrink-0" />
+	                          <span>{categorieLabel(osc.categorie)}</span>
+	                        </div>
+	                      )}
+	                      <div className="flex items-center gap-2 text-sm text-gray-600">
+	                        <MapPin className="w-4 h-4 text-[#E05017] flex-shrink-0" />
+	                        <span>{[osc.region_nom, osc.sous_prefecture, osc.ville].filter(Boolean).join(' · ') || "Non spécifié"}</span>
+	                      </div>
                     </div>
 
                     <div className="mt-4 pt-4 border-t border-gray-200">
@@ -411,10 +512,10 @@ export default function AnnuaireOSCPage() {
         <div className="bg-gradient-to-r from-[#E05017] to-[#d04010] rounded-2xl p-12 text-center text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-10"></div>
           <div className="relative z-10">
-            <h3 className="font-extrabold text-3xl mb-4">Votre OSC n'est pas listée ?</h3>
-            <p className="max-w-2xl mx-auto mb-8 text-lg">
-              Rejoindre le réseau des CRASC pour bénéficier d'un accompagnement personnalisé et apparaître dans cet annuaire.
-            </p>
+	            <h3 className="font-extrabold text-3xl mb-4">Votre OSC n&apos;est pas listée ?</h3>
+	            <p className="max-w-2xl mx-auto mb-8 text-lg">
+	              Rejoindre le réseau des CRASC pour bénéficier d&apos;un accompagnement personnalisé et apparaître dans cet annuaire.
+	            </p>
             <Link
               href="/auth/login"
               className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#E05017] font-bold rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300"

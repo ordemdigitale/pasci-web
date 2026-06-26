@@ -12,6 +12,14 @@ import {
   MapPin, Clock, FileText, Building2, ChevronDown,
 } from "lucide-react";
 
+type EventStatus = "realise" | "en_cours" | "non_realise";
+
+const EVENT_STATUS_OPTIONS: { value: EventStatus; label: string }[] = [
+  { value: "realise", label: "Réalisé" },
+  { value: "en_cours", label: "En cours" },
+  { value: "non_realise", label: "Non réalisé" },
+];
+
 function toDatetimeLocal(iso?: string | null): string {
   if (!iso) return "";
   return iso.slice(0, 16);
@@ -29,7 +37,7 @@ export default function ModifierEvenementPage({ params }: { params: Promise<{ id
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
-    title: "", description: "", date_debut: "", date_fin: "", lieu: "", crasc_id: "",
+    title: "", description: "", date_debut: "", date_fin: "", lieu: "", statut: "en_cours" as EventStatus, crasc_id: "",
   });
 
   useEffect(() => {
@@ -52,10 +60,11 @@ export default function ModifierEvenementPage({ params }: { params: Promise<{ id
           date_debut: toDatetimeLocal(evt.date_debut),
           date_fin: toDatetimeLocal(evt.date_fin),
           lieu: evt.lieu || "",
+          statut: evt.statut || "en_cours",
           crasc_id: evt.crasc_id ? String(evt.crasc_id) : "",
         });
-      } catch (e: any) {
-        setError(e.message || "Impossible de charger l'événement.");
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Impossible de charger l'événement.");
       } finally {
         setLoading(false);
       }
@@ -64,6 +73,10 @@ export default function ModifierEvenementPage({ params }: { params: Promise<{ id
   }, [id, isCrascAdmin]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    if (e.target.name === "statut") {
+      setForm((prev) => ({ ...prev, statut: e.target.value as EventStatus }));
+      return;
+    }
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
@@ -82,12 +95,13 @@ export default function ModifierEvenementPage({ params }: { params: Promise<{ id
         date_debut: new Date(form.date_debut).toISOString(),
         date_fin: form.date_fin ? new Date(form.date_fin).toISOString() : undefined,
         lieu: form.lieu.trim() || undefined,
+        statut: form.statut,
         crasc_id: form.crasc_id ? parseInt(form.crasc_id) : undefined,
       }, token);
       setSuccess(true);
       setTimeout(() => router.push("/admin/gestion-des-crasc/agenda"), 1500);
-    } catch (err: any) {
-      setError(err.message || "Une erreur est survenue.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
       setSaving(false);
     }
@@ -139,6 +153,16 @@ export default function ModifierEvenementPage({ params }: { params: Promise<{ id
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
                 <textarea name="description" value={form.description} onChange={handleChange} rows={3}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all resize-none" />
+              </div>
+              <div className="mt-4">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Statut</label>
+                <div className="relative">
+                  <select name="statut" value={form.statut} onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent appearance-none transition-all">
+                    {EVENT_STATUS_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                </div>
               </div>
             </div>
 

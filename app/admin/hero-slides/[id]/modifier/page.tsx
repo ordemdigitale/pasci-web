@@ -16,6 +16,8 @@ export default function ModifierHeroSlidePage() {
 
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [ordre, setOrdre] = useState(0);
   const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -25,10 +27,12 @@ export default function ModifierHeroSlidePage() {
   useEffect(() => {
     fetchWithAuth(`${API_BASE}/api/v1/hero-slides`)
       .then((r) => r.json())
-      .then((data: { id: number; image_url: string; ordre: number; is_active: boolean }[]) => {
+      .then((data: { id: number; image_url: string; title?: string | null; description?: string | null; ordre: number; is_active: boolean }[]) => {
         const slide = data.find((s) => String(s.id) === id);
         if (slide) {
           setPreview(slide.image_url);
+          setTitle(slide.title || "");
+          setDescription(slide.description || "");
           setOrdre(slide.ordre);
           setIsActive(slide.is_active);
         }
@@ -48,6 +52,8 @@ export default function ModifierHeroSlidePage() {
     try {
       const fd = new FormData();
       if (image) fd.append("image", image);
+      fd.append("title", title);
+      fd.append("description", description);
       fd.append("ordre", String(ordre));
       fd.append("is_active", String(isActive));
       const res = await fetchWithAuth(`${API_BASE}/api/v1/hero-slides/${id}`, { method: "PATCH", body: fd });
@@ -120,6 +126,30 @@ export default function ModifierHeroSlidePage() {
             accept="image/*"
             className="hidden"
             onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Titre lié à cette image</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={200}
+            placeholder="Ex : Renforcer la visibilité des OSC"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]/30 focus:border-[#E05017]"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description liée à cette image</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            maxLength={1000}
+            placeholder="Texte affiché avec cette image dans le carrousel"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]/30 focus:border-[#E05017] resize-none"
           />
         </div>
 

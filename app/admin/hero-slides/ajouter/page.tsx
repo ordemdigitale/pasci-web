@@ -13,6 +13,8 @@ export default function AjouterHeroSlidePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [type, setType] = useState("haut");
   const [ordre, setOrdre] = useState(0);
   const [isActive, setIsActive] = useState(true);
@@ -32,6 +34,8 @@ export default function AjouterHeroSlidePage() {
     try {
       const fd = new FormData();
       fd.append("image", image);
+      fd.append("title", title);
+      fd.append("description", description);
       fd.append("type", type);
       fd.append("ordre", String(ordre));
       fd.append("is_active", String(isActive));
@@ -91,6 +95,30 @@ export default function AjouterHeroSlidePage() {
             accept="image/*"
             className="hidden"
             onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Titre lié à cette image</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={200}
+            placeholder="Ex : Renforcer la visibilité des OSC"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]/30 focus:border-[#E05017]"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description liée à cette image</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            maxLength={1000}
+            placeholder="Texte affiché avec cette image dans le carrousel"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]/30 focus:border-[#E05017] resize-none"
           />
         </div>
 

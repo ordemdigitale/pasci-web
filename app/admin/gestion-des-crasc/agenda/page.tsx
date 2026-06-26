@@ -19,6 +19,12 @@ import {
   Building2,
 } from "lucide-react";
 
+const EVENT_STATUS_META: Record<string, { label: string; className: string }> = {
+  realise: { label: "Réalisé", className: "bg-green-100 text-green-700" },
+  en_cours: { label: "En cours", className: "bg-blue-100 text-blue-700" },
+  non_realise: { label: "Non réalisé", className: "bg-red-100 text-red-700" },
+};
+
 export default function AdminAgendaPage() {
   const { user: currentUser } = useAuth();
   const isCrascAdmin = !!currentUser?.is_staff && !currentUser?.is_superuser && !!currentUser?.crasc_id;
@@ -63,8 +69,8 @@ export default function AdminAgendaPage() {
     try {
       await deleteEvenement(id, token);
       setEvenements((prev) => prev.filter((e) => e.id !== id));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Échec de la suppression de l'événement.");
     } finally {
       setDeleting(null);
     }
@@ -82,7 +88,7 @@ export default function AdminAgendaPage() {
             <CalendarDays className="w-8 h-8" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Gestion de l'Agenda</h1>
+            <h1 className="text-3xl font-bold">Gestion de l&apos;Agenda</h1>
             <p className="text-white/80 mt-1">Gérez les événements de chaque CRASC</p>
           </div>
         </div>
@@ -198,6 +204,7 @@ function EventCard({
   deleting: number | null;
 }) {
   const debut = new Date(evt.date_debut);
+  const status = EVENT_STATUS_META[evt.statut || "en_cours"] ?? EVENT_STATUS_META.en_cours;
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex gap-4 items-start">
       <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#2A591D] flex flex-col items-center justify-center text-white font-bold">
@@ -205,7 +212,12 @@ function EventCard({
         <span className="text-xs uppercase">{debut.toLocaleDateString("fr-FR", { month: "short" })}</span>
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-bold text-gray-900 line-clamp-1">{evt.title}</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="font-bold text-gray-900 line-clamp-1">{evt.title}</p>
+          <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${status.className}`}>
+            {status.label}
+          </span>
+        </div>
         {evt.description && <p className="text-sm text-gray-500 line-clamp-2 mt-0.5">{evt.description}</p>}
         <div className="flex flex-wrap gap-3 mt-1">
           <span className="flex items-center gap-1 text-xs text-gray-400">

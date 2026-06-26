@@ -19,8 +19,50 @@ import {
   Users,
   MapPin,
   Star,
+  Briefcase,
   CalendarDays,
 } from "lucide-react";
+
+type AgendaStatus = "realise" | "en_cours" | "non_realise";
+type AgendaItem = {
+  date: string;
+  titre: string;
+  description: string;
+  statut?: AgendaStatus;
+};
+
+const AGENDA_STATUS_META: Record<AgendaStatus, { label: string; className: string }> = {
+  realise: { label: "Réalisé", className: "bg-green-100 text-green-700" },
+  en_cours: { label: "En cours", className: "bg-blue-100 text-blue-700" },
+  non_realise: { label: "Non réalisé", className: "bg-red-100 text-red-700" },
+};
+
+function parseJsonList(raw?: string | null): string[] {
+  try {
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string" && item.trim()) : [];
+  } catch {
+    return [];
+  }
+}
+
+function parseAgenda(raw?: string | null): AgendaItem[] {
+  try {
+    const parsed = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((item) => item && typeof item === "object")
+      .map((item) => ({
+        date: typeof item.date === "string" ? item.date : "",
+        titre: typeof item.titre === "string" ? item.titre : "",
+        description: typeof item.description === "string" ? item.description : "",
+        statut: ["realise", "en_cours", "non_realise"].includes(item.statut) ? item.statut : "en_cours",
+      }))
+      .filter((item) => item.date || item.titre || item.description);
+  } catch {
+    return [];
+  }
+}
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("fr-FR", {
@@ -118,8 +160,8 @@ export default function PagePoleForum() {
       setTitle("");
       setContent("");
       setShowForm(false);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur lors de la création.");
     } finally {
       setSubmitting(false);
     }
@@ -149,6 +191,14 @@ export default function PagePoleForum() {
     );
   }
 
+  const objectifsAnnuels = parseJsonList(pole.objectifs_annuels);
+  const regionsInfluence = parseJsonList(pole.regions_influence);
+  const realisations = parseJsonList(pole.realisations);
+  const projetsEnCours = parseJsonList(pole.projets_en_cours);
+  const agendaItems = parseAgenda(pole.agenda);
+  const nbOscMembres = pole.nb_osc_membres ?? 0;
+  const nbMembresActifs = pole.nb_membres_actifs ?? nbOscMembres;
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 font-poppins">
       {/* Breadcrumb */}
@@ -170,120 +220,126 @@ export default function PagePoleForum() {
         {pole.description && (
           <p className="text-gray-600 text-sm">{pole.description}</p>
         )}
-        {pole.nb_osc_membres != null && (
-          <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
+        <div className="mt-4 grid sm:grid-cols-2 gap-3 text-sm text-gray-600">
+          <div className="flex items-center gap-2 rounded-lg bg-white/80 border border-gray-200 px-3 py-2">
             <Users className="w-4 h-4 text-[#E05017]" />
-            <span><strong>{pole.nb_osc_membres}</strong> OSC membres</span>
+            <span><strong>{nbOscMembres}</strong> OSC membres</span>
           </div>
-        )}
+          <div className="flex items-center gap-2 rounded-lg bg-white/80 border border-gray-200 px-3 py-2">
+            <Users className="w-4 h-4 text-[#2a591d]" />
+            <span><strong>{nbMembresActifs}</strong> membres actifs</span>
+          </div>
+        </div>
       </div>
 
       {/* Objectifs annuels */}
-      {pole.objectifs_annuels && (() => {
-        try {
-          const list: string[] = JSON.parse(pole.objectifs_annuels);
-          if (list.length === 0) return null;
-          return (
-            <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <Target className="w-5 h-5 text-[#E05017]" />
-                <h2 className="font-bold text-gray-800">Objectifs annuels du pôle</h2>
-              </div>
-              <ul className="space-y-2">
-                {list.map((obj, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#E05017] mt-2 flex-shrink-0" />
-                    {obj}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        } catch { return null; }
-      })()}
+      {objectifsAnnuels.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <Target className="w-5 h-5 text-[#E05017]" />
+            <h2 className="font-bold text-gray-800">Objectifs annuels du pôle</h2>
+          </div>
+          <ul className="space-y-2">
+            {objectifsAnnuels.map((obj, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E05017] mt-2 flex-shrink-0" />
+                {obj}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Régions d'influence */}
-      {pole.regions_influence && (() => {
-        try {
-          const list: string[] = JSON.parse(pole.regions_influence);
-          if (list.length === 0) return null;
-          return (
-            <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <MapPin className="w-5 h-5 text-[#E05017]" />
-                <h2 className="font-bold text-gray-800">Régions d&apos;influence</h2>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {list.map((r, i) => (
-                  <span key={i} className="px-3 py-1 bg-[#2a591d]/10 text-[#2a591d] rounded-full text-sm font-medium">
-                    {r}
-                  </span>
-                ))}
-              </div>
-            </div>
-          );
-        } catch { return null; }
-      })()}
+      {regionsInfluence.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <MapPin className="w-5 h-5 text-[#E05017]" />
+            <h2 className="font-bold text-gray-800">Régions d&apos;influence</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {regionsInfluence.map((region, i) => (
+              <span key={i} className="px-3 py-1 bg-[#2a591d]/10 text-[#2a591d] rounded-full text-sm font-medium">
+                {region}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Réalisations */}
-      {pole.realisations && (() => {
-        try {
-          const list: string[] = JSON.parse(pole.realisations);
-          if (list.length === 0) return null;
-          return (
-            <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <Star className="w-5 h-5 text-[#E05017]" />
-                <h2 className="font-bold text-gray-800">Nos réalisations</h2>
-              </div>
-              <ul className="space-y-2">
-                {list.map((r, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#2a591d] mt-2 flex-shrink-0" />
-                    {r}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        } catch { return null; }
-      })()}
+      {realisations.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <Star className="w-5 h-5 text-[#E05017]" />
+            <h2 className="font-bold text-gray-800">Nos réalisations</h2>
+          </div>
+          <ul className="space-y-2">
+            {realisations.map((realisation, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2a591d] mt-2 flex-shrink-0" />
+                {realisation}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Projets en cours */}
+      {projetsEnCours.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <Briefcase className="w-5 h-5 text-[#E05017]" />
+            <h2 className="font-bold text-gray-800">Nos projets en cours</h2>
+          </div>
+          <ul className="space-y-2">
+            {projetsEnCours.map((projet, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E05017] mt-2 flex-shrink-0" />
+                {projet}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Agenda */}
-      {pole.agenda && (() => {
-        try {
-          const items: { date: string; titre: string; description: string }[] = JSON.parse(pole.agenda);
-          if (items.length === 0) return null;
-          return (
-            <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <CalendarDays className="w-5 h-5 text-[#E05017]" />
-                <h2 className="font-bold text-gray-800">Agenda</h2>
-              </div>
-              <div className="space-y-3">
-                {items.map((item, i) => (
-                  <div key={i} className="flex gap-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                    {item.date && (
-                      <div className="flex-shrink-0 text-center bg-[#E05017] text-white rounded-lg px-3 py-2 min-w-[60px]">
-                        <p className="text-xs font-semibold">
-                          {new Date(item.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })}
-                        </p>
-                        <p className="text-xs">{new Date(item.date).getFullYear()}</p>
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-800 text-sm">{item.titre}</p>
-                      {item.description && (
-                        <p className="text-xs text-gray-500 mt-0.5">{item.description}</p>
-                      )}
+      {agendaItems.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <CalendarDays className="w-5 h-5 text-[#E05017]" />
+            <h2 className="font-bold text-gray-800">Agenda</h2>
+          </div>
+          <div className="space-y-3">
+            {agendaItems.map((item, i) => {
+              const status = AGENDA_STATUS_META[item.statut ?? "en_cours"];
+              return (
+                <div key={i} className="flex gap-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  {item.date && (
+                    <div className="flex-shrink-0 text-center bg-[#E05017] text-white rounded-lg px-3 py-2 min-w-[60px]">
+                      <p className="text-xs font-semibold">
+                        {new Date(item.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })}
+                      </p>
+                      <p className="text-xs">{new Date(item.date).getFullYear()}</p>
                     </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-semibold text-gray-800 text-sm">{item.titre}</p>
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${status.className}`}>
+                        {status.label}
+                      </span>
+                    </div>
+                    {item.description && (
+                      <p className="text-xs text-gray-500 mt-0.5">{item.description}</p>
+                    )}
                   </div>
-                ))}
-              </div>
-            </div>
-          );
-        } catch { return null; }
-      })()}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Header actions */}
       <div className="flex items-center justify-between mb-6">

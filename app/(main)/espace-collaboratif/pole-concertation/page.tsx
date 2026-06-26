@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { IPoleConcertation } from "@/types/api.types";
-import { Search, MessageSquare, Layers } from "lucide-react";
+import { Search, MessageSquare, Layers, Users, MapPin } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchWithAuth } from "@/lib/auth";
 
@@ -15,6 +15,15 @@ function getPoleImageUrl(imagePath?: string | null): string | null {
   if (!imagePath) return null;
   if (imagePath.startsWith("http") || imagePath.startsWith("/")) return imagePath;
   return `${API_BASE}/static/${imagePath}`;
+}
+
+function parseJsonList(raw?: string | null): string[] {
+  try {
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string" && item.trim()) : [];
+  } catch {
+    return [];
+  }
 }
 
 export default function PagePoleConcertation() {
@@ -107,13 +116,8 @@ export default function PagePoleConcertation() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filtered.map((pole) => {
-                const objectifsList: string[] = (() => {
-                  try {
-                    return pole.objectifs ? JSON.parse(pole.objectifs) : [];
-                  } catch {
-                    return [];
-                  }
-                })();
+                const objectifsList = parseJsonList(pole.objectifs);
+                const regions = parseJsonList(pole.regions_influence);
 
                 return (
                   <div
@@ -142,11 +146,21 @@ export default function PagePoleConcertation() {
                         </ul>
                       )}
 
-                      <div className="flex items-center gap-4 text-sm text-gray-500 mt-auto mb-4">
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mt-auto mb-4">
+                        <span className="flex items-center gap-1">
+                          <Users className="w-4 h-4" />
+                          {pole.nb_osc_membres ?? 0} OSC
+                        </span>
                         <span className="flex items-center gap-1">
                           <MessageSquare className="w-4 h-4" />
                           {pole.sujets_count} sujet{pole.sujets_count !== 1 ? "s" : ""}
                         </span>
+                        {regions.length > 0 && (
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-4 h-4" />
+                            {regions[0]}{regions.length > 1 ? ` +${regions.length - 1}` : ""}
+                          </span>
+                        )}
                       </div>
 
                       {(() => {

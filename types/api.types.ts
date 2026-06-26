@@ -173,6 +173,7 @@ export interface IEvenement {
   date_debut: string;
   date_fin?: string | null;
   lieu?: string | null;
+  statut?: "realise" | "en_cours" | "non_realise";
   crasc_id?: number | null;
   created_at?: string;
 }
@@ -360,8 +361,10 @@ export interface IPoleConcertation {
   objectifs_list?: string[];
   objectifs_annuels?: string;
   nb_osc_membres?: number;
+  nb_membres_actifs?: number;
   regions_influence?: string;
   realisations?: string;
+  projets_en_cours?: string;
   agenda?: string;
   is_active: boolean;
   sujets_count: number;
