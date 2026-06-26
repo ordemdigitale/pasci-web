@@ -1,4 +1,5 @@
 // lib/fetch-formations.ts | Functions to fetch formations from API
+import { getToken } from "@/lib/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -50,6 +51,7 @@ export interface IFormation {
   } | null;
   created_at: string;
   updated_at: string;
+  statut_publication?: "brouillon" | "en_attente" | "publie" | "rejete";
 }
 
 export interface FormationFilters {
@@ -129,13 +131,14 @@ export async function fetchUpcomingFormations(
 export async function getFormationBySlug(
   formation_slug: string
 ): Promise<IFormation> {
+  const token = getToken();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (token) headers.Authorization = `Bearer ${token}`;
   const response = await fetch(
     `${API_BASE_URL}/api/v1/formations/${formation_slug}`,
     {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       cache: "no-store",
     }
   );

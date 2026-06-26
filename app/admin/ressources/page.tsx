@@ -15,7 +15,6 @@ import {
   File,
   X,
   Calendar,
-  User,
   TrendingUp,
   Loader2,
 } from "lucide-react";
@@ -50,6 +49,7 @@ export default function RessourcesPage() {
           limit: 100,
           sort_by: "created_at",
           sort_order: "desc",
+          include_all: true,
         };
         
         if (selectedCategorie) {
@@ -510,7 +510,7 @@ export default function RessourcesPage() {
                     <Calendar className="w-5 h-5 text-[#E05017] mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">
-                        Date d'ajout
+                        Date d&apos;ajout
                       </p>
                       <p className="text-gray-900">
                         {formatDate(selectedRessource.created_at)}
