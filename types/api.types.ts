@@ -400,6 +400,32 @@ export interface IForumSujetDetail extends IForumSujet {
   commentaires: IForumCommentaire[];
 }
 
+export type ForumSondageStatus = "ouvert" | "ferme";
+export type ForumSondageResultsVisibility = "always" | "after_vote" | "after_close";
+
+export interface IForumSondageOption {
+  id: number;
+  label: string;
+  ordre: number;
+  votes_count: number;
+  percentage: number;
+}
+
+export interface IForumSondage {
+  id: number;
+  pole_id: number;
+  question: string;
+  description?: string | null;
+  status: ForumSondageStatus;
+  results_visibility: ForumSondageResultsVisibility;
+  closes_at?: string | null;
+  created_at: string;
+  total_votes: number;
+  user_vote_option_id?: number | null;
+  can_show_results: boolean;
+  options: IForumSondageOption[];
+}
+
 export interface IFaq {
   id: number;
   question: string;
