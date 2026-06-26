@@ -104,10 +104,10 @@ export default function Partners() {
         {/* CTA Section */}
         <div className="mt-16 text-center bg-gradient-to-r from-[#E05017]/5 to-[#2a591d]/5 rounded-2xl p-8 border border-[#E05017]/20">
           <h3 className="text-2xl font-bold text-gray-900 mb-3">
-            Adhésion au CRASC
+            S'enrôler sur la PdoC
           </h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Votre organisation souhaite intégrer le réseau des OSC membres du CRASC ? Soumettez votre demande d&apos;adhésion et bénéficiez de l&apos;accompagnement de la plateforme PdoC.
+            Votre organisation souhaite intégrer la  plateforme des OSC ? Soumettez votre demande et bénéficiez de l'accompagnement de la plateforme PdoC.
           </p>
           <Link
             href="/rejoindre"

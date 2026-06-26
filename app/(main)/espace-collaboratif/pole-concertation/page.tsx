@@ -67,24 +67,85 @@ export default function PagePoleConcertation() {
   return (
     <section className="mx-auto pt-12 pb-6 font-poppins">
       {/* Hero */}
-      <div className="max-w-5xl mx-auto sm:px-6 lg:px-6 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-6">
-        <div>
-          <h2 className="text-[#2a591d] font-bold text-4xl">Pôles de concertation</h2>
-          <p className="text-gray-600 text-md max-w-xl mt-6">
-            Au nombre de 11, les pôles de concertation sont des espaces de discussion, de libres échanges
-            et de valorisation des domaines prioritaires des OSC. Réservés uniquement aux OSC inscrits
-            sur la plateforme, les partages et les discussions s&apos;opèrent dans une dynamique de
-            respect mutuel et d&apos;intérêt commun.
+      <div className="text-gray-600 max-w-5xl mx-auto sm:px-6 lg:px-6 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] ">
+        <div className="grid lg:grid-cols-2 gap-6">
+          <div>
+            <h2 className="text-[#2a591d] font-bold text-4xl">Pôles de concertation</h2>
+            <p className="max-w-xl mt-6">
+              Les pôles de concertation, il y en a 11. Ce sont des espaces où les organisations de la société civile (OSC) peuvent <b>se rencontrer, discuter librement et partager leurs idées</b>.
+              <ul className="list-disc list-inside pl-5">
+                <li>Chaque pôle met en avant un domaine important (par exemple agriculture, santé, éducation…).</li>
+                <li>Seules les OSC inscrites sur la plateforme peuvent y participer.</li>
+                <li>Les échanges se font dans un esprit de <b>respect</b> et de <b>collaboration</b>, pour avancer ensemble vers des objectifs communs.</li>
+              </ul>
+              Les pôles sont des lieux pour <b>parler, échanger et valoriser les priorités des OSC</b>, dans une ambiance constructive et ouverte.
+            </p>
+          </div>
+          <div>
+            <ImageWithFallback
+              src="/images/b81daf7f-c015-4a68-942f-ce602fdf5542.jpg"
+              alt="Pôles de concertation"
+              className="w-full h-[280px] object-cover rounded-lg"
+            />
+          </div>
+          
+        </div>
+
+        <div className="mt-6">
+          <h3 className="font-bold mb-4">Charte des pôles de concertation</h3>
+          <p className="mb-4">
+            <b>1. Objectif des pôles</b> <br />
+            Les pôles de concertation sont des espaces où les organisations de la société civile (OSC) peuvent <b>échanger librement, partager leurs idées et mettre en valeur leurs domaines prioritaires</b>.
+          </p>
+
+          <p className="mb-4">
+            <b>2. Accès et participation</b> <br />
+            <ul className="list-disc list-inside pl-5">
+              <li>Les pôles sont <b>réservés aux OSC inscrites</b> sur la plateforme.</li>
+              <li>Chaque membre participe en son nom et représente son organisation.</li>
+              <li>L'inscription implique l'acceptation de cette charte.</li>
+            </ul>
+          </p>
+
+          <p className="mb-4">
+            <b>3. Principes de fonctionnement</b> <br />
+            <ul className="list-disc list-inside pl-5">
+              <li><b>Respect mutuel</b> : chaque avis compte, aucune discrimination n'est tolérée.</li>
+              <li><b>Intérêt commun</b> : les discussions doivent servir à renforcer l'action collective.</li>
+              <li><b>Transparence</b> : les échanges sont clairs et ouverts à tous les membres du pôle.</li>
+              <li><b>Collaboration</b> : les pôles favorisent l'entraide et la mise en réseau.</li>
+            </ul>
+          </p>
+
+          <p className="mb-4">
+            <b>4. Organisation des échanges</b> <br />
+            <ul className="list-disc list-inside pl-5">
+              <li>Les discussions se font en ligne sur la plateforme.</li>
+              <li>Les pôles peuvent organiser des <b>rencontres thématiques</b> ou des ateliers.</li>
+              <li>Les contributions doivent rester <b>constructives et pertinentes</b>.</li>
+            </ul>
+          </p>
+          <p className="mb-4">
+            <b>5. Responsabilités des membres</b> <br />
+            <ul className="list-disc list-inside pl-5">
+              <li>Respecter les règles de la charte.</li>
+              <li>Participer activement aux échanges.</li>
+              <li>Valoriser les priorités de son domaine (éducation, santé, agriculture, etc.).</li>
+              <li>Partager des informations fiables et utiles.</li>
+            </ul>
+          </p>
+          <p className="mb-4">
+            <b>6. Suivi et amélioration</b> <br />
+            <ul className="list-disc list-inside pl-5">
+              <li>Les pôles peuvent proposer des <b>recommandations collectives</b>.</li>
+              <li>Un bilan régulier est fait pour mesurer l'impact des échanges.</li>
+              <li>La charte peut évoluer selon les besoins des OSC.</li>
+            </ul>
           </p>
         </div>
-        <div>
-          <ImageWithFallback
-            src="/images/b81daf7f-c015-4a68-942f-ce602fdf5542.jpg"
-            alt="Pôles de concertation"
-            className="w-full h-[280px] object-cover rounded-lg"
-          />
-        </div>
+        
       </div>
+
 
       {/* Search */}
       <div className="p-6 mb-1">
