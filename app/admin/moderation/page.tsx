@@ -18,12 +18,12 @@ interface ItemEnAttente {
 }
 
 const TYPE_CONFIG = {
-  actualite:  { label: "Actualité",       icon: Newspaper,  color: "text-blue-600",   bg: "bg-blue-50",  border: "border-blue-200", adminPath: "/admin/actualites" },
-  emploi:     { label: "Offre d'emploi",  icon: Briefcase,  color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200", adminPath: "/admin/emplois" },
-  formation:  { label: "Formation",       icon: BookOpen,   color: "text-green-600",  bg: "bg-green-50",  border: "border-green-200", adminPath: "/admin/formations" },
-  projet:     { label: "Offre de projet", icon: FolderOpen, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", adminPath: "/admin/projets" },
-  video:      { label: "Vidéo CRASC",     icon: CheckCircle, color: "text-teal-600",  bg: "bg-teal-50",  border: "border-teal-200",  adminPath: "/admin/gestion-des-crasc/videos" },
-  osc_modification: { label: "Modification OSC", icon: Building2, color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", adminPath: "/admin/gestion-des-crasc/osc" },
+  actualite:  { label: "Actualité",       icon: Newspaper,  color: "text-blue-600",   bg: "bg-blue-50",  border: "border-blue-200", adminPath: "/admin/gestion-des-actualites", pathSuffix: "/modifier" },
+  emploi:     { label: "Offre d'emploi",  icon: Briefcase,  color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200", adminPath: "/admin/emplois", pathSuffix: "" },
+  formation:  { label: "Formation",       icon: BookOpen,   color: "text-green-600",  bg: "bg-green-50",  border: "border-green-200", adminPath: "/admin/formations", pathSuffix: "" },
+  projet:     { label: "Offre de projet", icon: FolderOpen, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", adminPath: "/admin/projets", pathSuffix: "" },
+  video:      { label: "Vidéo CRASC",     icon: CheckCircle, color: "text-teal-600",  bg: "bg-teal-50",  border: "border-teal-200",  adminPath: "/admin/gestion-des-crasc/videos", pathSuffix: "" },
+  osc_modification: { label: "Modification OSC", icon: Building2, color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", adminPath: "/admin/gestion-des-crasc/osc", pathSuffix: "" },
 };
 
 const FIELD_LABELS: Record<string, string> = {
@@ -198,7 +198,7 @@ export default function AdminModerationPage() {
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {item.slug && (
                       <Link
-                        href={`${cfg.adminPath}/${item.slug}`}
+                        href={`${cfg.adminPath}/${item.slug}${cfg.pathSuffix}`}
                         target="_blank"
                         className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 border border-gray-200 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors"
                         title="Ouvrir le contenu"
