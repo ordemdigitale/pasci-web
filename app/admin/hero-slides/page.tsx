@@ -9,6 +9,8 @@ import { ImageWithFallback } from "@/lib/imageWithFallback";
 interface IHeroSlide {
   id: number;
   image_url: string;
+  title?: string | null;
+  description?: string | null;
   ordre: number;
   is_active: boolean;
   type: string;
@@ -116,9 +118,18 @@ export default function HeroSlidesPage() {
             <div className="aspect-video">
               <ImageWithFallback
                 src={slide.image_url}
-                alt={`Slide ${slide.id}`}
+                alt={slide.title || `Slide ${slide.id}`}
                 className="w-full h-full object-cover"
               />
+            </div>
+
+            <div className="p-3 bg-white min-h-[88px]">
+              <p className="text-sm font-semibold text-gray-900 line-clamp-1">
+                {slide.title || "Sans titre"}
+              </p>
+              <p className="text-xs text-gray-500 line-clamp-2 mt-1">
+                {slide.description || "Aucune description liée à cette image"}
+              </p>
             </div>
 
             {/* Ordre badge */}
@@ -184,9 +195,12 @@ export default function HeroSlidesPage() {
         </Link>
       </div>
 
-      {/* Texte de la section */}
+      {/* Texte par défaut */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6 space-y-4">
-        <h2 className="text-base font-semibold text-gray-800">Texte de la section CRASC</h2>
+        <h2 className="text-base font-semibold text-gray-800">Texte par défaut du carrousel</h2>
+        <p className="text-xs text-gray-500">
+          Utilisé uniquement lorsqu&apos;une image du carrousel n&apos;a pas encore son propre titre ou sa propre description.
+        </p>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Titre</label>
           <input

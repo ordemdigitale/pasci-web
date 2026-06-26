@@ -14,7 +14,7 @@ export default function SubMenu() {
             href="/annuaire/annuaire-des-crasc"
             className="text-white hover:text-white/90 transition-colors"
           >
-            Annuaire des CRASC
+            Annuaire des OSC
           </a>
 
           {/* Annuaire des PTF */}

@@ -14,6 +14,7 @@ import {
   Search,
   Loader2,
   Pin,
+  BarChart3,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -213,6 +214,14 @@ export default function AdminForumPolesPage() {
                   </Link>
                   {!isCrascAdmin && (
                     <>
+                      <Link href={`/admin/forum/poles/${pole.slug}/sondages`}>
+                        <button
+                          className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                          title="Gérer les sondages"
+                        >
+                          <BarChart3 className="w-4 h-4" />
+                        </button>
+                      </Link>
                       <Link href={`/admin/forum/poles/${pole.slug}/modifier`}>
                         <button
                           className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"

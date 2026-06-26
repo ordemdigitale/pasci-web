@@ -7,6 +7,15 @@ import { API_ENDPOINTS } from "@/lib/api-config";
 import { fetchWithAuth } from "@/lib/auth";
 import { ArrowLeft, Plus, Trash2, Loader2, Image as ImageIcon, X } from "lucide-react";
 
+type AgendaStatus = "realise" | "en_cours" | "non_realise";
+type AgendaItem = { date: string; titre: string; description: string; statut: AgendaStatus };
+
+const AGENDA_STATUS_OPTIONS: { value: AgendaStatus; label: string }[] = [
+  { value: "realise", label: "Réalisé" },
+  { value: "en_cours", label: "En cours" },
+  { value: "non_realise", label: "Non réalisé" },
+];
+
 export default function AdminModifierPolePage() {
   const params = useParams();
   const router = useRouter();
@@ -23,11 +32,10 @@ export default function AdminModifierPolePage() {
   const [isActive, setIsActive] = useState(true);
   const [objectifs, setObjectifs] = useState<string[]>([""]);
   const [objectifsAnnuels, setObjectifsAnnuels] = useState<string[]>([""]);
-  const [nbOscMembres, setNbOscMembres] = useState("");
-  const [regionsInfluence, setRegionsInfluence] = useState<string[]>([""]);
   const [realisations, setRealisations] = useState<string[]>([""]);
-  const [agenda, setAgenda] = useState<{ date: string; titre: string; description: string }[]>([
-    { date: "", titre: "", description: "" },
+  const [projetsEnCours, setProjetsEnCours] = useState<string[]>([""]);
+  const [agenda, setAgenda] = useState<AgendaItem[]>([
+    { date: "", titre: "", description: "", statut: "en_cours" },
   ]);
 
   useEffect(() => {
@@ -46,17 +54,28 @@ export default function AdminModifierPolePage() {
           try { const p = raw ? JSON.parse(raw) : []; return p.length > 0 ? p : fallback; }
           catch { return fallback; }
         };
-        const parseAgenda = (raw: string | null) => {
+        const emptyAgenda: AgendaItem[] = [{ date: "", titre: "", description: "", statut: "en_cours" }];
+        const parseAgenda = (raw: string | null): AgendaItem[] => {
           try {
             const p = raw ? JSON.parse(raw) : [];
-            return Array.isArray(p) && p.length > 0 ? p : [{ date: "", titre: "", description: "" }];
-          } catch { return [{ date: "", titre: "", description: "" }]; }
+            if (!Array.isArray(p) || p.length === 0) return emptyAgenda;
+            return p.map((item) => {
+              const statut: AgendaStatus = ["realise", "en_cours", "non_realise"].includes(item.statut)
+                ? item.statut
+                : "en_cours";
+              return {
+                date: typeof item.date === "string" ? item.date : "",
+                titre: typeof item.titre === "string" ? item.titre : "",
+                description: typeof item.description === "string" ? item.description : "",
+                statut,
+              };
+            });
+          } catch { return emptyAgenda; }
         };
         setObjectifs(parseList(data.objectifs, [""]));
         setObjectifsAnnuels(parseList(data.objectifs_annuels, [""]));
-        setNbOscMembres(data.nb_osc_membres != null ? String(data.nb_osc_membres) : "");
-        setRegionsInfluence(parseList(data.regions_influence, [""]));
         setRealisations(parseList(data.realisations, [""]));
+        setProjetsEnCours(parseList(data.projets_en_cours, [""]));
         setAgenda(parseAgenda(data.agenda));
       })
       .catch(() => setError("Impossible de charger le pôle."))
@@ -71,18 +90,18 @@ export default function AdminModifierPolePage() {
   function removeObjectifAnnuel(i: number) { setObjectifsAnnuels((p) => p.filter((_, idx) => idx !== i)); }
   function updateObjectifAnnuel(i: number, v: string) { setObjectifsAnnuels((p) => p.map((o, idx) => (idx === i ? v : o))); }
 
-  function addRegion() { setRegionsInfluence((p) => [...p, ""]); }
-  function removeRegion(i: number) { setRegionsInfluence((p) => p.filter((_, idx) => idx !== i)); }
-  function updateRegion(i: number, v: string) { setRegionsInfluence((p) => p.map((o, idx) => (idx === i ? v : o))); }
-
   function addRealisation() { setRealisations((p) => [...p, ""]); }
   function removeRealisation(i: number) { setRealisations((p) => p.filter((_, idx) => idx !== i)); }
   function updateRealisation(i: number, v: string) { setRealisations((p) => p.map((o, idx) => (idx === i ? v : o))); }
 
-  function addAgendaItem() { setAgenda((p) => [...p, { date: "", titre: "", description: "" }]); }
+  function addProjet() { setProjetsEnCours((p) => [...p, ""]); }
+  function removeProjet(i: number) { setProjetsEnCours((p) => p.filter((_, idx) => idx !== i)); }
+  function updateProjet(i: number, v: string) { setProjetsEnCours((p) => p.map((o, idx) => (idx === i ? v : o))); }
+
+  function addAgendaItem() { setAgenda((p) => [...p, { date: "", titre: "", description: "", statut: "en_cours" }]); }
   function removeAgendaItem(i: number) { setAgenda((p) => p.filter((_, idx) => idx !== i)); }
-  function updateAgendaItem(i: number, field: "date" | "titre" | "description", v: string) {
-    setAgenda((p) => p.map((item, idx) => (idx === i ? { ...item, [field]: v } : item)));
+  function updateAgendaItem(i: number, patch: Partial<AgendaItem>) {
+    setAgenda((p) => p.map((item, idx) => (idx === i ? { ...item, ...patch } : item)));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -93,8 +112,8 @@ export default function AdminModifierPolePage() {
     try {
       const filteredObjectifs = objectifs.filter((o) => o.trim());
       const filteredObjAnnuels = objectifsAnnuels.filter((o) => o.trim());
-      const filteredRegions = regionsInfluence.filter((o) => o.trim());
       const filteredRealisations = realisations.filter((o) => o.trim());
+      const filteredProjets = projetsEnCours.filter((o) => o.trim());
       const filteredAgenda = agenda.filter((a) => a.titre.trim() || a.date.trim());
       const formData = new FormData();
       formData.append("name", name.trim());
@@ -102,9 +121,8 @@ export default function AdminModifierPolePage() {
       formData.append("is_active", String(isActive));
       formData.append("objectifs", filteredObjectifs.length > 0 ? JSON.stringify(filteredObjectifs) : "");
       formData.append("objectifs_annuels", filteredObjAnnuels.length > 0 ? JSON.stringify(filteredObjAnnuels) : "");
-      formData.append("nb_osc_membres", nbOscMembres.trim());
-      formData.append("regions_influence", filteredRegions.length > 0 ? JSON.stringify(filteredRegions) : "");
       formData.append("realisations", filteredRealisations.length > 0 ? JSON.stringify(filteredRealisations) : "");
+      formData.append("projets_en_cours", filteredProjets.length > 0 ? JSON.stringify(filteredProjets) : "");
       formData.append("agenda", filteredAgenda.length > 0 ? JSON.stringify(filteredAgenda) : "");
       if (image) formData.append("image", image);
 
@@ -117,8 +135,8 @@ export default function AdminModifierPolePage() {
         throw new Error(data.detail || "Erreur lors de la mise à jour.");
       }
       router.push("/admin/forum/poles");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur lors de la mise à jour.");
     } finally {
       setSubmitting(false);
     }
@@ -276,43 +294,9 @@ export default function AdminModifierPolePage() {
             </div>
           </div>
 
-          {/* Nombre d'OSC membres */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre d&apos;OSC membres</label>
-            <input
-              type="number"
-              min="0"
-              value={nbOscMembres}
-              onChange={(e) => setNbOscMembres(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
-              placeholder="Ex: 12"
-            />
-          </div>
-
-          {/* Régions d'influence */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Régions d&apos;influence</label>
-            <div className="space-y-2">
-              {regionsInfluence.map((r, i) => (
-                <div key={i} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={r}
-                    onChange={(e) => updateRegion(i, e.target.value)}
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
-                    placeholder={`Région ${i + 1}...`}
-                  />
-                  {regionsInfluence.length > 1 && (
-                    <button type="button" onClick={() => removeRegion(i)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button type="button" onClick={addRegion} className="flex items-center gap-1 text-sm text-[#E05017] hover:underline mt-1">
-                <Plus className="w-4 h-4" /> Ajouter une région
-              </button>
-            </div>
+          {/* Données dynamiques */}
+          <div className="rounded-lg border border-[#2a591d]/20 bg-[#2a591d]/5 p-4 text-sm text-gray-700">
+            Le nombre d&apos;OSC membres, les membres actifs et les régions d&apos;influence sont calculés automatiquement à partir des OSC rattachées à ce pôle.
           </div>
 
           {/* Réalisations */}
@@ -341,6 +325,32 @@ export default function AdminModifierPolePage() {
             </div>
           </div>
 
+          {/* Projets en cours */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Nos projets en cours</label>
+            <div className="space-y-2">
+              {projetsEnCours.map((projet, i) => (
+                <div key={i} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={projet}
+                    onChange={(e) => updateProjet(i, e.target.value)}
+                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+                    placeholder={`Projet ${i + 1}...`}
+                  />
+                  {projetsEnCours.length > 1 && (
+                    <button type="button" onClick={() => removeProjet(i)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button type="button" onClick={addProjet} className="flex items-center gap-1 text-sm text-[#E05017] hover:underline mt-1">
+                <Plus className="w-4 h-4" /> Ajouter un projet
+              </button>
+            </div>
+          </div>
+
           {/* Agenda */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Agenda</label>
@@ -355,19 +365,28 @@ export default function AdminModifierPolePage() {
                   <input
                     type="date"
                     value={item.date}
-                    onChange={(e) => updateAgendaItem(i, "date", e.target.value)}
+                    onChange={(e) => updateAgendaItem(i, { date: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
                   />
+                  <select
+                    value={item.statut}
+                    onChange={(e) => updateAgendaItem(i, { statut: e.target.value as AgendaStatus })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+                  >
+                    {AGENDA_STATUS_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
                   <input
                     type="text"
                     value={item.titre}
-                    onChange={(e) => updateAgendaItem(i, "titre", e.target.value)}
+                    onChange={(e) => updateAgendaItem(i, { titre: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
                     placeholder="Titre de l'événement..."
                   />
                   <textarea
                     value={item.description}
-                    onChange={(e) => updateAgendaItem(i, "description", e.target.value)}
+                    onChange={(e) => updateAgendaItem(i, { description: e.target.value })}
                     rows={2}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
                     placeholder="Description (optionnel)..."

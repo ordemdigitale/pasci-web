@@ -18,6 +18,22 @@ const FORMALISATION_OPTIONS = [
   { value: "journal_officiel", label: "Déclaration Journal Officiel de la République de Côte d'Ivoire" },
 ];
 
+const SORT_OPTIONS = [
+  { value: "name", label: "Nom" },
+  { value: "region_nom", label: "Région" },
+  { value: "departement", label: "Département" },
+  { value: "sous_prefecture", label: "Sous-préfecture" },
+  { value: "categorie", label: "Catégorie d'organisation" },
+  { value: "niveau_regroupement", label: "Niveau de regroupement" },
+  { value: "domaine_prioritaire", label: "1er domaine prioritaire" },
+  { value: "domaine_prioritaire_2", label: "2ème domaine prioritaire" },
+  { value: "domaine_prioritaire_3", label: "3ème domaine prioritaire" },
+  { value: "domaine_prioritaire_4", label: "4ème domaine prioritaire" },
+  { value: "domaine_prioritaire_5", label: "5ème domaine prioritaire" },
+  { value: "type_document_formalisation", label: "Type de document de formalisation" },
+  { value: "document_formalisation", label: "Justificatif de formalisation" },
+];
+
 const formalisationLabel = (value?: string | null) =>
   FORMALISATION_OPTIONS.find((option) => option.value === value)?.label || "—";
 
@@ -206,9 +222,9 @@ export default function AdminOscPage() {
               onChange={(event) => { setSortBy(event.target.value); setPage(1); }}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
             >
-              <option value="name">Nom</option>
-              <option value="type_document_formalisation">Type de document de formalisation</option>
-              <option value="document_formalisation">Justificatif de formalisation</option>
+              {SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
             </select>
           </label>
 

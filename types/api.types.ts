@@ -173,6 +173,7 @@ export interface IEvenement {
   date_debut: string;
   date_fin?: string | null;
   lieu?: string | null;
+  statut?: "realise" | "en_cours" | "non_realise";
   crasc_id?: number | null;
   created_at?: string;
 }
@@ -360,8 +361,10 @@ export interface IPoleConcertation {
   objectifs_list?: string[];
   objectifs_annuels?: string;
   nb_osc_membres?: number;
+  nb_membres_actifs?: number;
   regions_influence?: string;
   realisations?: string;
+  projets_en_cours?: string;
   agenda?: string;
   is_active: boolean;
   sujets_count: number;
@@ -395,6 +398,32 @@ export interface IForumCommentaire {
 
 export interface IForumSujetDetail extends IForumSujet {
   commentaires: IForumCommentaire[];
+}
+
+export type ForumSondageStatus = "ouvert" | "ferme";
+export type ForumSondageResultsVisibility = "always" | "after_vote" | "after_close";
+
+export interface IForumSondageOption {
+  id: number;
+  label: string;
+  ordre: number;
+  votes_count: number;
+  percentage: number;
+}
+
+export interface IForumSondage {
+  id: number;
+  pole_id: number;
+  question: string;
+  description?: string | null;
+  status: ForumSondageStatus;
+  results_visibility: ForumSondageResultsVisibility;
+  closes_at?: string | null;
+  created_at: string;
+  total_votes: number;
+  user_vote_option_id?: number | null;
+  can_show_results: boolean;
+  options: IForumSondageOption[];
 }
 
 export interface IFaq {

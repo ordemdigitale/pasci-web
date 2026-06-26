@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { fetchAllCrasc, fetchCrascVideos, createCrascVideo, deleteCrascVideo } from "@/lib/fetch-crasc";
+import { fetchAllCrasc, fetchCrascVideos, createCrascVideo, updateCrascVideo, deleteCrascVideo } from "@/lib/fetch-crasc";
 import { getToken } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { ICrasc, ICrascVideo } from "@/types/api.types";
@@ -10,6 +10,8 @@ import {
   Video,
   Plus,
   Trash2,
+  Pencil,
+  Check,
   ArrowLeft,
   Loader2,
   AlertCircle,
@@ -51,6 +53,9 @@ export default function AdminCrascVideosPage() {
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ titre: "", url: "", description: "", ordre: "0" });
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState({ titre: "", url: "", description: "", ordre: "0" });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (lockToCrasc && user?.crasc_id) {
@@ -115,6 +120,35 @@ export default function AdminCrascVideosPage() {
       setError(e.message);
     } finally {
       setDeleting(null);
+    }
+  }
+
+  function startEdit(video: ICrascVideo) {
+    setEditingId(video.id);
+    setEditForm({ titre: video.titre, url: video.url, description: video.description || "", ordre: String(video.ordre) });
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+  }
+
+  async function handleSaveEdit(id: number) {
+    const token = getToken();
+    if (!token) return setError("Non authentifié.");
+    setSaving(true);
+    try {
+      const updated = await updateCrascVideo(id, {
+        titre: editForm.titre,
+        url: editForm.url,
+        description: editForm.description || undefined,
+        ordre: parseInt(editForm.ordre) || 0,
+      }, token);
+      setVideos((prev) => prev.map((v) => v.id === id ? updated : v).sort((a, b) => a.ordre - b.ordre));
+      setEditingId(null);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -285,54 +319,120 @@ export default function AdminCrascVideosPage() {
             <div className="space-y-4">
               {videos.map((video) => {
                 const embedUrl = getEmbedUrl(video.url);
+                const isEditing = editingId === video.id;
                 return (
                   <div key={video.id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div className="flex gap-4 p-4">
-                      {/* Thumbnail or embed preview */}
-                      <div className="flex-shrink-0 w-32 h-20 rounded-lg overflow-hidden bg-gray-100">
-                        {embedUrl ? (
-                          <iframe
-                            src={embedUrl}
-                            className="w-full h-full"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Video className="w-8 h-8 text-gray-400" />
+                    {isEditing ? (
+                      /* ── Formulaire d'édition inline ── */
+                      <div className="p-4 space-y-3">
+                        <div className="grid sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">Titre</label>
+                            <input
+                              type="text"
+                              value={editForm.titre}
+                              onChange={(e) => setEditForm({ ...editForm, titre: e.target.value })}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
+                            />
                           </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-gray-900 line-clamp-1">{video.titre}</p>
-                        {video.description && (
-                          <p className="text-sm text-gray-500 line-clamp-2 mt-0.5">{video.description}</p>
-                        )}
-                        <div className="flex items-center gap-3 mt-2">
-                          <span className="text-xs text-gray-400">Ordre : {video.ordre}</span>
-                          <a
-                            href={video.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700"
+                          <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">Ordre</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={editForm.ordre}
+                              onChange={(e) => setEditForm({ ...editForm, ordre: e.target.value })}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-600 mb-1">URL</label>
+                          <input
+                            type="url"
+                            value={editForm.url}
+                            onChange={(e) => setEditForm({ ...editForm, url: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
+                          <textarea
+                            rows={2}
+                            value={editForm.description}
+                            onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2A591D] resize-none"
+                          />
+                        </div>
+                        <div className="flex justify-end gap-2 pt-1">
+                          <button
+                            onClick={cancelEdit}
+                            className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                           >
-                            <ExternalLink className="w-3 h-3" />
-                            Voir la vidéo
-                          </a>
+                            Annuler
+                          </button>
+                          <button
+                            onClick={() => handleSaveEdit(video.id)}
+                            disabled={saving}
+                            className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-[#2A591D] rounded-lg hover:bg-[#3d7a28] disabled:opacity-50 transition-colors"
+                          >
+                            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                            Enregistrer
+                          </button>
                         </div>
                       </div>
-                      <button
-                        onClick={() => handleDelete(video.id)}
-                        disabled={deleting === video.id}
-                        className="flex-shrink-0 p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
-                      >
-                        {deleting === video.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                      </button>
-                    </div>
+                    ) : (
+                      /* ── Affichage normal ── */
+                      <div className="flex gap-4 p-4">
+                        <div className="flex-shrink-0 w-32 h-20 rounded-lg overflow-hidden bg-gray-100">
+                          {embedUrl ? (
+                            <iframe
+                              src={embedUrl}
+                              className="w-full h-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Video className="w-8 h-8 text-gray-400" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-gray-900 line-clamp-1">{video.titre}</p>
+                          {video.description && (
+                            <p className="text-sm text-gray-500 line-clamp-2 mt-0.5">{video.description}</p>
+                          )}
+                          <div className="flex items-center gap-3 mt-2">
+                            <span className="text-xs text-gray-400">Ordre : {video.ordre}</span>
+                            <a
+                              href={video.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              Voir la vidéo
+                            </a>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => startEdit(video)}
+                            className="p-2 rounded-lg text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(video.id)}
+                            disabled={deleting === video.id}
+                            className="p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
+                          >
+                            {deleting === video.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}

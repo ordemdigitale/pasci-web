@@ -63,6 +63,8 @@ export default function AdminSidebar({
           fetchWithAuth(`${API_BASE}/api/v1/jobs/admin/en-attente`),
           fetchWithAuth(`${API_BASE}/api/v1/formations/admin/en-attente`),
           fetchWithAuth(`${API_BASE}/api/v1/offre-projets/admin/en-attente`),
+          fetchWithAuth(`${API_BASE}/api/v1/crasc/video/admin/en-attente`),
+          fetchWithAuth(`${API_BASE}/api/v1/crasc/osc-modification-requests/en-attente`),
         ]);
         let count = 0;
         for (const r of results) {
@@ -180,7 +182,7 @@ export default function AdminSidebar({
       })
     : isRedacteurCrasc
     ? allNavItems
-        .filter((item) => item.href === "/admin" || item.label === "Contenu" || item.href === "/admin/gestion-des-crasc/videos")
+        .filter((item) => item.href === "/admin" || item.label === "Contenu" || item.href === "/admin/gestion-des-crasc/videos" || item.href === "/admin/gestion-des-crasc/agenda")
         .map((item) => {
           if (item.label === "Contenu" && item.submenus) {
             return {

@@ -46,7 +46,7 @@ export default function AnnuaireCrascHeader() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <p className="text-[#2a591d] font-bold text-4xl text-center pb-[50px]">Annuaire des CRASC</p>
+      <p className="text-[#2a591d] font-bold text-4xl text-center pb-[50px]">Annuaire des OSC</p>
       {/* Tabs for navigation between CRASC regions */}
       <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
         {menuItems.map((menuItem) => (

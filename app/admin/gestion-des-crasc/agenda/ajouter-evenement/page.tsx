@@ -20,6 +20,14 @@ import {
   ChevronDown,
 } from "lucide-react";
 
+type EventStatus = "realise" | "en_cours" | "non_realise";
+
+const EVENT_STATUS_OPTIONS: { value: EventStatus; label: string }[] = [
+  { value: "realise", label: "Réalisé" },
+  { value: "en_cours", label: "En cours" },
+  { value: "non_realise", label: "Non réalisé" },
+];
+
 function AjouterEvenementForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -40,6 +48,7 @@ function AjouterEvenementForm() {
     date_debut: "",
     date_fin: "",
     lieu: "",
+    statut: "en_cours" as EventStatus,
     crasc_id: preselectedCrascId,
   });
 
@@ -50,6 +59,10 @@ function AjouterEvenementForm() {
   }, [isCrascAdmin]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    if (e.target.name === "statut") {
+      setForm((prev) => ({ ...prev, statut: e.target.value as EventStatus }));
+      return;
+    }
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
@@ -71,14 +84,15 @@ function AjouterEvenementForm() {
           date_debut: new Date(form.date_debut).toISOString(),
           date_fin: form.date_fin ? new Date(form.date_fin).toISOString() : undefined,
           lieu: form.lieu.trim() || undefined,
+          statut: form.statut,
           crasc_id: form.crasc_id ? parseInt(form.crasc_id) : undefined,
         },
         token
       );
       setSuccess("Événement ajouté avec succès !");
       setTimeout(() => router.push("/admin/gestion-des-crasc/agenda"), 1500);
-    } catch (err: any) {
-      setError(err.message || "Une erreur est survenue.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
       setLoading(false);
     }
@@ -94,7 +108,7 @@ function AjouterEvenementForm() {
           </div>
           <div>
             <h1 className="text-3xl font-bold">Ajouter un événement</h1>
-            <p className="text-white/80 mt-1">Créez un événement dans l'agenda du CRASC</p>
+            <p className="text-white/80 mt-1">Créez un événement dans l&apos;agenda du CRASC</p>
           </div>
         </div>
         <Link
@@ -102,7 +116,7 @@ function AjouterEvenementForm() {
           className="inline-flex items-center gap-2 text-sm text-white/90 hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Retour à l'agenda
+          Retour à l&apos;agenda
         </Link>
       </div>
 
@@ -154,6 +168,23 @@ function AjouterEvenementForm() {
               placeholder="Décrivez brièvement l'événement..."
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all resize-none"
             />
+          </div>
+
+          <div className="mt-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Statut</label>
+            <div className="relative">
+              <select
+                name="statut"
+                value={form.statut}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent appearance-none transition-all"
+              >
+                {EVENT_STATUS_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+            </div>
           </div>
         </div>
 
@@ -258,7 +289,7 @@ function AjouterEvenementForm() {
             ) : (
               <>
                 <Check className="w-5 h-5" />
-                Ajouter l'événement
+                Ajouter l&apos;événement
               </>
             )}
           </button>

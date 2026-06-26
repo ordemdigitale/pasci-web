@@ -5,11 +5,42 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback"
-import Link from "next/link";
 //import SvgComponent from "../ui/svgComponent";
 import { CrascMapSvg } from "../ui/CrascMapSvg";
 
-const FALLBACK_SLIDES = [
+interface HeroSlide {
+  imageUrl: string;
+  title?: string | null;
+  description?: string | null;
+}
+
+const FALLBACK_TITLE = "Centre Régional d'Appui à la Société Civile (CRASC)";
+const FALLBACK_DESC = "Cette Plateforme digitale est la résultante d'une démarche alliant à la fois, inclusivité, représentativité, accessibilité et pérennité. Multifonctionnelle et dynamique, elle vise à accroître la visibilité des OSC, la synergie d'action, le partage d'expérience et la professionnalisation.";
+
+const DEFAULT_SLIDE_TEXTS = [
+  {
+    title: FALLBACK_TITLE,
+    description: FALLBACK_DESC,
+  },
+  {
+    title: "Renforcer la visibilité des OSC",
+    description: "Valorisez les initiatives, les expériences et les actions portées par les organisations de la société civile.",
+  },
+  {
+    title: "Partager les opportunités",
+    description: "Retrouvez les informations utiles pour les formations, appels à projets, emplois et activités des CRASC.",
+  },
+  {
+    title: "Créer une synergie d'action",
+    description: "Facilitez la collaboration entre OSC, CRASC et partenaires pour des actions mieux coordonnées.",
+  },
+  {
+    title: "Découvrir les CRASC",
+    description: "Identifiez les centres régionaux et les organisations qui agissent dans chaque zone.",
+  },
+];
+
+const FALLBACK_IMAGE_URLS = [
   "/images/de715dfa-b501-4ea4-9532-9d32d85c10e0.png",
   "/images/actualites/13bf15a5-0f87-415a-a05d-e3775879560d.jpg",
   "/images/actualites/359a7b7d-c126-4fdf-934d-9038c01df7e0.jpg",
@@ -17,14 +48,16 @@ const FALLBACK_SLIDES = [
   "/images/page-annuaire-crasc/09d92f51-b85c-4581-be51-d5333472e74d.jpg",
 ];
 
-const FALLBACK_TITLE = "Centre Régional d'Appui à la Société Civile (CRASC)";
-const FALLBACK_DESC = "Cette Plateforme digitale est la résultante d'une démarche alliant à la fois, inclusivité, représentativité, accessibilité et pérennité. Multifonctionnelle et dynamique, elle vise à accroître la visibilité des OSC, la synergie d'action, le partage d'expérience et la professionnalisation.";
+const FALLBACK_SLIDES = FALLBACK_IMAGE_URLS.map((imageUrl, index) => ({
+  imageUrl,
+  ...DEFAULT_SLIDE_TEXTS[index],
+})) satisfies HeroSlide[];
 
 export default function SectionHero() {
   const router = useRouter();
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [slides, setSlides] = useState<string[]>(FALLBACK_SLIDES);
+  const [slides, setSlides] = useState<HeroSlide[]>(FALLBACK_SLIDES);
   const [heroTitle, setHeroTitle] = useState(FALLBACK_TITLE);
   const [heroDesc, setHeroDesc] = useState(FALLBACK_DESC);
 
@@ -34,7 +67,14 @@ export default function SectionHero() {
       .then((r) => r.ok ? r.json() : [])
       .then((data) => {
         if (Array.isArray(data) && data.length > 0)
-          setSlides(data.map((s: { image_url: string }) => s.image_url));
+          setSlides(data.map((s: { image_url: string; title?: string | null; description?: string | null }, index) => {
+            const fallbackText = DEFAULT_SLIDE_TEXTS[index % DEFAULT_SLIDE_TEXTS.length];
+            return {
+              imageUrl: s.image_url,
+              title: s.title || fallbackText.title,
+              description: s.description || fallbackText.description,
+            };
+          }));
       })
       .catch(() => {});
 
@@ -60,6 +100,10 @@ export default function SectionHero() {
     router.push("/a-propos")
   }
 
+  const currentSlide = slides[current] ?? FALLBACK_SLIDES[0];
+  const currentTitle = currentSlide.title || heroTitle;
+  const currentDescription = currentSlide.description || heroDesc;
+
   return (
     <section className="py-8 font-poppins">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -70,7 +114,7 @@ export default function SectionHero() {
           <div className="space-y-6">
             {/* Left side Title */}
             <h2 className="text-gray-900 text-center font-bold">
-              {heroTitle}
+              {currentTitle}
             </h2>
 
             {/* Left side card */}
@@ -83,12 +127,12 @@ export default function SectionHero() {
                 onMouseEnter={() => setPaused(true)}
                 onMouseLeave={() => setPaused(false)}
               >
-                {slides.map((src, i) => (
+                {slides.map((slide, i) => (
                   <div
-                    key={i}
+                    key={`${slide.imageUrl}-${i}`}
                     className={`absolute inset-0 transition-opacity duration-700 ${i === current ? "opacity-100 z-10" : "opacity-0 z-0"}`}
                   >
-                    <ImageWithFallback alt="card-image" src={src} className="w-full h-full object-cover" />
+                    <ImageWithFallback alt={slide.title || "Slide CRASC"} src={slide.imageUrl} className="w-full h-full object-cover" />
                   </div>
                 ))}
                 {/* Prev */}
@@ -123,7 +167,7 @@ export default function SectionHero() {
               {/* Content */}
               <div className="px-6 pb-6 flex flex-col">
                 <p className="text-gray-600 text-sm mb-4">
-                  {heroDesc}
+                  {currentDescription}
                 </p>
                 <Button 
                   variant="outline" 

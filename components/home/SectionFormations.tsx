@@ -15,7 +15,24 @@ interface Formation {
   type?: string;
 }
 
-const DEFAULT_FORMATION_IMAGE = "/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg";
+const FALLBACK_FORMATION_IMAGES = [
+  "/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg",
+  "/images/page-formation/0b84a30a040801f8886da2a298f7333b7d390fa11d6ff0950895cc6356a72b41.png",
+  "/images/page-formation/325089b925013d8e1c19e49d60c060af5b15d40202bdaef5187ed1e44c67cedc.png",
+  "/images/page-formation/387d668c67b16d2201d39b5519f434cd019a4cdab4c7fd9f99c3456c0d6d40ec.png",
+  "/images/page-formation/423dccc165037227487e63cd4a3c3daac3c77689b23dab692da976de13b1cc9f.png",
+  "/images/page-formation/506ee6b1647fb568e2b4112507471561d4c817eec4dd9fb76a49a7473b19b4f5.png",
+];
+
+function getFormationImage(formation: Formation, index: number) {
+  if (formation.thumbnail_url && !formation.thumbnail_url.endsWith("/default.png")) {
+    return formation.thumbnail_url;
+  }
+
+  const key = formation.slug || formation.title || String(index);
+  const hash = Array.from(key).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  return FALLBACK_FORMATION_IMAGES[hash % FALLBACK_FORMATION_IMAGES.length];
+}
 
 export default function SectionFormations() {
   const [formations, setFormations] = useState<Formation[]>([]);
@@ -104,7 +121,7 @@ export default function SectionFormations() {
                 className="flex transition-transform duration-500 ease-in-out"
                 style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
               >
-                {formations.map((formation) => (
+                {formations.map((formation, index) => (
                   <div
                     key={formation.id}
                     className="flex-shrink-0 px-3"
@@ -113,7 +130,7 @@ export default function SectionFormations() {
                     <div className="group bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-[#E05017]/30 transition-all duration-300 hover:shadow-xl h-full">
                       <div className="relative h-48 overflow-hidden">
                         <ImageWithFallback
-                          src={formation.thumbnail_url || DEFAULT_FORMATION_IMAGE}
+                          src={getFormationImage(formation, index)}
                           alt={formation.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />

@@ -15,6 +15,7 @@ import {
   FORMALISATION_FILE_MAX_SIZE,
   isFormalisationFileAccepted,
 } from "@/lib/formalisation-file";
+import { DOMAINE_PRIORITAIRE_OPTIONS } from "@/lib/osc-domaines";
 import Image from "next/image";
 import {
   ArrowLeft, Building2, FileText, Upload, X, Check, Loader2,
@@ -808,7 +809,11 @@ export default function ModifierOscPage() {
               ["domaine_prioritaire_5", "5ème domaine prioritaire"],
             ].map(([field, label]) => (
               <Field key={field} label={label}>
-                <input {...register(field as keyof OscForm)} className={inputCls} />
+                <SelectField
+                  name={field as keyof OscForm}
+                  placeholder="Sélectionner un domaine"
+                  options={DOMAINE_PRIORITAIRE_OPTIONS}
+                />
               </Field>
             ))}
           </div>

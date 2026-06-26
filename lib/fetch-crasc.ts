@@ -241,7 +241,7 @@ export async function fetchEvenements(crasc_id?: number, a_venir = true): Promis
 
 // Create an event (requires auth token)
 export async function createEvenement(
-  data: { title: string; description?: string; date_debut: string; date_fin?: string; lieu?: string; crasc_id?: number },
+  data: { title: string; description?: string; date_debut: string; date_fin?: string; lieu?: string; statut?: string; crasc_id?: number },
   token: string
 ): Promise<IEvenement> {
   const response = await fetch(`${API_BASE_URL}/api/v1/crasc/evenement`, {
@@ -259,7 +259,7 @@ export async function createEvenement(
 // Update an event (requires auth token)
 export async function updateEvenement(
   id: number,
-  data: { title?: string; description?: string; date_debut?: string; date_fin?: string; lieu?: string; crasc_id?: number },
+  data: { title?: string; description?: string; date_debut?: string; date_fin?: string; lieu?: string; statut?: string; crasc_id?: number },
   token: string
 ): Promise<IEvenement> {
   const response = await fetch(`${API_BASE_URL}/api/v1/crasc/evenement/${id}`, {
@@ -308,6 +308,24 @@ export async function createCrascVideo(
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
     throw new Error(err.detail || "Échec de l'ajout de la vidéo");
+  }
+  return response.json();
+}
+
+// Update a CRASC video (requires auth token)
+export async function updateCrascVideo(
+  id: number,
+  data: { titre?: string; url?: string; description?: string; ordre?: number },
+  token: string
+): Promise<ICrascVideo> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/video/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || "Échec de la mise à jour de la vidéo");
   }
   return response.json();
 }

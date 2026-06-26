@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { fetchWithAuth } from "@/lib/auth";
-import { CheckCircle, XCircle, Loader2, Newspaper, Briefcase, BookOpen, FolderOpen, AlertCircle, Eye } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Newspaper, Briefcase, BookOpen, FolderOpen, AlertCircle, Eye, Building2 } from "lucide-react";
 import Link from "next/link";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -13,16 +13,47 @@ interface ItemEnAttente {
   title?: string;
   nom?: string;
   created_at: string;
-  type: "actualite" | "emploi" | "formation" | "projet" | "video";
+  type: "actualite" | "emploi" | "formation" | "projet" | "video" | "osc_modification";
+  changes?: Record<string, unknown>;
 }
 
 const TYPE_CONFIG = {
-  actualite:  { label: "Actualité",       icon: Newspaper,  color: "text-blue-600",   bg: "bg-blue-50",  border: "border-blue-200", adminPath: "/admin/actualites" },
-  emploi:     { label: "Offre d'emploi",  icon: Briefcase,  color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200", adminPath: "/admin/emplois" },
-  formation:  { label: "Formation",       icon: BookOpen,   color: "text-green-600",  bg: "bg-green-50",  border: "border-green-200", adminPath: "/admin/formations" },
-  projet:     { label: "Offre de projet", icon: FolderOpen, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", adminPath: "/admin/projets" },
-  video:      { label: "Vidéo CRASC",     icon: CheckCircle, color: "text-teal-600",  bg: "bg-teal-50",  border: "border-teal-200",  adminPath: "/admin/gestion-des-crasc/videos" },
+  actualite:  { label: "Actualité",       icon: Newspaper,  color: "text-blue-600",   bg: "bg-blue-50",  border: "border-blue-200", adminPath: "/admin/gestion-des-actualites", pathSuffix: "/modifier" },
+  emploi:     { label: "Offre d'emploi",  icon: Briefcase,  color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200", adminPath: "/admin/emplois", pathSuffix: "" },
+  formation:  { label: "Formation",       icon: BookOpen,   color: "text-green-600",  bg: "bg-green-50",  border: "border-green-200", adminPath: "/admin/formations", pathSuffix: "" },
+  projet:     { label: "Offre de projet", icon: FolderOpen, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", adminPath: "/admin/projets", pathSuffix: "" },
+  video:      { label: "Vidéo CRASC",     icon: CheckCircle, color: "text-teal-600",  bg: "bg-teal-50",  border: "border-teal-200",  adminPath: "/admin/gestion-des-crasc/videos", pathSuffix: "" },
+  osc_modification: { label: "Modification OSC", icon: Building2, color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", adminPath: "/admin/gestion-des-crasc/osc", pathSuffix: "" },
 };
+
+const FIELD_LABELS: Record<string, string> = {
+  name: "Nom",
+  sigle: "Sigle",
+  description: "Description",
+  thumbnail_path: "Logo / image",
+  type_id: "Type d'OSC",
+  email: "Email",
+  phone: "Téléphone",
+  region_nom: "Région",
+  departement: "Département",
+  sous_prefecture: "Sous-préfecture",
+  ville: "Ville",
+  address: "Adresse",
+  type_document_formalisation: "Type de document de formalisation",
+  document_formalisation_path: "Justificatif de formalisation",
+  existence_siege: "Existence d'un siège",
+  manuel_procedures: "Manuel de procédures",
+  plan_action: "Plan d'action",
+  plan_action_document_path: "Preuve du plan d'action",
+  rapports_annuels: "Rapports annuels",
+  rapports_annuels_document_path: "Preuve des rapports annuels",
+  adhesion_crasc_statut: "Adhésion au CRASC",
+  adhesion_crasc_document_path: "Preuve d'adhésion au CRASC",
+};
+
+function fieldLabel(field: string) {
+  return FIELD_LABELS[field] || field.replaceAll("_", " ");
+}
 
 export default function AdminModerationPage() {
   const [items, setItems] = useState<ItemEnAttente[]>([]);
@@ -32,12 +63,13 @@ export default function AdminModerationPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [newsRes, jobsRes, formRes, projRes, videoRes] = await Promise.allSettled([
+      const [newsRes, jobsRes, formRes, projRes, videoRes, oscRes] = await Promise.allSettled([
         fetchWithAuth(`${API_BASE}/api/v1/news/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/jobs/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/formations/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/offre-projets/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/crasc/video/admin/en-attente`),
+        fetchWithAuth(`${API_BASE}/api/v1/crasc/osc-modification-requests/en-attente`),
       ]);
 
       const parse = async (r: PromiseSettledResult<Response>, type: ItemEnAttente["type"]) => {
@@ -45,10 +77,11 @@ export default function AdminModerationPage() {
         const data = await r.value.json();
         return (Array.isArray(data) ? data : []).map((d: Record<string, unknown>) => ({
           id: d.id as number | string,
-          slug: (d.slug as string) ?? String(d.id),
-          title: (d.title as string) || (d.nom as string) || (d.titre as string),
+          slug: (d.osc_slug as string) || (d.slug as string) || String(d.id),
+          title: (d.osc_name as string) || (d.title as string) || (d.nom as string) || (d.titre as string),
           created_at: d.created_at as string,
           type,
+          changes: d.changes as Record<string, unknown> | undefined,
         }));
       };
 
@@ -58,6 +91,11 @@ export default function AdminModerationPage() {
         ...(await parse(formRes, "formation")),
         ...(await parse(projRes, "projet")),
         ...(await parse(videoRes, "video")),
+        ...(await parse(oscRes, "osc_modification")).map((item) => ({
+          ...item,
+          slug: item.slug,
+          title: item.title ? `Modification de ${item.title}` : "Modification OSC",
+        })),
       ];
 
       all.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
@@ -79,9 +117,10 @@ export default function AdminModerationPage() {
         formation: `${API_BASE}/api/v1/formations/${item.slug}/valider?action=${action}`,
         projet:    `${API_BASE}/api/v1/offre-projets/${item.slug}/valider?action=${action}`,
         video:     `${API_BASE}/api/v1/crasc/video/${item.id}/valider?action=${action}`,
+        osc_modification: `${API_BASE}/api/v1/crasc/osc-modification-requests/${item.id}/review?action=${action === "publie" ? "approuvee" : "rejetee"}`,
       };
       await fetchWithAuth(urlMap[item.type], { method: "PATCH" });
-      setItems((prev) => prev.filter((i) => !(i.slug === item.slug && i.type === item.type)));
+      setItems((prev) => prev.filter((i) => !(i.id === item.id && i.type === item.type)));
     } finally {
       setActionId(null);
     }
@@ -142,19 +181,32 @@ export default function AdminModerationPage() {
                       </span>
                       Soumis le {new Date(item.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                     </p>
+                    {item.type === "osc_modification" && item.changes && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        <p>
+                          {Object.keys(item.changes).length} champ{Object.keys(item.changes).length > 1 ? "s" : ""} soumis à validation
+                        </p>
+                        <p className="truncate">
+                          {Object.keys(item.changes).slice(0, 6).map(fieldLabel).join(", ")}
+                          {Object.keys(item.changes).length > 6 ? "..." : ""}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <Link
-                      href={`${cfg.adminPath}/${item.slug}`}
-                      target="_blank"
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 border border-gray-200 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors"
-                      title="Ouvrir le contenu"
-                    >
-                      <Eye className="w-4 h-4" />
-                      Voir
-                    </Link>
+                    {item.slug && (
+                      <Link
+                        href={`${cfg.adminPath}/${item.slug}${cfg.pathSuffix}`}
+                        target="_blank"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 border border-gray-200 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                        title="Ouvrir le contenu"
+                      >
+                        <Eye className="w-4 h-4" />
+                        Voir
+                      </Link>
+                    )}
                     <button
                       onClick={() => handleAction(item, "publie")}
                       disabled={busy}
