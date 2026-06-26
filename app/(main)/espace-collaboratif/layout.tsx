@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://plateforme-osci.org/espace-collaboratif" },
   openGraph: {
-    title: "Espace Collaboratif — Emploi & Concertation OSC | PDOC",
+    title: "Espace Collaboratif — Emploi & Concertation OSC | PdoC",
     description: "Offres d'emploi et pôles de concertation pour les OSC de Côte d'Ivoire.",
     url: "https://plateforme-osci.org/espace-collaboratif",
   },

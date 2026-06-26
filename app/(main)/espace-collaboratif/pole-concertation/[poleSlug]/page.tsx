@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { API_ENDPOINTS } from "@/lib/api-config";
-import { IPoleConcertation, IForumSujet, IForumSondage } from "@/types/api.types";
+import { IPoleConcertation, IForumSujet, IForumSondage, IPoleMembre } from "@/types/api.types";
 import { getToken, fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -24,6 +24,7 @@ import {
   Briefcase,
   CalendarDays,
   Vote,
+  Search,
 } from "lucide-react";
 
 type AgendaStatus = "realise" | "en_cours" | "non_realise";
@@ -39,6 +40,14 @@ const AGENDA_STATUS_META: Record<AgendaStatus, { label: string; className: strin
   en_cours: { label: "En cours", className: "bg-blue-100 text-blue-700" },
   non_realise: { label: "Non réalisé", className: "bg-red-100 text-red-700" },
 };
+
+const MEMBER_TYPE_FILTERS = [
+  { label: "Tous", value: "all" },
+  { label: "Association", value: "Association" },
+  { label: "ONG", value: "ONG" },
+  { label: "Fondation", value: "Fondation" },
+  { label: "Organisation cultuelle", value: "Organisation cultuelle" },
+];
 
 function parseJsonList(raw?: string | null): string[] {
   try {
@@ -97,11 +106,15 @@ export default function PagePoleForum() {
   const [pole, setPole] = useState<IPoleConcertation | null>(null);
   const [sujets, setSujets] = useState<IForumSujet[]>([]);
   const [sondages, setSondages] = useState<IForumSondage[]>([]);
+  const [membres, setMembres] = useState<IPoleMembre[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState(true);
+  const [searchingSujets, setSearchingSujets] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [discussionSearch, setDiscussionSearch] = useState("");
+  const [memberTypeFilter, setMemberTypeFilter] = useState("all");
   const [submitting, setSubmitting] = useState(false);
   const [votingId, setVotingId] = useState<number | null>(null);
   const [error, setError] = useState("");
@@ -140,6 +153,10 @@ export default function PagePoleForum() {
         if (!r.ok) return [];
         return r.json();
       }),
+      fetch(API_ENDPOINTS.forum.membres(poleSlug)).then((r) => {
+        if (!r.ok) return [];
+        return r.json();
+      }),
       fetch(API_ENDPOINTS.forum.sondages(poleSlug), {
         headers: authToken ? { Authorization: `Bearer ${authToken}` } : undefined,
       }).then((r) => {
@@ -147,12 +164,13 @@ export default function PagePoleForum() {
         return r.json();
       }),
     ])
-      .then(([poleData, sujetsData, sondagesData]) => {
+      .then(([poleData, sujetsData, membresData, sondagesData]) => {
         // Vérifier que poleData est bien un objet avec un id (pas une erreur API)
         if (poleData && typeof poleData === "object" && poleData.id) {
           setPole(poleData);
         }
         setSujets(Array.isArray(sujetsData) ? sujetsData : []);
+        setMembres(Array.isArray(membresData) ? membresData : []);
         const parsedSondages = Array.isArray(sondagesData) ? sondagesData : [];
         setSondages(parsedSondages);
         setSelectedOptions(
@@ -166,6 +184,22 @@ export default function PagePoleForum() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [poleSlug]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      const params = new URLSearchParams();
+      const term = discussionSearch.trim();
+      if (term) params.set("search", term);
+      setSearchingSujets(true);
+      fetch(`${API_ENDPOINTS.forum.sujets(poleSlug)}?${params.toString()}`)
+        .then((r) => (r.ok ? r.json() : []))
+        .then((data) => setSujets(Array.isArray(data) ? data : []))
+        .catch(console.error)
+        .finally(() => setSearchingSujets(false));
+    }, 250);
+
+    return () => window.clearTimeout(timeout);
+  }, [poleSlug, discussionSearch]);
 
   async function handleCreateSujet(e: React.FormEvent) {
     e.preventDefault();
@@ -269,6 +303,11 @@ export default function PagePoleForum() {
   const agendaItems = parseAgenda(pole.agenda);
   const nbOscMembres = pole.nb_osc_membres ?? 0;
   const nbMembresActifs = pole.nb_membres_actifs ?? nbOscMembres;
+  const filteredMembres = membres.filter((membre) => {
+    if (memberTypeFilter === "all") return true;
+    const expected = memberTypeFilter.toLowerCase();
+    return [membre.type_name, membre.categorie].some((value) => (value || "").trim().toLowerCase() === expected);
+  });
   const userCanVoteInPole =
     !!user?.is_superuser ||
     !!user?.is_staff ||
@@ -306,6 +345,67 @@ export default function PagePoleForum() {
             <span><strong>{nbMembresActifs}</strong> membres actifs</span>
           </div>
         </div>
+      </div>
+
+      {/* Membres du pôle */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-[#E05017]" />
+            <h2 className="font-bold text-gray-800">Membres du pôle</h2>
+          </div>
+          <span className="text-sm text-gray-500">
+            {filteredMembres.length} / {membres.length} membre{membres.length !== 1 ? "s" : ""}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mb-4">
+          {MEMBER_TYPE_FILTERS.map((filter) => {
+            const active = memberTypeFilter === filter.value;
+            return (
+              <button
+                key={filter.value}
+                type="button"
+                onClick={() => setMemberTypeFilter(filter.value)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+                  active
+                    ? "bg-[#E05017] text-white border-[#E05017]"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-[#E05017]/50"
+                }`}
+              >
+                {filter.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {filteredMembres.length === 0 ? (
+          <p className="text-sm text-gray-400 py-4">Aucun membre trouvé pour ce filtre.</p>
+        ) : (
+          <div className="grid sm:grid-cols-2 gap-3">
+            {filteredMembres.map((membre) => {
+              const typeLabel = membre.type_name || membre.categorie || "Type non renseigné";
+              return (
+                <Link
+                  key={membre.id}
+                  href={membre.slug ? `/annuaire/annuaire-des-osc/${membre.slug}` : "#"}
+                  className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3 hover:border-[#E05017]/40 hover:bg-white transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-full bg-[#2a591d]/10 text-[#2a591d] flex items-center justify-center font-bold flex-shrink-0">
+                    {(membre.sigle || membre.name || "?").slice(0, 1).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm text-gray-900 truncate">{membre.name}</p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {typeLabel}
+                      {membre.region_nom ? ` · ${membre.region_nom}` : ""}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Objectifs annuels */}
@@ -556,43 +656,59 @@ export default function PagePoleForum() {
       )}
 
       {/* Header actions */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-bold text-gray-800">
-          {sujets.length} discussion{sujets.length !== 1 ? "s" : ""}
-        </h2>
-        {token ? (
-          (() => {
-            // OSC user who hasn't loaded their poles yet → loading state, allow
-            const oscRestricted = isOscUser && oscPoleIds !== null && pole && !oscPoleIds.includes(pole.id);
-            if (oscRestricted) {
+      <div className="mb-6">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-lg font-bold text-gray-800">
+            {sujets.length} discussion{sujets.length !== 1 ? "s" : ""}
+          </h2>
+          {token ? (
+            (() => {
+              // OSC user who hasn't loaded their poles yet → loading state, allow
+              const oscRestricted = isOscUser && oscPoleIds !== null && pole && !oscPoleIds.includes(pole.id);
+              if (oscRestricted) {
+                return (
+                  <div
+                    title="Ce pôle ne correspond pas à vos domaines prioritaires"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-400 rounded-full text-sm font-semibold cursor-not-allowed select-none"
+                  >
+                    <Lock className="w-4 h-4" />
+                    Accès non autorisé
+                  </div>
+                );
+              }
               return (
-                <div
-                  title="Ce pôle ne correspond pas à vos domaines prioritaires"
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-400 rounded-full text-sm font-semibold cursor-not-allowed select-none"
+                <button
+                  onClick={() => setShowForm(!showForm)}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-full text-sm font-semibold hover:bg-[#C54415] transition-colors"
                 >
-                  <Lock className="w-4 h-4" />
-                  Accès non autorisé
-                </div>
+                  {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                  {showForm ? "Annuler" : "Nouveau sujet"}
+                </button>
               );
-            }
-            return (
-              <button
-                onClick={() => setShowForm(!showForm)}
-                className="flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-full text-sm font-semibold hover:bg-[#C54415] transition-colors"
-              >
-                {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-                {showForm ? "Annuler" : "Nouveau sujet"}
-              </button>
-            );
-          })()
-        ) : (
-          <Link
-            href={`/auth/login?redirect=${encodeURIComponent(pathname)}`}
-            className="text-sm text-[#E05017] font-semibold hover:underline"
-          >
-            Se connecter pour participer
-          </Link>
-        )}
+            })()
+          ) : (
+            <Link
+              href={`/auth/login?redirect=${encodeURIComponent(pathname)}`}
+              className="text-sm text-[#E05017] font-semibold hover:underline"
+            >
+              Se connecter pour participer
+            </Link>
+          )}
+        </div>
+
+        <div className="relative mt-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="search"
+            value={discussionSearch}
+            onChange={(e) => setDiscussionSearch(e.target.value)}
+            className="w-full rounded-xl border border-gray-200 bg-white pl-10 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+            placeholder="Filtrer les discussions par mots-clés..."
+          />
+          {searchingSujets && (
+            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-gray-400" />
+          )}
+        </div>
       </div>
 
       {/* New sujet form */}
@@ -641,7 +757,7 @@ export default function PagePoleForum() {
       {sujets.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-40" />
-          <p>Aucune discussion pour l&apos;instant.</p>
+          <p>{discussionSearch.trim() ? "Aucune discussion ne correspond à cette recherche." : "Aucune discussion pour l'instant."}</p>
           {token && (() => {
             const oscRestricted = isOscUser && oscPoleIds !== null && pole && !oscPoleIds.includes(pole.id);
             if (oscRestricted) return null;

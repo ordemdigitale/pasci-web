@@ -217,7 +217,7 @@ export default function AdminSidebar({
       <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
         <div className="flex items-center gap-2">
           <span className="text-4xl text-[#2a591d] font-extrabold font-karla">
-            PDOC
+            PdoC
           </span>
         </div>
         <button

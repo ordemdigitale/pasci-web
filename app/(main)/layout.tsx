@@ -23,12 +23,12 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: {
-    default: "PDOC — Plateforme Digitale des OSC de Côte d'Ivoire",
-    template: "%s | PDOC",
+    default: "PdoC — Plateforme Digitale des OSC de Côte d'Ivoire",
+    template: "%s | PdoC",
   },
-  description: "PDOC est la plateforme officielle des Organisations de la Société Civile (OSC) membres des CRASC en Côte d'Ivoire. Annuaire des OSC, formations, actualités, offres de projets et espace collaboratif.",
+  description: "PdoC est la plateforme officielle des Organisations de la Société Civile (OSC) membres des CRASC en Côte d'Ivoire. Annuaire des OSC, formations, actualités, offres de projets et espace collaboratif.",
   keywords: [
-    "OSC Côte d'Ivoire", "société civile ivoirienne", "CRASC", "PDOC", "PASCI",
+    "OSC Côte d'Ivoire", "société civile ivoirienne", "CRASC", "PdoC", "PASCI",
     "organisations société civile", "annuaire OSC", "formations OSC", "appui société civile",
     "partenaires techniques financiers", "offres de projets", "espace collaboratif OSC",
     "plateforme digitale OSC", "société civile Abidjan", "ONG Côte d'Ivoire",
@@ -43,14 +43,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_CI",
     url: "https://plateforme-osci.org",
-    siteName: "PDOC — Plateforme Digitale des OSC de Côte d'Ivoire",
-    title: "PDOC — Plateforme Digitale des OSC de Côte d'Ivoire",
+    siteName: "PdoC — Plateforme Digitale des OSC de Côte d'Ivoire",
+    title: "PdoC — Plateforme Digitale des OSC de Côte d'Ivoire",
     description: "La plateforme officielle des OSC membres des CRASC en Côte d'Ivoire : annuaire, formations, actualités et offres de projets.",
-    images: [{ url: "/images/og-default.jpg", width: 1200, height: 630, alt: "PDOC — Plateforme Digitale des OSC" }],
+    images: [{ url: "/images/og-default.jpg", width: 1200, height: 630, alt: "PdoC — Plateforme Digitale des OSC" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "PDOC — Plateforme Digitale des OSC de Côte d'Ivoire",
+    title: "PdoC — Plateforme Digitale des OSC de Côte d'Ivoire",
     description: "La plateforme officielle des OSC membres des CRASC en Côte d'Ivoire.",
     images: ["/images/og-default.jpg"],
   },

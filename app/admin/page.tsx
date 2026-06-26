@@ -322,7 +322,7 @@ export default function Dashboard() {
           Tableau de bord
         </h1>
         <p className="text-gray-600">
-          Bienvenue sur votre espace d'administration PASCI
+          Bienvenue sur votre espace d'administration PdoC
         </p>
       </div>
 

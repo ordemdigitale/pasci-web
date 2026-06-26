@@ -155,7 +155,7 @@ export default function Footer() {
 
         {/* Bottom Footer */}
         <div className="flex flex-col md:flex-col justify-center items-center gap-4 text-sm text-gray-300">
-          <p>Copyright © 2026 PDOC. Tous droits réservés.</p>
+          <p>Copyright © 2026 PdoC. Tous droits réservés.</p>
           <div className="flex gap-6">
             <Link href="/politique-de-confidentialite" className="hover:text-white transition-colors">
               Politique de Confidentialité

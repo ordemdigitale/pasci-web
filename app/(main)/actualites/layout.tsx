@@ -6,11 +6,11 @@ export const metadata: Metadata = {
   keywords: [
     "actualités OSC Côte d'Ivoire", "nouvelles société civile", "CRASC actualités",
     "news ONG Côte d'Ivoire", "événements OSC", "communiqués société civile ivoirienne",
-    "actualités PDOC", "informations PASCI",
+    "actualités PdoC", "informations PASCI",
   ],
   alternates: { canonical: "https://plateforme-osci.org/actualites" },
   openGraph: {
-    title: "Actualités — Société Civile Côte d'Ivoire | PDOC",
+    title: "Actualités — Société Civile Côte d'Ivoire | PdoC",
     description: "Toutes les actualités des OSC et CRASC de Côte d'Ivoire.",
     url: "https://plateforme-osci.org/actualites",
   },

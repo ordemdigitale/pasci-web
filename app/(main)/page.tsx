@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "Accueil — PdoC, Plateforme Digitale des OSC de Côte d'Ivoire",
   description: "Bienvenue sur PdoC, la plateforme officielle des Organisations de la Société Civile (OSC) de Côte d'Ivoire. Annuaire des OSC, formations, actualités, offres de projets et espace collaboratif.",
   keywords: [
-    "OSC Côte d'Ivoire", "société civile ivoirienne", "CRASC", "PDOC", "PASCI",
+    "OSC Côte d'Ivoire", "société civile ivoirienne", "CRASC", "PdoC", "PASCI",
     "plateforme OSC", "ONG Côte d'Ivoire", "ONG Abidjan", "organisations société civile",
     "renforcement capacités OSC", "développement communautaire Côte d'Ivoire",
   ],

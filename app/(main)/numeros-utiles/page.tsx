@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Phone, Shield, Flame, Heart, Ambulance, AlertTriangle, Info, Users, HelpCircle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Numéros utiles — PDOC",
+  title: "Numéros utiles — PdoC",
   description: "Retrouvez les numéros d'urgence et services utiles en Côte d'Ivoire.",
 };
 

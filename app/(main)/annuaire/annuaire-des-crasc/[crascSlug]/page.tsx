@@ -746,7 +746,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                     )}
                   </button>
                   <p className="text-xs text-gray-400 text-center">
-                    Votre message sera transmis à l&apos;équipe PDOC et au responsable du {crascData.name}.
+                    Votre message sera transmis à l&apos;équipe PdoC et au responsable du {crascData.name}.
                   </p>
                 </form>
               )}

@@ -400,6 +400,19 @@ export interface IForumSujetDetail extends IForumSujet {
   commentaires: IForumCommentaire[];
 }
 
+export interface IPoleMembre {
+  id: number;
+  name: string;
+  slug?: string | null;
+  sigle?: string | null;
+  type_id?: number | null;
+  type_name?: string | null;
+  categorie?: string | null;
+  region_nom?: string | null;
+  ville?: string | null;
+  thumbnail_url?: string | null;
+}
+
 export type ForumSondageStatus = "ouvert" | "ferme";
 export type ForumSondageResultsVisibility = "always" | "after_vote" | "after_close";
 

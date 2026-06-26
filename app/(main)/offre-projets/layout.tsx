@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://plateforme-osci.org/offre-projets" },
   openGraph: {
-    title: "Offres de Projets — Appels à Projets OSC | PDOC",
+    title: "Offres de Projets — Appels à Projets OSC | PdoC",
     description: "Appels à projets et opportunités de financement pour les OSC de Côte d'Ivoire.",
     url: "https://plateforme-osci.org/offre-projets",
   },

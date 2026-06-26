@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://plateforme-osci.org/services" },
   openGraph: {
-    title: "Services aux OSC — PDOC | Côte d'Ivoire",
+    title: "Services aux OSC — PdoC | Côte d'Ivoire",
     description: "Services d'accompagnement, de formalisation et de renforcement pour les OSC ivoiriennes.",
     url: "https://plateforme-osci.org/services",
   },

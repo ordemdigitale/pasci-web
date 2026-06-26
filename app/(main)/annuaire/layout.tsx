@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://plateforme-osci.org/annuaire" },
   openGraph: {
-    title: "Annuaire des OSC, CRASC et PTF — Côte d'Ivoire | PDOC",
+    title: "Annuaire des OSC, CRASC et PTF — Côte d'Ivoire | PdoC",
     description: "Répertoire complet des OSC, CRASC et partenaires techniques actifs en Côte d'Ivoire.",
     url: "https://plateforme-osci.org/annuaire",
   },

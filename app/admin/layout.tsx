@@ -16,8 +16,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "PDOC - Espace Administrateur",
-  description: "Espace Administrateur de la Plateforme Digitale des OSC membres du CRASC (PDOC)"
+  title: "PdoC - Espace Administrateur",
+  description: "Espace Administrateur de la Plateforme Digitale des OSC membres du CRASC (PdoC)"
 }
 
 export default function AdminRootLayout({

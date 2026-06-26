@@ -118,6 +118,7 @@ export const API_ENDPOINTS = {
     poles: `${API_BASE_URL}/api/v1/forum/poles`,
     poleBySlug: (slug: string) => `${API_BASE_URL}/api/v1/forum/poles/${slug}`,
     sujets: (poleSlug: string) => `${API_BASE_URL}/api/v1/forum/poles/${poleSlug}/sujets`,
+    membres: (poleSlug: string) => `${API_BASE_URL}/api/v1/forum/poles/${poleSlug}/membres`,
     sondages: (poleSlug: string) => `${API_BASE_URL}/api/v1/forum/poles/${poleSlug}/sondages`,
     sondage: (sondageId: number) => `${API_BASE_URL}/api/v1/forum/sondages/${sondageId}`,
     voteSondage: (sondageId: number) => `${API_BASE_URL}/api/v1/forum/sondages/${sondageId}/vote`,
