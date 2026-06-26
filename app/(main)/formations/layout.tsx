@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://plateforme-osci.org/formations" },
   openGraph: {
-    title: "Formations OSC — Renforcement de Capacités | PDOC",
+    title: "Formations OSC — Renforcement de Capacités | PdoC",
     description: "Programmes de formation pour les OSC de Côte d'Ivoire : gestion de projets, genre, gouvernance et plus.",
     url: "https://plateforme-osci.org/formations",
   },

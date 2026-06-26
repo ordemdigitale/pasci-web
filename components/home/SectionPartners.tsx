@@ -107,7 +107,7 @@ export default function Partners() {
             Adhésion au CRASC
           </h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Votre organisation souhaite intégrer le réseau des OSC membres du CRASC ? Soumettez votre demande d&apos;adhésion et bénéficiez de l&apos;accompagnement de la plateforme PDOC.
+            Votre organisation souhaite intégrer le réseau des OSC membres du CRASC ? Soumettez votre demande d&apos;adhésion et bénéficiez de l&apos;accompagnement de la plateforme PdoC.
           </p>
           <Link
             href="/rejoindre"

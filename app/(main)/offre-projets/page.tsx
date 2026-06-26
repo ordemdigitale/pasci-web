@@ -287,7 +287,7 @@ export default function PageOffreProjet() {
               </div> */}
               {/* <h3 className="font-bold text-xl text-gray-900">Un accompagrment pratique</h3> */}
               <p>
-                <b>Un accompagement pratique</b> pour vos projets grâce à la plateforme <b>PDOC</b>
+                <b>Un accompagement pratique</b> pour vos projets grâce à la plateforme <b>PdoC</b>
               </p>
             </div>
 
