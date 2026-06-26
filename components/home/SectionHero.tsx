@@ -14,7 +14,7 @@ interface HeroSlide {
   description?: string | null;
 }
 
-const FALLBACK_TITLE = "Centre Régional d'Appui à la Société Civile (CRASC)";
+const FALLBACK_TITLE = "Centre Régional d'Appui à la Société Civile - CRASC";
 const FALLBACK_DESC = "Cette Plateforme digitale est la résultante d'une démarche alliant à la fois, inclusivité, représentativité, accessibilité et pérennité. Multifonctionnelle et dynamique, elle vise à accroître la visibilité des OSC, la synergie d'action, le partage d'expérience et la professionnalisation.";
 
 const DEFAULT_SLIDE_TEXTS = [
