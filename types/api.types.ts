@@ -330,6 +330,18 @@ export interface IUser {
   date_joined?: string;
 }
 
+export interface INotification {
+  id: number;
+  user_id: string;
+  title: string;
+  message: string;
+  type: string;
+  link_url?: string | null;
+  is_read: boolean;
+  created_at: string;
+  read_at?: string | null;
+}
+
 export interface ILoginRequest {
   username: string; // Can be email or username
   password: string;

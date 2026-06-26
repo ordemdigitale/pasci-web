@@ -1,5 +1,5 @@
 // lib/services/news.service.ts | News service for API calls
-import { fetchWithAuth } from "@/lib/auth";
+import { fetchWithAuth, getToken } from "@/lib/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const API_URL = `${API_BASE_URL}/api/v1`;
@@ -133,11 +133,12 @@ export const newsService = {
    * Get single news by slug
    */
   async getBySlug(slug: string): Promise<INews> {
+    const token = getToken();
+    const headers: HeadersInit = { "Content-Type": "application/json" };
+    if (token) headers.Authorization = `Bearer ${token}`;
     const response = await fetch(`${API_URL}/news/${slug}`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       cache: "no-store",
     });
 

@@ -108,6 +108,13 @@ export const API_ENDPOINTS = {
     delete: (slug: string) => `${API_BASE_URL}/api/v1/news/${slug}`,
   },
 
+  notifications: {
+    list: `${API_BASE_URL}/api/v1/notifications`,
+    unreadCount: `${API_BASE_URL}/api/v1/notifications/unread-count`,
+    markRead: (id: number) => `${API_BASE_URL}/api/v1/notifications/${id}/read`,
+    markAllRead: `${API_BASE_URL}/api/v1/notifications/read-all`,
+  },
+
   // Key Stats
   keyStats: {
     list: `${API_BASE_URL}/api/v1/key-stats`,

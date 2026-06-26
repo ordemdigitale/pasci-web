@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { fetchWithAuth } from "@/lib/auth";
-import { CheckCircle, XCircle, Loader2, Newspaper, Briefcase, BookOpen, FolderOpen, AlertCircle, Eye, Building2 } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Newspaper, Briefcase, BookOpen, FolderOpen, AlertCircle, Eye, Building2, FileText } from "lucide-react";
 import Link from "next/link";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -13,7 +13,7 @@ interface ItemEnAttente {
   title?: string;
   nom?: string;
   created_at: string;
-  type: "actualite" | "emploi" | "formation" | "projet" | "video" | "osc_modification";
+  type: "actualite" | "emploi" | "formation" | "projet" | "video" | "documentation" | "osc_modification";
   changes?: Record<string, unknown>;
 }
 
@@ -23,6 +23,7 @@ const TYPE_CONFIG = {
   formation:  { label: "Formation",       icon: BookOpen,   color: "text-green-600",  bg: "bg-green-50",  border: "border-green-200", adminPath: "/admin/formations", pathSuffix: "" },
   projet:     { label: "Offre de projet", icon: FolderOpen, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", adminPath: "/admin/projets", pathSuffix: "" },
   video:      { label: "Vidéo CRASC",     icon: CheckCircle, color: "text-teal-600",  bg: "bg-teal-50",  border: "border-teal-200",  adminPath: "/admin/gestion-des-crasc/videos", pathSuffix: "" },
+  documentation: { label: "Ressource", icon: FileText, color: "text-indigo-600", bg: "bg-indigo-50", border: "border-indigo-200", adminPath: "/admin/ressources", pathSuffix: "/modifier" },
   osc_modification: { label: "Modification OSC", icon: Building2, color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", adminPath: "/admin/gestion-des-crasc/osc", pathSuffix: "" },
 };
 
@@ -63,12 +64,13 @@ export default function AdminModerationPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [newsRes, jobsRes, formRes, projRes, videoRes, oscRes] = await Promise.allSettled([
+      const [newsRes, jobsRes, formRes, projRes, videoRes, docRes, oscRes] = await Promise.allSettled([
         fetchWithAuth(`${API_BASE}/api/v1/news/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/jobs/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/formations/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/offre-projets/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/crasc/video/admin/en-attente`),
+        fetchWithAuth(`${API_BASE}/api/v1/documentation/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/crasc/osc-modification-requests/en-attente`),
       ]);
 
@@ -91,6 +93,7 @@ export default function AdminModerationPage() {
         ...(await parse(formRes, "formation")),
         ...(await parse(projRes, "projet")),
         ...(await parse(videoRes, "video")),
+        ...(await parse(docRes, "documentation")),
         ...(await parse(oscRes, "osc_modification")).map((item) => ({
           ...item,
           slug: item.slug,
@@ -117,6 +120,7 @@ export default function AdminModerationPage() {
         formation: `${API_BASE}/api/v1/formations/${item.slug}/valider?action=${action}`,
         projet:    `${API_BASE}/api/v1/offre-projets/${item.slug}/valider?action=${action}`,
         video:     `${API_BASE}/api/v1/crasc/video/${item.id}/valider?action=${action}`,
+        documentation: `${API_BASE}/api/v1/documentation/${item.slug}/valider?action=${action}`,
         osc_modification: `${API_BASE}/api/v1/crasc/osc-modification-requests/${item.id}/review?action=${action === "publie" ? "approuvee" : "rejetee"}`,
       };
       await fetchWithAuth(urlMap[item.type], { method: "PATCH" });

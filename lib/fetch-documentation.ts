@@ -1,4 +1,5 @@
 // lib/fetch-documentation.ts | Functions to fetch documentation from API
+import { getToken } from "@/lib/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -15,6 +16,7 @@ export interface IDocumentation {
   file_url: string | null;
   download_url: string | null;
   thumbnail_url: string;
+  statut_publication?: "brouillon" | "en_attente" | "publie" | "rejete";
   crasc_id: number | null;
   osc_id: number | null;
   slug: string | null;
@@ -42,6 +44,7 @@ export interface DocumentationFilters {
   search?: string;
   sort_by?: "created_at" | "title";
   sort_order?: "asc" | "desc";
+  include_all?: boolean;
 }
 
 /**
@@ -61,14 +64,16 @@ export async function fetchAllDocumentation(
   if (filters.search) params.append("search", filters.search);
   if (filters.sort_by) params.append("sort_by", filters.sort_by);
   if (filters.sort_order) params.append("sort_order", filters.sort_order);
+  if (filters.include_all !== undefined) params.append("include_all", filters.include_all.toString());
 
   const url = `${API_BASE_URL}/api/v1/documentation${params.toString() ? `?${params.toString()}` : ""}`;
+  const token = getToken();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (token) headers.Authorization = `Bearer ${token}`;
   
   const response = await fetch(url, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     cache: "no-store",
   });
 
@@ -85,13 +90,14 @@ export async function fetchAllDocumentation(
 export async function getDocumentationBySlug(
   doc_slug: string
 ): Promise<IDocumentation> {
+  const token = getToken();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (token) headers.Authorization = `Bearer ${token}`;
   const response = await fetch(
     `${API_BASE_URL}/api/v1/documentation/${doc_slug}`,
     {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       cache: "no-store",
     }
   );
