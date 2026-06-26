@@ -48,7 +48,7 @@ export default function AdminForumPolesPage() {
     setLoading(true);
     try {
       // Fetch all poles including inactive (admin view)
-      const res = await fetchWithAuth(API_ENDPOINTS.forum.poles + "?limit=100");
+      const res = await fetchWithAuth(API_ENDPOINTS.forum.poles + "?limit=100&include_inactive=true");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setPoles(Array.isArray(data) ? data : []);
@@ -62,17 +62,22 @@ export default function AdminForumPolesPage() {
   async function handleToggleActive(pole: IPoleConcertation) {
     setTogglingSlug(pole.slug);
     try {
+      const formData = new FormData();
+      formData.append("is_active", String(!pole.is_active));
       const res = await fetchWithAuth(API_ENDPOINTS.forum.poleBySlug(pole.slug), {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_active: !pole.is_active }),
+        body: formData,
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || "Erreur lors de la mise à jour.");
+      }
+      const updated: IPoleConcertation = await res.json();
       setPoles((prev) =>
-        prev.map((p) => (p.slug === pole.slug ? { ...p, is_active: !p.is_active } : p))
+        prev.map((p) => (p.slug === pole.slug ? { ...p, is_active: updated.is_active } : p))
       );
-    } catch {
-      alert("Erreur lors de la mise à jour.");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Erreur lors de la mise à jour.");
     } finally {
       setTogglingSlug(null);
     }
