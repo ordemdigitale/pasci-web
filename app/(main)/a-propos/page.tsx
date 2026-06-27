@@ -167,8 +167,8 @@ export default async function AboutPage() {
           
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Pourquoi ce rôle est important ?</h4>
           <ul className="list-disc ml-12">
-            <li>Avant, les OSC étaient encadrées par la <b>loi de 1960 sur les associations</b>, trop limitée.</li>
-            <li>La DGAT est désormais l’organe central qui veille à ce que toutes les OSC respectent le nouveau cadre légal.</li>
+            <li>Pendant plus de 60 ans, la loi n° 60-315 du 21 septembre de 1960 a encadré les associations. Elle a posé les bases de la liberté d'association. Pendant des décennies, elle est restée inchangée, trop limitée.</li>
+            <li>La DGAT est désormais l'organe central qui veille à ce que toutes les OSC respectent le nouveau cadre légal.</li>
             <li>Elle garantit que les OSC soient <b>conformes à la Constitution</b> et puissent contribuer efficacement au développement économique et social.</li>
           </ul>
 
@@ -179,17 +179,17 @@ export default async function AboutPage() {
             <li><b>Protection</b> : La DGAT aide à éviter les dérives (structures fictives, financements illicites).</li>
             <li><b>Structuration durable</b> : Les OSC sont encouragées à se regrouper en réseaux et plateformes pour plus de force collective.</li>
           </ul>
-          <p className="my-4">En clair, la DGAT est le <b>bras opérationnel du ministère de l’Intérieur</b> pour appliquer l’ordonnance sur les OSC. Elle ne se contente pas de contrôler, mais elle <b>forme, accompagne et professionnalise</b> les organisations afin qu’elles deviennent des acteurs crédibles du développement et de la cohésion sociale en Côte d’Ivoire.</p>
-          <p className="text-[#2a591d] mb-4"><b>Les 10 articles Clés illustratifs de l’ordonnance n° 2024-368 sur les OSC</b>, pour comprendre le rôle de la DGAT et son rapport avec les OSC.</p>
+          <p className="my-4">En clair, la DGAT est le <b>bras opérationnel du ministère de l'Intérieur</b> pour appliquer l'ordonnance sur les OSC. Elle ne se contente pas de contrôler, mais elle <b>forme, accompagne et professionnalise</b> les organisations afin qu’elles deviennent des acteurs crédibles du développement et de la cohésion sociale en Côte d’Ivoire.</p>
+          <p className="text-[#2a591d] mb-4 font-bold">Les 10 articles Clés illustratifs de l'ordonnance n° 2024-368 sur les OSC, pour comprendre le rôle de la DGAT et son rapport avec les OSC.</p>
           <ul className="list-disc ml-12">
             <li><b>Article 5</b> : « Les associations et organisations cultuelles doivent être déclarées auprès de la préfecture ou sous-préfecture. Les fondations doivent obtenir une autorisation préalable. ». Cela veut dire que pour exister légalement, une OSC doit faire une démarche officielle.</li>
             <li><b>Article 15</b> : « Les OSC régulièrement déclarées peuvent recevoir des dons, posséder des biens nécessaires à leurs activités et ouvrir un compte bancaire. ». Une OSC reconnue a donc le droit de gérer de l’argent et des biens pour ses actions.</li>
             <li><b>Article 28</b> : « Les OSC doivent tenir une comptabilité claire et transparente et déclarer leurs impôts. ». Elles doivent montrer comment elles utilisent l’argent et respecter les règles fiscales.</li>
-            <li><b>Article 42</b> : « Toute OSC doit informer l’administration de tout changement concernant ses dirigeants, son siège, ses statuts ou son logo. ». Si quelque chose change dans l’organisation, il faut le signaler.</li>
-            <li><b>Article 64 à 69</b> : Ces articles portent sur la lutte contre le blanchiment d’argent et le financement du terrorisme. Ils obligent les OSC à être vigilantes et à éviter que leurs fonds servent à des activités illégales.</li>
-            <li><b>Article 75</b> : « Une OSC peut être dissoute si son objet est illégal, contraire aux bonnes mœurs, ou s’il menace l’ordre public et la cohésion sociale. » L’État peut fermer une OSC si elle agit contre l’intérêt général.</li>
+            <li><b>Article 42</b> : « Toute OSC doit informer l'administration de tout changement concernant ses dirigeants, son siège, ses statuts ou son logo. ». Si quelque chose change dans l’organisation, il faut le signaler.</li>
+            <li><b>Article 64 à 69</b> : Ces articles portent sur la lutte contre le blanchiment d'argent et le financement du terrorisme. Ils obligent les OSC à être vigilantes et à éviter que leurs fonds servent à des activités illégales.</li>
+            <li><b>Article 75</b> : « Une OSC peut être dissoute si son objet est illégal, contraire aux bonnes mœurs, ou s'il menace l'ordre public et la cohésion sociale. » L’État peut fermer une OSC si elle agit contre l’intérêt général.</li>
           </ul>
-          <p className="my-4">Les articles montrent que l’ordonnance :</p>
+          <p className="my-4">Les articles montrent que l'ordonnance :</p>
           <ul className="list-disc ml-12">
             <li><b>Encadre la création</b> (déclaration ou autorisation).</li>
             <li><b>Donne des droits</b> (recevoir des dons, agir en justice).</li>
