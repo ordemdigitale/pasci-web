@@ -110,7 +110,7 @@ export const domainesIntervention = [
   "Développement durable",
   "Développement local",
   "Bien-être social",
-  "Cohésion social"
+  "Cohésion sociale"
 ];
 
 // Mock data actualités (même que dans SectionNews)
@@ -381,13 +381,13 @@ export default function PageAnnuaireCrasc() {
                 <Users className="w-10 h-10 text-[#E05017] group-hover:text-white transition-colors" strokeWidth={2} />
               </div>
               <h3 className="text-xs uppercase font-bold text-gray-600 group-hover:text-white/80 mb-2 transition-colors tracking-wider">
-                OSC MEMBRES
+                OSC identifiées
               </h3>
               <div className="text-4xl font-extrabold text-[#E05017] group-hover:text-white transition-colors mb-1">
                 {loading ? "..." : (dashboardStats?.osc ?? 0).toLocaleString()}
               </div>
               <p className="text-xs text-gray-500 group-hover:text-white/70 transition-colors">
-                Organisations actives
+                Organisations
               </p>
             </div>
           </div>
@@ -463,11 +463,11 @@ export default function PageAnnuaireCrasc() {
         </div>
       </div>
 
-      {/* Section OSC membres */}
+      {/* Section OSC identifiées */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-3xl font-extrabold text-gray-900">
-            OSC membres
+            OSC identifiées
             {oscTotal > 0 && (
               <span className="ml-3 text-base font-semibold text-gray-400">
                 ({oscTotal})
