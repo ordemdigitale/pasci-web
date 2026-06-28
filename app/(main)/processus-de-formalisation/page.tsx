@@ -26,25 +26,25 @@ const formal: IFormal[] = [
   {
     id: 1,
     icon: <CircleCheck size={24} color="#E05017" />,
-    name: "Reconnaissance Légale",
-    content: "Obtenez un statut juridique officiel, indispensable pour opérer en toute légalité et bénéficier de protections."
+    name: "Reconnaissance légale",
+    content: "obtenir un statut officiel pour agir en toute légalité."
   },
   {
     id: 2,
     icon: <Handshake size={24} color="#E05017" />,
-    name: "Crédibilité Accrue",
-    content: "Renforcez la confiance des partenaires financiers, institutionnels et des communautés que vous servez."
+    name: "Crédibilité renforcée",
+    content: "inspire confiance aux partenaires et aux communautés."
   },
   {
     id: 3,
     icon: <Signal size={24} color="#E05017" />,
-    name: "Accès aux Financements",
-    content: "Ouvrez les portes à des opportunités de subventions, de dons et de partenariats nationaux et internationaux."
+    name: "Accès aux financements",
+    content: "Ouvrir la porte aux subventions, dons et de partenariats et pouvoir disposer d'un compte bancaire au nom de votre organisation."
   },
   {
     id: 4,
     icon: <Users size={24} color="#E05017" />,
-    name: "Renforcement Institutionnel",
+    name: "Renforcement institutionnelle",
     content: "Améliorez votre gouvernance interne et votre capacité à mobiliser des ressources humaines et matérielles."
   },
   {
@@ -110,9 +110,9 @@ export default function PageProcessusFormalisation() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
         {/* Left content */}
         <div className="">
-          <h2 className="font-bold text-4xl text-[#2a591d] leading-tight">Simplifiez la Formalisation de Votre Organisation</h2>
+          <h2 className="font-bold text-4xl text-[#2a591d] leading-tight">Simplifiez la formalisation de votre organisation</h2>
           <p className="text-gray-600 text-md max-w-xl mt-6">
-            Le processus de formalisation des Organisations de la Société Civile (OSC) est une étape cruciale pour leur reconnaissance légale et leur développement. Découvrir comment le projet PASCI vous accompagne pour naviguer efficacement dans cette démarche.
+            La reconnaissance légale est une étape essentielle pour toute organisation de la société civile (OSC). Le CRASC vous accompagne pas à pas pour rendre ce processus plus simple et efficace, afin de soutenir votre développement.
           </p>
         </div>
         

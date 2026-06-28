@@ -23,7 +23,7 @@ export default async function AboutPage() {
           
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Un outil pratique et vivant</h4>
           <p className="mb-3">
-            La plateforme s&apos;adresse aux organisations de la société civile liées aux <b>Centres Régionaux d&apos;Appui à la Société Civile &#40;CRASC&#41;</b>. Elle permet de :
+            La plateforme s&apos;adresse aux organisations de la société civile et aux <b>Centres Régionaux d&apos;Appui à la Société Civile &#40;CRASC&#41;</b>. Elle permet de :
             <ul className="list-disc ml-12">
               <li>rendre les OSC plus visibles,</li>
               <li>travailler ensemble plus facilement,</li>
@@ -75,7 +75,7 @@ export default async function AboutPage() {
 
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Mission des CRASC</h4>
           <p className="mb-2">Les CRASC ont pour mission principale d&apos;<b>aider les organisations de la société civile &#40;OSC&#41;</b> de leur région à mieux fonctionner.</p>
-          <p>Ils aident les organisations à avoir leurs papiers, à bien s&apos;organiser et leur donne des manières pour bien travailler.</p>
+          <p>Ils aident les organisations à avoir leurs papiers, à bien s&apos;organiser et leur donnent des méthodes efficaces pour bien travailler.</p>
 
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Objectifs des CRASC</h4>
           <ul className="list-disc ml-12">
@@ -106,7 +106,7 @@ export default async function AboutPage() {
 
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Les zones couvertes par les CRASC</h4>
           <p><b>CRASC Centre</b> : 5 régions + 1 district</p>
-          <p className="mb-2">Bélier &#40;Toumodi&#41;, Gbêkè &#40;Bouaké&#41;, Hambol &#40;Katiola&#41;, Marahoué &#40;Bouaflé&#41;, N&apos;Zi &#40;Dimbokro&#41;, Yamoussoukro</p>
+          <p className="mb-2">Bélier &#40;Toumodi&#41;, Gbêkè &#40;Bouaké&#41;, Hambol &#40;Katiola&#41;, Marahoué &#40;Bouaflé&#41;, N&apos;Zi &#40;Dimbokro&#41;, District autonome de Yamoussoukro</p>
           
           <p><b>CRASC Est</b> : 5 régions</p>
           <p className="mb-2">Bounkani &#40;Bouna&#41;, Gontougo &#40;Bondoukou&#41;, Iffou &#40;Daoukro&#41;, Moronou &#40;Bongouanou&#41;, Indénié-Djuablin &#40;Abengourou&#41;</p>
@@ -118,14 +118,14 @@ export default async function AboutPage() {
           <p className="mb-2">Bafing &#40;Touba&#41;, Cavally &#40;Guiglo&#41;, Guémon &#40;Duékoué&#41;, Haut-Sassandra &#40;Daloa&#41;, Tonkpi &#40;Man&#41;</p>
 
           <p><b>CRASC Sud</b> : 9 régions + 1 district</p>
-          <p className="mb-2">Agnéby-Tiassa &#40;Agboville&#41;, Gbôklè &#40;Sassandra&#41;, Gôh &#40;Gagnoa&#41;, Mé &#40;Adzopé&#41;, San-Pedro, Grands-Ponts &#40;Dabou&#41;, Loh-Djiboua &#40;Divo&#41;, Nawa &#40;Soubré&#41;, Sud-Comoé &#40;Aboisso&#41;, Abidjan</p>
+          <p className="mb-2">Agnéby-Tiassa &#40;Agboville&#41;, Gbôklè &#40;Sassandra&#41;, Gôh &#40;Gagnoa&#41;, Mé &#40;Adzopé&#41;, San Pedro, Grands-Ponts &#40;Dabou&#41;, Loh-Djiboua &#40;Divo&#41;, Nawa &#40;Soubré&#41;, Sud-Comoé &#40;Aboisso&#41;, District autonome d'Abidjan</p>
 
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Réalisations des CRASC</h4>
           <p className="font-bold text-lg pt-4 pb-2">1. Renforcement des capacités de 5 409 OSC</p>
           <ul className="list-disc ml-12">
             <li><b>3 553</b> OSC formées aux critères de soumission aux appels à projet</li>
             <li><b>1 056</b> Organisations formées aux <b>thématiques</b> : gestion de projets, communication digitale, égalité de genre, prévention et gestion des conflits.</li>
-            <li><b>780</b> organisations &#40;femmes, jeunes, associations locales&#41; appuyée à la <b>création et à la formalisation</b>.</li>
+            <li><b>780</b> organisations &#40;femmes, jeunes, associations locales&#41; appuyées à la <b>création et à la formalisation</b>.</li>
             <li><b>20</b> organisations accompagnées techniquement et institutionnellement par semaine.</li>
           </ul>
 
@@ -135,6 +135,7 @@ export default async function AboutPage() {
             <li>30 Organisations de <b>cafés citoyens</b> et panels de dialogue avec les autorités et les candidats aux élections.</li>
             <li>Contribution à la <b>définition des politiques de développement local</b>.</li>
             <li>Élaboration d&apos;une <b>feuille de route pour les CRASC</b>.</li>
+            <li>Déclaration commune pour la <b>liberté d&apos;association</b> dans le cadre de l&apos;avant-projet de loi sur les associations.</li>
           </ul>
 
           <p className="font-bold text-lg pt-4 pb-2">3. Partenariats et projets structurants</p>
@@ -144,13 +145,6 @@ export default async function AboutPage() {
             <li>Exécution du <b>projet ECOTER</b> : création d&apos;un centre de services pour les OSC du Gontougo.</li>
           </ul>
 
-          <p className="font-bold text-lg pt-4 pb-2">4. Engagement institutionnel et plaidoyer</p>
-          <ul className="list-disc ml-12">
-            <li>Déclaration commune pour la <b>liberté d&apos;association</b> dans le cadre de l&apos;avant-projet de loi sur les associations.</li>
-            <li>Participation régulière aux <b>réunions du Conseil d&apos;Administration</b> et aux instances de gouvernance.</li>
-            <li>Positionnement comme <b>partenaire incontournable de l&apos;État</b> dans la mise en œuvre de la politique de bonne gouvernance.</li>
-          </ul>
-
           <h2 className="text-[#2a591d] font-bold text-xl py-4">Le rôle de la DGAT et les textes qui régissent la relation entre la société civile et l&apos;État</h2>
           <p>
             La DGAT &#40;Direction Générale de l&apos;Administration du Territoire&#41; joue un rôle clé dans l&apos;application de l&apos;ordonnance sur les OSC : elle est chargée de vulgariser le texte, d&apos;accompagner les organisations dans leur mise en conformité et de renforcer leur gouvernance.
@@ -158,11 +152,11 @@ export default async function AboutPage() {
 
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Rôle principal de la DGAT</h4>
           <ul className="list-disc ml-12">
-            <li><b>Vulgarisation et formation</b> : La DGAT organise des ateliers pour expliquer l’ordonnance n° 2024-368 aux OSC et aux CRASC (Centres Régionaux d’Appui à la Société Civile).</li>
+            <li><b>Vulgarisation et formation</b> : La DGAT organise des ateliers pour expliquer l'ordonnance n° 2024-368 aux OSC et aux CRASC (Centres Régionaux d'Appui à la Société Civile).</li>
             <li><b>Accompagnement juridique et administratif</b> : Elle aide les OSC à comprendre les nouvelles obligations (déclaration, comptabilité, transparence, gouvernance).</li>
-            <li><b>Mise en conformité</b> : La DGAT guide les OSC pour qu’elles adaptent leurs statuts, leurs procédures et leur fonctionnement aux nouvelles règles.</li>
+            <li><b>Mise en conformité</b> : La DGAT guide les OSC pour qu'elles adaptent leurs statuts, leurs procédures et leur fonctionnement aux nouvelles règles.</li>
             <li><b>Renforcement de la gouvernance</b> : Elle insiste sur la professionnalisation des OSC en matière de gestion financière, comptable et des ressources humaines.</li>
-            <li><b>Coordination nationale</b> : Elle harmonise les actions des différents acteurs (OSC, CRASC, partenaires comme l’UE ou ONG) pour une application cohérente de la réforme.</li>
+            <li><b>Coordination nationale</b> : Elle harmonise les actions des différents acteurs (OSC, CRASC, partenaires comme l'UE ou ONG) pour une application cohérente de la réforme.</li>
           </ul>
           
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Pourquoi ce rôle est important ?</h4>

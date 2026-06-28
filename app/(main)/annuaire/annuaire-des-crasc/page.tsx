@@ -287,8 +287,8 @@ export default function PageAnnuaireCrasc() {
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
             Annuaire des <span className="text-[#E05017]">OSC</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Découvrir nos centres régionaux d'appui à la société civile et leurs organisations membres
+          <p className="text-gray-600 max-w-3xl mx-auto">
+            Découvrez les organisations de la société civile (OSC) situées dans nos Centres Régionaux d'Appui à la Société Civile (CRASC). Si vous cliquez sur un centre vous pourrez mieux connaître les OSC locales, leurs domaines prioritaires, leurs savoir-faire et expertises, ainsi que leur zone de couverture.
           </p>
           <div className="w-24 h-1 bg-gradient-to-r from-[#E05017] to-[#2a591d] mx-auto mt-6 rounded-full"></div>
         </div>

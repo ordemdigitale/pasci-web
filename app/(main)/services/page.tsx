@@ -199,7 +199,7 @@ export default function ServicesPage() {
         <p className="font-bold text-4xl text-center pb-4">Formation</p>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg py-8 space-y-6">
           <p>
-            Nos formations ne servent pas seulement à apprendre des notions. Elles développent aussi l&pos;esprit critique, l&pos;autonomie et la capacité à appliquer ce qu&pos;on a appris dans la vraie vie. On encourage aussi le partage d&pos;expériences entre participants.
+            Nos formations ne servent pas seulement à apprendre des notions. Elles développent aussi l'esprit critique, l'autonomie et la capacité à appliquer ce qu'on a appris dans la vraie vie. On encourage aussi le partage d&pos;expériences entre participants.
           </p>
         </div>
       </div>

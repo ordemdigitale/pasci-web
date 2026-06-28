@@ -219,7 +219,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                 <div className="flex items-center gap-2 text-white/90">
                   <Users className="w-5 h-5" />
                   <span className="text-lg font-semibold">
-                    {crascData.osc_count} OSC{crascData.osc_count > 1 ? 's' : ''} membre{crascData.osc_count > 1 ? 's' : ''}
+                    {crascData.osc_count} OSC identifié{crascData.osc_count > 1 ? 'es' : ''}
                   </span>
                 </div>
               )}
@@ -280,7 +280,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
               </div>
             </div>
 
-            {/* OSC Members Section */}
+            {/* OSC membres Section */}
             {crascData.oscs !== undefined && (
               <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
                 {/* Header avec recherche */}
@@ -291,7 +291,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                     </div>
                     <div>
                       <h2 className="text-2xl font-bold text-gray-900">
-                        OSC Membres <span className="text-gray-400 font-semibold">({crascData.oscs.length})</span>
+                        OSC identifiées <span className="text-gray-400 font-semibold">({crascData.oscs.length})</span>
                       </h2>
                       <p className="text-xs text-gray-500">
                         {crascData.oscs.filter(o => o.name.toLowerCase().includes(oscSearch.toLowerCase())).length} / {crascData.oscs.length} organisation{crascData.oscs.length > 1 ? 's' : ''}
@@ -763,7 +763,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
               
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">OSC Membres</span>
+                  <span className="text-sm font-medium text-gray-700">OSC identifiées</span>
                   <span className="text-2xl font-bold text-blue-600">
                     {crascData.osc_count || crascData.oscs?.length || 0}
                   </span>

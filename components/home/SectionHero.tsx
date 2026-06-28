@@ -184,7 +184,7 @@ export default function SectionHero() {
           <div className="space-y-6">
             {/* Title */}
             <h2 className="text-gray-900 text-center font-bold">
-              Centre Régional d'Appuis à la Société Civile - CRASC
+              Découvrir les OSC sur le Centre Régional d'Appuis à la Société Civile (CRASC)
             </h2>
 
             {/* Right side card */}

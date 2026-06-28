@@ -185,7 +185,7 @@ export default function PageRessources() {
           </p>
           <p className="font-bold text-xl max-w-sm mt-4">Besoin d'un guide ou d&apos;une fiche ? Tout est ici, à portée de clic !</p>
           <p className="text-gray-600 text-md max-w-xl mt-4">
-            Tu trouveras dans cette section <b>pleine de documents utiles</b> du projet PASCI : rapports, études, guides et fiches pratiques.
+            Tu trouveras dans cette section <b>plusieurs documents utiles</b> : rapports, études, guides et fiches pratiques.
           </p>
           <p className="text-gray-600 text-md max-w-xl mt-4">  
             Tu peux <b>choisir par type</b> &#40;rapport, guide, fiche&#41; pour aller directement à ce qui t&apos;intéresse. Chaque ressource est <b>simple à consulter et à télécharger</b>.
