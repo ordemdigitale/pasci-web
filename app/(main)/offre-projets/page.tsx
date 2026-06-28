@@ -282,30 +282,18 @@ export default function PageOffreProjet() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center space-y-4">
-              {/* <div className="w-16 h-16 bg-[#E05017]/10 rounded-2xl flex items-center justify-center mx-auto">
-                <CircleCheckBig className="w-8 h-8 text-[#E05017]" />
-              </div> */}
-              {/* <h3 className="font-bold text-xl text-gray-900">Un accompagrment pratique</h3> */}
               <p>
-                <b>Un accompagement pratique</b> pour vos projets grâce à la plateforme <b>PdoC</b>
+                <b>Des mécanismes d'accompagnement pratiques</b> pour vos projets grâce à la plateforme <b>PdoC</b>
               </p>
             </div>
 
             <div className="text-center space-y-4">
-              {/* <div className="w-16 h-16 bg-[#E05017]/10 rounded-2xl flex items-center justify-center mx-auto">
-                <DollarSign className="w-8 h-8 text-[#E05017]" />
-              </div> */}
-              {/* <h3 className="font-bold text-xl text-gray-900">Accès aux ressources</h3> */}
               <p>
-                <b>Des formations utiles</b> : apprendre à communiquer, gérer un projet, travailler en équipe, prévenir les conflits.
+                <b>Des formations utiles</b> : apprendre à communiquer, gérer un projet, travailler en équipe, prévenir les conflits...
               </p>
             </div>
 
             <div className="text-center space-y-4">
-              {/* <div className="w-16 h-16 bg-[#E05017]/10 rounded-2xl flex items-center justify-center mx-auto">
-                <Handshake className="w-8 h-8 text-[#E05017]" />
-              </div> */}
-              {/* <h3 className="font-bold text-xl text-gray-900">Partenariats stratégiques</h3> */}
               <p>
                 <b>Un réseau solide</b> : rencontrer d'autres organisations, échanger des idées, créer des partenariats.
               </p>
@@ -313,21 +301,20 @@ export default function PageOffreProjet() {
 
             <div className="text-center space-y-4">
               <p>
-                <b>Plus de visibilité</b> : faire connaître vos actions auprès des partenaires et des institutions
+                <b>Plus de visibilité</b> : faire connaître vos actions auprès des partenaires et des institutions.
               </p>
             </div>
 
             <div className="text-center space-y-4">
               <p>
-                <b>Un rôle actif</b> : participer aux décisions locales et aux initiatives citoyennes
+                <b>Comment les OSC ont un rôle actif</b> : participer aux décisions locales et aux initiatives citoyennes.
               </p>
             </div>
             <div className="text-center space-y-4">
               <p>
-                <b>Un appui officiel</b> : être reconnu et soutenu dans vos démarches administratives
+                <b>Un appui officiel</b> : être reconnu et soutenu dans vos démarches administratives.
               </p>
             </div>
-
           </div>
 
           <p className="text-center mb-12 max-w-2xl mx-auto mt-6">
