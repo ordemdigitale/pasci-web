@@ -33,31 +33,31 @@ const formal: IFormal[] = [
     id: 2,
     icon: <Handshake size={24} color="#E05017" />,
     name: "Crédibilité renforcée",
-    content: "inspire confiance aux partenaires et aux communautés."
+    content: "inspirer confiance aux partenaires et aux communautés."
   },
   {
     id: 3,
     icon: <Signal size={24} color="#E05017" />,
     name: "Accès aux financements",
-    content: "Ouvrir la porte aux subventions, dons et de partenariats et pouvoir disposer d'un compte bancaire au nom de votre organisation."
+    content: "ouvrir la porte aux subventions, dons et de partenariats et pouvoir disposer d'un compte bancaire au nom de votre organisation."
   },
   {
     id: 4,
     icon: <Users size={24} color="#E05017" />,
-    name: "Renforcement institutionnelle",
-    content: "Améliorez votre gouvernance interne et votre capacité à mobiliser des ressources humaines et matérielles."
+    name: "Solidité institutionnelle",
+    content: "améliorer la gouvernance et mobiliser plus de ressources."
   },
   {
     id: 5,
     icon: <Globe size={24} color="#E05017" />,
-    name: "Visibilité et Influence",
-    content: "Accroissez votre impact et votre participation aux débats publics et aux processus décisionnels."
+    name: "Visibilité et influence",
+    content: "accroître votre impact et participer aux prises de décisions publiques."
   },
   {
     id: 6,
     icon: <FileText size={24} color="#E05017" />,
-    name: "Protection Juridique",
-    content: "Protégez les membres et les activités de votre organisation contre les litiges et les abus."
+    name: "Protection juridique",
+    content: "sécuriser vos membres et vos activités contre les litiges."
   },
 ];
 
@@ -130,7 +130,7 @@ export default function PageProcessusFormalisation() {
 
       {/* Pourquoi formaliser votre OSC ? */}
       <div className="py-8">
-        <p className="font-bold text-4xl text-center pb-[50px]">Pourquoi formaliser votre OSC ?</p>
+        <p className="font-bold text-4xl text-center pb-[50px]">Pourquoi formaliser son OSC</p>
         <div className="max-w-5xl mx-auto">
           {/* Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -151,7 +151,7 @@ export default function PageProcessusFormalisation() {
         </div>
       </div>
 
-      <div className="py-8">
+      {/* <div className="py-8">
         <div className="max-w-5xl mx-auto">
           <p className="font-bold text-4xl text-center pb-4">
             Les 10 Étapes Détaillées du Processus de Formalisation en Côte d'Ivoire
@@ -163,7 +163,7 @@ export default function PageProcessusFormalisation() {
                 <div className="flex flex-row items-center justify-between gap-8">
                   <p className="text-[#E05017] font-bold">{item.id}.</p>
                   <p className="font-bold">{item.name}</p>
-                  <p>{/*  */}</p>
+                  <p></p>
                 </div>
               </div>
             ))}
@@ -171,11 +171,115 @@ export default function PageProcessusFormalisation() {
           </div>
 
         </div>
-      </div>
+      </div> */}
+
+      <div className="py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-xl py-4 my-4 shadow-md">
+          <p className="font-bold text-4xl">
+            Étapes de création et déclaration
+          </p>
+          <p className="font-bold text-lg text-[#2a591d] pt-4 pb-2">1. Formation libre</p>
+          <ul className="list-disc list-inside ml-12">
+            <li>Les OSC (associations, ONG, organistation cultuelles) peuvent se constituer librement, mais elles n'acquièrent la capacité juridique qu'après déclaration préalable (art. 6).</li>
+          </ul>
+      
+          <p className="font-bold text-lg text-[#2a591d] pt-4 pb-2">2. Dépôt de la déclaration</p>
+          <ul className="list-disc list-inside ml-12">
+            <li>À la préfecture, sous-préfecture ou direction compétente du ministère de l'Administration du Territoire (art. 7).</li>
+            <li>La déclaration doit préciser : nature, titre, objet, siège, établissements éventuels, noms et domiciles des responsables.</li>
+          </ul>
+        
+          <p className="font-bold text-lg text-[#2a591d] pt-4 pb-2">3. Pièces obligatoires (art. 10)</p>
+          <ul className="list-disc list-inside ml-12">
+            <li>Preuve du paiement du droit de dépôt.</li>
+            <li>Statuts et règlement intérieur (3 exemplaires).</li>
+            <li>Procès-verbal de l'assemblée constitutive.</li>
+            <li>Liste des membres fondateurs et dirigeants.</li>
+            <li>Liste de présence légalisée.</li>
+            <li>Commissaires aux comptes.</li>
+            <li>Pour les représentations locales d'OSC étrangères : documents de l'organisation-mère (mandat, publication officielle, etc.).</li>
+          </ul>          
+        
+          <p className="font-bold text-lg text-[#2a591d] pt-4 pb-2">4. Contenu des statuts (art. 11)</p>
+          <ul className="list-disc list-inside ml-12">
+            <li>Titre, objet, durée, siège.</li>
+            <li>Conditions d'adhésion et de perte de qualité de membre.</li>
+            <li>Origine des ressources financières.</li>
+            <li>Organisation et fonctionnement (pouvoirs, quorum, contrôle, dissolution).</li>
+            <li>Engagement de conformité à l'ordonnance.</li>
+          </ul>
+        
+        </div>
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-xl py-4 my-4 shadow-md">
+          <p className="font-bold text-4xl">
+            Contrôles et enquêtes
+          </p>
+          <p className="font-bold text-lg text-[#2a591d] pt-4 pb-2">5. Enquête de moralité (art. 12)</p>
+          <ul className="list-disc list-inside ml-12">
+            <li>Vérification de l'authenticité des pièces, probité et honorabilité des dirigeants.</li>
+            <li>Réalisée par la gendarmerie ou la police, résultats transmis sous un mois.</li>
+          </ul>
+
+          <p className="font-bold text-lg text-[#2a591d] pt-4 pb-2">6. Conditions d'éligibilité des dirigeants (art. 13)</p>
+          <ul className="list-disc list-inside ml-12">
+            <li>Pas de condamnations pénales entraînant perte des droits civiques, sauf exceptions mineures.</li>
+          </ul>
+        </div>
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-xl py-4 my-4 shadow-md">
+          <p className="font-bold text-4xl">
+            Obtention du récépissé
+          </p>
+
+          <p className="font-bold text-lg text-[#2a591d] pt-4 pb-2">7. Récépissé de déclaration (art. 14-15)</p>
+          <ul className="list-disc list-inside ml-12">
+            <li>Délivré sous 23 jours si l'enquête est favorable.</li>
+            <li>Publication obligatoire au Journal officiel.</li>
+            <li>Transmission du dossier complet au ministère de l'Administration du Territoire.</li>
+          </ul>
+
+          <p className="font-bold text-lg text-[#2a591d] pt-4 pb-2">8. Capacité juridique</p>
+          <ul className="list-disc list-inside ml-12">
+            <li>Une fois déclarée et publiée, l'OSC peut ester en justice, recevoir des dons, posséder des biens nécessaires à son objet, ouvrir un compte bancaire, etc. (art. 16).</li>
+          </ul>         
+        </div>
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-xl py-4 my-4 shadow-md">
+          <p className="font-bold text-4xl">
+            Obligation post-déclaration
+          </p>
+        
+          <p className="font-bold text-lg text-[#2a591d] pt-4 pb-2">9. Mise à jour (art. 17-18)</p>
+          <ul className="list-disc list-inside ml-12">
+            <li>Déclarer tout changement (dirigeants, siège, statuts, logo, etc.) dans le mois.</li>
+            <li>Publication au Journal officiel.</li>
+            <li>Tenue de registres cotés et paraphés.</li>
+          </ul>
+
+          <p className="font-bold text-lg text-[#2a591d] pt-4 pb-2">10. Respect des lois sociales et fiscales (art. 19, 33)</p>
+          <ul className="list-disc list-inside ml-12">
+            <li>Déclarations fiscales obligatoires.</li>
+            <li>Tenue d'un compte bancaire.</li>
+          </ul>
+
+          <p className="font-bold text-lg text-[#2a591d] pt-4 pb-2">11. Organisation interne (art. 25-31)</p>
+          <ul className="list-disc list-inside ml-12">
+            <li>OSC dotée d'un organe délibérant, exécutif et de contrôle.</li>
+            <li>Principes de transparence et de démocratie.</li>
+            <li>Manuel de procédures administratives, financières et comptables.</li>
+          </ul>
+        </div>
+
+        <p className="max-w-4xl mx-auto">
+          Il faut retenir que la formalisation d'une OSC en Côte d'Ivoire suit un processus structuré : <b>constitution libre - déclaration préalable avec pièces justificatives - enquête de moralité - récépissé et publication au Journal officiel - capacité juridique et obligations de fonctionnement</b>.
+        </p>
+        
+      </div>      
 
       {/* Prêt à se faire accompagner */}
       <div className="py-8">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 rounded-lg py-8 space-y-6 text-center text-white shadow-md border border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 rounded-lg py-8 space-y-6 text-center text-white shadow-md border border-gray-200">
           <p className="font-bold text-4xl text-black">Prêt à se faire accompagner ?</p>
           <p className="max-w-2xl mx-auto text-gray-800">
             Nous sommes votre partenaire pour réussir votre processus de formalisation. Nous contacter pour bénéficier d'un accompagnement personnalisé et propulser votre organisation vers de nouveaux sommets.
