@@ -53,7 +53,7 @@ export default function Stats() {
 
         setStats([
           {
-            label: "CRASC",
+            label: "Nombre de CRASC",
             value: data.crasc?.total ?? 0,
             icon: Landmark,
             bg: "bg-[#E05017]/10",
@@ -62,7 +62,7 @@ export default function Stats() {
             gradient: "from-[#E05017] to-[#d04010]",
           },
           {
-            label: "Régions et districts",
+            label: "Régions et districts d'intervention",
             value: data.regions?.total ?? 0,
             icon: MapPin,
             bg: "bg-green-50",
@@ -79,7 +79,7 @@ export default function Stats() {
             border: "border-blue-200",
             gradient: "from-blue-500 to-blue-600",
           },
-/*           {
+/*{
             label: "Offres de projets",
             value: data.jobs?.active ?? 0,
             icon: Briefcase,
@@ -159,7 +159,7 @@ export default function Stats() {
                   {projets.length}
                 </p>
                 <p className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/90 transition-colors duration-300 text-center">
-                  Offres de projets
+                  Offres de projets disponibles
                 </p>
               </div>
             </div>
