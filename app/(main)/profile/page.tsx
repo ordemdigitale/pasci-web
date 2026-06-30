@@ -1,10 +1,22 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ImageWithFallback } from '@/lib/imageWithFallback';
 import { User, Mail, Phone, Building, MapPin, Lock, Camera, Save } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProfilePage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace('/auth/login');
+    }
+  }, [loading, user, router]);
+
+  if (loading || !user) return null;
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
   const [profileData, setProfileData] = useState({
