@@ -40,11 +40,20 @@ export const userService = {
    * Get all users (admin only)
    */
   async getAllUsers(): Promise<IUser[]> {
-    const response = await fetchWithAuth(`${API_URL}/users/`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch users");
+    const allUsers: IUser[] = [];
+    let skip = 0;
+    const limit = 500;
+    while (true) {
+      const response = await fetchWithAuth(`${API_URL}/users/?skip=${skip}&limit=${limit}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const batch: IUser[] = await response.json();
+      allUsers.push(...batch);
+      if (batch.length < limit) break;
+      skip += limit;
     }
-    return await response.json();
+    return allUsers;
   },
 
   /**

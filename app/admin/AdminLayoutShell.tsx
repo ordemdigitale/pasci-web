@@ -14,7 +14,6 @@ const OSC_ALLOWED_ROUTES = ["/admin", "/admin/mon-osc"];
 // Routes NON autorisées pour les admins CRASC (paramètres globaux plateforme)
 const CRASC_ADMIN_BLOCKED_PREFIXES = [
   "/admin/hero-slides",
-  "/admin/settings",
   "/admin/mon-osc",
   "/admin/dons",
   "/admin/volontaires",
@@ -29,7 +28,9 @@ const REDACTEUR_CRASC_ALLOWED_PREFIXES = [
   "/admin/gestion-des-actualites",
   "/admin/gestion-des-crasc/articles",
   "/admin/gestion-des-crasc/videos",
+  "/admin/gestion-des-crasc/agenda",
   "/admin/profile",
+  "/admin/settings",
 ];
 
 function OscRouteGuard({ children }: { children: React.ReactNode }) {
