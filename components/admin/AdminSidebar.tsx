@@ -181,7 +181,7 @@ export default function AdminSidebar({
             }
             return item;
           }),
-        { icon: <Settings size={20} />, label: "Paramètres", href: "/admin/profile" },
+        { icon: <Settings size={20} />, label: "Paramètres", href: "/admin/profile" } as NavItem,
       ]
     : isRedacteurCrasc
     ? [
@@ -200,7 +200,7 @@ export default function AdminSidebar({
             }
             return item;
           }),
-        { icon: <Settings size={20} />, label: "Paramètres", href: "/admin/profile" },
+        { icon: <Settings size={20} />, label: "Paramètres", href: "/admin/profile" } as NavItem,
       ]
     : isRedacteur
     ? allNavItems.filter((item) => !item.staffOnly && item.href !== "/admin/mon-osc")
