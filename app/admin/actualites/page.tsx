@@ -70,7 +70,7 @@ export default function ActualitesPage() {
       const query = searchQuery.toLowerCase();
       const filtered = actualites.filter(article =>
         article.title.toLowerCase().includes(query) ||
-        article.content.toLowerCase().includes(query) ||
+        (article.content || '').toLowerCase().includes(query) ||
         article.crasc?.name.toLowerCase().includes(query) ||
         article.osc?.name.toLowerCase().includes(query)
       );

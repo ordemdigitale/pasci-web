@@ -46,7 +46,7 @@ export default function GestionActualitesPage() {
       const query = searchQuery.toLowerCase();
       const filtered = articles.filter(article =>
         article.title.toLowerCase().includes(query) ||
-        article.content.toLowerCase().includes(query) ||
+        (article.content || '').toLowerCase().includes(query) ||
         article.crasc?.name.toLowerCase().includes(query) ||
         article.osc?.name.toLowerCase().includes(query)
       );
