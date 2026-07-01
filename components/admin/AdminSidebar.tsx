@@ -164,38 +164,44 @@ export default function AdminSidebar({
   const navItems = isOscUser
     ? allNavItems.filter((item) => item.href === "/admin" || item.href === "/admin/mon-osc")
     : isCrascAdmin
-    ? allNavItems
-      .filter((item) =>
-        item.href !== "/admin/mon-osc" &&
-        item.href !== "/admin/settings" &&
-        item.href !== "/admin/hero-slides" &&
-        item.href !== "/admin/dons" &&
-        item.href !== "/admin/volontaires" &&
-        item.href !== "/admin/contact"
-      )
-      .map((item) => {
-        // Retirer PTF des sous-menus "Organisations"
-        if (item.submenus?.some((s) => s.href === "/admin/ptf")) {
-          return { ...item, submenus: item.submenus.filter((s) => s.href !== "/admin/ptf") };
-        }
-        return item;
-      })
+    ? [
+        ...allNavItems
+          .filter((item) =>
+            item.href !== "/admin/mon-osc" &&
+            item.href !== "/admin/settings" &&
+            item.href !== "/admin/hero-slides" &&
+            item.href !== "/admin/dons" &&
+            item.href !== "/admin/volontaires" &&
+            item.href !== "/admin/contact"
+          )
+          .map((item) => {
+            // Retirer PTF des sous-menus "Organisations"
+            if (item.submenus?.some((s) => s.href === "/admin/ptf")) {
+              return { ...item, submenus: item.submenus.filter((s) => s.href !== "/admin/ptf") };
+            }
+            return item;
+          }),
+        { icon: <Settings size={20} />, label: "Paramètres", href: "/admin/profile" },
+      ]
     : isRedacteurCrasc
-    ? allNavItems
-        .filter((item) => item.href === "/admin" || item.label === "Contenu" || item.href === "/admin/gestion-des-crasc/videos" || item.href === "/admin/gestion-des-crasc/agenda")
-        .map((item) => {
-          if (item.label === "Contenu" && item.submenus) {
-            return {
-              ...item,
-              submenus: item.submenus.filter(
-                (s) =>
-                  s.href === "/admin/formations" ||
-                  s.href === "/admin/actualites"
-              ),
-            };
-          }
-          return item;
-        })
+    ? [
+        ...allNavItems
+          .filter((item) => item.href === "/admin" || item.label === "Contenu" || item.href === "/admin/gestion-des-crasc/videos" || item.href === "/admin/gestion-des-crasc/agenda")
+          .map((item) => {
+            if (item.label === "Contenu" && item.submenus) {
+              return {
+                ...item,
+                submenus: item.submenus.filter(
+                  (s) =>
+                    s.href === "/admin/formations" ||
+                    s.href === "/admin/actualites"
+                ),
+              };
+            }
+            return item;
+          }),
+        { icon: <Settings size={20} />, label: "Paramètres", href: "/admin/profile" },
+      ]
     : isRedacteur
     ? allNavItems.filter((item) => !item.staffOnly && item.href !== "/admin/mon-osc")
     : allNavItems.filter((item) => item.href !== "/admin/mon-osc");

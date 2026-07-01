@@ -33,6 +33,13 @@ export default function AdminNavbar({ setSidebarOpen, title = "Tableau de bord" 
     ? "Rédacteur"
     : "Utilisateur";
 
+  // Platform settings (superuser or global staff without crasc_id)
+  // Account settings for everyone else (crascAdmin, rédacteur, osc…)
+  const settingsHref =
+    user?.is_superuser || (user?.is_staff && !user?.crasc_id)
+      ? "/admin/settings"
+      : "/admin/profile";
+
   const displayName = user
     ? [user.first_name, user.last_name].filter(Boolean).join(" ") || user.username || user.email
     : "";
@@ -239,7 +246,7 @@ export default function AdminNavbar({ setSidebarOpen, title = "Tableau de bord" 
                 </Link>
 
                 <Link
-                  href="/admin/settings"
+                  href={settingsHref}
                   className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                   onClick={() => setShowUserMenu(false)}
                 >
