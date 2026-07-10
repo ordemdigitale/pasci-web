@@ -24,6 +24,7 @@ import {
   X,
   Target,
   Loader2,
+  ExternalLink,
 } from "lucide-react";
 import { IJobs } from "@/types/api.types";
 
@@ -328,7 +329,7 @@ export default function EmploisPage() {
                   {job.expiration_date && (
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Calendar className="w-4 h-4 text-gray-400" />
-                      <span>Expire le {formatDate(job.expiration_date)}</span>
+                      <span>Candidature jusqu'au {formatDate(job.expiration_date)}</span>
                     </div>
                   )}
                 </div>
@@ -516,11 +517,30 @@ export default function EmploisPage() {
                       <Calendar className="w-5 h-5 text-red-600 mt-0.5" />
                       <div>
                         <p className="text-sm font-semibold text-gray-700">
-                          Date d'expiration
+                          Date limite de candidature
                         </p>
                         <p className="text-red-600 font-bold">
                           {formatDate(selectedJob.expiration_date)}
                         </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedJob.offre_url && (
+                    <div className="flex items-start gap-3 p-4 bg-orange-50 rounded-lg">
+                      <ExternalLink className="w-5 h-5 text-[#E05017] mt-0.5" />
+                      <div>
+                        <p className="text-sm font-semibold text-gray-700">
+                          Lien de l'offre
+                        </p>
+                        <a
+                          href={selectedJob.offre_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#E05017] font-bold break-all hover:underline"
+                        >
+                          {selectedJob.offre_url}
+                        </a>
                       </div>
                     </div>
                   )}

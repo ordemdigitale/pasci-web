@@ -1,10 +1,6 @@
 import React from 'react'
 import Link from 'next/link';
-import { Button } from '@/components/ui/button'
-import {
-  Briefcase,
-  MapPin
-} from "lucide-react";
+import { API_ENDPOINTS } from '@/lib/api-config';
 
 interface IJobs {
   id: string;
@@ -12,12 +8,14 @@ interface IJobs {
   description: string;
   location: string;
   type: string;
+  offre_url?: string | null;
   is_expired: boolean;
   publication_date: string;
+  expiration_date?: string;
 }
 
 export default async function AdminOffresEmploi() {
-  const response = await fetch("http://localhost:8000/api/v1/jobs/", {
+  const response = await fetch(API_ENDPOINTS.jobs.list, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -26,7 +24,11 @@ export default async function AdminOffresEmploi() {
   });
   const jobs: IJobs[] = await response.json();
 
-  console.log("Jobs fetched from API into Admin Offres emploi: ", jobs);
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("fr-FR");
+  };
+
   return (
     <section className="max-w-5xl mx-auto font-poppins bg-slate-50">
       <div className="mb-4">
@@ -59,6 +61,8 @@ export default async function AdminOffresEmploi() {
               <th className="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Localisation</th>
               <th className="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Type de contrat</th>
               <th className="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Date de publication</th>
+              <th className="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Date limite de candidature</th>
+              <th className="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Lien</th>
               <th className="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Validité</th>
             </tr>
           </thead>
@@ -69,7 +73,17 @@ export default async function AdminOffresEmploi() {
                 <td className="py-2 px-4 border-b border-gray-200 text-sm">{job.description.substring(0, 100)}...</td>
                 <td className="py-2 px-4 border-b border-gray-200 text-sm">{job.location}</td>
                 <td className="py-2 px-4 border-b border-gray-200 text-sm">{job.type}</td>
-                <td className="py-2 px-4 border-b border-gray-200 text-sm">{job.publication_date}</td>
+                <td className="py-2 px-4 border-b border-gray-200 text-sm">{formatDate(job.publication_date)}</td>
+                <td className="py-2 px-4 border-b border-gray-200 text-sm">{formatDate(job.expiration_date)}</td>
+                <td className="py-2 px-4 border-b border-gray-200 text-sm">
+                  {job.offre_url ? (
+                    <a href={job.offre_url} target="_blank" rel="noopener noreferrer" className="text-[#E05017] hover:underline">
+                      Ouvrir
+                    </a>
+                  ) : (
+                    <span className="text-gray-400">-</span>
+                  )}
+                </td>
                 <td className={`py-2 px-4 border-b border-gray-200 text-sm font-semibold ${job.is_expired ? 'text-red-600' : 'text-green-600'}`}>
                   <span className="bg-">{job.is_expired ? "Expirée" : "Valide"}</span>
                 </td>

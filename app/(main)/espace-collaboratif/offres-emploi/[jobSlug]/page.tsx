@@ -94,6 +94,14 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
     return date.toLocaleDateString('fr-FR');
   };
 
+  const formatFullDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
   return (
     <div className="bg-[#f8f6f6] min-h-screen font-poppins">
       <main className="max-w-[840px] mx-auto px-6 py-12">
@@ -127,6 +135,11 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
                 <span className="flex items-center gap-1.5 font-medium text-xs bg-gray-100 px-2 py-0.5 rounded">
                   <Clock className="w-3 h-3" /> {formatDate(jobData.publication_date)}
                 </span>
+                {jobData.expiration_date && (
+                  <span className="flex items-center gap-1.5 font-semibold text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded">
+                    <Clock className="w-3 h-3" /> Candidature jusqu'au {formatFullDate(jobData.expiration_date)}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -159,6 +172,24 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
 
         {/* Content Sections */}
         <div className="space-y-12">
+          {jobData.offre_url && (
+            <section className="bg-white rounded-xl p-6 border border-[#E05017]/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <p className="text-sm font-bold text-gray-900">Lien pour plus d'informations</p>
+                <p className="text-sm text-gray-600">Consultez la page officielle de l'offre ou les instructions de candidature.</p>
+              </div>
+              <a
+                href={jobData.offre_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 bg-[#E05017] text-white h-12 px-6 rounded-xl font-bold hover:bg-[#c44315] transition-colors"
+              >
+                Plus d'informations
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </section>
+          )}
+
           {/* Description */}
           <section>
             <div className="flex items-center gap-3 mb-6">

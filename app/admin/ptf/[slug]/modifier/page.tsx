@@ -8,8 +8,9 @@ import * as z from "zod";
 import { ArrowLeft, Upload, X, Plus, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { IPTF } from "@/types/api.types";
+import { fetchWithAuth } from "@/lib/auth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Validation schema
 const PTF_CATEGORIES = [
@@ -171,7 +172,7 @@ export default function EditPTFPage() {
       if (coverFile) formData.append("cover", coverFile);
       else if (removeCover) formData.append("remove_cover", "1");
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/ptf/${slug}`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/ptf/${slug}`, {
         method: "PATCH",
         body: formData,
       });

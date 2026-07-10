@@ -19,8 +19,9 @@ const jobSchema = z.object({
   description: z.string().min(50, "La description doit contenir au moins 50 caractères."),
   location: z.string().min(2, "La localisation est requise."),
   type: z.string().min(1, "Le type de contrat est requis."),
+  offre_url: z.string().min(1, "Le lien de l'offre est requis.").url("Veuillez saisir une URL valide."),
   publication_date: z.string().optional(),
-  expiration_date: z.string().optional(),
+  expiration_date: z.string().min(1, "La date limite de candidature est requise."),
   is_expired: z.boolean().optional(),
 });
 
@@ -132,6 +133,7 @@ export default function EditJobPage() {
         setValue("description", data.description);
         setValue("location", data.location);
         setValue("type", data.type);
+        setValue("offre_url", data.offre_url || "");
         setValue("is_expired", data.is_expired);
 
         // Set dates if available
@@ -181,6 +183,7 @@ export default function EditJobPage() {
         description: data.description,
         location: data.location,
         type: data.type,
+        offre_url: data.offre_url,
         is_expired: data.is_expired || false,
         missions: filteredMissions.length > 0 ? JSON.stringify(filteredMissions) : null,
         requirements: filteredRequirements.length > 0 ? JSON.stringify(filteredRequirements) : null,
@@ -360,6 +363,24 @@ export default function EditJobPage() {
                   )}
                 </div>
               </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Lien de l'offre *
+                </label>
+                <input
+                  {...register("offre_url")}
+                  type="url"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                  placeholder="https://exemple.org/offre"
+                />
+                <p className="text-gray-500 text-xs mt-1">
+                  Lien vers la page contenant les informations complètes ou les instructions de candidature.
+                </p>
+                {errors.offre_url && (
+                  <p className="text-red-600 text-sm mt-1">{errors.offre_url.message}</p>
+                )}
+              </div>
             </div>
           </div>
 
@@ -384,13 +405,16 @@ export default function EditJobPage() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Date d'expiration
+                    Date limite de candidature *
                   </label>
                   <input
                     {...register("expiration_date")}
                     type="date"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
                   />
+                  {errors.expiration_date && (
+                    <p className="text-red-600 text-sm mt-1">{errors.expiration_date.message}</p>
+                  )}
                 </div>
               </div>
 

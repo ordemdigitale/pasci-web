@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, Phone, CheckCircle, Loader2, Smartphone } from "lucide-react";
 
 const MONTANTS = [5000, 10000, 25000, 50000, 100000];
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const DEFAULT_PAYMENT_NUMBERS = {
+  wave_number: "+225 07 09 51 88 75",
+  orange_money_number: "+225 07 09 51 88 75",
+};
 
 type Step = "form" | "instructions" | "done";
 
@@ -30,6 +34,21 @@ export default function FaireUnDonPage() {
   const [operateur, setOperateur] = useState("");
   const [isSoumitting, setIsSoumitting] = useState(false);
   const [soumitError, setSoumitError] = useState("");
+  const [paymentNumbers, setPaymentNumbers] = useState(DEFAULT_PAYMENT_NUMBERS);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/v1/config/payment-numbers`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { wave_number?: string; orange_money_number?: string } | null) => {
+        if (data) {
+          setPaymentNumbers({
+            wave_number: data.wave_number || DEFAULT_PAYMENT_NUMBERS.wave_number,
+            orange_money_number: data.orange_money_number || DEFAULT_PAYMENT_NUMBERS.orange_money_number,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -152,7 +171,7 @@ export default function FaireUnDonPage() {
                   <p className="text-xs text-blue-600">Paiement mobile</p>
                 </div>
               </div>
-              <p className="text-xl font-bold text-blue-900 font-mono">+225 07 07 07 07 07</p>
+              <p className="text-xl font-bold text-blue-900 font-mono">{paymentNumbers.wave_number}</p>
             </div>
             <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-3">
@@ -164,7 +183,7 @@ export default function FaireUnDonPage() {
                   <p className="text-xs text-orange-600">Paiement mobile</p>
                 </div>
               </div>
-              <p className="text-xl font-bold text-orange-900 font-mono">+225 05 05 05 05 05</p>
+              <p className="text-xl font-bold text-orange-900 font-mono">{paymentNumbers.orange_money_number}</p>
             </div>
           </div>
 
@@ -393,14 +412,14 @@ export default function FaireUnDonPage() {
                   <Smartphone className="w-5 h-5 text-blue-600 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-blue-900">Wave</p>
-                    <p className="font-mono">+225 07 07 07 07 07</p>
+                    <p className="font-mono">{paymentNumbers.wave_number}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-xl">
                   <Smartphone className="w-5 h-5 text-orange-600 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-orange-900">Orange Money</p>
-                    <p className="font-mono">+225 05 05 05 05 05</p>
+                    <p className="font-mono">{paymentNumbers.orange_money_number}</p>
                   </div>
                 </div>
               </div>

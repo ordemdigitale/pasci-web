@@ -13,6 +13,8 @@ En tant que Chargé de Mission Innovation, vous jouerez un rôle clé dans le d�
     slug: 'charge-mission-innovation',
     employer: 'PASCI Côte d\'Ivoire',
     publication_date: new Date().toISOString(),
+    expiration_date: new Date(Date.now() + 1209600000).toISOString(),
+    offre_url: 'https://plateforme-osci.org/espace-collaboratif/offres-emploi/charge-mission-innovation',
     is_expired: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -28,6 +30,8 @@ Votre mission principale sera de renforcer la visibilité de PASCI sur les plate
     slug: 'responsable-communication-digitale',
     employer: 'PASCI Sénégal',
     publication_date: new Date(Date.now() - 86400000).toISOString(),
+    expiration_date: new Date(Date.now() + 1814400000).toISOString(),
+    offre_url: 'https://plateforme-osci.org/espace-collaboratif/offres-emploi/responsable-communication-digitale',
     is_expired: false,
     created_at: new Date(Date.now() - 86400000).toISOString(),
     updated_at: new Date(Date.now() - 86400000).toISOString()
@@ -43,6 +47,8 @@ En collaboration avec nos partenaires régionaux, vous développerez et supervis
     slug: 'chef-projet-developpement-durable',
     employer: 'PASCI Burkina Faso',
     publication_date: new Date(Date.now() - 172800000).toISOString(),
+    expiration_date: new Date(Date.now() + 1555200000).toISOString(),
+    offre_url: 'https://plateforme-osci.org/espace-collaboratif/offres-emploi/chef-projet-developpement-durable',
     is_expired: false,
     created_at: new Date(Date.now() - 172800000).toISOString(),
     updated_at: new Date(Date.now() - 172800000).toISOString()
@@ -58,6 +64,8 @@ Votre expertise en analyse de données sera cruciale pour évaluer l'efficacité
     slug: 'analyste-donnees-impact',
     employer: 'PASCI Sénégal',
     publication_date: new Date(Date.now() - 259200000).toISOString(),
+    expiration_date: new Date(Date.now() + 1296000000).toISOString(),
+    offre_url: 'https://plateforme-osci.org/espace-collaboratif/offres-emploi/analyste-donnees-impact',
     is_expired: false,
     created_at: new Date(Date.now() - 259200000).toISOString(),
     updated_at: new Date(Date.now() - 259200000).toISOString()
@@ -73,6 +81,8 @@ En tant que Coordonnateur RSE, vous développerez des programmes d'engagement de
     slug: 'coordonnateur-rse-senior',
     employer: 'PASCI Côte d\'Ivoire',
     publication_date: new Date(Date.now() - 345600000).toISOString(),
+    expiration_date: new Date(Date.now() + 1036800000).toISOString(),
+    offre_url: 'https://plateforme-osci.org/espace-collaboratif/offres-emploi/coordonnateur-rse-senior',
     is_expired: false,
     created_at: new Date(Date.now() - 345600000).toISOString(),
     updated_at: new Date(Date.now() - 345600000).toISOString()
@@ -88,6 +98,8 @@ Vous assurerez une gestion efficace des agendas, coordonnerez les réunions stra
     slug: 'assistant-direction',
     employer: 'PASCI Togo',
     publication_date: new Date(Date.now() - 432000000).toISOString(),
+    expiration_date: new Date(Date.now() + 864000000).toISOString(),
+    offre_url: 'https://plateforme-osci.org/espace-collaboratif/offres-emploi/assistant-direction',
     is_expired: false,
     created_at: new Date(Date.now() - 432000000).toISOString(),
     updated_at: new Date(Date.now() - 432000000).toISOString()

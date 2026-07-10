@@ -27,6 +27,10 @@ import { getFormationBySlug, inscrireFormation, verifierCertificat, IFormation }
 import { getStoredUser, fetchWithAuth, getToken } from '@/lib/auth';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const DEFAULT_PAYMENT_NUMBERS = {
+  wave_number: "+225 07 09 51 88 75",
+  orange_money_number: "+225 07 09 51 88 75",
+};
 
 interface ILecon {
   id: number;
@@ -98,6 +102,7 @@ export default function FormationDetailPage() {
   const [soumettreLoading, setSoumettreLoading] = useState(false);
   const [soumettreError, setSoumettreError] = useState("");
   const [soumettreSuccess, setSoumettreSuccess] = useState(false);
+  const [paymentNumbers, setPaymentNumbers] = useState(DEFAULT_PAYMENT_NUMBERS);
 
   // Certificat
   const [certCode, setCertCode] = useState("");
@@ -202,6 +207,18 @@ export default function FormationDetailPage() {
       }
     }
     load();
+
+    fetch(`${API_BASE_URL}/api/v1/config/payment-numbers`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { wave_number?: string; orange_money_number?: string } | null) => {
+        if (data) {
+          setPaymentNumbers({
+            wave_number: data.wave_number || DEFAULT_PAYMENT_NUMBERS.wave_number,
+            orange_money_number: data.orange_money_number || DEFAULT_PAYMENT_NUMBERS.orange_money_number,
+          });
+        }
+      })
+      .catch(() => {});
   }, [formationSlug]);
 
   async function inscrire(nom: string, prenoms: string, email: string, phone?: string, categorie?: string) {
@@ -703,7 +720,7 @@ export default function FormationDetailPage() {
                           </div>
                           <div>
                             <p className="text-xs font-semibold text-blue-800">Wave</p>
-                            <p className="font-mono font-bold text-blue-900">+225 07 09 51 88 75</p>
+                            <p className="font-mono font-bold text-blue-900">{paymentNumbers.wave_number}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3 bg-orange-50 border border-orange-200 rounded-xl p-4">
@@ -712,7 +729,7 @@ export default function FormationDetailPage() {
                           </div>
                           <div>
                             <p className="text-xs font-semibold text-orange-800">Orange Money</p>
-                            <p className="font-mono font-bold text-orange-900">+225 07 09 51 88 75</p>
+                            <p className="font-mono font-bold text-orange-900">{paymentNumbers.orange_money_number}</p>
                           </div>
                         </div>
                       </div>

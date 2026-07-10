@@ -2,14 +2,18 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader } from 'lucide-react';
 import Link from 'next/link';
+import { fetchWithAuth } from '@/lib/auth';
+import { API_ENDPOINTS } from '@/lib/api-config';
 
 export default function AdminCreateJobPage() {
   const [title, setTitle] = useState('');
+  const [employer, setEmployer] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [type, setType] = useState('');
+  const [offreUrl, setOffreUrl] = useState('');
+  const [expirationDate, setExpirationDate] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -18,22 +22,29 @@ export default function AdminCreateJobPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/jobs/', { // Your FastAPI URL
+      const response = await fetchWithAuth(API_ENDPOINTS.jobs.create, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, location, type }),
+        body: JSON.stringify({
+          title,
+          employer,
+          description,
+          location,
+          type,
+          offre_url: offreUrl,
+          expiration_date: expirationDate,
+        }),
       });
 
       if (response.ok) {
-        alert('Job created successfully!');
+        alert("Offre d'emploi créée avec succès.");
         router.push('/admin/espace-collaboratif/offres-emploi'); // Redirect to job list
       } else {
         const errorData = await response.json();
-        alert(`Error: ${errorData.detail || 'Failed to create job'}`);
+        alert(`Erreur : ${errorData.detail || "Impossible de créer l'offre"}`);
       }
     } catch (error) {
       console.error('Submission error:', error);
-      alert('Network error. Is the backend running?');
+      alert('Erreur réseau. Vérifiez que le serveur API est disponible.');
     } finally {
       setLoading(false);
     }
@@ -58,6 +69,17 @@ export default function AdminCreateJobPage() {
               className="w-full p-2 border border-gray-300 rounded-lg"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="employer" className="block text-gray-700 font-medium mb-2">Employeur</label>
+            <input
+              id="employer"
+              type="text"
+              required
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              value={employer}
+              onChange={(e) => setEmployer(e.target.value)}
             />
           </div>
           <div>
@@ -86,6 +108,29 @@ export default function AdminCreateJobPage() {
               className="w-full p-2 border border-gray-300 rounded-lg"
               value={type}
               onChange={(e) => setType(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="offre-url" className="block text-gray-700 font-medium mb-2">Lien de l'offre</label>
+            <input
+              id="offre-url"
+              type="url"
+              required
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              value={offreUrl}
+              onChange={(e) => setOffreUrl(e.target.value)}
+              placeholder="https://exemple.org/offre"
+            />
+          </div>
+          <div>
+            <label htmlFor="expiration-date" className="block text-gray-700 font-medium mb-2">Date limite de candidature</label>
+            <input
+              id="expiration-date"
+              type="date"
+              required
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              value={expirationDate}
+              onChange={(e) => setExpirationDate(e.target.value)}
             />
           </div>
 

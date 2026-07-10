@@ -250,6 +250,7 @@ export interface IJobs {
   type: string;
   slug: string;
   employer: string;
+  offre_url?: string | null;
   publication_date: string;
   expiration_date?: string;
   is_expired: boolean;

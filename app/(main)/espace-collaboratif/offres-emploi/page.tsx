@@ -6,6 +6,7 @@ import { ImageWithFallback } from '@/lib/imageWithFallback'
 import {
   Search,
   Briefcase,
+  Calendar,
   MapPin
 } from "lucide-react";
 import { IJobs } from '@/types/api.types';
@@ -33,6 +34,15 @@ export default function PageOffreEmploi() {
       .catch(() => setError("Impossible de charger les offres d'emploi."))
       .finally(() => setLoading(false));
   }, []);
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return null;
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
 
   if (loading) {
     return (
@@ -191,10 +201,19 @@ export default function PageOffreEmploi() {
                     <span className='text-sm'>{job.location}</span>
                   </div>
                   
-                  <div className="flex flex-row items-center gap-2 text-gray-700 text-sm mb-8">
+                  <div className="flex flex-row items-center gap-2 text-gray-700 text-sm mb-3">
                     <Briefcase className="w-4 h-4" />
                     <span className='inline-block px-3 py-1 rounded-full text-xs text-white bg-[#E05017]'>{job.type}</span>
                   </div>
+
+                  {job.expiration_date && (
+                    <div className="flex flex-row items-center gap-2 text-red-600 text-sm mb-8">
+                      <Calendar className="w-4 h-4" />
+                      <span className="text-sm font-semibold">
+                        Candidature jusqu'au {formatDate(job.expiration_date)}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <Link href={`/espace-collaboratif/offres-emploi/${job.slug}`}>
                   <button className="px-4 py-2 border border-transparent hover:border hover:border-[#E05017] rounded-3xl bg-[#E05017] hover:bg-transparent text-white hover:text-[#E05017] transition-all cursor-pointer">
