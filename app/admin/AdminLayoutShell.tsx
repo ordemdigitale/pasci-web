@@ -13,7 +13,6 @@ const OSC_ALLOWED_ROUTES = ["/admin", "/admin/mon-osc"];
 
 // Routes NON autorisées pour les admins CRASC (paramètres globaux plateforme)
 const CRASC_ADMIN_BLOCKED_PREFIXES = [
-  "/admin/hero-slides",
   "/admin/mon-osc",
   "/admin/dons",
   "/admin/volontaires",

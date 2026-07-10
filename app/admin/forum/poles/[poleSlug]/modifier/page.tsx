@@ -16,6 +16,14 @@ const AGENDA_STATUS_OPTIONS: { value: AgendaStatus; label: string }[] = [
   { value: "non_realise", label: "Non réalisé" },
 ];
 
+async function readApiError(response: Response, fallback: string) {
+  const data = await response.json().catch(() => null);
+  if (typeof data?.detail === "string") return data.detail;
+  if (Array.isArray(data?.detail)) return data.detail.map((item: { msg?: string }) => item.msg).filter(Boolean).join(" ") || fallback;
+  if (data?.detail?.errors) return data.detail.errors.map((item: { message?: string }) => item.message).filter(Boolean).join(" ") || fallback;
+  return fallback;
+}
+
 export default function AdminModifierPolePage() {
   const params = useParams();
   const router = useRouter();
@@ -44,9 +52,10 @@ export default function AdminModifierPolePage() {
       .then((data) => {
         setName(data.name || "");
         setDescription(data.description || "");
-        if (data.image_path) {
+        if (data.image_url || data.image_path) {
           const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-          const url = data.image_path.startsWith("/") ? data.image_path : `${API_BASE}/static/${data.image_path}`;
+          const imagePath = data.image_url || data.image_path;
+          const url = imagePath.startsWith("http") || imagePath.startsWith("/") ? imagePath : `${API_BASE}/static/${imagePath}`;
           setImagePreview(url);
         }
         setIsActive(data.is_active ?? true);
@@ -131,8 +140,7 @@ export default function AdminModifierPolePage() {
         body: formData,
       });
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.detail || "Erreur lors de la mise à jour.");
+        throw new Error(await readApiError(res, "Erreur lors de la mise à jour."));
       }
       router.push("/admin/forum/poles");
     } catch (err: unknown) {

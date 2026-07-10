@@ -25,6 +25,7 @@ interface IPoleConcertation {
   category: string | null;
   description: string | null;
   image_path: string | null;
+  image_url?: string | null;
   objectifs: string | null;
   is_active: boolean;
   sujets_count: number;

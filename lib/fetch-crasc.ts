@@ -77,8 +77,18 @@ export async function fetchAllOscType(): Promise<IOscType[]> {
 }
 
 // Fetch paginated OSC from API
-export async function fetchAllOsc(page = 1, size = 20): Promise<{ items: IOsc[]; total: number; page: number; size: number; pages: number }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?page=${page}&size=${size}`, {
+export async function fetchAllOsc(
+  page = 1,
+  size = 20,
+  filters: { search?: string } = {}
+): Promise<{ items: IOsc[]; total: number; page: number; size: number; pages: number }> {
+  const params = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  });
+  if (filters.search?.trim()) params.set("search", filters.search.trim());
+
+  const response = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?${params.toString()}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"

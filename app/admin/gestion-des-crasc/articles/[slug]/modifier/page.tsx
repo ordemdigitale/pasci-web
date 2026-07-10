@@ -6,12 +6,12 @@ import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import * as Select from "@radix-ui/react-select";
 import { ICrasc, IOsc } from "@/types/api.types";
 import { fetchAllCrasc, fetchAllOsc } from "@/lib/fetch-crasc";
 import { newsService, INews } from "@/lib/services/news.service";
 import Image from "next/image";
 import ClientTextEditor from "@/components/ui/ClientTextEditor";
+import SearchableAssociationSelect from "@/components/admin/SearchableAssociationSelect";
 import {
     ArrowLeft,
     Newspaper,
@@ -21,10 +21,8 @@ import {
     Check,
     Loader2,
     AlertCircle,
-    ChevronDown,
     Image as ImageIcon,
     Building2,
-    Users,
     Edit3,
     Trash2
 } from 'lucide-react';
@@ -59,6 +57,8 @@ export default function AdminModifierArticle() {
     const [oscs, setOscs] = useState<IOsc[]>([]);
     const [loading, setLoading] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
+    const [oscLoading, setOscLoading] = useState(false);
+    const [oscSearch, setOscSearch] = useState("");
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [currentThumbnail, setCurrentThumbnail] = useState<string | null>(null);
     const [newsData, setNewsData] = useState<INews | null>(null);
@@ -73,11 +73,23 @@ export default function AdminModifierArticle() {
         fetchAllCrasc()
             .then(data => setCrascRegions(data))
             .catch(error => console.error("Erreur CRASC:", error));
-
-        fetchAllOsc()
-            .then(data => setOscs(data.items))
-            .catch(error => console.error("Erreur OSC:", error));
     }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+        setOscLoading(true);
+        fetchAllOsc(1, 100, { search: oscSearch })
+            .then(data => {
+                if (!cancelled) setOscs(data.items);
+            })
+            .catch(error => console.error("Erreur OSC:", error))
+            .finally(() => {
+                if (!cancelled) setOscLoading(false);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [oscSearch]);
 
     const { control, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<NewsForm>({
         resolver: zodResolver(newsSchema),
@@ -370,69 +382,44 @@ export default function AdminModifierArticle() {
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-6">
-                            {/* CRASC */}
-                            <div>
-                                <label htmlFor="crasc_id" className="block text-sm font-semibold text-gray-700 mb-2">
-                                    CRASC associé
-                                </label>
-                                <Controller
-                                    name="crasc_id"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select.Root onValueChange={field.onChange} value={field.value}>
-                                            <Select.Trigger className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between">
-                                                <Select.Value placeholder="Sélectionnez un CRASC" />
-                                                <ChevronDown className="w-4 h-4 text-gray-500" />
-                                            </Select.Trigger>
-                                            <Select.Content className="bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-auto z-50">
-                                                <Select.Viewport>
-                                                    {crascRegions.map((region) => (
-                                                        <Select.Item
-                                                            key={region.id}
-                                                            value={region.id.toString()}
-                                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
-                                                        >
-                                                            <Select.ItemText>{region.name}</Select.ItemText>
-                                                        </Select.Item>
-                                                    ))}
-                                                </Select.Viewport>
-                                            </Select.Content>
-                                        </Select.Root>
-                                    )}
-                                />
-                            </div>
+                            <Controller
+                                name="crasc_id"
+                                control={control}
+                                render={({ field }) => (
+                                    <SearchableAssociationSelect
+                                        label="CRASC associé"
+                                        value={field.value || ""}
+                                        options={crascRegions.map((region) => ({
+                                            id: region.id,
+                                            name: region.name,
+                                        }))}
+                                        placeholder="Sélectionnez un CRASC"
+                                        searchPlaceholder="Tapez le début du nom du CRASC..."
+                                        onChange={field.onChange}
+                                    />
+                                )}
+                            />
 
-                            {/* OSC */}
-                            <div>
-                                <label htmlFor="osc_id" className="block text-sm font-semibold text-gray-700 mb-2">
-                                    OSC associée
-                                </label>
-                                <Controller
-                                    name="osc_id"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select.Root onValueChange={field.onChange} value={field.value}>
-                                            <Select.Trigger className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between">
-                                                <Select.Value placeholder="Sélectionnez une OSC" />
-                                                <ChevronDown className="w-4 h-4 text-gray-500" />
-                                            </Select.Trigger>
-                                            <Select.Content className="bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-auto z-50">
-                                                <Select.Viewport>
-                                                    {oscs.map((osc) => (
-                                                        <Select.Item
-                                                            key={osc.id}
-                                                            value={osc.id.toString()}
-                                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
-                                                        >
-                                                            <Select.ItemText>{osc.name}</Select.ItemText>
-                                                        </Select.Item>
-                                                    ))}
-                                                </Select.Viewport>
-                                            </Select.Content>
-                                        </Select.Root>
-                                    )}
-                                />
-                            </div>
+                            <Controller
+                                name="osc_id"
+                                control={control}
+                                render={({ field }) => (
+                                    <SearchableAssociationSelect
+                                        label="OSC associée"
+                                        value={field.value || ""}
+                                        options={oscs.map((osc) => ({
+                                            id: osc.id,
+                                            name: osc.name,
+                                            subtitle: [osc.sigle, osc.crasc?.name, osc.type?.name].filter(Boolean).join(" • "),
+                                        }))}
+                                        placeholder="Sélectionnez une OSC"
+                                        searchPlaceholder="Tapez le début du nom de l'OSC..."
+                                        onChange={field.onChange}
+                                        onSearchChange={setOscSearch}
+                                        loading={oscLoading}
+                                    />
+                                )}
+                            />
                         </div>
                     </div>
 

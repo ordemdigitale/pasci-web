@@ -185,9 +185,9 @@ export default function PagePoleConcertation() {
                     key={pole.id}
                     className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 flex flex-col"
                   >
-                    {getPoleImageUrl(pole.image_path) ? (
+                    {(pole.image_url || getPoleImageUrl(pole.image_path)) ? (
                       <ImageWithFallback
-                        src={getPoleImageUrl(pole.image_path)!}
+                        src={(pole.image_url || getPoleImageUrl(pole.image_path))!}
                         alt={pole.name}
                         className="w-full h-40 object-cover"
                       />

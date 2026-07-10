@@ -370,6 +370,7 @@ export interface IPoleConcertation {
   category?: string;
   description?: string;
   image_path?: string;
+  image_url?: string | null;
   objectifs?: string;
   objectifs_list?: string[];
   objectifs_annuels?: string;

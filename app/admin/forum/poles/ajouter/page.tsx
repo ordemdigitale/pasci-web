@@ -16,6 +16,14 @@ const AGENDA_STATUS_OPTIONS: { value: AgendaStatus; label: string }[] = [
   { value: "non_realise", label: "Non réalisé" },
 ];
 
+async function readApiError(response: Response, fallback: string) {
+  const data = await response.json().catch(() => null);
+  if (typeof data?.detail === "string") return data.detail;
+  if (Array.isArray(data?.detail)) return data.detail.map((item: { msg?: string }) => item.msg).filter(Boolean).join(" ") || fallback;
+  if (data?.detail?.errors) return data.detail.errors.map((item: { message?: string }) => item.message).filter(Boolean).join(" ") || fallback;
+  return fallback;
+}
+
 export default function AdminAjouterPolePage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -83,8 +91,7 @@ export default function AdminAjouterPolePage() {
         body: formData,
       });
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.detail || "Erreur lors de la création.");
+        throw new Error(await readApiError(res, "Erreur lors de la création."));
       }
       router.push("/admin/forum/poles");
     } catch (err: unknown) {

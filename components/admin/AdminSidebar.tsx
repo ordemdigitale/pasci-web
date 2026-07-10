@@ -169,7 +169,6 @@ export default function AdminSidebar({
           .filter((item) =>
             item.href !== "/admin/mon-osc" &&
             item.href !== "/admin/settings" &&
-            item.href !== "/admin/hero-slides" &&
             item.href !== "/admin/dons" &&
             item.href !== "/admin/volontaires" &&
             item.href !== "/admin/contact"
