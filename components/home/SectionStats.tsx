@@ -104,7 +104,7 @@ export default function Stats() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-gray-900 font-extrabold text-3xl mb-3">Chiffres clés</h2>
-          <p className="text-gray-600 text-lg">Notre impact en quelques chiffres</p>
+          <p className="text-gray-600 text-lg">Découvrir la PdoC en quelques chiffres</p>
         </div>
 
         {/* Loading skeleton */}

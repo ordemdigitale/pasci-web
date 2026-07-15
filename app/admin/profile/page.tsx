@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from 'react';
-import { User, Mail, Phone, MapPin, Calendar, Save, Camera } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Save, Camera, Lock, Loader2, X, Edit } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { fetchWithAuth } from '@/lib/auth';
+import { API_BASE_URL } from '@/lib/api-config';
 
 export default function AdminProfilePage() {
   const { user } = useAuth();
@@ -26,12 +28,55 @@ export default function AdminProfilePage() {
 
   const [saving, setSaving] = useState(false);
 
+  // Changement de mot de passe
+  const [showPwdForm, setShowPwdForm] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [pwdSaving, setPwdSaving] = useState(false);
+  const [pwdError, setPwdError] = useState("");
+  const [pwdSuccess, setPwdSuccess] = useState("");
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwdError("");
+    setPwdSuccess("");
+    if (newPassword.length < 8) {
+      setPwdError("Le nouveau mot de passe doit contenir au moins 8 caractères.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPwdError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+    setPwdSaving(true);
+    try {
+      const res = await fetchWithAuth(`${API_BASE_URL}/api/v1/users/me/change-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ old_password: oldPassword, new_password: newPassword }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || "Erreur lors du changement de mot de passe.");
+      }
+      setPwdSuccess("Mot de passe modifié avec succès.");
+      setOldPassword(""); setNewPassword(""); setConfirmPassword("");
+      setShowPwdForm(false);
+      setTimeout(() => setPwdSuccess(""), 4000);
+    } catch (err: any) {
+      setPwdError(err.message);
+    } finally {
+      setPwdSaving(false);
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -246,19 +291,81 @@ export default function AdminProfilePage() {
 
           {/* Security Section */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">
-              Sécurité
-            </h3>
-            <div className="space-y-4">
-              <button className="w-full text-left px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                <p className="font-semibold text-gray-900">Changer le mot de passe</p>
-                <p className="text-sm text-gray-600">Dernière modification il y a 30 jours</p>
-              </button>
-              <button className="w-full text-left px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                <p className="font-semibold text-gray-900">Authentification à deux facteurs</p>
-                <p className="text-sm text-gray-600">Ajoutez une couche de sécurité supplémentaire</p>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Lock size={20} className="text-[#2a591d]" />
+                Mot de passe
+              </h3>
+              <button
+                onClick={() => { setShowPwdForm(!showPwdForm); setPwdError(""); setPwdSuccess(""); }}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors"
+              >
+                {showPwdForm ? <X size={16} /> : <Edit size={16} />}
+                {showPwdForm ? "Annuler" : "Modifier"}
               </button>
             </div>
+            {pwdSuccess && (
+              <div className="mb-4 bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">{pwdSuccess}</div>
+            )}
+            {!showPwdForm ? (
+              <p className="text-sm text-gray-500">••••••••</p>
+            ) : (
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                {pwdError && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{pwdError}</div>
+                )}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Mot de passe actuel</label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="password"
+                      required
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                      className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2a591d] focus:border-transparent"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Nouveau mot de passe</label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="password"
+                      required
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2a591d] focus:border-transparent"
+                      placeholder="Minimum 8 caractères"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Confirmer le nouveau mot de passe</label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="password"
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2a591d] focus:border-transparent"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={pwdSaving}
+                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#2a591d] to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-[#2a591d] disabled:opacity-50 transition-all duration-300"
+                >
+                  {pwdSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                  {pwdSaving ? "Enregistrement..." : "Mettre à jour le mot de passe"}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>

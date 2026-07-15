@@ -2,8 +2,8 @@
 
 import { Download, QrCode, Smartphone } from "lucide-react";
 
-const APK_URL = "/downloads/pasci.apk";
-const QR_URL = "/downloads/pasci-apk-qr.svg";
+const APK_URL = "/downloads/pdoc.apk";
+const QR_URL = "/downloads/pdoc-apk-qr.svg";
 
 export default function SectionMobileApp() {
   return (
@@ -20,7 +20,7 @@ export default function SectionMobileApp() {
                   Application mobile
                 </p>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-3">
-                  Télécharger PASCI sur Android
+                  Télécharger PdoC sur Android
                 </h2>
                 <p className="text-gray-600 max-w-2xl mb-5">
                   Scannez le QR code avec votre téléphone ou téléchargez directement le fichier APK.
