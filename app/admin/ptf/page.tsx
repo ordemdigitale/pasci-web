@@ -21,6 +21,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { IPTF } from "@/types/api.types";
+import { fetchWithAuth } from "@/lib/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -73,7 +74,7 @@ export default function PTFPage() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/ptf/${ptf.slug}`, {
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/ptf/${ptf.slug}`, {
         method: "DELETE",
       });
 
