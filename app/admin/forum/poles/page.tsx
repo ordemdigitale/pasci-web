@@ -175,11 +175,19 @@ export default function AdminForumPolesPage() {
                   pole.is_active ? "border-gray-200" : "border-gray-100 opacity-60"
                 }`}
               >
-                {/* Category badge */}
+                {/* Image / Icon */}
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-lg bg-[#E05017]/10 flex items-center justify-center">
-                    <MessageSquare className="w-6 h-6 text-[#E05017]" />
-                  </div>
+                  {pole.image_url ? (
+                    <img
+                      src={pole.image_url}
+                      alt={pole.name}
+                      className="w-12 h-12 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-lg bg-[#E05017]/10 flex items-center justify-center">
+                      <MessageSquare className="w-6 h-6 text-[#E05017]" />
+                    </div>
+                  )}
                 </div>
 
                 {/* Info */}
