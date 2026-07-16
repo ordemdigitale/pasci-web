@@ -37,6 +37,7 @@ export default function AdminModifierPolePage() {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageRemoved, setImageRemoved] = useState(false);
   const [isActive, setIsActive] = useState(true);
   const [objectifs, setObjectifs] = useState<string[]>([""]);
   const [objectifsAnnuels, setObjectifsAnnuels] = useState<string[]>([""]);
@@ -133,7 +134,11 @@ export default function AdminModifierPolePage() {
       formData.append("realisations", filteredRealisations.length > 0 ? JSON.stringify(filteredRealisations) : "");
       formData.append("projets_en_cours", filteredProjets.length > 0 ? JSON.stringify(filteredProjets) : "");
       formData.append("agenda", filteredAgenda.length > 0 ? JSON.stringify(filteredAgenda) : "");
-      if (image) formData.append("image", image);
+      if (image) {
+        formData.append("image", image);
+      } else if (imageRemoved) {
+        formData.append("remove_image", "true");
+      }
 
       const res = await fetchWithAuth(API_ENDPOINTS.forum.poleBySlug(poleSlug), {
         method: "PATCH",
@@ -215,7 +220,7 @@ export default function AdminModifierPolePage() {
                   <img src={imagePreview} alt="Aperçu" className="w-full h-full object-cover" />
                   <button
                     type="button"
-                    onClick={(e) => { e.stopPropagation(); setImage(null); setImagePreview(null); }}
+                    onClick={(e) => { e.stopPropagation(); setImage(null); setImagePreview(null); setImageRemoved(true); }}
                     className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-red-50"
                   >
                     <X className="w-4 h-4 text-red-500" />
@@ -237,7 +242,10 @@ export default function AdminModifierPolePage() {
               onChange={(e) => {
                 const file = e.target.files?.[0] ?? null;
                 setImage(file);
-                if (file) setImagePreview(URL.createObjectURL(file));
+                if (file) {
+                  setImagePreview(URL.createObjectURL(file));
+                  setImageRemoved(false);
+                }
               }}
             />
           </div>
