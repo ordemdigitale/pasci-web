@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Search, Trash2, Eye, X, Loader2, Users } from "lucide-react";
+import { getToken } from "@/lib/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -77,7 +78,7 @@ export default function VolontairesPage() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/v1/volontaires/${selected.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ statut, note_admin: noteAdmin }),
       });
       if (res.ok) {
@@ -95,7 +96,7 @@ export default function VolontairesPage() {
     if (!confirm("Supprimer cette candidature ?")) return;
     setIsDeleting(true);
     try {
-      await fetch(`${API_BASE_URL}/api/v1/volontaires/${id}`, { method: "DELETE" });
+      await fetch(`${API_BASE_URL}/api/v1/volontaires/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${getToken()}` } });
       setVolontaires((prev) => prev.filter((v) => v.id !== id));
       if (selected?.id === id) setSelected(null);
     } finally {

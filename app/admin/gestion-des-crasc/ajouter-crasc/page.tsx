@@ -7,6 +7,9 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { API_ENDPOINTS } from "@/lib/api-config";
+import { getToken } from "@/lib/auth";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Schema de validation pour le formulaire d'ajout de région CIV
 const crascSchema = z.object({
@@ -88,7 +91,8 @@ export default function AdminAddCrasc() {
         setLoading(false);
       };
       
-      xhr.open("POST", "http://localhost:8000/api/v1/crasc/crasc");
+      xhr.open("POST", `${API_BASE_URL}/api/v1/crasc/crasc`);
+      xhr.setRequestHeader("Authorization", `Bearer ${getToken()}`);
       xhr.send(formData);
       
     } catch (error) {

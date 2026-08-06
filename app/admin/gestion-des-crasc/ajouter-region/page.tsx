@@ -9,6 +9,7 @@ import * as z from "zod";
 import * as Select from "@radix-ui/react-select";
 import { ICrasc, IRegionCiv } from "@/types/api.types";
 import { fetchAllCrasc, fetchAllRegion } from "@/lib/fetch-crasc";
+import { getToken } from "@/lib/auth";
 
 // Get API base URL from environment variable
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -51,6 +52,7 @@ export default function AdminAddRegionCiv() {
 
       const response = await fetch(`${API_BASE_URL}/api/v1/crasc/region`, {
         method: "POST",
+        headers: { Authorization: `Bearer ${getToken()}` },
         body: formData,
       });
 
