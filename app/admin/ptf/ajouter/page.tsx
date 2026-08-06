@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { ArrowLeft, Upload, X, Plus } from "lucide-react";
 import Link from "next/link";
+import { getToken } from "@/lib/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -114,8 +115,10 @@ export default function AddPTFPage() {
       if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
       if (coverFile) formData.append("cover", coverFile);
 
+      const token = getToken();
       const response = await fetch(`${API_BASE_URL}/api/v1/ptf`, {
         method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
