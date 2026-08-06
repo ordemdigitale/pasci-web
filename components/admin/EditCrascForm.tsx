@@ -15,7 +15,6 @@ export function EditCrascForm({ crasc, onSuccess, onCancel }: EditCrascFormProps
     const [formData, setFormData] = useState({
         name: crasc.name || '',
         description: crasc.description || '',
-        osc_count: crasc.osc_count || 0,
         email_pca: (crasc as any).email_pca || '',
     });
 
@@ -51,7 +50,7 @@ export function EditCrascForm({ crasc, onSuccess, onCancel }: EditCrascFormProps
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: name === 'osc_count' ? parseInt(value) || 0 : value
+            [name]: value
         }));
     };
 
@@ -118,26 +117,6 @@ export function EditCrascForm({ crasc, onSuccess, onCancel }: EditCrascFormProps
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#E05017] focus:ring-2 focus:ring-[#E05017]/20 outline-none transition-all resize-none"
                         placeholder="Description du CRASC..."
                     />
-                </div>
-
-                {/* OSC Count Field */}
-                <div>
-                    <label htmlFor="osc_count" className="block text-sm font-semibold text-gray-700 mb-2">
-                        Nombre d'OSC membres
-                    </label>
-                    <input
-                        type="number"
-                        id="osc_count"
-                        name="osc_count"
-                        value={formData.osc_count}
-                        onChange={handleChange}
-                        min="0"
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#E05017] focus:ring-2 focus:ring-[#E05017]/20 outline-none transition-all"
-                        placeholder="0"
-                    />
-                    <p className="mt-2 text-xs text-gray-500">
-                        Ce nombre sera automatiquement calculé en fonction des OSC associées
-                    </p>
                 </div>
 
                 {/* Email PCA Field */}

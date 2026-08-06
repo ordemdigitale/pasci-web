@@ -12,7 +12,6 @@ import { API_ENDPOINTS } from "@/lib/api-config";
 const crascSchema = z.object({
   name: z.string().min(5, "Le nom du crasc doit contenir au moins 5 caractères."),
   description: z.string().optional(),
-  osc_count: z.string().min(1, "Renseigner le nombre de OSC pour ce CRASC."),
 });
 
 type CrascSchemaForm = z.infer<typeof crascSchema>;
@@ -23,7 +22,7 @@ export default function AdminAddCrasc() {
 
   const { control, handleSubmit, formState: { errors }, reset, setValue, register } = useForm<CrascSchemaForm>({
     resolver: zodResolver(crascSchema),
-    defaultValues: { name: "", description: "", osc_count: "" }
+    defaultValues: { name: "", description: "" }
   });
 
   // Gestion de la soumission du formulaire
@@ -40,10 +39,6 @@ export default function AdminAddCrasc() {
         formData.append("description", values.description);
       }
 
-      if (values.osc_count) {
-        formData.append("osc_count", values.osc_count);
-      }
-      
       const xhr = new XMLHttpRequest();
 
       xhr.onload = () => {
@@ -135,17 +130,6 @@ export default function AdminAddCrasc() {
             className="w-full p-2 border border-gray-300 rounded-lg"
           />
           {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
-        </div>
-        {/* Nombre de OSC du CRASC */}
-        <div className="mb-4">
-          <label htmlFor="osc_count" className="block text-gray-700 font-medium mb-2">Nombre de OSC</label>
-          <input
-            id="osc_count"
-            type="text"
-            {...control.register("osc_count")}
-            className="w-full p-2 border border-gray-300 rounded-lg"
-          />
-          {errors.osc_count && <p className="text-red-500 text-sm mt-1">{errors.osc_count.message}</p>}
         </div>
         {/* Groupe de boutons */}
         <div className="flex items-center justify-between pt-6 border-t border-gray-200">

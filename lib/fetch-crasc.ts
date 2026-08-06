@@ -157,7 +157,7 @@ export async function fetchSpotlightNews(): Promise<SpotlightNews[]> {
 // Update CRASC by slug
 export async function updateCrasc(
   slug: string,
-  data: { name?: string; description?: string; osc_count?: number; email_pca?: string }
+  data: { name?: string; description?: string; email_pca?: string }
 ): Promise<ICrasc> {
   const response = await fetch(`${API_BASE_URL}/api/v1/crasc/crasc/${slug}`, {
     method: "PATCH",
