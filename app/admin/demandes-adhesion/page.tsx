@@ -1,6 +1,7 @@
 "use client";
 
 import { isValidElement, useState, useEffect } from "react";
+import { getToken } from "@/lib/auth";
 import {
   Search,
   Trash2,
@@ -239,7 +240,7 @@ export default function DemandesAdhesionPage() {
       const url = filterStatut
         ? `${API_BASE_URL}/api/v1/adhesion?statut=${filterStatut}&limit=200`
         : `${API_BASE_URL}/api/v1/adhesion?limit=200`;
-      const res = await fetch(url);
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${getToken()}` } });
       if (res.ok) setDemandes(await res.json());
     } catch (e) {
       console.error(e);
@@ -274,7 +275,7 @@ export default function DemandesAdhesionPage() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/v1/adhesion/${selected.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ statut, note_admin: noteAdmin || null }),
       });
       if (res.ok) {
@@ -299,7 +300,7 @@ export default function DemandesAdhesionPage() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/v1/adhesion/${selected.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ note_admin: noteAdmin || null }),
       });
       if (res.ok) {
@@ -320,6 +321,7 @@ export default function DemandesAdhesionPage() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/v1/adhesion/${id}`, {
         method: "DELETE",
+        headers: { Authorization: `Bearer ${getToken()}` },
       });
       if (res.ok) {
         setDemandes((prev) => prev.filter((d) => d.id !== id));
