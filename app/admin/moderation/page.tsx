@@ -13,7 +13,7 @@ interface ItemEnAttente {
   title?: string;
   nom?: string;
   created_at: string;
-  type: "actualite" | "emploi" | "formation" | "projet" | "video" | "documentation" | "osc_modification";
+  type: "actualite" | "emploi" | "formation" | "projet" | "video" | "documentation" | "osc_modification" | "nouvelle_osc";
   changes?: Record<string, unknown>;
 }
 
@@ -25,6 +25,7 @@ const TYPE_CONFIG = {
   video:      { label: "Vidéo CRASC",     icon: CheckCircle, color: "text-teal-600",  bg: "bg-teal-50",  border: "border-teal-200",  adminPath: "/admin/gestion-des-crasc/videos", pathSuffix: "" },
   documentation: { label: "Ressource", icon: FileText, color: "text-indigo-600", bg: "bg-indigo-50", border: "border-indigo-200", adminPath: "/admin/ressources", pathSuffix: "/modifier" },
   osc_modification: { label: "Modification OSC", icon: Building2, color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", adminPath: "/admin/gestion-des-crasc/osc", pathSuffix: "" },
+  nouvelle_osc: { label: "Nouvelle OSC", icon: Building2, color: "text-amber-700", bg: "bg-amber-50", border: "border-amber-200", adminPath: "/admin/gestion-des-crasc/osc", pathSuffix: "" },
 };
 
 const FIELD_LABELS: Record<string, string> = {
@@ -64,7 +65,7 @@ export default function AdminModerationPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [newsRes, jobsRes, formRes, projRes, videoRes, docRes, oscRes] = await Promise.allSettled([
+      const [newsRes, jobsRes, formRes, projRes, videoRes, docRes, oscRes, newOscRes] = await Promise.allSettled([
         fetchWithAuth(`${API_BASE}/api/v1/news/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/jobs/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/formations/admin/en-attente`),
@@ -72,6 +73,7 @@ export default function AdminModerationPage() {
         fetchWithAuth(`${API_BASE}/api/v1/crasc/video/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/documentation/admin/en-attente`),
         fetchWithAuth(`${API_BASE}/api/v1/crasc/osc-modification-requests/en-attente`),
+        fetchWithAuth(`${API_BASE}/api/v1/crasc/osc/admin/en-attente`),
       ]);
 
       const parse = async (r: PromiseSettledResult<Response>, type: ItemEnAttente["type"]) => {
@@ -99,6 +101,10 @@ export default function AdminModerationPage() {
           slug: item.slug,
           title: item.title ? `Modification de ${item.title}` : "Modification OSC",
         })),
+        ...(await parse(newOscRes, "nouvelle_osc")).map((item) => ({
+          ...item,
+          title: item.title ? `Nouvelle OSC : ${item.title}` : "Nouvelle OSC",
+        })),
       ];
 
       all.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
@@ -122,6 +128,7 @@ export default function AdminModerationPage() {
         video:     `${API_BASE}/api/v1/crasc/video/${item.id}/valider?action=${action}`,
         documentation: `${API_BASE}/api/v1/documentation/${item.slug}/valider?action=${action}`,
         osc_modification: `${API_BASE}/api/v1/crasc/osc-modification-requests/${item.id}/review?action=${action === "publie" ? "approuvee" : "rejetee"}`,
+        nouvelle_osc: `${API_BASE}/api/v1/crasc/osc/${item.slug}/valider?action=${action}`,
       };
       await fetchWithAuth(urlMap[item.type], { method: "PATCH" });
       setItems((prev) => prev.filter((i) => !(i.id === item.id && i.type === item.type)));
