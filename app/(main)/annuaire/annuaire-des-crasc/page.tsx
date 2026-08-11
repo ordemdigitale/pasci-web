@@ -384,7 +384,7 @@ export default function PageAnnuaireCrasc() {
                 OSC identifiées
               </h3>
               <div className="text-4xl font-extrabold text-[#E05017] group-hover:text-white transition-colors mb-1">
-                {loading ? "..." : (dashboardStats?.osc ?? 0).toLocaleString()}
+                {loading ? "..." : oscTotal.toLocaleString()}
               </div>
               <p className="text-xs text-gray-500 group-hover:text-white/70 transition-colors">
                 Organisations
