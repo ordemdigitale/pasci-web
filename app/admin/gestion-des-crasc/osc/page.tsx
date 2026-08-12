@@ -77,7 +77,9 @@ export default function AdminOscPage() {
       }
       params.set("sort_by", sortBy);
       params.set("sort_order", sortOrder);
-      const res  = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?${params}`);
+      const res  = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?${params}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
       const data = await res.json();
       setOscs(data.items);
       setTotal(data.total);
