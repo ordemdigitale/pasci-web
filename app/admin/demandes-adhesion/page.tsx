@@ -228,7 +228,7 @@ export default function DemandesAdhesionPage() {
   const [demandes, setDemandes] = useState<DemandeAdhesion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatut, setFilterStatut] = useState("");
+  const [filterStatut, setFilterStatut] = useState("en_attente");
   const [selected, setSelected] = useState<DemandeAdhesion | null>(null);
   const [noteAdmin, setNoteAdmin] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
