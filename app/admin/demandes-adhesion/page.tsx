@@ -234,6 +234,7 @@ export default function DemandesAdhesionPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [pendingCredentials, setPendingCredentials] = useState<OscCredentials | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const loadDemandes = async () => {
     try {
@@ -262,16 +263,19 @@ export default function DemandesAdhesionPage() {
   const openDetail = (demande: DemandeAdhesion) => {
     setSelected(demande);
     setNoteAdmin(demande.note_admin || "");
+    setActionError(null);
   };
 
   const closeDetail = () => {
     setSelected(null);
     setNoteAdmin("");
+    setActionError(null);
   };
 
   const handleUpdateStatut = async (statut: "approuvee" | "rejetee") => {
     if (!selected) return;
     setIsUpdating(true);
+    setActionError(null);
     try {
       const res = await fetch(`${API_BASE_URL}/api/v1/adhesion/${selected.id}`, {
         method: "PATCH",
@@ -286,9 +290,17 @@ export default function DemandesAdhesionPage() {
         if (statut === "approuvee" && updated.credentials) {
           setPendingCredentials(updated.credentials);
         }
+      } else {
+        // Ne pas laisser l'échec passer inaperçu : la demande n'a pas changé de statut
+        const body = await res.json().catch(() => null);
+        const detail = body?.detail;
+        setActionError(
+          typeof detail === "string" ? detail : `Échec de la mise à jour (HTTP ${res.status}).`
+        );
       }
     } catch (e) {
       console.error(e);
+      setActionError("Erreur réseau : la mise à jour n'a pas pu être envoyée.");
     } finally {
       setIsUpdating(false);
     }
@@ -696,6 +708,12 @@ export default function DemandesAdhesionPage() {
             </div>
 
             {/* Actions */}
+            {actionError && (
+              <div className="mx-6 mb-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+                <XCircle size={14} className="mt-0.5 shrink-0" />
+                <span>{actionError}</span>
+              </div>
+            )}
             {selected.statut === "en_attente" && (
               <div className="flex gap-3 p-6 border-t border-gray-200">
                 <button
