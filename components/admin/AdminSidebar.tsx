@@ -21,6 +21,7 @@ import {
   Video,
   CreditCard,
   CalendarDays,
+  UploadCloud,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
@@ -48,6 +49,7 @@ export default function AdminSidebar({
 }: AdminSidebarProps) {
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
+  const [oscAPublierCount, setOscAPublierCount] = useState(0);
   const pathname = usePathname();
   const { user } = useAuth();
   const isOscUser = !!user?.osc_id && !user?.is_staff && !user?.is_superuser;
@@ -76,8 +78,30 @@ export default function AdminSidebar({
         setPendingCount(count);
       } catch { /* silencieux */ }
     }
+    // Rattrapage : OSC approuvées qui n'apparaissent pas encore sur le site
+    async function fetchOscAPublier() {
+      try {
+        const results = await Promise.allSettled([
+          fetchWithAuth(`${API_BASE}/api/v1/crasc/osc/admin/en-attente`),
+          fetchWithAuth(`${API_BASE}/api/v1/adhesion/admin/sans-osc`),
+        ]);
+        let count = 0;
+        for (const r of results) {
+          if (r.status === "fulfilled" && r.value.ok) {
+            const data = await r.value.json();
+            if (Array.isArray(data)) count += data.length;
+          }
+        }
+        setOscAPublierCount(count);
+      } catch { /* silencieux */ }
+    }
+
     fetchPending();
-    const interval = setInterval(fetchPending, 5 * 60_000); // toutes les 5 min
+    fetchOscAPublier();
+    const interval = setInterval(() => {
+      fetchPending();
+      fetchOscAPublier();
+    }, 5 * 60_000); // toutes les 5 min
     return () => clearInterval(interval);
   }, []);
 
@@ -145,6 +169,13 @@ export default function AdminSidebar({
       icon: <ClipboardList size={20} />,
       label: "Demandes d'adhésion",
       href: "/admin/demandes-adhesion",
+      staffOnly: true,
+    },
+    {
+      icon: <UploadCloud size={20} />,
+      label: "OSC à mettre en ligne",
+      href: "/admin/osc-a-publier",
+      badge: oscAPublierCount,
       staffOnly: true,
     },
     { icon: <Heart size={20} />, label: "Dons", href: "/admin/dons", staffOnly: true },
