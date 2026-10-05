@@ -59,6 +59,7 @@ const EVENT_STATUS_META: Record<string, { label: string; className: string }> = 
   en_cours: { label: 'En cours', className: 'bg-blue-100 text-blue-700' },
   non_realise: { label: 'Non réalisé', className: 'bg-red-100 text-red-700' },
 };
+const VISIBLE_EVENT_STATUSES = ['en_cours', 'non_realise'];
 
 export default function CrascRegionPage({ params }: { params: Promise<{ crascSlug: string }>; }) {
   const resolvedParams = use(params);
@@ -588,6 +589,10 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
               ) : (
                 <div className="space-y-4">
                   {[...evenements]
+                    .filter((evt) => {
+                        const status = evt.statut ?? 'en_cours';
+                        return (VISIBLE_EVENT_STATUSES as readonly string[]).includes(status);
+                    })
                     .sort((a, b) => new Date(b.date_debut).getTime() - new Date(a.date_debut).getTime())
                     .map((evt) => {
                       const debut = new Date(evt.date_debut);
