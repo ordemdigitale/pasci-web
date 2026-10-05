@@ -176,6 +176,8 @@ const textareaCls = inputCls + " resize-none";
 
 interface Pole { id: number; name: string; slug: string; }
 
+const NONE_VALUE = "__none__";
+
 export default function ModifierOscPage() {
   const params = useParams();
   const oscSlug = params.oscSlug as string;
@@ -215,8 +217,9 @@ export default function ModifierOscPage() {
         const data = await res.json();
         setOsc(data);
         setPreviewImage(data.thumbnail_url || null);
-        if (Array.isArray(data.poles)) {
-          setSelectedPoleIds(data.poles.map((p: Pole) => p.id));
+        // Une OSC n'appartient qu'à un seul pôle de concertation
+        if (Array.isArray(data.poles) && data.poles.length > 0) {
+          setSelectedPoleIds([data.poles[0].id]);
         }
       } catch (err) {
         setErrorMessage(err instanceof Error ? err.message : "Erreur de chargement");
@@ -430,11 +433,12 @@ export default function ModifierOscPage() {
       append("niveau_couverture", values.niveau_couverture);
       append("zone_couverture", values.zone_couverture);
       append("categorie", values.categorie);
-      append("domaine_prioritaire", values.domaine_prioritaire);
-      append("domaine_prioritaire_2", values.domaine_prioritaire_2);
-      append("domaine_prioritaire_3", values.domaine_prioritaire_3);
-      append("domaine_prioritaire_4", values.domaine_prioritaire_4);
-      append("domaine_prioritaire_5", values.domaine_prioritaire_5);
+      // Toujours envoyés, même vides : une chaîne vide efface un domaine choisi par erreur
+      fd.append("domaine_prioritaire", values.domaine_prioritaire ?? "");
+      fd.append("domaine_prioritaire_2", values.domaine_prioritaire_2 ?? "");
+      fd.append("domaine_prioritaire_3", values.domaine_prioritaire_3 ?? "");
+      fd.append("domaine_prioritaire_4", values.domaine_prioritaire_4 ?? "");
+      fd.append("domaine_prioritaire_5", values.domaine_prioritaire_5 ?? "");
       append("nb_membres", values.nb_membres);
       append("nb_femmes_membres", values.nb_femmes_membres);
       append("nb_hommes_membres", values.nb_hommes_membres);
@@ -530,13 +534,17 @@ export default function ModifierOscPage() {
 
   const SelectField = ({ name, placeholder, options }: { name: keyof OscForm; placeholder: string; options: { value: string; label: string }[] }) => (
     <Controller name={name} control={control} render={({ field }) => (
-      <Select.Root onValueChange={field.onChange} value={field.value as string}>
+      // Radix refuse value="" sur un item : "Aucun" passe par NONE_VALUE puis est ramené à ""
+      <Select.Root onValueChange={v => field.onChange(v === NONE_VALUE ? "" : v)} value={field.value as string}>
         <Select.Trigger className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-left flex items-center justify-between text-sm hover:border-[#2A591D] transition-all">
           <Select.Value placeholder={placeholder} />
           <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
         </Select.Trigger>
         <Select.Content className="bg-white border-2 border-gray-200 rounded-lg shadow-lg overflow-hidden z-50">
           <Select.Viewport className="p-1">
+            <Select.Item value={NONE_VALUE} className="px-3 py-2 hover:bg-[#2A591D]/10 cursor-pointer rounded text-sm outline-none italic text-gray-500">
+              <Select.ItemText>— Aucun —</Select.ItemText>
+            </Select.Item>
             {options.map(o => (
               <Select.Item key={o.value} value={o.value} className="px-3 py-2 hover:bg-[#2A591D]/10 cursor-pointer rounded text-sm outline-none">
                 <Select.ItemText>{o.label}</Select.ItemText>
@@ -776,9 +784,10 @@ export default function ModifierOscPage() {
         {/* Domaines prioritaires / Pôles de concertation */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6">
           <SectionTitle icon={<Tag className="w-5 h-5 text-indigo-600" />} title="Domaines prioritaires (Pôles de concertation)" />
+          <p className="text-sm text-gray-500 mb-3">Une OSC appartient à un seul pôle de concertation.</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {allPoles.map(pole => {
-              const checked = selectedPoleIds.includes(pole.id);
+              const checked = selectedPoleIds[0] === pole.id;
               return (
                 <label
                   key={pole.id}
@@ -786,14 +795,11 @@ export default function ModifierOscPage() {
                     ${checked ? "bg-indigo-50 border-indigo-400 text-indigo-800" : "border-gray-200 text-gray-700 hover:border-indigo-300"}`}
                 >
                   <input
-                    type="checkbox"
+                    type="radio"
+                    name="pole_concertation"
                     className="accent-indigo-600"
                     checked={checked}
-                    onChange={() =>
-                      setSelectedPoleIds(prev =>
-                        checked ? prev.filter(id => id !== pole.id) : [...prev, pole.id]
-                      )
-                    }
+                    onChange={() => setSelectedPoleIds([pole.id])}
                   />
                   {pole.name}
                 </label>

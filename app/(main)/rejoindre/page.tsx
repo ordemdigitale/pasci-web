@@ -449,13 +449,17 @@ export default function PageRejoindre() {
       render={({ field }) => (
         <FormItem>
           <FormLabel className="text-gray-700 font-semibold">{label}</FormLabel>
-          <Select onValueChange={field.onChange} value={field.value}>
+          {/* Radix refuse value="" sur un item : "Aucun" passe par "__none__" puis est ramené à "" */}
+          <Select onValueChange={(v) => field.onChange(v === "__none__" ? "" : v)} value={field.value}>
             <FormControl>
               <SelectTrigger className="border-gray-300">
                 <SelectValue placeholder={placeholder} />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
+              <SelectItem value="__none__" className="italic text-gray-500">
+                — Aucun —
+              </SelectItem>
               {options.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
