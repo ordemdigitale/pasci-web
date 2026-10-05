@@ -49,6 +49,22 @@ const MEMBER_TYPE_FILTERS = [
   { label: "Organisation cultuelle", value: "Organisation cultuelle" },
 ];
 
+const MEMBRES_PAR_PAGE = 10;
+
+// Comparaison sans accents ni casse : "Fondation" doit trouver "fondation",
+// "ONG" doit trouver "Organisation Non Gouvernementale (ONG)".
+function normaliser(value?: string | null) {
+  return (value || "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
+}
+
+function correspondAuType(membre: IPoleMembre, filtre: string) {
+  const attendu = normaliser(filtre);
+  return [membre.type_name, membre.categorie].some((value) => {
+    const v = normaliser(value);
+    return v === attendu || v.split(/[^a-z0-9]+/).includes(attendu) || (attendu.includes(" ") && v.includes(attendu));
+  });
+}
+
 function parseJsonList(raw?: string | null): string[] {
   try {
     const parsed = raw ? JSON.parse(raw) : [];
@@ -115,6 +131,8 @@ export default function PagePoleForum() {
   const [content, setContent] = useState("");
   const [discussionSearch, setDiscussionSearch] = useState("");
   const [memberTypeFilter, setMemberTypeFilter] = useState("all");
+  const [membresPage, setMembresPage] = useState(1);
+  const [regionOuverte, setRegionOuverte] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [votingId, setVotingId] = useState<number | null>(null);
   const [error, setError] = useState("");
@@ -297,17 +315,36 @@ export default function PagePoleForum() {
   }
 
   const objectifsAnnuels = parseJsonList(pole.objectifs_annuels);
-  const regionsInfluence = parseJsonList(pole.regions_influence);
   const realisations = parseJsonList(pole.realisations);
   const projetsEnCours = parseJsonList(pole.projets_en_cours);
   const agendaItems = parseAgenda(pole.agenda);
   const nbOscMembres = pole.nb_osc_membres ?? 0;
   const nbMembresActifs = pole.nb_membres_actifs ?? nbOscMembres;
-  const filteredMembres = membres.filter((membre) => {
-    if (memberTypeFilter === "all") return true;
-    const expected = memberTypeFilter.toLowerCase();
-    return [membre.type_name, membre.categorie].some((value) => (value || "").trim().toLowerCase() === expected);
-  });
+  const filteredMembres = membres.filter(
+    (membre) => memberTypeFilter === "all" || correspondAuType(membre, memberTypeFilter)
+  );
+  const nbPagesMembres = Math.max(1, Math.ceil(filteredMembres.length / MEMBRES_PAR_PAGE));
+  const pageMembres = Math.min(membresPage, nbPagesMembres);
+  const membresAffiches = filteredMembres.slice(
+    (pageMembres - 1) * MEMBRES_PAR_PAGE,
+    pageMembres * MEMBRES_PAR_PAGE
+  );
+
+  // Régions d'influence : regroupées à partir des OSC membres, de la plus
+  // représentée à la moins représentée, avec le nombre d'OSC entre parenthèses.
+  const regionsMap = new Map<string, { nom: string; oscs: IPoleMembre[] }>();
+  for (const membre of membres) {
+    const nom = (membre.region_nom || "").trim();
+    if (!nom) continue;
+    const cle = normaliser(nom);
+    const entree = regionsMap.get(cle) ?? { nom, oscs: [] };
+    entree.oscs.push(membre);
+    regionsMap.set(cle, entree);
+  }
+  const regionsInfluence = [...regionsMap.values()].sort(
+    (a, b) => b.oscs.length - a.oscs.length || a.nom.localeCompare(b.nom, "fr")
+  );
+  const oscsRegionOuverte = regionsInfluence.find((r) => r.nom === regionOuverte)?.oscs ?? [];
   const userCanVoteInPole =
     !!user?.is_superuser ||
     !!user?.is_staff ||
@@ -347,6 +384,44 @@ export default function PagePoleForum() {
         </div>
       </div>
 
+      {/* Agenda : affiché avant les membres */}
+      {agendaItems.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <CalendarDays className="w-5 h-5 text-[#E05017]" />
+            <h2 className="font-bold text-gray-800">Agenda</h2>
+          </div>
+          <div className="space-y-3">
+            {agendaItems.map((item, i) => {
+              const status = AGENDA_STATUS_META[item.statut ?? "en_cours"];
+              return (
+                <div key={i} className="flex gap-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  {item.date && (
+                    <div className="flex-shrink-0 text-center bg-[#E05017] text-white rounded-lg px-3 py-2 min-w-[60px]">
+                      <p className="text-xs font-semibold">
+                        {new Date(item.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })}
+                      </p>
+                      <p className="text-xs">{new Date(item.date).getFullYear()}</p>
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-semibold text-gray-800 text-sm">{item.titre}</p>
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${status.className}`}>
+                        {status.label}
+                      </span>
+                    </div>
+                    {item.description && (
+                      <p className="text-xs text-gray-500 mt-0.5">{item.description}</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Membres du pôle */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -366,7 +441,7 @@ export default function PagePoleForum() {
               <button
                 key={filter.value}
                 type="button"
-                onClick={() => setMemberTypeFilter(filter.value)}
+                onClick={() => { setMemberTypeFilter(filter.value); setMembresPage(1); }}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
                   active
                     ? "bg-[#E05017] text-white border-[#E05017]"
@@ -383,7 +458,7 @@ export default function PagePoleForum() {
           <p className="text-sm text-gray-400 py-4">Aucun membre trouvé pour ce filtre.</p>
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">
-            {filteredMembres.map((membre) => {
+            {membresAffiches.map((membre) => {
               const typeLabel = membre.type_name || membre.categorie || "Type non renseigné";
               return (
                 <Link
@@ -404,6 +479,30 @@ export default function PagePoleForum() {
                 </Link>
               );
             })}
+          </div>
+        )}
+
+        {nbPagesMembres > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-4 text-sm">
+            <button
+              type="button"
+              onClick={() => setMembresPage(pageMembres - 1)}
+              disabled={pageMembres <= 1}
+              className="px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-[#E05017]/50 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              ← Précédent
+            </button>
+            <span className="text-gray-500">
+              Page {pageMembres} / {nbPagesMembres}
+            </span>
+            <button
+              type="button"
+              onClick={() => setMembresPage(pageMembres + 1)}
+              disabled={pageMembres >= nbPagesMembres}
+              className="px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-[#E05017]/50 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Suivant →
+            </button>
           </div>
         )}
       </div>
@@ -433,13 +532,40 @@ export default function PagePoleForum() {
             <MapPin className="w-5 h-5 text-[#E05017]" />
             <h2 className="font-bold text-gray-800">Régions d&apos;influence</h2>
           </div>
+          <p className="text-xs text-gray-500 mb-3">Cliquez sur une région pour voir ses OSC membres.</p>
           <div className="flex flex-wrap gap-2">
-            {regionsInfluence.map((region, i) => (
-              <span key={i} className="px-3 py-1 bg-[#2a591d]/10 text-[#2a591d] rounded-full text-sm font-medium">
-                {region}
-              </span>
-            ))}
+            {regionsInfluence.map((region) => {
+              const active = regionOuverte === region.nom;
+              return (
+                <button
+                  key={region.nom}
+                  type="button"
+                  onClick={() => setRegionOuverte(active ? null : region.nom)}
+                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    active
+                      ? "bg-[#2a591d] text-white"
+                      : "bg-[#2a591d]/10 text-[#2a591d] hover:bg-[#2a591d]/20"
+                  }`}
+                >
+                  {region.nom} ({region.oscs.length})
+                </button>
+              );
+            })}
           </div>
+          {regionOuverte && (
+            <ul className="mt-4 grid sm:grid-cols-2 gap-2">
+              {oscsRegionOuverte.map((membre) => (
+                <li key={membre.id}>
+                  <Link
+                    href={membre.slug ? `/annuaire/annuaire-des-osc/${membre.slug}` : "#"}
+                    className="block rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-sm text-gray-800 hover:border-[#E05017]/40 hover:bg-white"
+                  >
+                    {membre.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
@@ -476,44 +602,6 @@ export default function PagePoleForum() {
               </li>
             ))}
           </ul>
-        </div>
-      )}
-
-      {/* Agenda */}
-      {agendaItems.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <CalendarDays className="w-5 h-5 text-[#E05017]" />
-            <h2 className="font-bold text-gray-800">Agenda</h2>
-          </div>
-          <div className="space-y-3">
-            {agendaItems.map((item, i) => {
-              const status = AGENDA_STATUS_META[item.statut ?? "en_cours"];
-              return (
-                <div key={i} className="flex gap-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                  {item.date && (
-                    <div className="flex-shrink-0 text-center bg-[#E05017] text-white rounded-lg px-3 py-2 min-w-[60px]">
-                      <p className="text-xs font-semibold">
-                        {new Date(item.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })}
-                      </p>
-                      <p className="text-xs">{new Date(item.date).getFullYear()}</p>
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold text-gray-800 text-sm">{item.titre}</p>
-                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${status.className}`}>
-                        {status.label}
-                      </span>
-                    </div>
-                    {item.description && (
-                      <p className="text-xs text-gray-500 mt-0.5">{item.description}</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
       )}
 
