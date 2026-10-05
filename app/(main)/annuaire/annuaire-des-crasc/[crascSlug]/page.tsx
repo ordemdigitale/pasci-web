@@ -587,8 +587,8 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {evenements
-                    .sort((a, b) => new Date(a.date_debut).getTime() - new Date(b.date_debut).getTime())
+                  {[...evenements]
+                    .sort((a, b) => new Date(b.date_debut).getTime() - new Date(a.date_debut).getTime())
                     .map((evt) => {
                       const debut = new Date(evt.date_debut);
                       const isPast = debut < new Date();
