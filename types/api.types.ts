@@ -425,6 +425,12 @@ export interface IPoleMembre {
   region_nom?: string | null;
   ville?: string | null;
   thumbnail_url?: string | null;
+  crasc_id?: number | null;
+  crasc_nom?: string | null;
+  axe?: string | null;
+  specialites?: string | null;
+  /** A déjà lancé au moins un sujet de discussion dans le pôle */
+  est_actif?: boolean;
 }
 
 export type ForumSondageStatus = "ouvert" | "ferme";

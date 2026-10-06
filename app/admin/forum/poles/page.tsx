@@ -15,7 +15,22 @@ import {
   Loader2,
   Pin,
   BarChart3,
+  GitMerge,
+  Link2,
+  X,
 } from "lucide-react";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+interface RattrapageResultat {
+  simulation: boolean;
+  oscs_examinees: number;
+  oscs_rattachees: number;
+  poles: number;
+  types: number;
+  regions: number;
+  details: { osc_id: number; osc: string; pole?: string; type?: string; region?: string }[];
+}
 import { useAuth } from "@/contexts/AuthContext";
 
 interface IPoleConcertation {
@@ -40,10 +55,75 @@ export default function AdminForumPolesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
   const [togglingSlug, setTogglingSlug] = useState<string | null>(null);
+  const isSuperuser = !!user?.is_superuser;
+
+  // Fusion de pôles (superadmin)
+  const [fusionSource, setFusionSource] = useState<IPoleConcertation | null>(null);
+  const [fusionCible, setFusionCible] = useState("");
+  const [fusionNom, setFusionNom] = useState("");
+  const [fusionEnCours, setFusionEnCours] = useState(false);
+
+  // Rattachement des OSC existantes à leur pôle / type / région (superadmin)
+  const [rattrapage, setRattrapage] = useState<RattrapageResultat | null>(null);
+  const [rattrapageEnCours, setRattrapageEnCours] = useState(false);
 
   useEffect(() => {
     fetchPoles();
   }, []);
+
+  async function handleFusion() {
+    if (!fusionSource || !fusionCible) return;
+    const cible = poles.find((p) => p.slug === fusionCible);
+    const nomFinal = fusionNom.trim() || cible?.name;
+    if (
+      !confirm(
+        `Fusionner « ${fusionSource.name} » dans « ${cible?.name} »${nomFinal !== cible?.name ? ` (renommé « ${nomFinal} »)` : ""} ?\n\n` +
+          "Les OSC membres, discussions et sondages seront déplacés, et le pôle source sera désactivé."
+      )
+    )
+      return;
+    setFusionEnCours(true);
+    try {
+      const res = await fetchWithAuth(`${API_ENDPOINTS.forum.poleBySlug(fusionSource.slug)}/fusionner`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cible_slug: fusionCible, nouveau_nom: fusionNom.trim() || null }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(typeof data.detail === "string" ? data.detail : "La fusion a échoué.");
+      }
+      setFusionSource(null);
+      setFusionCible("");
+      setFusionNom("");
+      await fetchPoles();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "La fusion a échoué.");
+    } finally {
+      setFusionEnCours(false);
+    }
+  }
+
+  async function lancerRattrapage(simulation: boolean) {
+    if (!simulation && !confirm("Enregistrer ces rattachements en base ?")) return;
+    setRattrapageEnCours(true);
+    try {
+      const res = await fetchWithAuth(
+        `${API_BASE}/api/v1/adhesion/admin/rattrapage-rattachements?simulation=${simulation}`,
+        { method: "POST" }
+      );
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(typeof data.detail === "string" ? data.detail : `Erreur HTTP ${res.status}`);
+      }
+      setRattrapage(await res.json());
+      if (!simulation) await fetchPoles();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Le rattachement a échoué.");
+    } finally {
+      setRattrapageEnCours(false);
+    }
+  }
 
   async function fetchPoles() {
     setLoading(true);
@@ -146,6 +226,119 @@ export default function AdminForumPolesPage() {
             </p>
           </div>
         </div>
+
+        {/* Rattachement des OSC existantes (superadmin) */}
+        {isSuperuser && (
+          <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6 shadow-sm">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="font-bold text-gray-900 flex items-center gap-2">
+                  <Link2 className="w-4 h-4 text-[#E05017]" /> Rattacher les OSC à leur pôle
+                </h2>
+                <p className="text-sm text-gray-500 mt-1 max-w-2xl">
+                  Les OSC sans pôle sont inscrites dans le pôle de leur 1er domaine prioritaire ; leur type
+                  et leur région sont complétés s&apos;ils manquent. Rien n&apos;est remplacé. Commencez par une simulation.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => lancerRattrapage(true)}
+                  disabled={rattrapageEnCours}
+                  className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 disabled:opacity-50"
+                >
+                  {rattrapageEnCours ? <Loader2 className="w-4 h-4 animate-spin" /> : "Simuler"}
+                </button>
+                <button
+                  onClick={() => lancerRattrapage(false)}
+                  disabled={rattrapageEnCours || !rattrapage?.simulation || rattrapage.oscs_rattachees === 0}
+                  className="px-4 py-2 text-sm font-semibold text-white bg-[#E05017] rounded-lg hover:bg-[#c44315] disabled:opacity-40"
+                  title="Lancez d'abord une simulation"
+                >
+                  Appliquer
+                </button>
+              </div>
+            </div>
+            {rattrapage && (
+              <div className="mt-4 text-sm">
+                <p className={rattrapage.simulation ? "text-amber-700" : "text-green-700"}>
+                  {rattrapage.simulation ? "Simulation : " : "Enregistré : "}
+                  {rattrapage.oscs_rattachees} OSC sur {rattrapage.oscs_examinees} — {rattrapage.poles} pôle(s),{" "}
+                  {rattrapage.types} type(s), {rattrapage.regions} région(s).
+                </p>
+                {rattrapage.details.length > 0 && (
+                  <div className="mt-2 max-h-56 overflow-y-auto rounded-lg border border-gray-100">
+                    <table className="w-full text-xs">
+                      <thead className="bg-gray-50 text-left text-gray-500">
+                        <tr>
+                          <th className="px-3 py-1.5">OSC</th>
+                          <th className="px-3 py-1.5">Pôle</th>
+                          <th className="px-3 py-1.5">Type</th>
+                          <th className="px-3 py-1.5">Région</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {rattrapage.details.map((d) => (
+                          <tr key={d.osc_id}>
+                            <td className="px-3 py-1.5 font-medium text-gray-800">{d.osc}</td>
+                            <td className="px-3 py-1.5 text-gray-600">{d.pole || "—"}</td>
+                            <td className="px-3 py-1.5 text-gray-600">{d.type || "—"}</td>
+                            <td className="px-3 py-1.5 text-gray-600">{d.region || "—"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Fusion de pôles (superadmin) */}
+        {isSuperuser && fusionSource && (
+          <div className="bg-orange-50 rounded-xl border border-orange-200 p-5 mb-6">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <h2 className="font-bold text-gray-900 flex items-center gap-2">
+                <GitMerge className="w-4 h-4 text-[#E05017]" /> Fusionner « {fusionSource.name} »
+              </h2>
+              <button onClick={() => setFusionSource(null)} className="text-gray-400 hover:text-gray-600" aria-label="Annuler">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="grid md:grid-cols-3 gap-3">
+              <select
+                value={fusionCible}
+                onChange={(e) => setFusionCible(e.target.value)}
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              >
+                <option value="">Dans le pôle…</option>
+                {poles
+                  .filter((p) => p.slug !== fusionSource.slug && p.is_active)
+                  .map((p) => (
+                    <option key={p.slug} value={p.slug}>{p.name}</option>
+                  ))}
+              </select>
+              <input
+                value={fusionNom}
+                onChange={(e) => setFusionNom(e.target.value)}
+                placeholder="Nouveau nom (facultatif)"
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              />
+              <button
+                onClick={handleFusion}
+                disabled={!fusionCible || fusionEnCours}
+                className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#E05017] rounded-lg hover:bg-[#c44315] disabled:opacity-40"
+              >
+                {fusionEnCours ? <Loader2 className="w-4 h-4 animate-spin" /> : <GitMerge className="w-4 h-4" />}
+                Fusionner
+              </button>
+            </div>
+            <p className="text-xs text-gray-600 mt-2">
+              Les OSC membres, discussions et sondages passent dans le pôle choisi ; les domaines prioritaires des OSC
+              sont mis à jour ; « {fusionSource.name} » est désactivé (conservé pour l&apos;historique).
+            </p>
+          </div>
+        )}
 
         {/* Search */}
         <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 shadow-sm">
@@ -258,6 +451,20 @@ export default function AdminForumPolesPage() {
                           <Eye className="w-4 h-4" />
                         )}
                       </button>
+                      {isSuperuser && pole.is_active && (
+                        <button
+                          onClick={() => {
+                            setFusionSource(pole);
+                            setFusionCible("");
+                            setFusionNom("");
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                          title="Fusionner dans un autre pôle"
+                        >
+                          <GitMerge className="w-4 h-4" />
+                        </button>
+                      )}
                       <button
                         onClick={() => handleDelete(pole)}
                         disabled={deletingSlug === pole.slug}

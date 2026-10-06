@@ -5,7 +5,7 @@ import { Search, MapPin, Users2, Building, Filter, ArrowRight, Loader2, ChevronL
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from 'next/link';
 import OscEvaluationBadge from '@/components/osc/OscEvaluationBadge';
-import { DOMAINE_PRIORITAIRE_OPTIONS } from '@/lib/osc-domaines';
+import { useDomainesPrioritaires } from '@/lib/osc-domaines';
 
 interface IOSCType {
   id: number;
@@ -53,6 +53,7 @@ const categorieLabel = (value?: string | null) =>
   CATEGORIE_OPTIONS.find((option) => option.value === value)?.label || value || '';
 
 export default function AnnuaireOSCPage() {
+  const domaines = useDomainesPrioritaires();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [selectedTypeId, setSelectedTypeId] = useState<string>('');
@@ -306,7 +307,7 @@ export default function AnnuaireOSCPage() {
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent appearance-none cursor-pointer"
                 >
                   <option value="">Tous les domaines</option>
-                  {DOMAINE_PRIORITAIRE_OPTIONS.map((option) => (
+                  {domaines.map((option) => (
                     <option key={option.value} value={option.value}>{option.label}</option>
                   ))}
                 </select>

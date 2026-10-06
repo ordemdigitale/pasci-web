@@ -15,7 +15,8 @@ import {
   FORMALISATION_FILE_MAX_SIZE,
   isFormalisationFileAccepted,
 } from "@/lib/formalisation-file";
-import { DOMAINE_PRIORITAIRE_OPTIONS } from "@/lib/osc-domaines";
+import { avecValeurActuelle, useDomainesPrioritaires } from "@/lib/osc-domaines";
+import { useRegions } from "@/lib/osc-referentiels";
 import Image from "next/image";
 import {
   ArrowLeft, Building2, FileText, Upload, X, Check, Loader2,
@@ -32,7 +33,8 @@ const supportingDocumentSchema = z.instanceof(File).optional()
 const oscSchema = z.object({
   name: z.string().min(4, "Minimum 4 caractères").optional(),
   sigle: z.string().optional(),
-  description: z.string().max(500, "Maximum 500 caractères").optional(),
+  // Pas de limite : identique au formulaire d'adhésion (des OSC ont des descriptions de plus de 500 car.)
+  description: z.string().optional(),
   crasc_id: z.string().optional(),
   type_id: z.string().optional(),
   email: z.string().email("Email invalide").optional().or(z.literal("")),
@@ -57,6 +59,8 @@ const oscSchema = z.object({
   domaine_prioritaire_3: z.string().optional(),
   domaine_prioritaire_4: z.string().optional(),
   domaine_prioritaire_5: z.string().optional(),
+  axe: z.string().optional(),
+  specialites: z.string().optional(),
   nb_membres: z.string().optional(),
   nb_femmes_membres: z.string().optional(),
   nb_hommes_membres: z.string().optional(),
@@ -130,6 +134,8 @@ interface IOscDetail {
   domaine_prioritaire?: string | null; domaine_prioritaire_2?: string | null;
   domaine_prioritaire_3?: string | null; domaine_prioritaire_4?: string | null;
   domaine_prioritaire_5?: string | null;
+  axe?: string | null;
+  specialites?: string | null;
   poles?: { id: number; name: string; slug: string }[];
   nb_membres?: number | null; nb_femmes_membres?: number | null;
   nb_hommes_membres?: number | null; nb_membres_jeunes?: number | null;
@@ -187,6 +193,8 @@ export default function ModifierOscPage() {
   const [typeList, setTypeList] = useState<IOscType[]>([]);
   const [allPoles, setAllPoles] = useState<Pole[]>([]);
   const [selectedPoleIds, setSelectedPoleIds] = useState<number[]>([]);
+  const domaines = useDomainesPrioritaires();
+  const regions = useRegions();
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -238,7 +246,7 @@ export default function ModifierOscPage() {
       website: "", reseaux_sociaux: "", date_creation: "", numero_recepisse: "",
       niveau_couverture: "", zone_couverture: "", categorie: "",
       domaine_prioritaire: "", domaine_prioritaire_2: "", domaine_prioritaire_3: "",
-      domaine_prioritaire_4: "", domaine_prioritaire_5: "",
+      domaine_prioritaire_4: "", domaine_prioritaire_5: "", axe: "", specialites: "",
       nb_membres: "", nb_femmes_membres: "", nb_hommes_membres: "", nb_membres_jeunes: "",
       nb_membres_handicap: "", nb_membres_be: "", nombre_mandats_be: "",
       nb_personnes_engagees: "", nb_cdi: "", nb_cdd: "", nb_beneficiaires: "",
@@ -287,6 +295,8 @@ export default function ModifierOscPage() {
     setValue("domaine_prioritaire_3", osc.domaine_prioritaire_3 || "");
     setValue("domaine_prioritaire_4", osc.domaine_prioritaire_4 || "");
     setValue("domaine_prioritaire_5", osc.domaine_prioritaire_5 || "");
+    setValue("axe", osc.axe || "");
+    setValue("specialites", osc.specialites || "");
     setValue("nb_membres", s(osc.nb_membres));
     setValue("nb_femmes_membres", s(osc.nb_femmes_membres));
     setValue("nb_hommes_membres", s(osc.nb_hommes_membres));
@@ -439,6 +449,8 @@ export default function ModifierOscPage() {
       fd.append("domaine_prioritaire_3", values.domaine_prioritaire_3 ?? "");
       fd.append("domaine_prioritaire_4", values.domaine_prioritaire_4 ?? "");
       fd.append("domaine_prioritaire_5", values.domaine_prioritaire_5 ?? "");
+      fd.append("axe", values.axe ?? "");
+      fd.append("specialites", values.specialites ?? "");
       append("nb_membres", values.nb_membres);
       append("nb_femmes_membres", values.nb_femmes_membres);
       append("nb_hommes_membres", values.nb_hommes_membres);
@@ -593,8 +605,8 @@ export default function ModifierOscPage() {
             <Field label="Sigle ou abréviation">
               <input {...register("sigle")} className={inputCls} placeholder="Ex: APD" />
             </Field>
-            <Field label="Description (max 500 car.)" error={errors.description?.message}>
-              <textarea {...register("description")} rows={3} maxLength={500} className={textareaCls} placeholder="Description..." />
+            <Field label="Description" error={errors.description?.message}>
+              <textarea {...register("description")} rows={5} className={textareaCls} placeholder="Description..." />
             </Field>
             <Field label="CRASC associé">
               <SelectField name="crasc_id" placeholder="Sélectionnez un CRASC"
@@ -625,7 +637,9 @@ export default function ModifierOscPage() {
               <input {...register("phone")} className={inputCls} placeholder="+225 XX XX XX XX" />
             </Field>
             <Field label="Région">
-              <input {...register("region_nom")} className={inputCls} placeholder="Région" />
+              {/* Même liste que le formulaire d'adhésion (plus de saisie libre) */}
+              <SelectField name="region_nom" placeholder="Sélectionnez une région"
+                options={avecValeurActuelle(regions, watch("region_nom"))} />
             </Field>
             <Field label="Département">
               <input {...register("departement")} className={inputCls} placeholder="Département" />
@@ -818,10 +832,16 @@ export default function ModifierOscPage() {
                 <SelectField
                   name={field as keyof OscForm}
                   placeholder="Sélectionner un domaine"
-                  options={DOMAINE_PRIORITAIRE_OPTIONS}
+                  options={avecValeurActuelle(domaines, watch(field as keyof OscForm) as string)}
                 />
               </Field>
             ))}
+            <Field label="Axe d'intervention dans le pôle">
+              <input {...register("axe")} className={inputCls} placeholder="Ex : Santé communautaire" />
+            </Field>
+            <Field label="Spécialités">
+              <textarea {...register("specialites")} rows={2} className={textareaCls} placeholder="Ex : Paludisme, VIH, nutrition..." />
+            </Field>
           </div>
           <div className="grid md:grid-cols-1 gap-4 mt-4">
             <Field label="Secteurs d'activités">

@@ -8,6 +8,15 @@ import { IPoleConcertation, IForumSujet, IForumSondage, IPoleMembre } from "@/ty
 import { getToken, fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import {
+  FILTRES_VIDES,
+  FiltresMembres,
+  MEMBER_TYPE_FILTERS,
+  MEMBRES_PAR_PAGE,
+  filtrerMembres,
+  regrouperParRegion,
+  valeursDistinctes,
+} from "@/lib/pole-membres";
+import {
   ArrowLeft,
   BarChart3,
   MessageSquare,
@@ -40,30 +49,6 @@ const AGENDA_STATUS_META: Record<AgendaStatus, { label: string; className: strin
   en_cours: { label: "En cours", className: "bg-blue-100 text-blue-700" },
   non_realise: { label: "Non réalisé", className: "bg-red-100 text-red-700" },
 };
-
-const MEMBER_TYPE_FILTERS = [
-  { label: "Tous", value: "all" },
-  { label: "Association", value: "Association" },
-  { label: "ONG", value: "ONG" },
-  { label: "Fondation", value: "Fondation" },
-  { label: "Organisation cultuelle", value: "Organisation cultuelle" },
-];
-
-const MEMBRES_PAR_PAGE = 10;
-
-// Comparaison sans accents ni casse : "Fondation" doit trouver "fondation",
-// "ONG" doit trouver "Organisation Non Gouvernementale (ONG)".
-function normaliser(value?: string | null) {
-  return (value || "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
-}
-
-function correspondAuType(membre: IPoleMembre, filtre: string) {
-  const attendu = normaliser(filtre);
-  return [membre.type_name, membre.categorie].some((value) => {
-    const v = normaliser(value);
-    return v === attendu || v.split(/[^a-z0-9]+/).includes(attendu) || (attendu.includes(" ") && v.includes(attendu));
-  });
-}
 
 function parseJsonList(raw?: string | null): string[] {
   try {
@@ -130,7 +115,7 @@ export default function PagePoleForum() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [discussionSearch, setDiscussionSearch] = useState("");
-  const [memberTypeFilter, setMemberTypeFilter] = useState("all");
+  const [filtres, setFiltres] = useState<FiltresMembres>(FILTRES_VIDES);
   const [membresPage, setMembresPage] = useState(1);
   const [regionOuverte, setRegionOuverte] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -319,10 +304,15 @@ export default function PagePoleForum() {
   const projetsEnCours = parseJsonList(pole.projets_en_cours);
   const agendaItems = parseAgenda(pole.agenda);
   const nbOscMembres = pole.nb_osc_membres ?? 0;
-  const nbMembresActifs = pole.nb_membres_actifs ?? nbOscMembres;
-  const filteredMembres = membres.filter(
-    (membre) => memberTypeFilter === "all" || correspondAuType(membre, memberTypeFilter)
-  );
+  const nbMembresActifs = pole.nb_membres_actifs ?? 0;
+  const filteredMembres = filtrerMembres(membres, filtres);
+  const changerFiltre = (patch: Partial<FiltresMembres>) => {
+    setFiltres((prev) => ({ ...prev, ...patch }));
+    setMembresPage(1);
+  };
+  const crascsMembres = valeursDistinctes(membres, "crasc_nom");
+  const regionsMembres = valeursDistinctes(membres, "region_nom");
+  const filtresActifs = JSON.stringify(filtres) !== JSON.stringify(FILTRES_VIDES);
   const nbPagesMembres = Math.max(1, Math.ceil(filteredMembres.length / MEMBRES_PAR_PAGE));
   const pageMembres = Math.min(membresPage, nbPagesMembres);
   const membresAffiches = filteredMembres.slice(
@@ -330,20 +320,9 @@ export default function PagePoleForum() {
     pageMembres * MEMBRES_PAR_PAGE
   );
 
-  // Régions d'influence : regroupées à partir des OSC membres, de la plus
-  // représentée à la moins représentée, avec le nombre d'OSC entre parenthèses.
-  const regionsMap = new Map<string, { nom: string; oscs: IPoleMembre[] }>();
-  for (const membre of membres) {
-    const nom = (membre.region_nom || "").trim();
-    if (!nom) continue;
-    const cle = normaliser(nom);
-    const entree = regionsMap.get(cle) ?? { nom, oscs: [] };
-    entree.oscs.push(membre);
-    regionsMap.set(cle, entree);
-  }
-  const regionsInfluence = [...regionsMap.values()].sort(
-    (a, b) => b.oscs.length - a.oscs.length || a.nom.localeCompare(b.nom, "fr")
-  );
+  // Régions d'influence : de la plus représentée à la moins représentée,
+  // avec le nombre d'OSC membres entre parenthèses.
+  const regionsInfluence = regrouperParRegion(membres);
   const oscsRegionOuverte = regionsInfluence.find((r) => r.nom === regionOuverte)?.oscs ?? [];
   const userCanVoteInPole =
     !!user?.is_superuser ||
@@ -382,6 +361,9 @@ export default function PagePoleForum() {
             <span><strong>{nbMembresActifs}</strong> membres actifs</span>
           </div>
         </div>
+        <p className="mt-2 text-xs text-gray-500">
+          Membre : OSC inscrite dans ce pôle. Membre actif : OSC membre qui a déjà lancé au moins un sujet de discussion dans le pôle.
+        </p>
       </div>
 
       {/* Agenda : affiché avant les membres */}
@@ -434,14 +416,60 @@ export default function PagePoleForum() {
           </span>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-4">
+        {/* Moteur de recherche du pôle : nom, axe, spécialité, région, CRASC */}
+        <div className="relative mb-3">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="search"
+            value={filtres.recherche}
+            onChange={(e) => changerFiltre({ recherche: e.target.value })}
+            className="w-full rounded-xl border border-gray-200 bg-white pl-10 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+            placeholder="Rechercher une OSC (nom, axe, spécialité, région...)"
+          />
+        </div>
+
+        <div className="grid sm:grid-cols-3 gap-2 mb-3">
+          <select
+            value={filtres.crasc}
+            onChange={(e) => changerFiltre({ crasc: e.target.value })}
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+            aria-label="Filtrer par CRASC"
+          >
+            <option value="">Tous les CRASC</option>
+            {crascsMembres.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+          <select
+            value={filtres.region}
+            onChange={(e) => changerFiltre({ region: e.target.value })}
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+            aria-label="Filtrer par région"
+          >
+            <option value="">Toutes les régions</option>
+            {regionsMembres.map((r) => (
+              <option key={r} value={r}>{r}</option>
+            ))}
+          </select>
+          <label className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 cursor-pointer">
+            <input
+              type="checkbox"
+              className="accent-[#E05017]"
+              checked={filtres.actifsSeulement}
+              onChange={(e) => changerFiltre({ actifsSeulement: e.target.checked })}
+            />
+            Membres actifs uniquement
+          </label>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 mb-4">
           {MEMBER_TYPE_FILTERS.map((filter) => {
-            const active = memberTypeFilter === filter.value;
+            const active = filtres.type === filter.value;
             return (
               <button
                 key={filter.value}
                 type="button"
-                onClick={() => { setMemberTypeFilter(filter.value); setMembresPage(1); }}
+                onClick={() => changerFiltre({ type: filter.value })}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
                   active
                     ? "bg-[#E05017] text-white border-[#E05017]"
@@ -452,10 +480,19 @@ export default function PagePoleForum() {
               </button>
             );
           })}
+          {filtresActifs && (
+            <button
+              type="button"
+              onClick={() => changerFiltre(FILTRES_VIDES)}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold text-[#E05017] hover:underline"
+            >
+              Réinitialiser les filtres
+            </button>
+          )}
         </div>
 
         {filteredMembres.length === 0 ? (
-          <p className="text-sm text-gray-400 py-4">Aucun membre trouvé pour ce filtre.</p>
+          <p className="text-sm text-gray-400 py-4">Aucun membre trouvé pour ces critères.</p>
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">
             {membresAffiches.map((membre) => {
@@ -469,12 +506,25 @@ export default function PagePoleForum() {
                   <div className="w-10 h-10 rounded-full bg-[#2a591d]/10 text-[#2a591d] flex items-center justify-center font-bold flex-shrink-0">
                     {(membre.sigle || membre.name || "?").slice(0, 1).toUpperCase()}
                   </div>
-                  <div className="min-w-0">
-                    <p className="font-semibold text-sm text-gray-900 truncate">{membre.name}</p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-sm text-gray-900 truncate">{membre.name}</p>
+                      {membre.est_actif && (
+                        <span className="flex-shrink-0 px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-semibold">
+                          Actif
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-gray-500 truncate">
                       {typeLabel}
                       {membre.region_nom ? ` · ${membre.region_nom}` : ""}
+                      {membre.crasc_nom ? ` · ${membre.crasc_nom}` : ""}
                     </p>
+                    {(membre.axe || membre.specialites) && (
+                      <p className="text-xs text-gray-400 truncate">
+                        {[membre.axe, membre.specialites].filter(Boolean).join(" · ")}
+                      </p>
+                    )}
                   </div>
                 </Link>
               );

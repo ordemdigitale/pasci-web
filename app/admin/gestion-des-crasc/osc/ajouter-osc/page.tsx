@@ -17,7 +17,7 @@ import {
   FORMALISATION_FILE_MAX_SIZE,
   isFormalisationFileAccepted,
 } from "@/lib/formalisation-file";
-import { DOMAINE_PRIORITAIRE_OPTIONS } from "@/lib/osc-domaines";
+import { useDomainesPrioritaires } from "@/lib/osc-domaines";
 import Image from "next/image";
 import {
   ArrowLeft,
@@ -125,6 +125,7 @@ type OscForm = z.infer<typeof oscSchema>;
 type ProofFileField = "plan_action_document_file" | "rapports_annuels_document_file" | "adhesion_crasc_document_file";
 
 export default function AdminAjoutOsc() {
+  const domaines = useDomainesPrioritaires();
   const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
   const [oscType, setOscType] = useState<IOscType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -1035,7 +1036,7 @@ export default function AdminAjoutOsc() {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
                 <select {...register(name as keyof OscForm)} className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all">
                   <option value="">Sélectionner un domaine</option>
-                  {DOMAINE_PRIORITAIRE_OPTIONS.map((option) => (
+                  {domaines.map((option) => (
                     <option key={option.value} value={option.value}>{option.label}</option>
                   ))}
                 </select>

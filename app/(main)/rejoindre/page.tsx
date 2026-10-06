@@ -30,7 +30,8 @@ import {
   FORMALISATION_FILE_MAX_SIZE,
   isFormalisationFileAccepted,
 } from '@/lib/formalisation-file';
-import { DOMAINE_PRIORITAIRE_OPTIONS } from '@/lib/osc-domaines';
+import { useDomainesPrioritaires } from '@/lib/osc-domaines';
+import { TYPE_OSC_OPTIONS, useRegions } from '@/lib/osc-referentiels';
 
 const supportingDocumentSchema = z
   .instanceof(File)
@@ -75,11 +76,14 @@ const registrationSchema = z.object({
   existenceSiege: z.string().optional(),
   categorie: z.string().optional(),
   niveauRegroupement: z.string().optional(),
-  domainePrioritaire: z.string().optional(),
+  // Le 1er domaine prioritaire détermine le pôle de concertation de l'OSC
+  domainePrioritaire: z.string().min(1, 'Choisissez votre domaine prioritaire (pôle de concertation)'),
   domainePrioritaire2: z.string().optional(),
   domainePrioritaire3: z.string().optional(),
   domainePrioritaire4: z.string().optional(),
   domainePrioritaire5: z.string().optional(),
+  axe: z.string().optional(),
+  specialites: z.string().optional(),
   nbMembres: z.string().optional(),
   nbFemmesMembres: z.string().optional(),
   nbHommesMembres: z.string().optional(),
@@ -122,13 +126,6 @@ type FileFieldName =
   | 'adhesionCrascDocumentFile';
 type TextFieldName = Exclude<keyof RegistrationFormValues, FileFieldName>;
 
-const TYPE_OSC_OPTIONS = [
-  { value: 'Association', label: 'Association' },
-  { value: 'Fondation', label: 'Fondation' },
-  { value: 'Organisation cultuelle', label: 'Organisation cultuelle' },
-  { value: 'ONG', label: 'ONG' },
-];
-
 const ORIGINE_OPTIONS = [
   { value: 'cote_ivoire', label: "Côte d'Ivoire" },
   { value: 'etranger', label: "À l'étranger" },
@@ -167,41 +164,6 @@ const ADHESION_CRASC_OPTIONS = [
   { value: 'en_cours', label: 'En cours' },
 ];
 
-const REGIONS = [
-  { value: 'District Autonome d\'Abidjan', label: 'District Autonome d\'Abidjan' },
-  { value: 'District Autonome de Yamoussoukro', label: 'District Autonome de Yamoussoukro' },
-  { value: 'Agnéby-Tiassa', label: 'Agnéby-Tiassa' },
-  { value: 'Bafing', label: 'Bafing' },
-  { value: 'Bagoué', label: 'Bagoué' },
-  { value: 'Béré', label: 'Béré' },
-  { value: 'Bélier', label: 'Bélier' },
-  { value: 'Bounkani', label: 'Bounkani' },
-  { value: 'Cavally', label: 'Cavally' },
-  { value: 'Folon', label: 'Folon' },
-  { value: 'Gbêkê', label: 'Gbêkê' },
-  { value: 'Gbôklé', label: 'Gbôklé' },
-  { value: 'Gôh', label: 'Gôh' },
-  { value: 'Gontougo', label: 'Gontougo' },
-  { value: 'Grands-Ponts', label: 'Grands-Ponts' },
-  { value: 'Guémon', label: 'Guémon' },
-  { value: 'Hambol', label: 'Hambol' },
-  { value: 'Haut-Sassandra', label: 'Haut-Sassandra' },
-  { value: 'Iffou', label: 'Iffou' },
-  { value: 'Indénié-Djuablin', label: 'Indénié-Djuablin' },
-  { value: 'Kabadougou', label: 'Kabadougou' },
-  { value: 'La Mé', label: 'La Mé' },
-  { value: 'Loh-Djiboua', label: 'Loh-Djiboua' },
-  { value: 'Marahoué', label: 'Marahoué' },
-  { value: 'Moronou', label: 'Moronou' },
-  { value: 'Nawa', label: 'Nawa' },
-  { value: 'N\'Zi', label: 'N\'Zi' },
-  { value: 'Poro', label: 'Poro' },
-  { value: 'San-Pédro', label: 'San-Pédro' },
-  { value: 'Sud-Comoé', label: 'Sud-Comoé' },
-  { value: 'Tchologo', label: 'Tchologo' },
-  { value: 'Tonkpi', label: 'Tonkpi' },
-  { value: 'Worodougou', label: 'Worodougou' },
-];
 
 const toBool = (value?: string) => value === 'true' ? true : value === 'false' ? false : null;
 const toNumber = (value?: string) => {
@@ -218,6 +180,9 @@ export default function PageRejoindre() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [crascs, setCrascs] = useState<ICrasc[]>([]);
   const [fileInputKey, setFileInputKey] = useState(0);
+  const domaines = useDomainesPrioritaires();
+  // Régions et domaines : mêmes listes que la modification du profil OSC
+  const REGIONS = useRegions();
 
   useEffect(() => {
     fetchAllCrasc().then(setCrascs).catch(() => {});
@@ -249,6 +214,8 @@ export default function PageRejoindre() {
       domainePrioritaire3: '',
       domainePrioritaire4: '',
       domainePrioritaire5: '',
+      axe: '',
+      specialites: '',
       nbMembres: '',
       nbFemmesMembres: '',
       nbHommesMembres: '',
@@ -312,6 +279,8 @@ export default function PageRejoindre() {
         domaine_prioritaire_3: emptyToNull(values.domainePrioritaire3),
         domaine_prioritaire_4: emptyToNull(values.domainePrioritaire4),
         domaine_prioritaire_5: emptyToNull(values.domainePrioritaire5),
+        axe: emptyToNull(values.axe),
+        specialites: emptyToNull(values.specialites),
         nb_membres: toNumber(values.nbMembres),
         nb_femmes_membres: toNumber(values.nbFemmesMembres),
         nb_hommes_membres: toNumber(values.nbHommesMembres),
@@ -732,13 +701,18 @@ export default function PageRejoindre() {
           </div>
 
           <div className="border-t border-gray-200 pt-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Domaines prioritaires</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Domaines prioritaires</h2>
+            <p className="text-sm text-gray-500 mb-4">
+              Le 1er domaine prioritaire est votre pôle de concertation : votre OSC y sera inscrite dès la validation de votre adhésion.
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {renderSelect('domainePrioritaire', '1er domaine prioritaire', 'Sélectionnez un domaine', DOMAINE_PRIORITAIRE_OPTIONS)}
-              {renderSelect('domainePrioritaire2', '2ème domaine prioritaire', 'Sélectionnez un domaine', DOMAINE_PRIORITAIRE_OPTIONS)}
-              {renderSelect('domainePrioritaire3', '3ème domaine prioritaire', 'Sélectionnez un domaine', DOMAINE_PRIORITAIRE_OPTIONS)}
-              {renderSelect('domainePrioritaire4', '4ème domaine prioritaire', 'Sélectionnez un domaine', DOMAINE_PRIORITAIRE_OPTIONS)}
-              {renderSelect('domainePrioritaire5', '5ème domaine prioritaire', 'Sélectionnez un domaine', DOMAINE_PRIORITAIRE_OPTIONS)}
+              {renderSelect('domainePrioritaire', '1er domaine prioritaire (pôle de concertation) *', 'Sélectionnez un domaine', domaines)}
+              {renderSelect('domainePrioritaire2', '2ème domaine prioritaire', 'Sélectionnez un domaine', domaines)}
+              {renderSelect('domainePrioritaire3', '3ème domaine prioritaire', 'Sélectionnez un domaine', domaines)}
+              {renderSelect('domainePrioritaire4', '4ème domaine prioritaire', 'Sélectionnez un domaine', domaines)}
+              {renderSelect('domainePrioritaire5', '5ème domaine prioritaire', 'Sélectionnez un domaine', domaines)}
+              {renderInput('axe', "Axe d'intervention dans le pôle", 'Ex : Santé communautaire')}
+              {renderTextarea('specialites', 'Spécialités', 'Ex : Paludisme, VIH, nutrition...')}
             </div>
           </div>
 
