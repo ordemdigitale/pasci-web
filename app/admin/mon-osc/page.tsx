@@ -7,10 +7,11 @@ import { fetchWithAuth } from "@/lib/auth";
 import { IOscDetail } from "@/types/api.types";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import OscEvaluationBadge from "@/components/osc/OscEvaluationBadge";
+import OscBaremeDetail from "@/components/osc/OscBaremeDetail";
 import {
   Edit3, Mail, Phone, MapPin, Globe, Users,
   Wallet, Target, BookOpen, Loader2, AlertCircle, ExternalLink,
-  FileText, Award,
+  FileText, Award, Gauge, CalendarClock, Download, CheckCircle2, Clock,
 } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -25,6 +26,37 @@ const FORMALISATION_OPTIONS = [
 
 const formalisationLabel = (value?: string | null) =>
   FORMALISATION_OPTIONS.find((option) => option.value === value)?.label || value || null;
+
+const formatDate = (valeur?: string | null) => {
+  if (!valeur) return null;
+  const date = new Date(valeur);
+  return Number.isNaN(date.getTime())
+    ? valeur
+    : date.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+};
+
+/**
+ * Complétude du profil : part des informations clés réellement renseignées.
+ * Elle indique à l'OSC ce qu'il lui reste à remplir, là où le score de
+ * notation ne juge que les cinq critères du barème.
+ */
+const CHAMPS_PROFIL: { cle: keyof IOscDetail; label: string }[] = [
+  { cle: "description", label: "Description" },
+  { cle: "email", label: "Email" },
+  { cle: "contact_osc", label: "Contact de l'OSC" },
+  { cle: "contact_president", label: "Contact du/de la président(e)" },
+  { cle: "region_nom", label: "Région" },
+  { cle: "sous_prefecture", label: "Sous-préfecture" },
+  { cle: "address", label: "Adresse" },
+  { cle: "date_creation", label: "Date de création" },
+  { cle: "numero_recepisse", label: "N° de récépissé" },
+  { cle: "nom_president", label: "Nom du/de la président(e)" },
+  { cle: "nb_membres", label: "Nombre de membres" },
+  { cle: "domaine_prioritaire", label: "Domaine prioritaire" },
+  { cle: "savoir_faire", label: "Savoir-faire" },
+  { cle: "populations_cibles", label: "Populations cibles" },
+  { cle: "thumbnail_url", label: "Logo" },
+];
 
 function Stat({ label, value, color }: { label: string; value?: string | number | null; color: string }) {
   return (
@@ -84,6 +116,20 @@ export default function MonOscPage() {
     );
   }
 
+  const localisation = [osc.region_nom, osc.sous_prefecture, osc.ville].filter(Boolean).join(" · ");
+  const champsRenseignes = CHAMPS_PROFIL.filter((champ) => {
+    const valeur = osc[champ.cle];
+    return valeur !== null && valeur !== undefined && String(valeur).trim() !== "";
+  });
+  const champsManquants = CHAMPS_PROFIL.filter((champ) => !champsRenseignes.includes(champ));
+  const completude = Math.round((champsRenseignes.length / CHAMPS_PROFIL.length) * 100);
+  const justificatifs = [
+    { label: "Document de formalisation", url: osc.document_formalisation_url },
+    { label: "Plan d'action", url: osc.plan_action_document_url },
+    { label: "Rapports annuels", url: osc.rapports_annuels_document_url },
+    { label: "Adhésion au CRASC", url: osc.adhesion_crasc_document_url },
+  ];
+
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 font-poppins space-y-6">
       {/* Header */}
@@ -100,12 +146,33 @@ export default function MonOscPage() {
             <div className="mb-3 rounded-full bg-white inline-flex">
               <OscEvaluationBadge score={osc.score_autoevaluation} color={osc.couleur_autoevaluation} hex={osc.couleur_autoevaluation_hex} />
             </div>
-            <h1 className="text-3xl font-extrabold mb-1">{osc.name}</h1>
-            {osc.crasc && (
-              <p className="text-white/80 text-sm mb-2 flex items-center gap-1">
-                <MapPin className="w-4 h-4" /> {osc.crasc.name}
-              </p>
-            )}
+            <h1 className="text-3xl font-extrabold mb-1">
+              {osc.name}
+              {osc.sigle && <span className="ml-2 text-lg font-semibold text-white/70">({osc.sigle})</span>}
+            </h1>
+            <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/80">
+              {osc.crasc && (
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4" /> {osc.crasc.name}
+                </span>
+              )}
+              {localisation && <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {localisation}</span>}
+              {osc.type?.name && <span className="flex items-center gap-1"><FileText className="w-4 h-4" /> {osc.type.name}</span>}
+            </div>
+            <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
+              <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-semibold ${
+                osc.statut_publication === "publie" ? "bg-white/20 text-white" : "bg-amber-400/90 text-amber-950"
+              }`}>
+                {osc.statut_publication === "publie"
+                  ? <><CheckCircle2 className="w-3.5 h-3.5" /> Publiée dans l&apos;annuaire</>
+                  : <><Clock className="w-3.5 h-3.5" /> En attente de validation</>}
+              </span>
+              {formatDate(osc.updated_at) && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 font-semibold text-white/90">
+                  <CalendarClock className="w-3.5 h-3.5" /> Mise à jour le {formatDate(osc.updated_at)}
+                </span>
+              )}
+            </div>
             {osc.description && (
               <p className="text-white/90 text-sm line-clamp-2">{osc.description}</p>
             )}
@@ -123,6 +190,52 @@ export default function MonOscPage() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main content */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Complétude du profil : ce qui reste à renseigner */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <Gauge className="w-5 h-5 text-[#2A591D]" /> Complétude du profil
+              </h2>
+              <span className="text-2xl font-extrabold tabular-nums text-[#2A591D]">{completude}%</span>
+            </div>
+            <div className="mb-3 h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
+              <div
+                className="h-full rounded-full bg-[#2A591D] transition-all"
+                style={{ width: `${completude}%` }}
+              />
+            </div>
+            <p className="text-sm text-gray-500">
+              {champsRenseignes.length} information{champsRenseignes.length > 1 ? "s" : ""} sur{" "}
+              {CHAMPS_PROFIL.length} renseignée{champsRenseignes.length > 1 ? "s" : ""}.
+            </p>
+            {champsManquants.length > 0 && (
+              <div className="mt-3">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-gray-500">À compléter</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {champsManquants.map((champ) => (
+                    <span key={String(champ.cle)} className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+                      {champ.label}
+                    </span>
+                  ))}
+                </div>
+                <Link
+                  href="/admin/mon-osc/modifier"
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2A591D] hover:underline"
+                >
+                  <Edit3 className="w-4 h-4" /> Compléter mon profil
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Détail du barème sur 20 points */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Award className="w-5 h-5 text-orange-500" /> Barème de notation sur 20 points
+            </h2>
+            <OscBaremeDetail osc={osc} />
+          </div>
+
           {/* Stats */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -218,14 +331,29 @@ export default function MonOscPage() {
                   <Mail className="w-4 h-4" /> {osc.email}
                 </a>
               )}
-              {osc.phone && (
-                <p className="flex items-center gap-2 text-sm text-gray-700">
-                  <Phone className="w-4 h-4 text-gray-400" /> {osc.phone}
+              {([
+                { label: "Téléphone", valeur: osc.phone },
+                { label: "Contact de l'OSC", valeur: osc.contact_osc },
+                { label: "Contact du/de la président(e)", valeur: osc.contact_president },
+                { label: "Contact 1", valeur: osc.contact_1 },
+                { label: "Contact 2", valeur: osc.contact_2 },
+              ] as const).map(({ label, valeur }) => valeur ? (
+                <p key={label} className="flex items-start gap-2 text-sm text-gray-700">
+                  <Phone className="mt-0.5 w-4 h-4 flex-shrink-0 text-gray-400" />
+                  <span>
+                    <span className="block text-xs text-gray-400">{label}</span>
+                    <a href={`tel:${valeur}`} className="hover:underline">{valeur}</a>
+                  </span>
+                </p>
+              ) : null)}
+              {localisation && (
+                <p className="flex items-start gap-2 text-sm text-gray-700">
+                  <MapPin className="mt-0.5 w-4 h-4 flex-shrink-0 text-gray-400" /> {localisation}
                 </p>
               )}
-              {osc.ville && (
-                <p className="flex items-center gap-2 text-sm text-gray-700">
-                  <MapPin className="w-4 h-4 text-gray-400" /> {osc.ville}
+              {osc.address && (
+                <p className="flex items-start gap-2 text-sm text-gray-700">
+                  <MapPin className="mt-0.5 w-4 h-4 flex-shrink-0 text-gray-400" /> {osc.address}
                 </p>
               )}
               {osc.website && (
@@ -251,6 +379,34 @@ export default function MonOscPage() {
               <Info label="Zone de couverture" value={osc.zone_couverture} />
               <Info label="Niveau de regroupement" value={osc.niveau_regroupement} />
               <Info label="Réseau d'appartenance" value={osc.reseau_appartenance} />
+            </div>
+          </div>
+
+          {/* Justificatifs : ce qui est effectivement déposé */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-green-700" /> Justificatifs déposés
+            </h3>
+            <div className="space-y-2">
+              {justificatifs.map(({ label, url }) => (
+                <div key={label} className="flex items-center justify-between gap-2 text-sm">
+                  <span className="truncate text-gray-700">{label}</span>
+                  {url ? (
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700 hover:underline"
+                    >
+                      <Download className="h-3 w-3" /> Déposé
+                    </a>
+                  ) : (
+                    <span className="flex-shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-400">
+                      Manquant
+                    </span>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 

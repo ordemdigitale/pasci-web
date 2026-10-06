@@ -19,6 +19,11 @@ const FORMALISATION_OPTIONS = [
 ];
 
 const SORT_OPTIONS = [
+  // Le tri par date de dernière mise à jour permet de repérer en un coup d'œil
+  // les fiches qui viennent d'être actualisées (ou celles laissées de côté).
+  { value: "updated_at", label: "Date de dernière mise à jour" },
+  { value: "created_at", label: "Date d'enregistrement" },
+  { value: "score_autoevaluation", label: "Score de notation (/20)" },
   { value: "name", label: "Nom" },
   { value: "region_nom", label: "Région" },
   { value: "departement", label: "Département" },
@@ -44,11 +49,24 @@ interface IOsc {
   description?: string; thumbnail_url?: string;
   type?: IOscType; crasc?: ICrasc;
   ville?: string; email?: string; phone?: string;
+  contact_president?: string | null; contact_osc?: string | null;
+  contact_1?: string | null; contact_2?: string | null;
   type_document_formalisation?: string | null;
   document_formalisation_url?: string | null;
   score_autoevaluation?: number; couleur_autoevaluation?: string; couleur_autoevaluation_hex?: string;
   is_visible?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
+
+/** « 6 oct. 2026 » — vide si la date n'est pas renseignée. */
+const formatDate = (valeur?: string) => {
+  if (!valeur) return "—";
+  const date = new Date(valeur);
+  return Number.isNaN(date.getTime())
+    ? "—"
+    : date.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
+};
 
 export default function AdminOscPage() {
   const [oscs, setOscs]           = useState<IOsc[]>([]);
@@ -59,8 +77,8 @@ export default function AdminOscPage() {
   const [search, setSearch]       = useState('');
   const [typeDocumentFormalisation, setTypeDocumentFormalisation] = useState("all");
   const [hasDocumentFormalisation, setHasDocumentFormalisation] = useState("all");
-  const [sortBy, setSortBy] = useState("name");
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortBy, setSortBy] = useState("updated_at");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [loading, setLoading]     = useState(true);
   const [togglingId, setTogglingId] = useState<number | null>(null);
 
@@ -115,8 +133,8 @@ export default function AdminOscPage() {
     setSearchInput('');
     setTypeDocumentFormalisation("all");
     setHasDocumentFormalisation("all");
-    setSortBy("name");
-    setSortOrder("asc");
+    setSortBy("updated_at");
+    setSortOrder("desc");
     setPage(1);
   };
 
@@ -179,7 +197,7 @@ export default function AdminOscPage() {
         >
           Rechercher
         </button>
-        {(search || typeDocumentFormalisation !== "all" || hasDocumentFormalisation !== "all" || sortBy !== "name" || sortOrder !== "asc") && (
+        {(search || typeDocumentFormalisation !== "all" || hasDocumentFormalisation !== "all" || sortBy !== "updated_at" || sortOrder !== "desc") && (
           <button
             onClick={resetFilters}
             className="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-100 transition-colors"
@@ -256,20 +274,21 @@ export default function AdminOscPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ville</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Formalisation</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mise à jour</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {loading ? (
               <tr>
-                <td colSpan={8} className="px-6 py-16 text-center">
+                <td colSpan={9} className="px-6 py-16 text-center">
                   <Loader2 className="w-8 h-8 text-[#2A591D] animate-spin mx-auto mb-2" />
                   <p className="text-sm text-gray-500">Chargement...</p>
                 </td>
               </tr>
             ) : oscs.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
+                <td colSpan={9} className="px-6 py-12 text-center text-gray-500">
                   Aucune OSC trouvée.
                 </td>
               </tr>
@@ -328,11 +347,21 @@ export default function AdminOscPage() {
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-xs space-y-1 max-w-[200px]">
+                    <div className="text-xs space-y-1 max-w-[220px]">
                       {osc.email && <div className="text-gray-600 truncate" title={osc.email}>📧 {osc.email}</div>}
-                      {osc.phone && <div className="text-gray-600 truncate" title={osc.phone}>📞 {osc.phone}</div>}
-                      {!osc.email && !osc.phone && <span className="text-gray-400">Aucun contact</span>}
+                      {osc.contact_osc && <div className="text-gray-600 truncate" title="Contact de l'OSC">🏢 {osc.contact_osc}</div>}
+                      {osc.contact_president && <div className="text-gray-600 truncate" title="Contact du/de la président(e)">👤 {osc.contact_president}</div>}
+                      {osc.contact_1 && <div className="text-gray-600 truncate" title="Contact 1">📞 {osc.contact_1}</div>}
+                      {osc.contact_2 && <div className="text-gray-600 truncate" title="Contact 2">📞 {osc.contact_2}</div>}
+                      {osc.phone && <div className="text-gray-600 truncate" title={osc.phone}>☎️ {osc.phone}</div>}
+                      {!osc.email && !osc.phone && !osc.contact_osc && !osc.contact_president && !osc.contact_1 && !osc.contact_2 && (
+                        <span className="text-gray-400">Aucun contact</span>
+                      )}
                     </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{formatDate(osc.updated_at)}</div>
+                    <div className="text-xs text-gray-400">créée le {formatDate(osc.created_at)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center gap-2">

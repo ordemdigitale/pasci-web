@@ -1,11 +1,21 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Search, MapPin, Users2, Building, Filter, ArrowRight, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Search, MapPin, Users2, Building, Filter, ArrowRight, Loader2, ChevronLeft, ChevronRight, SlidersHorizontal, ChevronDown, X } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from 'next/link';
 import OscEvaluationBadge from '@/components/osc/OscEvaluationBadge';
 import { useDomainesPrioritaires } from '@/lib/osc-domaines';
+import {
+  useOscFiltres,
+  ADHESION_OPTIONS,
+  CATEGORIE_OPTIONS,
+  FORMALISATION_OPTIONS,
+  JUSTIFICATIF_OPTIONS,
+  OUI_NON_OPTIONS,
+  SCORE_OPTIONS,
+  categorieLabel,
+} from '@/lib/osc-filtres';
 
 interface IOSCType {
   id: number;
@@ -43,17 +53,71 @@ interface IOSC {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const PAGE_SIZE = 12;
 
-const CATEGORIE_OPTIONS = [
-  { value: 'organisation_jeune', label: 'Organisation de jeune (ODJ)' },
-  { value: 'organisation_femme', label: 'Organisation de femme (ODF)' },
-  { value: 'organisation_mixte', label: 'Organisation mixte' },
-];
+/**
+ * Recherche avancée : les 15 champs demandés sont tous des listes
+ * déroulantes alimentées soit par un référentiel figé, soit par les valeurs
+ * réellement présentes en base (`/crasc/osc/filtres`).
+ */
+const FILTRES_AVANCES_VIDES = {
+  type_document_formalisation: '',
+  has_document_formalisation: '',
+  existence_siege: '',
+  manuel_procedures: '',
+  plan_action: '',
+  rapports_annuels: '',
+  adhesion_crasc_statut: '',
+  niveau_regroupement: '',
+  niveau_couverture: '',
+  departement: '',
+  annee_creation: '',
+  score: '',
+};
 
-const categorieLabel = (value?: string | null) =>
-  CATEGORIE_OPTIONS.find((option) => option.value === value)?.label || value || '';
+type FiltresAvances = typeof FILTRES_AVANCES_VIDES;
+
+const SELECT_CLS =
+  "w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent appearance-none cursor-pointer bg-white";
+
+/** Liste déroulante de la recherche avancée. */
+function ChampDeroulant({
+  label,
+  icone: Icone,
+  value,
+  onChange,
+  placeholder,
+  options,
+}: {
+  label: string;
+  icone: typeof Filter;
+  value: string;
+  onChange: (valeur: string) => void;
+  placeholder: string;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</span>
+      <div className="relative">
+        <Icone className="absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-gray-400" />
+        <select value={value} onChange={(e) => onChange(e.target.value)} className={SELECT_CLS}>
+          <option value="">{placeholder}</option>
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 w-4 h-4 -translate-y-1/2 text-gray-400" />
+      </div>
+    </label>
+  );
+}
+
+const enOptions = (valeurs: string[]) => valeurs.map((valeur) => ({ value: valeur, label: valeur }));
 
 export default function AnnuaireOSCPage() {
   const domaines = useDomainesPrioritaires();
+  const filtresDisponibles = useOscFiltres();
+
+  // Moteur 1 : recherche rapide
   const [searchQuery, setSearchQuery] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [selectedTypeId, setSelectedTypeId] = useState<string>('');
@@ -62,6 +126,11 @@ export default function AnnuaireOSCPage() {
   const [regionQuery, setRegionQuery] = useState<string>('');
   const [sousPrefectureQuery, setSousPrefectureQuery] = useState<string>('');
   const [selectedCategorie, setSelectedCategorie] = useState<string>('');
+
+  // Moteur 2 : recherche avancée
+  const [avances, setAvances] = useState<FiltresAvances>(FILTRES_AVANCES_VIDES);
+  const [panneauAvanceOuvert, setPanneauAvanceOuvert] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const [oscData, setOscData] = useState<IOSC[]>([]);
@@ -74,16 +143,21 @@ export default function AnnuaireOSCPage() {
 
   // Fetch filter options once
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/v1/crasc/crasc?limit=20`)
+    fetch(`${API_BASE_URL}/api/v1/crasc/crasc?limit=50`)
       .then(r => r.json())
-      .then((data: ICRASC[]) => setCrascs(data))
+      .then((data: ICRASC[]) => setCrascs(Array.isArray(data) ? data : []))
       .catch(() => {});
 
-    fetch(`${API_BASE_URL}/api/v1/crasc/osc-type?limit=20`)
+    fetch(`${API_BASE_URL}/api/v1/crasc/osc-type?limit=50`)
       .then(r => r.json())
-      .then((data: IOSCType[]) => setOscTypes(data))
+      .then((data: IOSCType[]) => setOscTypes(Array.isArray(data) ? data : []))
       .catch(() => {});
   }, []);
+
+  const nbFiltresAvances = useMemo(
+    () => Object.values(avances).filter(Boolean).length,
+    [avances],
+  );
 
   // Fetch OSCs from API with pagination + filters
   const fetchOscs = useCallback(async () => {
@@ -101,17 +175,31 @@ export default function AnnuaireOSCPage() {
       if (sousPrefectureQuery) params.set('sous_prefecture', sousPrefectureQuery);
       if (selectedCategorie) params.set('categorie', selectedCategorie);
 
+      // Recherche avancée
+      const { score, has_document_formalisation, ...reste } = avances;
+      Object.entries(reste).forEach(([cle, valeur]) => {
+        if (valeur) params.set(cle, valeur);
+      });
+      if (has_document_formalisation) {
+        params.set('has_document_formalisation', has_document_formalisation === 'with' ? 'true' : 'false');
+      }
+      if (score) {
+        const [min, max] = score.split('-');
+        params.set('score_min', min);
+        params.set('score_max', max);
+      }
+
       const res = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?${params}`);
       const data = await res.json();
-      setOscData(data.items);
-      setTotal(data.total);
-      setTotalPages(data.pages);
+      setOscData(data.items ?? []);
+      setTotal(data.total ?? 0);
+      setTotalPages(data.pages ?? 0);
     } catch (error) {
       console.error("Erreur lors du chargement des OSC:", error);
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchQuery, selectedTypeId, selectedCrascId, selectedDomaine, regionQuery, sousPrefectureQuery, selectedCategorie]);
+  }, [currentPage, searchQuery, selectedTypeId, selectedCrascId, selectedDomaine, regionQuery, sousPrefectureQuery, selectedCategorie, avances]);
 
   useEffect(() => {
     fetchOscs();
@@ -153,6 +241,16 @@ export default function AnnuaireOSCPage() {
     setCurrentPage(1);
   };
 
+  const handleAvanceChange = (cle: keyof FiltresAvances) => (valeur: string) => {
+    setAvances((precedents) => ({ ...precedents, [cle]: valeur }));
+    setCurrentPage(1);
+  };
+
+  const resetAvances = () => {
+    setAvances(FILTRES_AVANCES_VIDES);
+    setCurrentPage(1);
+  };
+
   const resetFilters = () => {
     setSearchInput('');
     setSearchQuery('');
@@ -162,6 +260,7 @@ export default function AnnuaireOSCPage() {
     setRegionQuery('');
     setSousPrefectureQuery('');
     setSelectedCategorie('');
+    setAvances(FILTRES_AVANCES_VIDES);
     setCurrentPage(1);
   };
 
@@ -185,7 +284,19 @@ export default function AnnuaireOSCPage() {
     return pages;
   };
 
-  const hasFilters = searchQuery || selectedTypeId || selectedCrascId || selectedDomaine || regionQuery || sousPrefectureQuery || selectedCategorie;
+  const hasFilters = Boolean(
+    searchQuery || selectedTypeId || selectedCrascId || selectedDomaine ||
+    regionQuery || sousPrefectureQuery || selectedCategorie || nbFiltresAvances,
+  );
+
+  // Les listes déroulantes reprennent les valeurs en base ; les référentiels
+  // servent de repli quand l'API des filtres n'a pas répondu.
+  const optionsRegions = filtresDisponibles.regions.length ? filtresDisponibles.regions : [];
+  const optionsDomaines = filtresDisponibles.domaines.length
+    ? enOptions(filtresDisponibles.domaines)
+    : domaines;
+  const optionsTypes = (filtresDisponibles.types_osc.length ? filtresDisponibles.types_osc : oscTypes)
+    .map((t) => ({ value: String(t.id), label: t.name }));
 
   return (
     <section className="py-12 bg-gradient-to-b from-gray-50 to-white font-poppins">
@@ -233,8 +344,10 @@ export default function AnnuaireOSCPage() {
           <div className="group bg-white rounded-xl p-6 border-2 border-[#E05017]/30 hover:border-[#E05017] hover:shadow-xl transition-all duration-300 text-center overflow-hidden relative">
             <div className="absolute inset-0 bg-gradient-to-br from-[#E05017] to-[#d04010] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div className="relative z-10">
+              {/* Compteur synchronisé avec la liste des CRASC : un 6e CRASC
+                  créé dans le back-office apparaît ici automatiquement. */}
               <div className="text-5xl font-extrabold text-[#E05017] group-hover:text-white transition-colors mb-2">
-                5
+                {crascs.length}
               </div>
               <div className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/80 transition-colors">
                 CRASC couverts
@@ -254,7 +367,7 @@ export default function AnnuaireOSCPage() {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-	                  placeholder="Rechercher par nom, description, région, sous-préfecture, domaine..."
+	                  placeholder="Rechercher par nom, sigle, description, région, sous-préfecture, domaine…"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && applySearch()}
@@ -268,19 +381,22 @@ export default function AnnuaireOSCPage() {
                 Rechercher
               </button>
             </div>
+            <p className="text-xs text-gray-400">
+              La recherche ignore les majuscules, les accents et les tirets : « san pedro » trouve « San-Pédro ».
+            </p>
 
             {/* Filter Dropdowns */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
                 <select
                   value={selectedTypeId}
                   onChange={(e) => handleTypeChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent appearance-none cursor-pointer"
+                  className={SELECT_CLS}
                 >
                   <option value="">Tous les types</option>
-                  {oscTypes.map((t) => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
+                  {optionsTypes.map((t) => (
+                    <option key={t.value} value={t.value}>{t.label}</option>
                   ))}
                 </select>
               </div>
@@ -290,7 +406,7 @@ export default function AnnuaireOSCPage() {
                 <select
                   value={selectedCrascId}
                   onChange={(e) => handleCrascChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent appearance-none cursor-pointer"
+                  className={SELECT_CLS}
                 >
                   <option value="">Tous les CRASC</option>
                   {crascs.map((c) => (
@@ -304,10 +420,10 @@ export default function AnnuaireOSCPage() {
                 <select
                   value={selectedDomaine}
                   onChange={(e) => handleDomaineChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent appearance-none cursor-pointer"
+                  className={SELECT_CLS}
                 >
                   <option value="">Tous les domaines</option>
-                  {domaines.map((option) => (
+                  {optionsDomaines.map((option) => (
                     <option key={option.value} value={option.value}>{option.label}</option>
                   ))}
                 </select>
@@ -318,7 +434,7 @@ export default function AnnuaireOSCPage() {
                 <select
                   value={selectedCategorie}
                   onChange={(e) => handleCategorieChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent appearance-none cursor-pointer"
+                  className={SELECT_CLS}
                 >
                   <option value="">Toutes les catégories</option>
                   {CATEGORIE_OPTIONS.map((option) => (
@@ -327,27 +443,201 @@ export default function AnnuaireOSCPage() {
                 </select>
               </div>
 
+              {/* Région et sous-préfecture : listes des valeurs réellement
+                  enregistrées, pour éviter les recherches sans résultat. */}
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
-                <input
-                  type="text"
+                <select
                   value={regionQuery}
                   onChange={(e) => handleRegionChange(e.target.value)}
-                  placeholder="Région de l’OSC"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
-                />
+                  className={SELECT_CLS}
+                >
+                  <option value="">Toutes les régions</option>
+                  {optionsRegions.map((region) => (
+                    <option key={region} value={region}>{region}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
-                <input
-                  type="text"
+                <select
                   value={sousPrefectureQuery}
                   onChange={(e) => handleSousPrefectureChange(e.target.value)}
-                  placeholder="Sous-préfecture de l’OSC"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E05017] focus:border-transparent"
-                />
+                  className={SELECT_CLS}
+                >
+                  <option value="">Toutes les sous-préfectures</option>
+                  {filtresDisponibles.sous_prefectures.map((sp) => (
+                    <option key={sp} value={sp}>{sp}</option>
+                  ))}
+                </select>
               </div>
+            </div>
+
+            {/* ─── Moteur de recherche avancée ─── */}
+            <div className="rounded-xl border-2 border-dashed border-[#E05017]/40 bg-orange-50/40">
+              <button
+                type="button"
+                onClick={() => setPanneauAvanceOuvert((ouvert) => !ouvert)}
+                className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+              >
+                <span className="flex items-center gap-3">
+                  <SlidersHorizontal className="h-5 w-5 text-[#E05017]" />
+                  <span>
+                    <span className="block font-bold text-gray-900">Recherche avancée</span>
+                    <span className="block text-xs text-gray-500">
+                      Documents de formalisation, barème de notation, couverture, gouvernance…
+                    </span>
+                  </span>
+                </span>
+                <span className="flex items-center gap-2">
+                  {nbFiltresAvances > 0 && (
+                    <span className="rounded-full bg-[#E05017] px-2.5 py-0.5 text-xs font-bold text-white">
+                      {nbFiltresAvances}
+                    </span>
+                  )}
+                  <ChevronDown
+                    className={`h-5 w-5 text-gray-400 transition-transform ${panneauAvanceOuvert ? 'rotate-180' : ''}`}
+                  />
+                </span>
+              </button>
+
+              {panneauAvanceOuvert && (
+                <div className="border-t border-[#E05017]/20 px-5 pb-5 pt-4">
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <ChampDeroulant
+                      label="1. Document de formalisation"
+                      icone={Filter}
+                      value={avances.type_document_formalisation}
+                      onChange={handleAvanceChange('type_document_formalisation')}
+                      placeholder="Tous les documents"
+                      options={FORMALISATION_OPTIONS}
+                    />
+                    <ChampDeroulant
+                      label="2. Justificatif de formalisation"
+                      icone={Filter}
+                      value={avances.has_document_formalisation}
+                      onChange={handleAvanceChange('has_document_formalisation')}
+                      placeholder="Avec ou sans justificatif"
+                      options={JUSTIFICATIF_OPTIONS}
+                    />
+                    <ChampDeroulant
+                      label="3. Existence d'un siège"
+                      icone={Building}
+                      value={avances.existence_siege}
+                      onChange={handleAvanceChange('existence_siege')}
+                      placeholder="Indifférent"
+                      options={OUI_NON_OPTIONS}
+                    />
+                    <ChampDeroulant
+                      label="4. Manuel de procédures"
+                      icone={Filter}
+                      value={avances.manuel_procedures}
+                      onChange={handleAvanceChange('manuel_procedures')}
+                      placeholder="Indifférent"
+                      options={OUI_NON_OPTIONS}
+                    />
+                    <ChampDeroulant
+                      label="5. Plan d'action"
+                      icone={Filter}
+                      value={avances.plan_action}
+                      onChange={handleAvanceChange('plan_action')}
+                      placeholder="Indifférent"
+                      options={OUI_NON_OPTIONS}
+                    />
+                    <ChampDeroulant
+                      label="6. Rapports annuels d'activités"
+                      icone={Filter}
+                      value={avances.rapports_annuels}
+                      onChange={handleAvanceChange('rapports_annuels')}
+                      placeholder="Indifférent"
+                      options={OUI_NON_OPTIONS}
+                    />
+                    <ChampDeroulant
+                      label="7. Adhésion au CRASC"
+                      icone={Users2}
+                      value={avances.adhesion_crasc_statut}
+                      onChange={handleAvanceChange('adhesion_crasc_statut')}
+                      placeholder="Indifférent"
+                      options={ADHESION_OPTIONS}
+                    />
+                    <ChampDeroulant
+                      label="8. Niveau de regroupement"
+                      icone={Users2}
+                      value={avances.niveau_regroupement}
+                      onChange={handleAvanceChange('niveau_regroupement')}
+                      placeholder="Tous les niveaux"
+                      options={enOptions(filtresDisponibles.niveaux_regroupement)}
+                    />
+                    <ChampDeroulant
+                      label="9. Catégorie d'organisation"
+                      icone={Users2}
+                      value={selectedCategorie}
+                      onChange={handleCategorieChange}
+                      placeholder="Toutes les catégories"
+                      options={CATEGORIE_OPTIONS}
+                    />
+                    <ChampDeroulant
+                      label="10. Type d'OSC"
+                      icone={Building}
+                      value={selectedTypeId}
+                      onChange={handleTypeChange}
+                      placeholder="Tous les types"
+                      options={optionsTypes}
+                    />
+                    <ChampDeroulant
+                      label="11. Niveau de couverture"
+                      icone={MapPin}
+                      value={avances.niveau_couverture}
+                      onChange={handleAvanceChange('niveau_couverture')}
+                      placeholder="Tous les niveaux"
+                      options={enOptions(filtresDisponibles.niveaux_couverture)}
+                    />
+                    <ChampDeroulant
+                      label="12. Département"
+                      icone={MapPin}
+                      value={avances.departement}
+                      onChange={handleAvanceChange('departement')}
+                      placeholder="Tous les départements"
+                      options={enOptions(filtresDisponibles.departements)}
+                    />
+                    <ChampDeroulant
+                      label="13. Domaine prioritaire"
+                      icone={Filter}
+                      value={selectedDomaine}
+                      onChange={handleDomaineChange}
+                      placeholder="Tous les domaines"
+                      options={optionsDomaines}
+                    />
+                    <ChampDeroulant
+                      label="14. Score de notation (/20)"
+                      icone={Filter}
+                      value={avances.score}
+                      onChange={handleAvanceChange('score')}
+                      placeholder="Tous les scores"
+                      options={SCORE_OPTIONS}
+                    />
+                    <ChampDeroulant
+                      label="15. Année de création"
+                      icone={Filter}
+                      value={avances.annee_creation}
+                      onChange={handleAvanceChange('annee_creation')}
+                      placeholder="Toutes les années"
+                      options={enOptions(filtresDisponibles.annees_creation)}
+                    />
+                  </div>
+
+                  {nbFiltresAvances > 0 && (
+                    <button
+                      onClick={resetAvances}
+                      className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#E05017] hover:text-[#d04010]"
+                    >
+                      <X className="h-4 w-4" />
+                      Effacer la recherche avancée
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Results Count and Reset */}

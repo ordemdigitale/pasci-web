@@ -57,6 +57,10 @@ const oscSchema = z.object({
   // Informations de contact
   email: z.string().email("Email invalide").optional().or(z.literal("")),
   phone: z.string().optional(),
+  contact_president: z.string().optional(),
+  contact_osc: z.string().optional(),
+  contact_1: z.string().optional(),
+  contact_2: z.string().optional(),
   region_nom: z.string().optional(),
   departement: z.string().optional(),
   sous_prefecture: z.string().optional(),
@@ -166,6 +170,10 @@ export default function AdminAjoutOsc() {
       type_id: "",
       email: "",
       phone: "",
+      contact_president: "",
+      contact_osc: "",
+      contact_1: "",
+      contact_2: "",
       region_nom: "",
       departement: "",
       sous_prefecture: "",
@@ -342,6 +350,18 @@ export default function AdminAjoutOsc() {
       }
       if (values.phone && values.phone.trim() !== "") {
         formData.append("phone", values.phone);
+      }
+      if (values.contact_president && values.contact_president.trim() !== "") {
+        formData.append("contact_president", values.contact_president);
+      }
+      if (values.contact_osc && values.contact_osc.trim() !== "") {
+        formData.append("contact_osc", values.contact_osc);
+      }
+      if (values.contact_1 && values.contact_1.trim() !== "") {
+        formData.append("contact_1", values.contact_1);
+      }
+      if (values.contact_2 && values.contact_2.trim() !== "") {
+        formData.append("contact_2", values.contact_2);
       }
       appendIfFilled("region_nom");
       appendIfFilled("departement");
@@ -781,6 +801,62 @@ export default function AdminAjoutOsc() {
                 id="phone"
                 type="tel"
                 {...register("phone")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="+225 XX XX XX XX XX"
+              />
+            </div>
+
+            {/* Contact du/de la président(e) */}
+            <div>
+              <label htmlFor="contact_president" className="block text-sm font-semibold text-gray-700 mb-2">
+                Contact du/de la président(e)
+              </label>
+              <input
+                id="contact_president"
+                type="tel"
+                {...register("contact_president")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="+225 XX XX XX XX XX"
+              />
+            </div>
+
+            {/* Contact de l'OSC */}
+            <div>
+              <label htmlFor="contact_osc" className="block text-sm font-semibold text-gray-700 mb-2">
+                Contact de l'OSC
+              </label>
+              <input
+                id="contact_osc"
+                type="tel"
+                {...register("contact_osc")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="+225 XX XX XX XX XX"
+              />
+            </div>
+
+            {/* Contact 1 */}
+            <div>
+              <label htmlFor="contact_1" className="block text-sm font-semibold text-gray-700 mb-2">
+                Contact 1
+              </label>
+              <input
+                id="contact_1"
+                type="tel"
+                {...register("contact_1")}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+                placeholder="+225 XX XX XX XX XX"
+              />
+            </div>
+
+            {/* Contact 2 */}
+            <div>
+              <label htmlFor="contact_2" className="block text-sm font-semibold text-gray-700 mb-2">
+                Contact 2
+              </label>
+              <input
+                id="contact_2"
+                type="tel"
+                {...register("contact_2")}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
                 placeholder="+225 XX XX XX XX XX"
               />

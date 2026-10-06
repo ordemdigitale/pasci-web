@@ -392,17 +392,23 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
                   </div>
                 )}
 
-                {oscData.phone && (
-                  <div className="flex items-start gap-3">
+                {([
+                  { label: "Téléphone", valeur: oscData.phone },
+                  { label: "Contact de l'OSC", valeur: oscData.contact_osc },
+                  { label: "Contact du/de la président(e)", valeur: oscData.contact_president },
+                  { label: "Contact 1", valeur: oscData.contact_1 },
+                  { label: "Contact 2", valeur: oscData.contact_2 },
+                ] as const).map(({ label, valeur }) => valeur ? (
+                  <div key={label} className="flex items-start gap-3">
                     <Phone className="w-5 h-5 text-[#E05017] flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-semibold text-gray-700">Téléphone</p>
-                      <a href={`tel:${oscData.phone}`} className="text-sm text-[#E05017] hover:underline">
-                        {oscData.phone}
+                      <p className="text-sm font-semibold text-gray-700">{label}</p>
+                      <a href={`tel:${valeur}`} className="text-sm text-[#E05017] hover:underline">
+                        {valeur}
                       </a>
                     </div>
                   </div>
-                )}
+                ) : null)}
 
                 {oscData.website && (
                   <div className="flex items-start gap-3">

@@ -3,6 +3,11 @@ export interface ICrasc {
   name: string;
   slug: string;
   osc_count: number;
+  description?: string;
+  email_pca?: string | null;
+  // Régions couvertes : renvoyées par `GET /crasc/crasc`, elles définissent
+  // la zone du CRASC (carte, filtres, création d'un nouveau CRASC).
+  regions?: IRegionCiv[];
 
   //description
   //oscs
@@ -38,6 +43,10 @@ export interface IOsc {
   origine_organisation?: string | null;
   email?: string | null;
   phone?: string | null;
+  contact_president?: string | null;
+  contact_osc?: string | null;
+  contact_1?: string | null;
+  contact_2?: string | null;
   website?: string | null;
   address?: string | null;
   document_formalisation_url?: string | null;
@@ -61,6 +70,10 @@ export interface IOscDetail {
   ville?: string | null;
   email?: string | null;
   phone?: string | null;
+  contact_president?: string | null;
+  contact_osc?: string | null;
+  contact_1?: string | null;
+  contact_2?: string | null;
   website?: string | null;
   address?: string | null;
   created_at?: string;
@@ -120,6 +133,8 @@ export interface IOscDetail {
   rapports_annuels_document_path?: string | null;
   rapports_annuels_document_url?: string | null;
   score_autoevaluation?: number;
+  is_visible?: boolean;
+  statut_publication?: "en_attente" | "publie" | "rejete";
   couleur_autoevaluation?: "gris" | "rouge" | "orange" | "jaune" | "bleu" | "vert";
   couleur_autoevaluation_hex?: string;
   reseaux_sociaux?: string | null;

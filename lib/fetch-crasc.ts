@@ -14,6 +14,8 @@ import {
 export type { ICrasc, ICrascDetail, IRegionCiv, IOscType, IOsc, IOscDetail, INews, IEvenement, ICrascVideo, SpotlightNews };
 
 // Get API base URL from environment variable
+import { getToken } from "@/lib/auth";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Fetch all Crasc
@@ -157,19 +159,30 @@ export async function fetchSpotlightNews(): Promise<SpotlightNews[]> {
 // Update CRASC by slug
 export async function updateCrasc(
   slug: string,
-  data: { name?: string; description?: string; email_pca?: string }
-): Promise<ICrasc> {
+  // `region_ids` : liste complète des régions couvertes ; celles qui n'y
+  // figurent plus sont détachées du CRASC.
+  data: { name?: string; description?: string; email_pca?: string; region_ids?: number[] }
+): Promise<ICrascDetail> {
+  const token = getToken();
   const response = await fetch(`${API_BASE_URL}/api/v1/crasc/crasc/${slug}`, {
     method: "PATCH",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      // La modification d'un CRASC est réservée au superadministrateur.
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify(data)
   });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || "Échec de la mise à jour du CRASC");
+    const detail = errorData.detail;
+    throw new Error(
+      typeof detail === "string"
+        ? detail
+        : detail?.errors?.map((e: { message: string }) => e.message).join("\n") ||
+          "Échec de la mise à jour du CRASC"
+    );
   }
 
   return response.json();

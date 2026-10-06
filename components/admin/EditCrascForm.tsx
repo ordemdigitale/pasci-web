@@ -1,9 +1,13 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ICrascDetail } from '@/types/api.types';
 import { updateCrasc } from '@/lib/fetch-crasc';
-import { Save, X, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { API_ENDPOINTS } from '@/lib/api-config';
+import { Save, X, Loader2, AlertCircle, CheckCircle, MapPin, Search } from 'lucide-react';
+
+interface IRegion { id: number; name: string }
+interface ICrascExistant { id: number; name: string; regions?: { id: number; name: string }[] }
 
 interface EditCrascFormProps {
     crasc: ICrascDetail;
@@ -18,9 +22,42 @@ export function EditCrascForm({ crasc, onSuccess, onCancel }: EditCrascFormProps
         email_pca: (crasc as any).email_pca || '',
     });
 
+    // Les régions définissent la zone du CRASC : elles s'éditent ici comme
+    // à la création, et une région ne peut appartenir qu'à un seul CRASC.
+    const [regions, setRegions] = useState<IRegion[]>([]);
+    const [crascs, setCrascs] = useState<ICrascExistant[]>([]);
+    const [regionsChoisies, setRegionsChoisies] = useState<number[]>(
+        (crasc.regions ?? []).map((region) => Number(region.id)),
+    );
+    const [recherche, setRecherche] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+
+    useEffect(() => {
+        fetch(`${API_ENDPOINTS.region.list}?limit=200`)
+            .then((r) => (r.ok ? r.json() : []))
+            .then((data) => setRegions(Array.isArray(data) ? data : data?.items ?? []))
+            .catch(() => setRegions([]));
+        fetch(`${API_ENDPOINTS.crasc.list}?limit=50`)
+            .then((r) => (r.ok ? r.json() : []))
+            .then((data) => setCrascs(Array.isArray(data) ? data : []))
+            .catch(() => setCrascs([]));
+    }, []);
+
+    // Régions déjà prises par un *autre* CRASC : affichées mais verrouillées.
+    const crascParRegion = useMemo(() => {
+        const index = new Map<number, string>();
+        crascs
+            .filter((autre) => Number(autre.id) !== Number(crasc.id))
+            .forEach((autre) => (autre.regions ?? []).forEach((region) => index.set(Number(region.id), autre.name)));
+        return index;
+    }, [crascs, crasc.id]);
+
+    const regionsFiltrees = useMemo(() => {
+        const terme = recherche.trim().toLowerCase();
+        return terme ? regions.filter((region) => region.name.toLowerCase().includes(terme)) : regions;
+    }, [regions, recherche]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -28,8 +65,14 @@ export function EditCrascForm({ crasc, onSuccess, onCancel }: EditCrascFormProps
         setError(null);
         setSuccess(false);
 
+        if (regionsChoisies.length === 0) {
+            setError('Un CRASC doit couvrir au moins une région.');
+            setLoading(false);
+            return;
+        }
+
         try {
-            const updated = await updateCrasc(crasc.slug, formData);
+            const updated = await updateCrasc(crasc.slug, { ...formData, region_ids: regionsChoisies });
             setSuccess(true);
 
             // Call onSuccess callback if provided
@@ -136,6 +179,69 @@ export function EditCrascForm({ crasc, onSuccess, onCancel }: EditCrascFormProps
                     <p className="mt-2 text-xs text-gray-500">
                         Cet email recevra une copie des messages de contact envoyés via le site.
                     </p>
+                </div>
+
+                {/* Régions couvertes */}
+                <div>
+                    <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+                        <label className="block text-sm font-semibold text-gray-700">
+                            Régions couvertes <span className="text-red-500">*</span>
+                        </label>
+                        <span className="text-sm text-gray-500">
+                            {regionsChoisies.length} sélectionnée{regionsChoisies.length > 1 ? 's' : ''}
+                        </span>
+                    </div>
+
+                    <div className="relative mb-3">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            value={recherche}
+                            onChange={(e) => setRecherche(e.target.value)}
+                            placeholder="Filtrer les régions…"
+                            className="w-full rounded-lg border-2 border-gray-200 py-2 pl-9 pr-3 text-sm outline-none focus:border-[#E05017]"
+                        />
+                    </div>
+
+                    <div className="max-h-64 overflow-y-auto rounded-lg border-2 border-gray-200 p-2">
+                        {regionsFiltrees.length === 0 ? (
+                            <p className="p-4 text-center text-sm text-gray-400">Aucune région.</p>
+                        ) : (
+                            <div className="grid gap-1 sm:grid-cols-2">
+                                {regionsFiltrees.map((region) => {
+                                    const occupeePar = crascParRegion.get(Number(region.id));
+                                    return (
+                                        <label
+                                            key={region.id}
+                                            title={occupeePar ? `Déjà rattachée à ${occupeePar}` : undefined}
+                                            className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm ${
+                                                occupeePar ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={regionsChoisies.includes(Number(region.id))}
+                                                disabled={Boolean(occupeePar)}
+                                                onChange={() =>
+                                                    setRegionsChoisies((precedentes) =>
+                                                        precedentes.includes(Number(region.id))
+                                                            ? precedentes.filter((id) => id !== Number(region.id))
+                                                            : [...precedentes, Number(region.id)],
+                                                    )
+                                                }
+                                                className="h-4 w-4 rounded border-gray-300 text-[#E05017] focus:ring-[#E05017]"
+                                            />
+                                            <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-gray-400" />
+                                            <span className="truncate">{region.name}</span>
+                                            {occupeePar && (
+                                                <span className="ml-auto flex-shrink-0 text-[11px] text-gray-400">{occupeePar}</span>
+                                            )}
+                                        </label>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 

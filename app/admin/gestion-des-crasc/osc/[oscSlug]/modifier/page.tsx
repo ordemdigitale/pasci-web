@@ -39,6 +39,10 @@ const oscSchema = z.object({
   type_id: z.string().optional(),
   email: z.string().email("Email invalide").optional().or(z.literal("")),
   phone: z.string().optional(),
+  contact_president: z.string().optional(),
+  contact_osc: z.string().optional(),
+  contact_1: z.string().optional(),
+  contact_2: z.string().optional(),
   region_nom: z.string().optional(),
   departement: z.string().optional(),
   sous_prefecture: z.string().optional(),
@@ -124,6 +128,8 @@ interface IOscDetail {
   thumbnail_url: string; thumbnail_path: string;
   type?: { id: number; name: string }; crasc?: { id: number; name: string };
   ville: string | null; email: string | null; phone: string | null;
+  contact_president?: string | null; contact_osc?: string | null;
+  contact_1?: string | null; contact_2?: string | null;
   region_nom?: string | null; departement?: string | null; sous_prefecture?: string | null;
   origine_organisation?: string | null;
   address: string | null; latitude: number | null; longitude: number | null;
@@ -241,7 +247,8 @@ export default function ModifierOscPage() {
     resolver: zodResolver(oscSchema),
     defaultValues: {
       name: "", sigle: "", description: "", crasc_id: "", type_id: "",
-      email: "", phone: "", region_nom: "", departement: "", sous_prefecture: "",
+      email: "", phone: "", contact_president: "", contact_osc: "", contact_1: "", contact_2: "",
+      region_nom: "", departement: "", sous_prefecture: "",
       ville: "", origine_organisation: "", address: "", latitude: "", longitude: "",
       website: "", reseaux_sociaux: "", date_creation: "", numero_recepisse: "",
       niveau_couverture: "", zone_couverture: "", categorie: "",
@@ -275,6 +282,10 @@ export default function ModifierOscPage() {
     setValue("type_id", osc.type?.id ? String(osc.type.id) : "");
     setValue("email", osc.email || "");
     setValue("phone", osc.phone || "");
+    setValue("contact_president", osc.contact_president || "");
+    setValue("contact_osc", osc.contact_osc || "");
+    setValue("contact_1", osc.contact_1 || "");
+    setValue("contact_2", osc.contact_2 || "");
     setValue("region_nom", osc.region_nom || "");
     setValue("departement", osc.departement || "");
     setValue("sous_prefecture", osc.sous_prefecture || "");
@@ -428,6 +439,10 @@ export default function ModifierOscPage() {
       append("type_id", values.type_id);
       append("email", values.email);
       append("phone", values.phone);
+      append("contact_president", values.contact_president);
+      append("contact_osc", values.contact_osc);
+      append("contact_1", values.contact_1);
+      append("contact_2", values.contact_2);
       append("region_nom", values.region_nom);
       append("departement", values.departement);
       append("sous_prefecture", values.sous_prefecture);
@@ -635,6 +650,18 @@ export default function ModifierOscPage() {
             </Field>
             <Field label="Téléphone">
               <input {...register("phone")} className={inputCls} placeholder="+225 XX XX XX XX" />
+            </Field>
+            <Field label="Contact du/de la président(e)">
+              <input {...register("contact_president")} className={inputCls} placeholder="+225 XX XX XX XX" />
+            </Field>
+            <Field label="Contact de l'OSC">
+              <input {...register("contact_osc")} className={inputCls} placeholder="+225 XX XX XX XX" />
+            </Field>
+            <Field label="Contact 1">
+              <input {...register("contact_1")} className={inputCls} placeholder="+225 XX XX XX XX" />
+            </Field>
+            <Field label="Contact 2">
+              <input {...register("contact_2")} className={inputCls} placeholder="+225 XX XX XX XX" />
             </Field>
             <Field label="Région">
               {/* Même liste que le formulaire d'adhésion (plus de saisie libre) */}

@@ -17,6 +17,8 @@ interface IOscDetail {
   type?: { id: number; name: string; slug: string };
   crasc?: { id: number; name: string; slug: string };
   ville: string | null; email: string | null; phone: string | null;
+  contact_president?: string | null; contact_osc?: string | null;
+  contact_1?: string | null; contact_2?: string | null;
   address: string | null; latitude: number | null; longitude: number | null;
   news_items?: Array<unknown>;
   // Champs complémentaires
@@ -315,6 +317,10 @@ export default function OscDetailPage() {
             </h2>
             <InfoRow label="Email" value={osc.email ? <a href={`mailto:${osc.email}`} className="text-blue-600 hover:underline">{osc.email}</a> : null} />
             <InfoRow label="Téléphone" value={osc.phone ? <a href={`tel:${osc.phone}`} className="text-blue-600 hover:underline">{osc.phone}</a> : null} />
+            <InfoRow label="Contact de l'OSC" value={osc.contact_osc ? <a href={`tel:${osc.contact_osc}`} className="text-blue-600 hover:underline">{osc.contact_osc}</a> : null} />
+            <InfoRow label="Contact du/de la président(e)" value={osc.contact_president ? <a href={`tel:${osc.contact_president}`} className="text-blue-600 hover:underline">{osc.contact_president}</a> : null} />
+            <InfoRow label="Contact 1" value={osc.contact_1 ? <a href={`tel:${osc.contact_1}`} className="text-blue-600 hover:underline">{osc.contact_1}</a> : null} />
+            <InfoRow label="Contact 2" value={osc.contact_2 ? <a href={`tel:${osc.contact_2}`} className="text-blue-600 hover:underline">{osc.contact_2}</a> : null} />
             <InfoRow label="Ville" value={osc.ville} />
             <InfoRow label="Adresse" value={osc.address} />
             <InfoRow label="Site web" value={osc.website ? <a href={osc.website} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline break-all">{osc.website}</a> : null} />

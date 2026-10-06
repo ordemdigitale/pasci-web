@@ -9,6 +9,7 @@ import { Users, Building2, Target, ArrowRight, MapPin, Calendar, Search, Chevron
 import Link from "next/link";
 import DOMPurify from 'dompurify';
 import { CrascMapSvg } from '@/components/ui/CrascMapSvg';
+import { useOscFiltres } from '@/lib/osc-filtres';
 import { useRouter } from 'next/navigation';
 
 interface IActivityCard {
@@ -105,6 +106,21 @@ const activities = [
   "Le Commissariat Aux Comptes"
 ];
 
+// Couleurs de la légende, alignées sur celles des zones de la carte.
+// Un CRASC sans entrée ici (le 6e, par exemple) reçoit le style neutre.
+const STYLES_LEGENDE: Record<string, { conteneur: string; titre: string; texte: string }> = {
+  'crasc-sud': { conteneur: 'bg-blue-50 border-blue-200 hover:bg-blue-100', titre: 'text-blue-900', texte: 'text-blue-700' },
+  'crasc-centre': { conteneur: 'bg-green-50 border-green-200 hover:bg-green-100', titre: 'text-green-900', texte: 'text-green-700' },
+  'crasc-nord': { conteneur: 'bg-orange-50 border-orange-200 hover:bg-orange-100', titre: 'text-orange-900', texte: 'text-orange-700' },
+  'crasc-ouest': { conteneur: 'bg-cyan-50 border-cyan-200 hover:bg-cyan-100', titre: 'text-cyan-900', texte: 'text-cyan-700' },
+  'crasc-est': { conteneur: 'bg-rose-50 border-rose-200 hover:bg-rose-100', titre: 'text-rose-900', texte: 'text-rose-700' },
+};
+const STYLE_LEGENDE_DEFAUT = {
+  conteneur: 'bg-slate-50 border-slate-200 hover:bg-slate-100',
+  titre: 'text-slate-900',
+  texte: 'text-slate-600',
+};
+
 export const domainesIntervention = [
   "Gouvernance",
   "Développement durable",
@@ -196,6 +212,9 @@ export default function PageAnnuaireCrasc() {
   const [oscPage, setOscPage] = useState(1);
   const OSC_PER_PAGE = 6;
   const router = useRouter();
+  // Barème sur 20 points et code couleur, servis par l'API pour rester
+  // alignés sur le calcul du score côté serveur.
+  const { bareme, tranches_couleur: tranchesCouleur } = useOscFiltres();
 
   // Fetch CRASC data on component mount
    useEffect(() => {
@@ -306,58 +325,52 @@ export default function PageAnnuaireCrasc() {
             {/* Map Container */}
             <CrascMapSvg
               interactive={true}
+              crascs={crascData.map((crasc) => ({
+                id: Number(crasc.id),
+                name: crasc.name,
+                slug: crasc.slug,
+                osc_count: crasc.osc_count,
+                regions: (crasc.regions ?? []).map((region) => ({ id: Number(region.id), name: region.name })),
+              }))}
               onRegionClick={(regionId, href) => {
-                console.log(regionId)
                 router.push(href)
               }}
             />
 
-            {/* Legend */}
+            {/* Légende construite depuis la base : un CRASC créé dans le
+                back-office (6e et suivants) y figure automatiquement, même si
+                sa zone n'est pas encore dessinée sur la carte. */}
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Légende des zones</h3>
-              
-              <div className="space-y-3">
-                {/* Crasc Sud */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer">
-                  <ImageWithFallback src="/images/logos-crasc/crasc-sud.jpg" alt="Logo CRASC SUD" className="w-10 h-10 rounded object-contain bg-white" />
-                  <div>
-                    <p className="font-bold text-blue-900">CRASC SUD</p>
-                    <p className="text-xs text-blue-700">Abidjan, San-Pédro, Gagnoa</p>
-                  </div>
-                </div>
-                {/* Crasc Centre */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200 hover:bg-green-100 transition-colors cursor-pointer">
-                  <ImageWithFallback src="/images/logos-crasc/crasc-centre.jpg" alt="Logo CRASC CENTRE" className="w-10 h-10 rounded object-contain bg-white" />
-                  <div>
-                    <p className="font-bold text-green-900">CRASC CENTRE</p>
-                    <p className="text-xs text-green-700">Yamoussoukro, Bouaké, Dimbokro</p>
-                  </div>
-                </div>
-                {/* Crasc Nord */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-orange-50 border border-orange-200 hover:bg-orange-100 transition-colors cursor-pointer">
-                  <ImageWithFallback src="/images/logos-crasc/crasc-nord.jpg" alt="Logo CRASC NORD" className="w-10 h-10 rounded object-contain bg-white" />
-                  <div>
-                    <p className="font-bold text-orange-900">CRASC NORD</p>
-                    <p className="text-xs text-orange-700">Korhogo, Ferkessédougou, Séguéla</p>
-                  </div>
-                </div>
-                {/* Crasc Ouest */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-cyan-50 border border-cyan-200 hover:bg-cyan-100 transition-colors cursor-pointer">
-                  <ImageWithFallback src="/images/logos-crasc/crasc-ouest.jpg" alt="Logo CRASC OUEST" className="w-10 h-10 rounded object-contain bg-white" />
-                  <div>
-                    <p className="font-bold text-cyan-900">CRASC OUEST</p>
-                    <p className="text-xs text-cyan-700">Man, Daloa, Guiglo</p>
-                  </div>
-                </div>
-                {/* Crasc Est */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors cursor-pointer">
-                  <ImageWithFallback src="/images/logos-crasc/crasc-est.jpg" alt="Logo CRASC EST" className="w-10 h-10 rounded object-contain bg-white" />
-                  <div>
-                    <p className="font-bold text-rose-900">CRASC EST</p>
-                    <p className="text-xs text-rose-700">Abengourou, Bondoukou</p>
-                  </div>
-                </div>
 
+              <div className="space-y-3">
+                {crascData.map((crasc) => {
+                  const style = STYLES_LEGENDE[crasc.slug] ?? STYLE_LEGENDE_DEFAUT;
+                  const regions = (crasc.regions ?? []).map((region) => region.name).join(', ');
+                  return (
+                    <Link
+                      key={crasc.id}
+                      href={`/annuaire/annuaire-des-crasc/${crasc.slug}`}
+                      className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${style.conteneur}`}
+                    >
+                      <ImageWithFallback
+                        src={`/images/logos-crasc/${crasc.slug}.jpg`}
+                        alt={`Logo ${crasc.name}`}
+                        className="w-10 h-10 rounded object-contain bg-white"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className={`font-bold ${style.titre}`}>{crasc.name}</p>
+                        <p className={`truncate text-xs ${style.texte}`}>
+                          {regions || crasc.description || 'Régions à renseigner'}
+                        </p>
+                      </div>
+                      <span className={`flex-shrink-0 text-sm font-extrabold tabular-nums ${style.titre}`}>
+                        {(crasc.osc_count ?? 0).toLocaleString('fr-FR')}
+                        <span className="ml-1 text-[10px] font-semibold uppercase opacity-70">OSC</span>
+                      </span>
+                    </Link>
+                  );
+                })}
               </div>
 
               {/* {<div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -392,55 +405,36 @@ export default function PageAnnuaireCrasc() {
             </div>
           </div>
 
-          {/* CRASC Regions */}
+          {/* Barème de notation sur 20 points
+              (remplace l'ancienne carte « Nos zones CRASC » : la liste des
+              CRASC est déjà donnée par la carte et la légende ci-dessus). */}
           <div className="group relative bg-white rounded-xl p-6 border-2 border-[#E05017]/30 hover:border-[#E05017] hover:shadow-xl transition-all duration-300 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-[#E05017] to-[#d04010] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div className="relative z-10">
-              <div className="mb-3">
+              <div className="mb-3 flex items-center justify-between">
                 <Building2 className="w-10 h-10 text-[#E05017] group-hover:text-white transition-colors" strokeWidth={2} />
+                <span className="text-2xl font-extrabold text-[#E05017] group-hover:text-white transition-colors">/20</span>
               </div>
               <h3 className="text-xs uppercase font-bold text-gray-600 group-hover:text-white/80 mb-2 transition-colors tracking-wider">
-                NOS ZONES CRASC
+                BARÈME DE NOTATION
               </h3>
-              <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
-                {crascData.length > 0 ? (
-                  <>
-                    {crascData.map((crasc) => (
-                      <div key={crasc.id} className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                        <span className="truncate">{crasc.name}</span>
-                      </div>
-                    ))}
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      
-                      <span>CRASC Sud</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      
-                      <span>CRASC Centre</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      
-                      <span>CRASC Nord</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      
-                      <span>CRASC Ouest</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                      
-                      <span>CRASC Est</span>
-                    </div>
-                    
-                  </>
-                )}
+              <div className="space-y-1">
+                {bareme.map((ligne) => (
+                  <div
+                    key={ligne.critere}
+                    title={ligne.detail}
+                    className="flex items-baseline justify-between gap-2 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors"
+                  >
+                    <span className="truncate">{ligne.critere}</span>
+                    <span className="flex-shrink-0 tabular-nums opacity-70">{ligne.points} pt{ligne.points > 1 ? 's' : ''}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Domaines d'intervention */}
+          {/* Code couleur du score (remplace « Domaines d'intervention ») :
+              une OSC est située d'un coup d'œil, du rouge au vert. */}
           <div className="group relative bg-white rounded-xl p-6 border-2 border-[#E05017]/30 hover:border-[#E05017] hover:shadow-xl transition-all duration-300 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-[#E05017] to-[#d04010] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div className="relative z-10">
@@ -448,13 +442,21 @@ export default function PageAnnuaireCrasc() {
                 <Target className="w-10 h-10 text-[#E05017] group-hover:text-white transition-colors" strokeWidth={2} />
               </div>
               <h3 className="text-xs uppercase font-bold text-gray-600 group-hover:text-white/80 mb-2 transition-colors tracking-wider">
-                DOMAINES D'INTERVENTION
+                CODE COULEUR DU SCORE
               </h3>
-              <div className="space-y-1.5">
-                {domainesIntervention.slice(0, 5).map((domaine, index) => (
-                  <div key={index} className="flex items-center gap-2 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#E05017] group-hover:bg-white"></div>
-                    <span>{domaine}</span>
+              <div className="mb-2 h-2 w-full rounded-full bg-gradient-to-r from-[#DC2626] via-[#CA8A04] to-[#16A34A]"></div>
+              <div className="space-y-1">
+                {tranchesCouleur.map((tranche) => (
+                  <div
+                    key={tranche.couleur}
+                    className="flex items-center gap-2 text-xs font-semibold text-[#E05017] group-hover:text-white transition-colors"
+                  >
+                    <span
+                      className="h-2.5 w-2.5 flex-shrink-0 rounded-full ring-1 ring-black/10"
+                      style={{ backgroundColor: tranche.hex }}
+                    ></span>
+                    <span className="tabular-nums">{tranche.min}–{tranche.max}</span>
+                    <span className="truncate opacity-80">{tranche.libelle}</span>
                   </div>
                 ))}
               </div>
