@@ -52,6 +52,10 @@ interface DemandeAdhesion {
   origine_organisation?: string | null;
   email: string;
   telephone: string;
+  contact_president?: string | null;
+  contact_osc?: string | null;
+  contact_1?: string | null;
+  contact_2?: string | null;
   description: string | null;
   motivation: string;
   type_document_formalisation?: string | null;
@@ -537,6 +541,16 @@ export default function DemandesAdhesionPage() {
                   <div className="font-medium">{selected.telephone}</div>
                 </div>
               </div>
+
+              <DetailBlock
+                title="Contacts de l'organisation"
+                rows={[
+                  { label: "Contact de l'OSC", value: selected.contact_osc },
+                  { label: "Contact du/de la président(e)", value: selected.contact_president },
+                  { label: "Contact 1", value: selected.contact_1 },
+                  { label: "Contact 2", value: selected.contact_2 },
+                ]}
+              />
 
               <DetailBlock
                 title="Localisation"

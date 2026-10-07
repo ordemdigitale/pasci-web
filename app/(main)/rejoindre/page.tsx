@@ -21,6 +21,7 @@ import {
   FormItem,
   FormLabel,
   FormControl,
+  FormDescription,
   FormMessage,
 } from '@/components/ui/form';
 import { toast } from 'sonner';
@@ -45,6 +46,11 @@ const supportingDocumentSchema = z
     'Format invalide. Formats acceptés : PDF, DOC, DOCX, JPG, PNG ou WEBP'
   );
 
+const contactFacultatif = z
+  .string()
+  .optional()
+  .refine((valeur) => !valeur || /^[+\d\s\-()]+$/.test(valeur), 'Veuillez entrer un numéro de téléphone valide');
+
 const registrationSchema = z.object({
   organizationName: z
     .string()
@@ -66,6 +72,12 @@ const registrationSchema = z.object({
     .string()
     .min(1, 'Le numéro de téléphone est requis')
     .regex(/^[+\d\s\-()]+$/, 'Veuillez entrer un numéro de téléphone valide'),
+  // Contacts facultatifs, mais validés au même format que le téléphone
+  // principal dès qu'ils sont renseignés.
+  contactPresident: contactFacultatif,
+  contactOsc: contactFacultatif,
+  contact1: contactFacultatif,
+  contact2: contactFacultatif,
   description: z.string().optional(),
   motivation: z
     .string()
@@ -202,6 +214,10 @@ export default function PageRejoindre() {
       origineOrganisation: '',
       email: '',
       phone: '',
+      contactPresident: '',
+      contactOsc: '',
+      contact1: '',
+      contact2: '',
       description: '',
       motivation: '',
       typeDocumentFormalisation: '',
@@ -268,6 +284,10 @@ export default function PageRejoindre() {
         origine_organisation: emptyToNull(values.origineOrganisation),
         email: values.email,
         telephone: values.phone,
+        contact_president: emptyToNull(values.contactPresident),
+        contact_osc: emptyToNull(values.contactOsc),
+        contact_1: emptyToNull(values.contact1),
+        contact_2: emptyToNull(values.contact2),
         description: values.description || null,
         motivation: values.motivation,
         type_document_formalisation: emptyToNull(values.typeDocumentFormalisation),
@@ -673,6 +693,86 @@ export default function PageRejoindre() {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="contactOsc"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 font-semibold">Contact de l'OSC</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder="+225 XX XX XX XX XX"
+                      className="border-gray-300"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs text-gray-500">Numéro du standard de l'organisation</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="contactPresident"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 font-semibold">Contact du/de la président(e)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder="+225 XX XX XX XX XX"
+                      className="border-gray-300"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs text-gray-500">Numéro du/de la président(e)</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="contact1"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 font-semibold">Contact 1</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder="+225 XX XX XX XX XX"
+                      className="border-gray-300"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs text-gray-500">Autre personne à joindre</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="contact2"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 font-semibold">Contact 2</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder="+225 XX XX XX XX XX"
+                      className="border-gray-300"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs text-gray-500">Autre personne à joindre</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
