@@ -53,6 +53,7 @@ const CHAMPS_PROFIL: { cle: keyof IOscDetail; label: string }[] = [
   { cle: "nom_president", label: "Nom du/de la président(e)" },
   { cle: "nb_membres", label: "Nombre de membres" },
   { cle: "domaine_prioritaire", label: "Domaine prioritaire" },
+  { cle: "axe", label: "Axe d'intervention" },
   { cle: "savoir_faire", label: "Savoir-faire" },
   { cle: "populations_cibles", label: "Populations cibles" },
   { cle: "thumbnail_url", label: "Logo" },
@@ -252,7 +253,7 @@ export default function MonOscPage() {
           </div>
 
           {/* Domaines / Pôles */}
-          {((osc.poles && osc.poles.length > 0) || osc.secteurs_activites) && (
+          {((osc.poles && osc.poles.length > 0) || osc.secteurs_activites || osc.axe || osc.specialites) && (
             <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
               <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <Target className="w-5 h-5 text-purple-600" /> Domaines &amp; secteurs
@@ -270,6 +271,8 @@ export default function MonOscPage() {
                 {osc.secteurs_activites && (
                   <p className="text-sm text-gray-700 mt-2">{osc.secteurs_activites}</p>
                 )}
+                <Info label="Axe d'intervention" value={osc.axe} />
+                <Info label="Spécialités" value={osc.specialites} />
               </div>
             </div>
           )}

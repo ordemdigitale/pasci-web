@@ -114,6 +114,8 @@ export interface IOscDetail {
   domaine_prioritaire_3?: string | null;
   domaine_prioritaire_4?: string | null;
   domaine_prioritaire_5?: string | null;
+  axe?: string | null;
+  specialites?: string | null;
   // Many-to-many avec PoleConcertation
   poles?: { id: number; name: string; slug: string }[];
   categorie?: string | null;

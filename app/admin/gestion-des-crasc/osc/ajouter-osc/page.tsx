@@ -89,6 +89,8 @@ const oscSchema = z.object({
   domaine_prioritaire_3: z.string().optional(),
   domaine_prioritaire_4: z.string().optional(),
   domaine_prioritaire_5: z.string().optional(),
+  axe: z.string().optional(),
+  specialites: z.string().optional(),
   nb_membres: z.string().optional(),
   nb_femmes_membres: z.string().optional(),
   nb_hommes_membres: z.string().optional(),
@@ -198,6 +200,8 @@ export default function AdminAjoutOsc() {
       domaine_prioritaire_3: "",
       domaine_prioritaire_4: "",
       domaine_prioritaire_5: "",
+      axe: "",
+      specialites: "",
       nb_membres: "",
       nb_femmes_membres: "",
       nb_hommes_membres: "",
@@ -393,6 +397,8 @@ export default function AdminAjoutOsc() {
         "domaine_prioritaire_3",
         "domaine_prioritaire_4",
         "domaine_prioritaire_5",
+        "axe",
+        "specialites",
         "nb_membres",
         "nb_femmes_membres",
         "nb_hommes_membres",
@@ -1118,7 +1124,27 @@ export default function AdminAjoutOsc() {
                 </select>
               </div>
             ))}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Axe d&apos;intervention dans le pôle</label>
+              <input
+                {...register("axe")}
+                placeholder="Ex : Santé communautaire"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Spécialités</label>
+              <textarea
+                {...register("specialites")}
+                rows={2}
+                placeholder="Ex : Paludisme, VIH, nutrition..."
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all resize-none"
+              />
+            </div>
           </div>
+          <p className="text-xs text-gray-500 mt-3">
+            Le 1er domaine prioritaire est le pôle de concertation : l&apos;OSC y est inscrite dès sa création.
+          </p>
         </div>
 
         {/* Membres et bénéficiaires */}

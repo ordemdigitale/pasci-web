@@ -8,17 +8,24 @@ export type DomaineOption = { value: string; label: string };
 // chaque pôle correspond à un domaine prioritaire, et le 1er domaine d'une OSC
 // détermine son pôle.
 export const DOMAINE_PRIORITAIRE_OPTIONS: DomaineOption[] = [
-  { value: "Agriculture pêche et sylviculture", label: "Agriculture pêche et sylviculture" },
+  { value: "Agriculture, sylviculture et pêche", label: "Agriculture, sylviculture et pêche" },
+  { value: "Autres multi-secteurs", label: "Autres multi-secteurs" },
   { value: "Banques et services financiers", label: "Banques et services financiers" },
   { value: "Commerce et tourisme", label: "Commerce et tourisme" },
+  { value: "Communication", label: "Communication" },
+  { value: "Distribution d'eau et assainissement", label: "Distribution d'eau et assainissement" },
   { value: "Éducation", label: "Éducation" },
+  { value: "Energie", label: "Energie" },
   { value: "Entreprises et autres services", label: "Entreprises et autres services" },
   { value: "Gouvernement et Société Civile", label: "Gouvernement et Société Civile" },
+  { value: "Industrie, mines et constructions", label: "Industrie, mines et constructions" },
   { value: "Infrastructure et services sociaux divers", label: "Infrastructure et services sociaux divers" },
   { value: "Prévention et règlement des conflits, paix et sécurité", label: "Prévention et règlement des conflits, paix et sécurité" },
   { value: "Programme pour la Population", label: "Programme pour la Population" },
   { value: "Protection de l’environnement, général", label: "Protection de l’environnement, général" },
   { value: "Santé", label: "Santé" },
+  { value: "Soutien budgétaire", label: "Soutien budgétaire" },
+  { value: "Transports et entreposage", label: "Transports et entreposage" },
 ];
 
 /**

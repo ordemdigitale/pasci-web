@@ -68,6 +68,8 @@ interface DemandeAdhesion {
   domaine_prioritaire_3?: string | null;
   domaine_prioritaire_4?: string | null;
   domaine_prioritaire_5?: string | null;
+  axe?: string | null;
+  specialites?: string | null;
   nb_membres?: number | null;
   nb_femmes_membres?: number | null;
   nb_hommes_membres?: number | null;
@@ -636,6 +638,8 @@ export default function DemandesAdhesionPage() {
                   { label: "3ème domaine", value: selected.domaine_prioritaire_3 },
                   { label: "4ème domaine", value: selected.domaine_prioritaire_4 },
                   { label: "5ème domaine", value: selected.domaine_prioritaire_5 },
+                  { label: "Axe d'intervention", value: selected.axe },
+                  { label: "Spécialités", value: selected.specialites },
                 ]}
               />
 

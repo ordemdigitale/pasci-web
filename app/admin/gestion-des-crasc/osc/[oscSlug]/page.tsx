@@ -38,6 +38,7 @@ interface IOscDetail {
   domaine_prioritaire?: string | null; domaine_prioritaire_2?: string | null;
   domaine_prioritaire_3?: string | null; domaine_prioritaire_4?: string | null;
   domaine_prioritaire_5?: string | null;
+  axe?: string | null; specialites?: string | null;
   nb_membres?: number | null; nb_femmes_membres?: number | null;
   nb_membres_jeunes?: number | null; nb_membres_be?: number | null;
   nb_personnes_engagees?: number | null; nb_beneficiaires?: number | null;
@@ -421,6 +422,22 @@ export default function OscDetailPage() {
               <ol className="list-decimal list-inside space-y-1">
                 {domaines.map((d, i) => <li key={i} className="text-sm text-gray-800">{d}</li>)}
               </ol>
+            </div>
+          )}
+
+          {(osc.axe || osc.specialites) && (
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Axe d&apos;intervention et spécialités</h2>
+              {osc.axe && (
+                <p className="text-sm text-gray-800">
+                  <span className="font-semibold">Axe d&apos;intervention :</span> {osc.axe}
+                </p>
+              )}
+              {osc.specialites && (
+                <p className="text-sm text-gray-800 mt-1 whitespace-pre-line">
+                  <span className="font-semibold">Spécialités :</span> {osc.specialites}
+                </p>
+              )}
             </div>
           )}
 
