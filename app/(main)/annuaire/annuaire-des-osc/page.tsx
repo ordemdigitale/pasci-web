@@ -137,6 +137,9 @@ export default function AnnuaireOSCPage() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
+  // Distingue « pas encore chargé » de « aucun résultat » : sans cela le
+  // rendu serveur affiche 0 partout et laisse croire que la base est vide.
+  const [chargementInitial, setChargementInitial] = useState(true);
 
   const [crascs, setCrascs] = useState<ICRASC[]>([]);
   const [oscTypes, setOscTypes] = useState<IOSCType[]>([]);
@@ -198,6 +201,7 @@ export default function AnnuaireOSCPage() {
       console.error("Erreur lors du chargement des OSC:", error);
     } finally {
       setLoading(false);
+      setChargementInitial(false);
     }
   }, [currentPage, searchQuery, selectedTypeId, selectedCrascId, selectedDomaine, regionQuery, sousPrefectureQuery, selectedCategorie, avances]);
 
@@ -321,7 +325,7 @@ export default function AnnuaireOSCPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#E05017] to-[#d04010] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div className="relative z-10">
               <div className="text-5xl font-extrabold text-[#E05017] group-hover:text-white transition-colors mb-2">
-                {total}
+                {chargementInitial ? '…' : total.toLocaleString('fr-FR')}
               </div>
               <div className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/80 transition-colors">
                 OSC Enregistrées
@@ -333,7 +337,7 @@ export default function AnnuaireOSCPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#E05017] to-[#d04010] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div className="relative z-10">
               <div className="text-5xl font-extrabold text-[#E05017] group-hover:text-white transition-colors mb-2">
-                {oscTypes.length}
+                {oscTypes.length || '…'}
               </div>
               <div className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/80 transition-colors">
 	                Types d&apos;Organisation
@@ -347,7 +351,7 @@ export default function AnnuaireOSCPage() {
               {/* Compteur synchronisé avec la liste des CRASC : un 6e CRASC
                   créé dans le back-office apparaît ici automatiquement. */}
               <div className="text-5xl font-extrabold text-[#E05017] group-hover:text-white transition-colors mb-2">
-                {crascs.length}
+                {crascs.length || '…'}
               </div>
               <div className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/80 transition-colors">
                 CRASC couverts
@@ -643,9 +647,15 @@ export default function AnnuaireOSCPage() {
             {/* Results Count and Reset */}
             <div className="flex items-center justify-between pt-2">
               <p className="text-sm text-gray-600">
-                <span className="font-bold text-[#E05017]">{total}</span> OSC{total > 1 ? 's' : ''} trouvée{total > 1 ? 's' : ''}
-                {totalPages > 1 && (
-                  <span className="text-gray-400"> — page {currentPage} / {totalPages}</span>
+                {chargementInitial ? (
+                  <span className="text-gray-400">Chargement de l&apos;annuaire…</span>
+                ) : (
+                  <>
+                    <span className="font-bold text-[#E05017]">{total}</span> OSC{total > 1 ? 's' : ''} trouvée{total > 1 ? 's' : ''}
+                    {totalPages > 1 && (
+                      <span className="text-gray-400"> — page {currentPage} / {totalPages}</span>
+                    )}
+                  </>
                 )}
               </p>
               {hasFilters && (
