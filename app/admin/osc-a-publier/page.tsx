@@ -443,7 +443,7 @@ export default function OscAPublierPage() {
                       Identifiants générés ({credentials.length})
                     </h2>
                     <p className="text-xs text-red-600 mt-0.5 font-medium">
-                      À copier maintenant : les mots de passe temporaires ne sont plus consultables
+                      À copier maintenant : les mots de passe ne sont plus consultables
                       après avoir quitté cette page.
                     </p>
                   </div>

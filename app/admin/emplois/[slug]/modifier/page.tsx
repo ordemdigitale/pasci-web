@@ -305,7 +305,7 @@ export default function EditJobPage() {
                   {...register("employer")}
                   type="text"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
-                  placeholder="Ex: PASCI Côte d'Ivoire"
+                  placeholder="Ex: PdoC Côte d'Ivoire"
                 />
                 {errors.employer && (
                   <p className="text-red-600 text-sm mt-1">{errors.employer.message}</p>

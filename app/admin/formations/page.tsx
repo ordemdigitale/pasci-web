@@ -190,7 +190,7 @@ export default function FormationsPage() {
             Gestion des Formations
           </h1>
           <p className="text-gray-600">
-            Créez et gérez toutes les formations PASCI
+            Créez et gérez toutes les formations PdoC
           </p>
         </div>
 

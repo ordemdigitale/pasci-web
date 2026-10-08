@@ -195,7 +195,7 @@ export default function UtilisateursPage() {
             Gestion des Utilisateurs
           </h1>
           <p className="text-gray-600">
-            Gérez tous les utilisateurs de la plateforme PASCI
+            Gérez tous les utilisateurs de la plateforme PdoC
           </p>
         </div>
 

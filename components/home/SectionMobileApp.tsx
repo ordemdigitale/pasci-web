@@ -43,7 +43,7 @@ export default function SectionMobileApp() {
               </div>
               <img
                 src={QR_URL}
-                alt="QR code de téléchargement de l'application mobile PASCI"
+                alt="QR code de téléchargement de l'application mobile PdoC"
                 className="w-full aspect-square object-contain"
               />
             </div>

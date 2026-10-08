@@ -177,7 +177,7 @@ export default function EmploisPage() {
             Gestion des Offres d'Emploi
           </h1>
           <p className="text-gray-600">
-            Créez et gérez toutes les offres d'emploi sur la plateforme PASCI
+            Créez et gérez toutes les offres d'emploi sur la plateforme PdoC
           </p>
         </div>
 

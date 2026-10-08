@@ -199,7 +199,7 @@ function CredentialsPanel({ creds, onClose }: { creds: OscCredentials; onClose: 
           {[
             { label: "Email de connexion", value: creds.email, id: "email" },
             { label: "Nom d'utilisateur", value: creds.username, id: "username" },
-            { label: "Mot de passe temporaire", value: creds.temp_password, id: "password" },
+            { label: "Mot de passe", value: creds.temp_password, id: "password" },
           ].map(({ label, value, id }) => (
             <div key={id}>
               <div className="text-xs text-gray-500 font-medium mb-1">{label}</div>

@@ -195,7 +195,7 @@ export default function FaireUnDonPage() {
             </div>
             <div>
               <p className="text-sm text-gray-500">Référence</p>
-              <p className="font-mono font-bold text-gray-800">Don PASCI #{donId}</p>
+              <p className="font-mono font-bold text-gray-800">Don PdoC #{donId}</p>
             </div>
           </div>
 

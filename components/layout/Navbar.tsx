@@ -301,7 +301,7 @@ export default function Navbar() {
         const baseItems = annonces.length > 0
           ? annonces.map((a) => a.texte)
           : [
-              "Bienvenue sur la Plateforme PASCI — Portail d'Appui à la Société Civile en Côte d'Ivoire",
+              "Bienvenue sur la PdoC — Plateforme Digitale de la Société Civile Ivoirienne",
               "✦ Consulter les dernières formations disponibles dans votre région",
               "✦ Rejoindre le Pôle de concertation des OSC membres des CRASC",
               "✦ Nouvelles offres d'emploi disponibles — Consulter l'espace collaboratif",

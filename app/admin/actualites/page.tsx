@@ -121,7 +121,7 @@ export default function ActualitesPage() {
             Gestion des Actualités
           </h1>
           <p className="text-gray-600">
-            Créez et gérez toutes les actualités et annonces PASCI
+            Créez et gérez toutes les actualités et annonces PdoC
           </p>
         </div>
 

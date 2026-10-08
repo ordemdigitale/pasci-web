@@ -95,7 +95,7 @@ function ResetPasswordForm() {
         <div className="text-center mb-8">
           <ImageWithFallback
             src="/images/logo.png"
-            alt="PASCI Logo"
+            alt="PdoC Logo"
             className="w-20 h-20 object-contain mx-auto mb-4"
           />
         </div>

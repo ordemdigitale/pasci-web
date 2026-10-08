@@ -75,11 +75,11 @@ export default function RegisterPage() {
         <div className="text-center mb-8">
           <ImageWithFallback
             src="/images/logo.png"
-            alt="PASCI Logo"
+            alt="PdoC Logo"
             className="w-20 h-20 object-contain mx-auto mb-4"
           />
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Créer un compte</h1>
-          <p className="text-gray-600">Rejoignez la communauté PASCI et accédez à tous nos services</p>
+          <p className="text-gray-600">Rejoignez la communauté PdoC et accédez à tous nos services</p>
         </div>
 
         {/* Registration Form */}

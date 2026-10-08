@@ -549,7 +549,7 @@ export default function FormationDetailPage() {
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2 text-[#E05017] font-bold text-sm">
                   <BookOpen className="w-4 h-4" />
-                  {formation.rubrique?.name || "Formation"} • PASCI
+                  {formation.rubrique?.name || "Formation"} • PdoC
                 </div>
                 <h1 className="text-3xl font-black leading-tight">{formation.title}</h1>
                 <div className="flex items-center gap-4 text-gray-600 text-sm">

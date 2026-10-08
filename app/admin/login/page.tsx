@@ -180,7 +180,7 @@ export default function AdminLoginPage() {
 
         {/* Copyright */}
         <p className="text-center text-xs text-gray-500">
-          © {new Date().getFullYear()} PASCI - Plateforme d'Appui à la Société Civile
+          © {new Date().getFullYear()} PdoC - Plateforme Digitale de la Société Civile Ivoirienne
         </p>
       </div>
     </div>

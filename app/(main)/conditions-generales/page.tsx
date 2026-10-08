@@ -13,7 +13,7 @@ export default function ConditionsGeneralesPage() {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Introduction</h2>
           <p className="text-gray-700 mb-3">
-            Bienvenue sur la plateforme PASCI (Plateforme d'Appui à la Société Civile Ivoirienne). Les présentes
+            Bienvenue sur la plateforme PdoC (Plateforme Digitale de la Société Civile Ivoirienne). Les présentes
             Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation de notre plateforme digitale.
           </p>
           <p className="text-gray-700">
@@ -26,7 +26,7 @@ export default function ConditionsGeneralesPage() {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <h2 className="text-2xl font-bold text-[#2a591d] mb-4">1. Objet de la Plateforme</h2>
           <p className="text-gray-700 mb-3">
-            La plateforme PASCI a pour objectif de :
+            La plateforme PdoC a pour objectif de :
           </p>
           <ul className="list-disc ml-6 space-y-2 text-gray-700">
             <li>Renforcer la visibilité des Organisations de la Société Civile (OSC) en Côte d'Ivoire</li>
@@ -91,13 +91,13 @@ export default function ConditionsGeneralesPage() {
           <h3 className="text-lg font-semibold text-gray-900 mb-2">4.1 Propriété du contenu</h3>
           <p className="text-gray-700 mb-4">
             Vous conservez tous les droits sur les contenus que vous publiez (textes, images, documents). Toutefois,
-            en publiant du contenu sur la plateforme, vous accordez à PASCI une licence non exclusive pour utiliser,
+            en publiant du contenu sur la plateforme, vous accordez à PdoC une licence non exclusive pour utiliser,
             reproduire et diffuser ce contenu dans le cadre de ses missions.
           </p>
 
           <h3 className="text-lg font-semibold text-gray-900 mb-2">4.2 Responsabilité du contenu</h3>
           <p className="text-gray-700 mb-4">
-            Vous êtes seul responsable du contenu que vous publiez. PASCI se réserve le droit de supprimer tout
+            Vous êtes seul responsable du contenu que vous publiez. PdoC se réserve le droit de supprimer tout
             contenu inapproprié sans préavis.
           </p>
         </div>
@@ -106,7 +106,7 @@ export default function ConditionsGeneralesPage() {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <h2 className="text-2xl font-bold text-[#2a591d] mb-4">5. Propriété Intellectuelle</h2>
           <p className="text-gray-700 mb-3">
-            La plateforme PASCI, son contenu (textes, images, logos, vidéos), sa structure et son design sont protégés
+            La plateforme PdoC, son contenu (textes, images, logos, vidéos), sa structure et son design sont protégés
             par les droits de propriété intellectuelle.
           </p>
           <p className="text-gray-700 mb-3">
@@ -211,7 +211,7 @@ export default function ConditionsGeneralesPage() {
         {/* Acceptation */}
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <p className="text-gray-700 italic text-center">
-            En utilisant la plateforme PASCI, vous reconnaissez avoir lu, compris et accepté les présentes
+            En utilisant la plateforme PdoC, vous reconnaissez avoir lu, compris et accepté les présentes
             Conditions Générales d'Utilisation.
           </p>
         </div>

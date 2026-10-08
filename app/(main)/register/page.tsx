@@ -125,7 +125,7 @@ export default function RegisterPage() {
           <Link href="/" className="inline-block">
             <ImageWithFallback
               src="/images/logo.png"
-              alt="PASCI Logo"
+              alt="PdoC Logo"
               className="h-16 w-auto mx-auto"
             />
           </Link>

@@ -46,7 +46,7 @@ function LoginForm() {
               <div className="mb-6">
                 <ImageWithFallback
                   src="/images/logo.png"
-                  alt="PASCI Logo"
+                  alt="PdoC Logo"
                   className="w-24 h-24 object-contain"
                 />
               </div>
