@@ -22,6 +22,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
+import { GestionEvaluation, GestionSupports } from "@/components/formations/GestionParcours";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -70,6 +71,7 @@ export default function FormationContenuPage() {
   const slug = params.slug as string;
 
   const [formationTitle, setFormationTitle] = useState("");
+  const [noteMinimale, setNoteMinimale] = useState(70);
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set());
@@ -108,12 +110,14 @@ export default function FormationContenuPage() {
     setLoading(true);
     try {
       const [formRes, modsRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/v1/formations/${slug}`),
-        fetch(`${API_BASE_URL}/api/v1/formations/${slug}/modules`),
+        // Authentifié : brouillons visibles et contenu des leçons non masqué
+        fetchWithAuth(`${API_BASE_URL}/api/v1/formations/${slug}`),
+        fetchWithAuth(`${API_BASE_URL}/api/v1/formations/${slug}/modules`),
       ]);
       if (formRes.ok) {
         const f = await formRes.json();
         setFormationTitle(f.title);
+        if (typeof f.note_minimale === "number") setNoteMinimale(f.note_minimale);
       }
       if (modsRes.ok) {
         const mods = await modsRes.json();
@@ -575,6 +579,11 @@ export default function FormationContenuPage() {
             )}
           </div>
         ))}
+      </div>
+
+      <div className="mt-10 space-y-6">
+        <GestionSupports slug={slug} />
+        <GestionEvaluation slug={slug} noteInitiale={noteMinimale} />
       </div>
     </div>
   );

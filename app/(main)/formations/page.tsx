@@ -35,6 +35,9 @@ function formatDate(dateStr: string | null | undefined) {
   return new Date(dateStr).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+// Statut calculé par l'API (marquée terminée ou date de fin passée)
+const estTerminee = (f: IFormation) => f.est_terminee ?? f.is_completed;
+
 function isUpcoming(dateStr: string | null | undefined) {
   if (!dateStr) return false;
   return new Date(dateStr) > new Date();
@@ -97,7 +100,7 @@ export default function FormationsPage() {
     const matchesType = filterType === 'all' || formation.type === filterType;
     const isEnLigne = !formation.location || formation.location.toLowerCase().includes('ligne') || formation.location.toLowerCase().includes('online') || formation.location.toLowerCase().includes('distance');
     const matchesMode = filterMode === 'all' || (filterMode === 'en_ligne' ? isEnLigne : !isEnLigne);
-    const matchesStatut = filterStatut === 'all' || (filterStatut === 'actif' ? !formation.is_completed : formation.is_completed);
+    const matchesStatut = filterStatut === 'all' || (filterStatut === 'actif' ? !estTerminee(formation) : estTerminee(formation));
     return matchesSearch && matchesCategorie && matchesType && matchesMode && matchesStatut;
   });
 
@@ -112,7 +115,7 @@ export default function FormationsPage() {
   const resetFilters = () => { setFilterType('all'); setFilterMode('all'); setFilterStatut('all'); setCurrentPage(1); };
 
   const upcomingFormations = formations
-    .filter(f => isUpcoming(f.start_date))
+    .filter(f => isUpcoming(f.start_date) && !estTerminee(f))
     .sort((a, b) => new Date(a.start_date!).getTime() - new Date(b.start_date!).getTime())
     .slice(0, 6);
 
@@ -151,7 +154,7 @@ export default function FormationsPage() {
         <div className="border border-gray-200 rounded-lg p-8 mb-10 bg-[#f0f9ff] grid lg:grid-cols-2 gap-12">
           <div>
             <h2 className="text-[#2a591d] font-bold text-4xl">Explorez nos programmes de formation</h2>
-            <p className="text-gray-600 text-md max-w-xl mt-6">
+            <div className="text-gray-600 text-md max-w-xl mt-6">
               Découvrez une <b>bibliothèque complète</b> de cours, formations, vidéos, audios et tutoriels conçus pour :
               <ul className="list-disc list-inside pl-5">
                 <li><b>Enrichir vos connaissances</b> dans des domaines variés</li>
@@ -170,7 +173,7 @@ export default function FormationsPage() {
                 <li><b>780</b> organisations &#40;femmes, jeunes, associations locales&#41; appuyées à la <b>création et à la formalisation</b>.</li>
                 <li><b>20</b> organisations accompagnées techniquement et institutionnellement par semaine.</li>
               </ul>
-            </p>
+            </div>
           </div>
           <div>
             <ImageWithFallback
@@ -268,7 +271,7 @@ export default function FormationsPage() {
                 </div>
                 {/* Statut */}
                 <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
-                  {([['all', 'Tous statuts'], ['actif', 'Actif'], ['termine', 'Terminé']] as const).map(([val, label]) => (
+                  {([['all', 'Tous statuts'], ['actif', 'En cours / à venir'], ['termine', 'Terminées']] as const).map(([val, label]) => (
                     <button key={val} onClick={() => setStatut(val)}
                       className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${filterStatut === val ? 'bg-[#E05017] text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}>
                       {label}
@@ -316,6 +319,11 @@ export default function FormationsPage() {
                             alt={formation.title}
                             className="w-full h-full object-cover"
                           />
+                          {estTerminee(formation) && (
+                            <span className="absolute top-3 left-3 px-2.5 py-1 bg-gray-800/80 text-white text-xs font-semibold rounded-full">
+                              Terminée
+                            </span>
+                          )}
                         </div>
                         <div className="p-5">
                           {/* Ligne 1 : type + rubrique */}

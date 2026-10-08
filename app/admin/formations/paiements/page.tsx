@@ -9,6 +9,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 interface Inscription {
   id: number;
   formation_id: number;
+  formation_title?: string | null;
   participant_name: string;
   participant_email: string;
   participant_phone: string | null;
@@ -60,7 +61,8 @@ export default function PaiementsFormationsPage() {
   const filtered = inscriptions.filter(i =>
     i.participant_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     i.participant_email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (i.payment_transaction_id || "").toLowerCase().includes(searchQuery.toLowerCase())
+    (i.payment_transaction_id || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (i.formation_title || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   async function handleValider(id: number) {
@@ -126,7 +128,7 @@ export default function PaiementsFormationsPage() {
       {/* Search */}
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <input type="text" placeholder="Nom, email ou code transaction..."
+        <input type="text" placeholder="Nom, email, formation ou code transaction..."
           value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
           className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]" />
       </div>
@@ -145,6 +147,7 @@ export default function PaiementsFormationsPage() {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Participant</th>
+                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Formation</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Montant</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Opérateur / Code</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Statut</th>
@@ -159,6 +162,9 @@ export default function PaiementsFormationsPage() {
                       <p className="font-medium text-gray-900">{insc.participant_name}</p>
                       <p className="text-xs text-gray-500">{insc.participant_email}</p>
                       {insc.participant_phone && <p className="text-xs text-gray-400">{insc.participant_phone}</p>}
+                    </td>
+                    <td className="px-4 py-3 text-gray-800 max-w-[220px]">
+                      <p className="line-clamp-2">{insc.formation_title || `Formation #${insc.formation_id}`}</p>
                     </td>
                     <td className="px-4 py-3 font-semibold text-gray-900 whitespace-nowrap">
                       {insc.payment_amount ? `${insc.payment_amount.toLocaleString("fr-FR")} FCFA` : "—"}

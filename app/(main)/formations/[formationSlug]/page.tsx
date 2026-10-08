@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { ImageWithFallback } from '@/lib/imageWithFallback';
 import {
@@ -21,10 +21,14 @@ import {
   MapPin,
   Calendar,
   Smartphone,
+  Clock,
+  AlertCircle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { getFormationBySlug, inscrireFormation, verifierCertificat, IFormation } from '@/lib/fetch-formations';
-import { getStoredUser, fetchWithAuth, getToken } from '@/lib/auth';
+import { getStoredUser, getToken } from '@/lib/auth';
+import SupportsFormation from '@/components/formations/SupportsFormation';
+import EvaluationFinale from '@/components/formations/EvaluationFinale';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const DEFAULT_PAYMENT_NUMBERS = {
@@ -42,6 +46,8 @@ interface ILecon {
   duration_minutes: number | null;
   is_preview: boolean;
   order: number;
+  /** Contenu masqué par l'API : inscription (et paiement validé) requise. */
+  verrouillee?: boolean;
 }
 
 interface IModule {
@@ -124,6 +130,9 @@ export default function FormationDetailPage() {
   const [progression, setProgression] = useState(0);
   const [totalLecons, setTotalLecons] = useState(0);
   const [certEmis, setCertEmis] = useState<string | null>(null);
+  // Accès au contenu : formation gratuite ou paiement validé par l'équipe
+  const [acces, setAcces] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
 
   // Partage
   const [copied, setCopied] = useState(false);
@@ -142,6 +151,38 @@ export default function FormationDetailPage() {
     }
   }
 
+  const chargerModules = useCallback(async () => {
+    // Le jeton permet à l'API de renvoyer le contenu des leçons aux participants ayant accès.
+    const token = getToken();
+    const mods = await fetch(`${API_BASE_URL}/api/v1/formations/${formationSlug}/modules`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    })
+      .then((r) => (r.ok ? r.json() : []))
+      .catch(() => []);
+    const modList: IModule[] = Array.isArray(mods) ? mods : [];
+    setModules(modList);
+    return modList;
+  }, [formationSlug]);
+
+  const chargerProgression = useCallback(async () => {
+    if (!getToken()) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/formations/${formationSlug}/ma-progression`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (!res.ok) return;
+      const prog = await res.json();
+      setLeconsVues(prog.lecons_vues || []);
+      setProgression(prog.progression || 0);
+      setTotalLecons(prog.total_lecons || 0);
+      setCertEmis(prog.certificat_code || null);
+      setAcces(!!prog.acces);
+      setPaymentStatus(prog.payment_status || null);
+      if (prog.inscription_id) setInscriptionId(prog.inscription_id);
+      if (prog.inscrit) setAlreadyRegistered(true);
+    } catch {}
+  }, [formationSlug]);
+
   useEffect(() => {
     async function load() {
       try {
@@ -150,20 +191,19 @@ export default function FormationDetailPage() {
           ? `${API_BASE_URL}/api/v1/formations/${formationSlug}/check-inscription?email=${encodeURIComponent(user.email)}`
           : null;
 
-        const [f, mods, checkResult] = await Promise.all([
+        const [f, modList, checkResult] = await Promise.all([
           getFormationBySlug(formationSlug),
-          fetch(`${API_BASE_URL}/api/v1/formations/${formationSlug}/modules`)
-            .then((r) => (r.ok ? r.json() : []))
-            .catch(() => []),
+          chargerModules(),
           checkUrl
             ? fetch(checkUrl).then((r) => (r.ok ? r.json() : null)).catch(() => null)
             : Promise.resolve(null),
         ]);
 
-        if (checkResult?.registered) setAlreadyRegistered(true);
+        if (checkResult?.registered) {
+          setAlreadyRegistered(true);
+          setPaymentStatus(checkResult.payment_status || null);
+        }
         setFormation(f);
-        const modList = Array.isArray(mods) ? mods : [];
-        setModules(modList);
         // Auto-select first preview leçon if any
         const firstPreview = modList.flatMap((m: IModule) => m.lecons).find((l: ILecon) => l.is_preview);
         if (firstPreview) setActiveLecon(firstPreview);
@@ -184,22 +224,8 @@ export default function FormationDetailPage() {
             .catch(() => {});
         }
 
-        // Charger la progression si l'utilisateur est inscrit et connecté
-        if (checkResult?.registered && getToken()) {
-          fetch(`${API_BASE_URL}/api/v1/formations/${formationSlug}/ma-progression`, {
-            headers: { Authorization: `Bearer ${getToken()}` },
-          })
-            .then((r) => r.ok ? r.json() : null)
-            .then((prog) => {
-              if (prog) {
-                setLeconsVues(prog.lecons_vues || []);
-                setProgression(prog.progression || 0);
-                setTotalLecons(prog.total_lecons || 0);
-                if (prog.certificat_code) setCertEmis(prog.certificat_code);
-              }
-            })
-            .catch(() => {});
-        }
+        // Progression, accès et statut du paiement si l'utilisateur est inscrit et connecté
+        if (checkResult?.registered) await chargerProgression();
       } catch (err) {
         console.error(err);
       } finally {
@@ -219,7 +245,7 @@ export default function FormationDetailPage() {
         }
       })
       .catch(() => {});
-  }, [formationSlug]);
+  }, [formationSlug, chargerModules, chargerProgression]);
 
   async function inscrire(nom: string, prenoms: string, email: string, phone?: string, categorie?: string) {
     setInscribing(true);
@@ -229,12 +255,16 @@ export default function FormationDetailPage() {
       if (formation?.type === "payante") {
         // Paiement manuel : afficher les instructions de paiement
         setInscriptionId(insc.id);
+        setAlreadyRegistered(true);
+        setPaymentStatus("pending");
         setPaiementMontant(formation.price || 0);
         setShowPaiement(true);
         setShowInscription(false);
       } else {
         setInscriptionSuccess(true);
         setAlreadyRegistered(true);
+        // Formation gratuite : le contenu devient accessible tout de suite
+        await Promise.all([chargerModules(), chargerProgression()]);
       }
     } catch (err: unknown) {
       setInscriptionError(err instanceof Error ? err.message : "Une erreur est survenue.");
@@ -259,6 +289,7 @@ export default function FormationDetailPage() {
         throw new Error(data.detail || "Une erreur est survenue.");
       }
       setSoumettreSuccess(true);
+      setPaymentStatus("soumis");
     } catch (err: unknown) {
       setSoumettreError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
@@ -310,10 +341,13 @@ export default function FormationDetailPage() {
 
   async function handleSelectLecon(lecon: ILecon) {
     setActiveLecon(lecon);
-    // Si inscrit et connecté → marquer comme vue
-    if (alreadyRegistered && getToken()) {
+    // Accès au contenu (gratuite ou paiement validé) et connecté → marquer comme vue
+    if (acces && getToken()) {
       try {
-        const res = await fetchWithAuth(`${API_BASE_URL}/api/v1/formations/lecons/${lecon.id}/vue`, { method: "POST" });
+        const res = await fetch(`${API_BASE_URL}/api/v1/formations/lecons/${lecon.id}/vue`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${getToken()}` },
+        });
         if (res.ok) {
           const data = await res.json();
           setLeconsVues(prev => prev.includes(lecon.id) ? prev : [...prev, lecon.id]);
@@ -352,8 +386,93 @@ export default function FormationDetailPage() {
     );
   }
 
-  const canRegister = !alreadyRegistered && !formation.is_completed && !formation.is_full &&
-    (!formation.registration_deadline || new Date(formation.registration_deadline) > new Date());
+  const terminee = formation.est_terminee ?? formation.is_completed;
+  const canRegister = !alreadyRegistered && !terminee && !formation.is_full &&
+    (formation.inscriptions_ouvertes ??
+      (!formation.registration_deadline || new Date(formation.registration_deadline) > new Date()));
+  // Inscrit à une formation payante dont le paiement n'est pas encore validé
+  const paiementAFaire = alreadyRegistered && !acces && (paymentStatus === "pending" || paymentStatus === "failed");
+  const paiementEnVerification = alreadyRegistered && !acces && paymentStatus === "soumis";
+
+  const programme = modules.length === 0 ? (
+    <p className="text-xs text-gray-400 px-3">Aucun contenu disponible.</p>
+  ) : (
+    <div className="flex flex-col gap-6">
+      {modules.map((module) => (
+        <div key={module.id}>
+          <h3 className="text-[10px] font-bold uppercase tracking-widest mb-3 px-3 text-gray-500">
+            {module.title}
+          </h3>
+          <div className="flex flex-col gap-1">
+            {module.lecons.map((lecon) => {
+              // L'API masque le contenu (verrouillee) tant que l'accès n'est pas ouvert
+              const canAccess = lecon.is_preview || (!lecon.verrouillee && (acces || !!(lecon.content || lecon.file_url)));
+              const isActive = activeLecon?.id === lecon.id;
+              const isVue = leconsVues.includes(lecon.id);
+              return (
+                <button
+                  key={lecon.id}
+                  onClick={() => canAccess ? handleSelectLecon(lecon) : undefined}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors w-full text-left ${
+                    isActive ? "bg-[#E05017]/10 text-[#E05017]" : "hover:bg-gray-100"
+                  } ${!canAccess ? "cursor-default opacity-60" : "cursor-pointer"}`}
+                >
+                  {isVue ? (
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                  ) : !canAccess ? (
+                    <Lock className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                  ) : lecon.type === 'video' ? (
+                    <Play className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#E05017]" : "text-gray-600"}`} />
+                  ) : lecon.type === 'pdf' ? (
+                    <FileText className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#E05017]" : "text-blue-500"}`} />
+                  ) : (
+                    <FileText className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#E05017]" : "text-gray-600"}`} />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium line-clamp-1">{lecon.title}</p>
+                    <p className="text-[10px] text-gray-500">
+                      {!canAccess
+                        ? alreadyRegistered ? "Après validation du paiement" : "Inscription requise"
+                        : `${lecon.type === 'video' ? 'Vidéo' : lecon.type === 'pdf' ? 'PDF' : 'Lecture'}${lecon.duration_minutes ? ` • ${lecon.duration_minutes} min` : ''}`}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const progressionBloc = alreadyRegistered && acces && totalLecons > 0 ? (
+    certEmis ? (
+      <a
+        href={`/certificat/${certEmis}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-center gap-2 w-full py-2.5 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 transition-colors"
+      >
+        Télécharger mon certificat
+      </a>
+    ) : (
+      <>
+        <div className="flex justify-between text-xs text-gray-500 mb-1.5">
+          <span>Ma progression</span>
+          <span className="font-bold text-[#E05017]">{progression}%</span>
+        </div>
+        <div className="w-full bg-gray-100 rounded-full h-2">
+          <div
+            className="bg-[#E05017] h-2 rounded-full transition-all duration-500"
+            style={{ width: `${progression}%` }}
+          />
+        </div>
+        <p className="text-[10px] text-gray-400 mt-1 text-center">
+          {leconsVues.length} / {totalLecons} leçons vues
+        </p>
+      </>
+    )
+  ) : null;
 
   return (
     <div className="min-h-screen bg-gray-50 font-poppins">
@@ -380,10 +499,10 @@ export default function FormationDetailPage() {
                   {formation.rubrique.name}
                 </span>
               )}
-              {formation.is_completed && (
+              {terminee && (
                 <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-full">Terminée</span>
               )}
-              {formation.is_full && !formation.is_completed && (
+              {formation.is_full && !terminee && (
                 <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-full">Complet</span>
               )}
             </div>
@@ -418,87 +537,12 @@ export default function FormationDetailPage() {
             <h2 className="text-xs font-bold uppercase tracking-wider mb-4 px-3 text-gray-600">
               Programme
             </h2>
-            {modules.length === 0 ? (
-              <p className="text-xs text-gray-400 px-3">Aucun contenu disponible.</p>
-            ) : (
-              <div className="flex flex-col gap-6">
-                {modules.map((module) => (
-                  <div key={module.id}>
-                    <h3 className="text-[10px] font-bold uppercase tracking-widest mb-3 px-3 text-gray-500">
-                      {module.title}
-                    </h3>
-                    <div className="flex flex-col gap-1">
-                      {module.lecons.map((lecon) => {
-                        const canAccess = lecon.is_preview || alreadyRegistered;
-                        const isActive = activeLecon?.id === lecon.id;
-                        const isVue = leconsVues.includes(lecon.id);
-                        return (
-                          <button
-                            key={lecon.id}
-                            onClick={() => canAccess ? handleSelectLecon(lecon) : undefined}
-                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors w-full text-left ${
-                              isActive ? "bg-[#E05017]/10 text-[#E05017]" : "hover:bg-gray-100"
-                            } ${!canAccess ? "cursor-default opacity-60" : "cursor-pointer"}`}
-                          >
-                            {isVue ? (
-                              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                            ) : !canAccess ? (
-                              <Lock className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                            ) : lecon.type === 'video' ? (
-                              <Play className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#E05017]" : "text-gray-600"}`} />
-                            ) : lecon.type === 'pdf' ? (
-                              <FileText className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#E05017]" : "text-blue-500"}`} />
-                            ) : (
-                              <FileText className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#E05017]" : "text-gray-600"}`} />
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium line-clamp-1">{lecon.title}</p>
-                              <p className="text-[10px] text-gray-500">
-                                {!canAccess
-                                  ? "Inscription requise"
-                                  : `${lecon.type === 'video' ? 'Vidéo' : lecon.type === 'pdf' ? 'PDF' : 'Lecture'}${lecon.duration_minutes ? ` • ${lecon.duration_minutes} min` : ''}`}
-                              </p>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            {programme}
           </div>
 
           {/* Barre de progression */}
-          {alreadyRegistered && totalLecons > 0 && (
-            <div className="px-4 py-3 border-t border-gray-200">
-              {certEmis && progression >= 100 ? (
-                <a
-                  href={`/certificat/${certEmis}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 transition-colors"
-                >
-                  Télécharger mon certificat
-                </a>
-              ) : (
-                <>
-                  <div className="flex justify-between text-xs text-gray-500 mb-1.5">
-                    <span>Ma progression</span>
-                    <span className="font-bold text-[#E05017]">{progression}%</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div
-                      className="bg-[#E05017] h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${progression}%` }}
-                    />
-                  </div>
-                  <p className="text-[10px] text-gray-400 mt-1 text-center">
-                    {leconsVues.length} / {totalLecons} leçons vues
-                  </p>
-                </>
-              )}
-            </div>
+          {progressionBloc && (
+            <div className="px-4 py-3 border-t border-gray-200">{progressionBloc}</div>
           )}
 
           {/* S'inscrire button */}
@@ -524,12 +568,22 @@ export default function FormationDetailPage() {
               )
             ) : (
               <div className="text-center text-sm">
-                {alreadyRegistered ? (
+                {paiementEnVerification ? (
+                  <span className="flex items-center justify-center gap-2 text-amber-600 font-medium">
+                    <Clock className="w-4 h-4" />
+                    Paiement en cours de vérification
+                  </span>
+                ) : paiementAFaire ? (
+                  <a href="#paiement" className="flex items-center justify-center gap-2 text-[#E05017] font-medium">
+                    <AlertCircle className="w-4 h-4" />
+                    Paiement à effectuer
+                  </a>
+                ) : alreadyRegistered ? (
                   <span className="flex items-center justify-center gap-2 text-green-600 font-medium">
                     <CheckCircle className="w-4 h-4" />
                     Vous êtes inscrit
                   </span>
-                ) : formation.is_completed ? (
+                ) : terminee ? (
                   <span className="text-gray-500">Formation terminée</span>
                 ) : formation.is_full ? (
                   <span className="text-gray-500">Formation complète</span>
@@ -696,12 +750,27 @@ export default function FormationDetailPage() {
               </div>
             )}
 
+            {/* Paiement soumis, en attente de validation par l'équipe */}
+            {paiementEnVerification && !showPaiement && (
+              <div className="mb-6 flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                <Clock className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-amber-900 text-sm">
+                  <span className="font-semibold">Paiement en cours de vérification.</span> Le contenu complet de la
+                  formation sera accessible dès que notre équipe aura validé votre paiement (vous serez prévenu par email).
+                </p>
+              </div>
+            )}
+
             {/* ── Paiement manuel (formation payante) ── */}
-            {showPaiement && (
+            {(showPaiement || (paiementAFaire && inscriptionId)) && (
               <div id="paiement" className="mb-8 bg-white rounded-xl border border-orange-200 shadow-sm overflow-hidden">
                 <div className="bg-[#E05017] px-6 py-4">
                   <h2 className="text-white font-bold text-lg">Instructions de paiement</h2>
-                  <p className="text-white/80 text-sm">Effectuez le paiement pour confirmer votre inscription</p>
+                  <p className="text-white/80 text-sm">
+                    {paymentStatus === "failed" && !soumettreSuccess
+                      ? "Votre précédent paiement n'a pas pu être validé : vérifiez votre code ou effectuez un nouveau paiement."
+                      : "Effectuez le paiement pour confirmer votre inscription"}
+                  </p>
                 </div>
                 <div className="p-6">
                   {soumettreSuccess ? (
@@ -737,7 +806,7 @@ export default function FormationDetailPage() {
                       {/* Montant */}
                       <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 mb-5">
                         <p className="text-sm text-gray-600">Montant à envoyer</p>
-                        <p className="text-xl font-bold text-[#E05017]">{paiementMontant.toLocaleString("fr-FR")} FCFA</p>
+                        <p className="text-xl font-bold text-[#E05017]">{(paiementMontant || formation.price || 0).toLocaleString("fr-FR")} FCFA</p>
                       </div>
 
                       {/* Formulaire code transaction */}
@@ -890,6 +959,25 @@ export default function FormationDetailPage() {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
               {/* Left Column */}
               <div className="xl:col-span-2 space-y-8">
+                {/* Programme sur petit écran (la barre latérale n'y est pas affichée) */}
+                <div className="lg:hidden bg-white p-4 rounded-xl border border-gray-200">
+                  <h2 className="text-xs font-bold uppercase tracking-wider mb-4 px-3 text-gray-600">Programme</h2>
+                  {programme}
+                  {progressionBloc && <div className="mt-4 px-3">{progressionBloc}</div>}
+                </div>
+
+                {/* Supports de formation (lucarne) */}
+                <SupportsFormation slug={formationSlug} rafraichir={acces} />
+
+                {/* Évaluation finale avant certificat */}
+                {acces && (
+                  <EvaluationFinale
+                    slug={formationSlug}
+                    rafraichir={leconsVues.length}
+                    onCertificat={(code) => setCertEmis(code)}
+                  />
+                )}
+
                 {/* Description */}
                 <div className="bg-white p-6 rounded-xl border border-gray-200">
                   <h2 className="text-lg font-bold mb-4 flex items-center gap-2">

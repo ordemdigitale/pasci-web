@@ -28,6 +28,12 @@ export interface IFormation {
   is_published: boolean;
   is_full: boolean;
   is_completed: boolean;
+  /** Calculé par l'API : marquée terminée ou date de fin passée. */
+  est_terminee?: boolean;
+  /** Calculé par l'API : ni terminée, ni date limite d'inscription dépassée. */
+  inscriptions_ouvertes?: boolean;
+  /** Note minimale (%) à l'évaluation finale pour obtenir le certificat. */
+  note_minimale?: number;
   type: string;
   price: number | null;
   thumbnail_path: string;
@@ -63,6 +69,7 @@ export interface FormationFilters {
   crasc_id?: number;
   osc_id?: number;
   rubrique_id?: number;
+  statut?: "terminees" | "en_cours" | "a_venir";
 }
 
 /**
@@ -81,6 +88,7 @@ export async function fetchAllFormations(
   if (filters.crasc_id !== undefined) params.append("crasc_id", filters.crasc_id.toString());
   if (filters.osc_id !== undefined) params.append("osc_id", filters.osc_id.toString());
   if (filters.rubrique_id !== undefined) params.append("rubrique_id", filters.rubrique_id.toString());
+  if (filters.statut) params.append("statut", filters.statut);
 
   const url = `${API_BASE_URL}/api/v1/formations${params.toString() ? `?${params.toString()}` : ""}`;
 
