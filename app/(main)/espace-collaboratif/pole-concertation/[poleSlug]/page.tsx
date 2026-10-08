@@ -7,6 +7,7 @@ import { API_ENDPOINTS } from "@/lib/api-config";
 import { IPoleConcertation, IForumSujet, IForumSondage, IPoleMembre } from "@/types/api.types";
 import { getToken, fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
+import { libelleRegion } from "@/lib/osc-referentiels";
 import {
   FILTRES_VIDES,
   FiltresMembres,
@@ -597,7 +598,7 @@ export default function PagePoleForum() {
                       : "bg-[#2a591d]/10 text-[#2a591d] hover:bg-[#2a591d]/20"
                   }`}
                 >
-                  {region.nom} ({region.oscs.length})
+                  {libelleRegion(region.nom)} ({region.oscs.length})
                 </button>
               );
             })}

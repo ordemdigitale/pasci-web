@@ -394,6 +394,8 @@ export interface IPoleConcertation {
   nb_osc_membres?: number;
   nb_membres_actifs?: number;
   regions_influence?: string;
+  // Régions des membres avec leur nombre d'OSC, de la plus représentée à la moins représentée
+  regions_effectifs?: { nom: string; nb: number }[];
   realisations?: string;
   projets_en_cours?: string;
   agenda?: string;

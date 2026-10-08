@@ -7,6 +7,7 @@ import { API_ENDPOINTS } from "@/lib/api-config";
 import { IPoleConcertation } from "@/types/api.types";
 import { Search, MessageSquare, Layers, Users, MapPin } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { libelleRegion } from "@/lib/osc-referentiels";
 import { fetchWithAuth } from "@/lib/auth";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -217,9 +218,15 @@ export default function PagePoleConcertation() {
                           {pole.sujets_count} sujet{pole.sujets_count !== 1 ? "s" : ""}
                         </span>
                         {regions.length > 0 && (
-                          <span className="flex items-center gap-1">
+                          <span
+                            className="flex items-center gap-1"
+                            title="Région qui compte le plus d'OSC membres, puis nombre d'autres régions"
+                          >
                             <MapPin className="w-4 h-4" />
-                            {regions[0]}{regions.length > 1 ? ` +${regions.length - 1}` : ""}
+                            {/* L'API classe les régions de la plus représentée à la moins représentée */}
+                            {libelleRegion(regions[0])}
+                            {pole.regions_effectifs?.[0]?.nb ? ` (${pole.regions_effectifs[0].nb})` : ""}
+                            {regions.length > 1 ? ` +${regions.length - 1}` : ""}
                           </span>
                         )}
                       </div>
