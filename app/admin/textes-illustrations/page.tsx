@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle, Eye, ImageIcon, Loader2, RotateCcw, Save, Type, Upload } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 import { CONTENUS_PAR_DEFAUT, TexteFormate } from "@/lib/contenus-site";
+import ReglagesMediasAccueil from "@/components/admin/ReglagesMediasAccueil";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -97,8 +98,10 @@ export default function TextesIllustrationsPage() {
       <div className="max-w-5xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Textes et illustrations</h1>
-          <p className="text-gray-600">Textes des pôles et images d&apos;illustration des pages Pôles et Ressources.</p>
+          <p className="text-gray-600">Vidéo et podcast de l&apos;accueil, textes des pôles et images d&apos;illustration des pages Pôles et Ressources.</p>
         </div>
+
+        <ReglagesMediasAccueil config={config} />
 
         <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
           <h2 className="font-bold text-gray-900 flex items-center gap-2 mb-4">

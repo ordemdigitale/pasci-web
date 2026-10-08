@@ -9,6 +9,8 @@ import { ImageWithFallback } from "@/lib/imageWithFallback"
 import { CrascMapSvg } from "../ui/CrascMapSvg";
 
 interface HeroSlide {
+  /** Absent pour les slides par défaut (pas de page « Voir plus ») */
+  id?: number;
   imageUrl: string;
   title?: string | null;
   description?: string | null;
@@ -63,28 +65,29 @@ export default function SectionHero() {
 
   useEffect(() => {
     const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-    fetch(`${API_BASE}/api/v1/hero-slides?active_only=true&type=haut`)
-      .then((r) => r.ok ? r.json() : [])
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0)
-          setSlides(data.map((s: { image_url: string; title?: string | null; description?: string | null }, index) => {
-            const fallbackText = DEFAULT_SLIDE_TEXTS[index % DEFAULT_SLIDE_TEXTS.length];
-            return {
-              imageUrl: s.image_url,
-              title: s.title || fallbackText.title,
-              description: s.description || fallbackText.description,
-            };
-          }));
-      })
-      .catch(() => {});
-
-    fetch(`${API_BASE}/api/v1/config`)
-      .then((r) => r.ok ? r.json() : {})
-      .then((cfg: Record<string, string>) => {
-        if (cfg.hero_title) setHeroTitle(cfg.hero_title);
-        if (cfg.hero_description) setHeroDesc(cfg.hero_description);
-      })
-      .catch(() => {});
+    Promise.all([
+      fetch(`${API_BASE}/api/v1/hero-slides?active_only=true&type=haut`).then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch(`${API_BASE}/api/v1/config`).then((r) => (r.ok ? r.json() : {})).catch(() => ({})),
+    ]).then(([data, cfg]: [Array<{ id: number; image_url: string; title?: string | null; description?: string | null }>, Record<string, string>]) => {
+      // Texte et image par défaut du carrousel (modifiables dans l'admin : Slider accueil)
+      const titreDefaut = cfg.hero_title?.trim() || FALLBACK_TITLE;
+      const descDefaut = cfg.hero_description?.trim() || FALLBACK_DESC;
+      setHeroTitle(titreDefaut);
+      setHeroDesc(descDefaut);
+      if (Array.isArray(data) && data.length > 0) {
+        // Une slide sans titre ni description reprend le texte par défaut
+        setSlides(data.map((s) => ({
+          id: s.id,
+          imageUrl: s.image_url,
+          title: s.title || titreDefaut,
+          description: s.description || descDefaut,
+        })));
+      } else if (cfg.hero_image_defaut?.trim()) {
+        // Aucune slide active : image par défaut choisie dans l'admin
+        setSlides([{ imageUrl: cfg.hero_image_defaut.trim(), title: titreDefaut, description: descDefaut }]);
+      }
+      setCurrent(0);
+    });
   }, []);
 
   const next = useCallback(() => setCurrent((p) => (p + 1) % slides.length), [slides.length]);
@@ -96,8 +99,9 @@ export default function SectionHero() {
     return () => clearInterval(t);
   }, [paused, next]);
 
+  // « Voir plus » : descriptif propre à la slide (objectif, résumé, photos, article)
   const handleClick = () => {
-    router.push("/a-propos")
+    if (currentSlide.id) router.push(`/accueil/slides/${currentSlide.id}`);
   }
 
   const currentSlide = slides[current] ?? FALLBACK_SLIDES[0];
@@ -169,13 +173,13 @@ export default function SectionHero() {
                 <p className="text-gray-600 text-sm mb-4">
                   {currentDescription}
                 </p>
-                <Button 
+                {currentSlide.id && <Button
                   variant="outline" 
                   className="border border-[#E05017] bg-[#E05017] text-white hover:text-[#e05017] hover:bg-white rounded-lg px-6 ml-auto cursor-pointer"
                   onClick={() => handleClick()}
                 >
                   Voir plus
-                </Button>
+                </Button>}
               </div>
             </div>
           </div>
@@ -184,7 +188,7 @@ export default function SectionHero() {
           <div className="space-y-6">
             {/* Title */}
             <h2 className="text-gray-900 text-center font-bold">
-              Découvrir les OSC sur le Centre Régional d'Appuis à la Société Civile (CRASC)
+              Découvrir les OSC sur le Centre Régional d&apos;Appuis à la Société Civile (CRASC)
             </h2>
 
             {/* Right side card */}

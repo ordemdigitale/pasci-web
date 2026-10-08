@@ -149,6 +149,8 @@ export default function AdminSidebar({
         { label: "FAQ", href: "/admin/faq" },
         { label: "Bande défilante", href: "/admin/annonces", },
         { label: "Slider accueil", href: "/admin/hero-slides" },
+        { label: "Partenaires (accueil)", href: "/admin/partenaires-accueil" },
+        { label: "Vidéo et podcast (accueil)", href: "/admin/textes-illustrations#medias" },
       ],
     },
     {

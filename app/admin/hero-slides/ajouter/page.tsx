@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save, Image as ImageIcon, X } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
+import ChampsDescriptifSlide, { ajouterDescriptif, DESCRIPTIF_VIDE, type DescriptifSlide } from "@/components/admin/ChampsDescriptifSlide";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -18,6 +19,7 @@ export default function AjouterHeroSlidePage() {
   const [type, setType] = useState("haut");
   const [ordre, setOrdre] = useState(0);
   const [isActive, setIsActive] = useState(true);
+  const [descriptif, setDescriptif] = useState<DescriptifSlide>(DESCRIPTIF_VIDE);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,11 +41,15 @@ export default function AjouterHeroSlidePage() {
       fd.append("type", type);
       fd.append("ordre", String(ordre));
       fd.append("is_active", String(isActive));
+      ajouterDescriptif(fd, descriptif);
       const res = await fetchWithAuth(`${API_BASE}/api/v1/hero-slides`, { method: "POST", body: fd });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(typeof data.detail === "string" ? data.detail : "Une erreur est survenue.");
+      }
       router.push("/admin/hero-slides");
-    } catch {
-      setError("Une erreur est survenue.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
       setSaving(false);
     }
@@ -130,7 +136,7 @@ export default function AjouterHeroSlidePage() {
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]/30 focus:border-[#E05017]"
           >
             <option value="haut">Slider Héro (section héro, haut)</option>
-            <option value="bas">Slider CRASC (section pleine largeur, bas)</option>
+            <option value="bas">Slider photo (section pleine largeur, bas)</option>
           </select>
         </div>
 
@@ -158,6 +164,8 @@ export default function AjouterHeroSlidePage() {
             </select>
           </div>
         </div>
+
+        <ChampsDescriptifSlide valeur={descriptif} onChange={setDescriptif} />
 
         <div className="flex justify-end gap-3 pt-2">
           <Link href="/admin/hero-slides" className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm transition-colors">

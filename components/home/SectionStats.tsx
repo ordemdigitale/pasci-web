@@ -53,7 +53,7 @@ export default function Stats() {
 
         setStats([
           {
-            label: "Nombre de CRASC",
+            label: "CRASC",
             value: data.crasc?.total ?? 0,
             icon: Landmark,
             bg: "bg-[#E05017]/10",
@@ -175,7 +175,7 @@ export default function Stats() {
                   <VisiteCounter />
                 </p>
                 <p className="text-sm font-bold uppercase tracking-wider text-gray-600 group-hover:text-white/90 transition-colors duration-300 text-center">
-                  Nombre de visites
+                  Visites
                 </p>
               </div>
             </div>

@@ -1,51 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ImageWithFallback } from "@/lib/imageWithFallback"
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
-interface IPartenaires {
+interface IPartenaire {
   id: number;
-  name: string;
-  imageUrl: string;
-  description?: string;
-  website?: string;
+  nom: string;
+  logo_url?: string | null;
+  site_web?: string | null;
 }
 
-export default function Partners() {
-  const [hoveredPartner, setHoveredPartner] = useState<number | null>(null);
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-  const partners: IPartenaires[] = [
-    {
-      id: 1,
-      name: 'Save The Children',
-      imageUrl: "/images/partenaires/save-the-children.png",
-      description: "Protection de l'enfance",
-      website: "#"
-    },
-    {
-      id: 2,
-      name: 'CERAP',
-      imageUrl: '/images/partenaires/cerap.png',
-      description: "Recherche et formation",
-      website: "#"
-    },
-    {
-      id: 3,
-      name: 'Social Justice',
-      imageUrl: '/images/partenaires/social-justice.png',
-      description: "Justice sociale",
-      website: "#"
-    },
-    {
-      id: 4,
-      name: 'Union Européenne',
-      imageUrl: '/images/partenaires/union-europeenne.png',
-      description: "Coopération internationale",
-      website: "#"
-    },
-  ];
+// Repli si l'API ne répond pas (les logos sont gérés dans l'admin : Accueil › Partenaires)
+const PARTENAIRES_DEFAUT: IPartenaire[] = [
+  { id: 1, nom: "Save The Children", logo_url: "/images/partenaires/save-the-children.png" },
+  { id: 2, nom: "CERAP", logo_url: "/images/partenaires/cerap.png" },
+  { id: 3, nom: "Social Justice", logo_url: "/images/partenaires/social-justice.png" },
+  { id: 4, nom: "Union Européenne", logo_url: "/images/partenaires/union-europeenne.png" },
+  { id: 5, nom: "AICS", logo_url: null, site_web: "https://www.aics.gov.it" },
+];
+
+export default function Partners() {
+  const [partners, setPartners] = useState<IPartenaire[]>(PARTENAIRES_DEFAUT);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/v1/partenaires-accueil`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (Array.isArray(data)) setPartners(data);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <section className="py-12 bg-white font-poppins">
@@ -58,56 +46,47 @@ export default function Partners() {
         </div>
 
         {/* Partners Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {partners.map((partner) => (
-            <div
-              key={partner.id}
-              onMouseEnter={() => setHoveredPartner(partner.id)}
-              onMouseLeave={() => setHoveredPartner(null)}
-              className="group relative bg-white rounded-2xl p-8 border-2 border-gray-100 hover:border-[#E05017]/30 transition-all duration-300 hover:shadow-xl hover:-translate-y-2"
-            >
-              {/* Card Background Gradient on Hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#E05017]/5 to-[#2a591d]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-
-              {/* Content */}
-              <div className="relative z-10 flex flex-col items-center">
-                {/* Logo Container */}
-                <div className="w-full h-24 flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
-                  <ImageWithFallback
-                    src={partner.imageUrl}
-                    alt={partner.name}
-                    className="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-300"
-                  />
+        <div className="flex flex-wrap justify-center gap-6">
+          {partners.map((partner) => {
+            const carte = (
+              <>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#E05017]/5 to-[#2a591d]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="w-full h-24 flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
+                    {partner.logo_url ? (
+                      <ImageWithFallback
+                        src={partner.logo_url}
+                        alt={partner.nom}
+                        className="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-300"
+                      />
+                    ) : (
+                      <span className="text-3xl font-black tracking-wider text-[#2a591d]">{partner.nom}</span>
+                    )}
+                  </div>
+                  <h3 className="text-sm font-bold text-gray-900 text-center group-hover:text-[#E05017] transition-colors duration-300">
+                    {partner.nom}
+                  </h3>
                 </div>
-
-                {/* Partner Name */}
-                <h3 className="text-sm font-bold text-gray-900 text-center mb-2 group-hover:text-[#E05017] transition-colors duration-300">
-                  {partner.name}
-                </h3>
-
-                {/* Description - visible on hover */}
-                {partner.description && (
-                  <p className={`text-xs text-gray-500 text-center mb-3 transition-all duration-300 ${
-                    hoveredPartner === partner.id ? 'opacity-100 max-h-20' : 'opacity-0 max-h-0'
-                  }`}>
-                    {partner.description}
-                  </p>
-                )}
-              </div>
-
-              {/* Decorative corner */}
-              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-[#E05017]/10 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-          ))}
+              </>
+            );
+            const classe = "group relative w-[calc(50%-12px)] lg:w-[calc(20%-20px)] min-w-[150px] bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-[#E05017]/30 transition-all duration-300 hover:shadow-xl hover:-translate-y-2";
+            return partner.site_web ? (
+              <a key={partner.id} href={partner.site_web} target="_blank" rel="noopener noreferrer" className={classe} title={partner.nom}>
+                {carte}
+              </a>
+            ) : (
+              <div key={partner.id} className={classe}>{carte}</div>
+            );
+          })}
         </div>
 
         {/* CTA Section */}
         <div className="mt-16 text-center bg-gradient-to-r from-[#E05017]/5 to-[#2a591d]/5 rounded-2xl p-8 border border-[#E05017]/20">
           <h3 className="text-2xl font-bold text-gray-900 mb-3">
-            S'enrôler sur la PdoC
+            S&apos;enrôler sur la PdoC
           </h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Votre organisation souhaite intégrer la  plateforme des OSC ? Soumettez votre demande et bénéficiez de l'accompagnement de la plateforme PdoC.
+            Votre organisation souhaite intégrer la  plateforme des OSC ? Soumettez votre demande et bénéficiez de l&apos;accompagnement de la plateforme PdoC.
           </p>
           <Link
             href="/rejoindre"

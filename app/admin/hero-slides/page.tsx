@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Trash2, Eye, EyeOff, Images, GripVertical, Save } from "lucide-react";
+import { Plus, Trash2, Eye, EyeOff, Images, GripVertical, Save, Upload, RotateCcw, Loader2 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 
@@ -14,7 +14,13 @@ interface IHeroSlide {
   ordre: number;
   is_active: boolean;
   type: string;
+  date_expiration?: string | null;
+  est_expiree?: boolean;
+  a_descriptif?: boolean;
 }
+
+// Image affichée quand aucune slide n'est active (site public, components/home/SectionHero.tsx)
+const IMAGE_DEFAUT_ORIGINE = "/images/de715dfa-b501-4ea4-9532-9d32d85c10e0.png";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -30,6 +36,10 @@ export default function HeroSlidesPage() {
   const [textSaved, setTextSaved] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [togglingId, setTogglingId] = useState<number | null>(null);
+  // Image par défaut du carrousel (1.6), modifiable comme le texte par défaut
+  const [imageDefaut, setImageDefaut] = useState("");
+  const [envoiImage, setEnvoiImage] = useState(false);
+  const [erreurImage, setErreurImage] = useState("");
 
   const fetchSlides = async () => {
     setLoading(true);
@@ -48,6 +58,7 @@ export default function HeroSlidesPage() {
       .then((cfg: Record<string, string>) => {
         if (cfg.hero_title) setHeroTitle(cfg.hero_title);
         if (cfg.hero_description) setHeroDesc(cfg.hero_description);
+        setImageDefaut(cfg.hero_image_defaut || "");
       })
       .catch(() => {});
   }, []);
@@ -97,6 +108,28 @@ export default function HeroSlidesPage() {
     }
   };
 
+  const changerImageDefaut = async (fichier: File | null) => {
+    setEnvoiImage(true);
+    setErreurImage("");
+    try {
+      if (fichier) {
+        const fd = new FormData();
+        fd.append("image", fichier);
+        const res = await fetchWithAuth(`${API_BASE}/api/v1/config/upload/hero_image_defaut`, { method: "POST", body: fd });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : "Envoi impossible.");
+        setImageDefaut(data.value);
+      } else {
+        await fetchWithAuth(`${API_BASE}/api/v1/config/hero_image_defaut`, { method: "PUT", body: JSON.stringify({ value: "" }) });
+        setImageDefaut("");
+      }
+    } catch (err) {
+      setErreurImage(err instanceof Error ? err.message : "Envoi impossible.");
+    } finally {
+      setEnvoiImage(false);
+    }
+  };
+
   const slidesHaut = slides.filter((s) => s.type === "haut");
   const slidesBas = slides.filter((s) => s.type === "bas");
 
@@ -112,7 +145,7 @@ export default function HeroSlidesPage() {
           <div
             key={slide.id}
             className={`relative rounded-lg overflow-hidden border-2 group transition-all ${
-              slide.is_active ? "border-gray-200" : "border-gray-100 opacity-50"
+              slide.is_active && !slide.est_expiree ? "border-gray-200" : "border-gray-100 opacity-50"
             }`}
           >
             <div className="aspect-video">
@@ -130,6 +163,17 @@ export default function HeroSlidesPage() {
               <p className="text-xs text-gray-500 line-clamp-2 mt-1">
                 {slide.description || "Aucune description liée à cette image"}
               </p>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {slide.date_expiration && (
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${slide.est_expiree ? "bg-red-100 text-red-700" : "bg-amber-50 text-amber-700"}`}>
+                    {slide.est_expiree ? "Expirée le " : "Expire le "}
+                    {new Date(slide.date_expiration).toLocaleDateString("fr-FR")}
+                  </span>
+                )}
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${slide.a_descriptif ? "bg-green-50 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                  {slide.a_descriptif ? "Descriptif « Voir plus »" : "Sans descriptif"}
+                </span>
+              </div>
             </div>
 
             {/* Ordre badge */}
@@ -139,9 +183,9 @@ export default function HeroSlidesPage() {
 
             {/* Status badge */}
             <div className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full font-medium ${
-              slide.is_active ? "bg-green-500 text-white" : "bg-gray-500 text-white"
+              slide.est_expiree ? "bg-red-500 text-white" : slide.is_active ? "bg-green-500 text-white" : "bg-gray-500 text-white"
             }`}>
-              {slide.is_active ? "Active" : "Inactive"}
+              {slide.est_expiree ? "Expirée" : slide.is_active ? "Active" : "Inactive"}
             </div>
 
             {/* Actions overlay */}
@@ -197,10 +241,38 @@ export default function HeroSlidesPage() {
 
       {/* Texte par défaut */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6 space-y-4">
-        <h2 className="text-base font-semibold text-gray-800">Texte par défaut du carrousel</h2>
+        <h2 className="text-base font-semibold text-gray-800">Texte et image par défaut du carrousel</h2>
         <p className="text-xs text-gray-500">
-          Utilisé uniquement lorsqu&apos;une image du carrousel n&apos;a pas encore son propre titre ou sa propre description.
+          Le texte est utilisé lorsqu&apos;une image du carrousel n&apos;a pas son propre titre ou sa propre description.
+          L&apos;image par défaut s&apos;affiche (avec ce texte) lorsqu&apos;aucune image n&apos;est active.
         </p>
+        <div className="flex flex-wrap items-center gap-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imageDefaut || IMAGE_DEFAUT_ORIGINE} alt="Image par défaut du carrousel" className="w-48 aspect-video object-cover rounded-lg border border-gray-200" />
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="inline-flex items-center gap-2 px-3 py-2 bg-[#E05017] text-white rounded-lg text-sm font-medium cursor-pointer hover:bg-[#c94510]">
+              {envoiImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+              Changer l&apos;image par défaut
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                aria-label="Image par défaut du carrousel"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) changerImageDefaut(f);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+            {imageDefaut && (
+              <button onClick={() => changerImageDefaut(null)} className="inline-flex items-center gap-1 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
+                <RotateCcw className="w-4 h-4" /> Image d&apos;origine
+              </button>
+            )}
+            {erreurImage && <span className="text-sm text-red-600">{erreurImage}</span>}
+          </div>
+        </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Titre</label>
           <input
@@ -257,7 +329,7 @@ export default function HeroSlidesPage() {
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-base font-semibold text-gray-800">Slider CRASC (bas)</h2>
+                <h2 className="text-base font-semibold text-gray-800">Slider photo (bas)</h2>
                 <p className="text-xs text-gray-500 mt-0.5">Images du grand carousel pleine largeur sous les actualités</p>
               </div>
               <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">

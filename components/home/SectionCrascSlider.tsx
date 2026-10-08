@@ -2,9 +2,17 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 
-const FALLBACK_SLIDES = [
+interface SlideBas {
+  src: string;
+  id?: number;
+  title?: string | null;
+  description?: string | null;
+}
+
+const FALLBACK_SLIDES: SlideBas[] = [
   { src: "/images/actualites/13bf15a5-0f87-415a-a05d-e3775879560d.jpg" },
   { src: "/images/actualites/359a7b7d-c126-4fdf-934d-9038c01df7e0.jpg" },
   { src: "/images/actualites/433ece92-1b86-441e-b78a-8382fcf60a00.jpg" },
@@ -24,7 +32,9 @@ export default function SectionCrascSlider() {
       .then((r) => r.ok ? r.json() : [])
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
-          setSlides(data.map((s: { image_url: string }) => ({ src: s.image_url })));
+          setSlides(data.map((s: { id: number; image_url: string; title?: string | null; description?: string | null }) => ({
+            src: s.image_url, id: s.id, title: s.title, description: s.description,
+          })));
           setCurrent(0);
         }
       })
@@ -64,9 +74,23 @@ export default function SectionCrascSlider() {
             >
               <ImageWithFallback
                 src={slide.src}
-                alt={`Slide ${index + 1}`}
+                alt={slide.title || `Slide ${index + 1}`}
                 className="w-full h-full object-cover"
               />
+              {slide.id && (
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent px-6 pt-16 pb-10 flex flex-col sm:flex-row sm:items-end gap-3">
+                  <div className="flex-1 text-white">
+                    {slide.title && <p className="font-bold text-lg">{slide.title}</p>}
+                    {slide.description && <p className="text-sm text-white/85 line-clamp-2">{slide.description}</p>}
+                  </div>
+                  <Link
+                    href={`/accueil/slides/${slide.id}`}
+                    className="self-start sm:self-auto px-5 py-2 rounded-lg bg-[#E05017] text-white text-sm font-semibold hover:bg-[#c44315]"
+                  >
+                    Voir plus
+                  </Link>
+                </div>
+              )}
             </div>
           ))}
 
