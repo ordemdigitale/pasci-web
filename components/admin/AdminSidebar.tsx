@@ -134,6 +134,7 @@ export default function AdminSidebar({
       staffOnly: true,
       submenus: [
         { label: "PTF", href: "/admin/ptf" },
+        { label: "Task forces (PTF)", href: "/admin/task-forces" },
         { label: "OSC", href: "/admin/gestion-des-crasc/osc" },
       ],
     },
@@ -215,7 +216,7 @@ export default function AdminSidebar({
           .map((item) => {
             // Retirer PTF des sous-menus "Organisations"
             if (item.submenus?.some((s) => s.href === "/admin/ptf")) {
-              return { ...item, submenus: item.submenus.filter((s) => s.href !== "/admin/ptf") };
+              return { ...item, submenus: item.submenus.filter((s) => s.href !== "/admin/ptf" && s.href !== "/admin/task-forces") };
             }
             return item;
           }),

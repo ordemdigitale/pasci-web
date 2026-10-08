@@ -27,6 +27,7 @@ const projetSchema = z.object({
   beneficiaires: z.string().optional(),
   statut: z.string().min(1, "Le statut est requis."),
   progression: z.number().min(0).max(100),
+  date_limite_soumission: z.string().optional(),
 });
 
 type ProjetFormData = z.infer<typeof projetSchema>;
@@ -107,6 +108,7 @@ export default function EditProjetPage() {
         setValue("zone", data.zone);
         setValue("durée", data.durée);
         setValue("budget", data.budget);
+        setValue("date_limite_soumission", data.date_limite_soumission ? String(data.date_limite_soumission).slice(0, 10) : "");
         setValue("offre_url", data.offre_url || "");
         setValue("statut", data.statut);
         setValue("progression", data.progression);
@@ -226,6 +228,8 @@ export default function EditProjetPage() {
       formData.append("zone", data.zone);
       formData.append("durée", data.durée);
       formData.append("budget", data.budget);
+      // Vide = retirer la date limite
+      formData.append("date_limite_soumission", data.date_limite_soumission || "");
       formData.append("offre_url", data.offre_url || "");
       formData.append("statut", data.statut);
       formData.append("progression", data.progression.toString());
@@ -432,6 +436,20 @@ export default function EditProjetPage() {
                     <p className="text-red-600 text-sm mt-1">{errors.budget.message}</p>
                   )}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Date limite de soumission
+                </label>
+                <input
+                  {...register("date_limite_soumission")}
+                  type="date"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Facultative. Après cette date, l&apos;offre est affichée « Clôturée » et le lien de candidature est retiré.
+                </p>
               </div>
 
               <div>

@@ -10,6 +10,7 @@ import {
   Clock, DollarSign, FolderOpen
 } from 'lucide-react';
 import { IOffreProjet } from '@/types/api.types';
+import TaskForcesThematiques from '@/components/ptf/TaskForcesThematiques';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -371,6 +372,8 @@ export default function PTFDetailPage({ params }: { params: Promise<{ ptfSlug: s
             </div>
           )}
         </div>
+
+        {ptfData && <TaskForcesThematiques ptfId={ptfData.id} titre="Task forces dont ce partenaire est membre" />}
 
         <div className="mt-12 text-center">
           <Link

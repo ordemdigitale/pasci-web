@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { IOffreProjet } from '@/types/api.types';
+import DateLimiteSoumission from '@/components/projets/DateLimiteSoumission';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -45,6 +46,8 @@ export default function PageOffreProjet() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDomaine, setSelectedDomaine] = useState("");
   const [selectedZone, setSelectedZone] = useState("");
+  // Offres dont la date limite de soumission n'est pas dépassée, clôturées ou toutes
+  const [soumission, setSoumission] = useState<"toutes" | "ouvertes" | "cloturees">("ouvertes");
 
   // Load projets from API
   useEffect(() => {
@@ -75,7 +78,10 @@ export default function PageOffreProjet() {
     const matchDomaine = !selectedDomaine || projet.domaine === selectedDomaine;
     const matchZone = !selectedZone || projet.zone === selectedZone;
 
-    return matchSearch && matchDomaine && matchZone;
+    const ouverte = projet.soumission_ouverte !== false;
+    const matchSoumission = soumission === "toutes" || (soumission === "ouvertes" ? ouverte : !ouverte);
+
+    return matchSearch && matchDomaine && matchZone && matchSoumission;
   });
 
   const formatDate = (dateString: string) => {
@@ -175,9 +181,19 @@ export default function PageOffreProjet() {
 
       {/* Projets Grid */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-        <h2 className="font-bold text-2xl text-gray-900 mb-6">
-          Projets disponibles
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <h2 className="font-bold text-2xl text-gray-900">
+            Projets disponibles
+          </h2>
+          <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
+            {([["ouvertes", "Soumission ouverte"], ["cloturees", "Clôturées"], ["toutes", "Toutes"]] as const).map(([val, label]) => (
+              <button key={val} onClick={() => setSoumission(val)}
+                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${soumission === val ? 'bg-[#E05017] text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-gray-200">
@@ -225,6 +241,11 @@ export default function PageOffreProjet() {
                       {projet.nom}
                     </h3>
 
+                    {projet.date_limite_soumission && (
+                      <div className="mb-3">
+                        <DateLimiteSoumission date={projet.date_limite_soumission} ouverte={projet.soumission_ouverte} joursRestants={projet.jours_restants} />
+                      </div>
+                    )}
                     <div className="space-y-2 text-sm text-gray-600 mb-4">
                       <div className="flex items-center gap-2">
                         <Building2 className="w-4 h-4 text-[#E05017]" />

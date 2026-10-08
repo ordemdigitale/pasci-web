@@ -10,16 +10,12 @@ import Link from "next/link";
 import { IPTF } from "@/types/api.types";
 import { fetchWithAuth } from "@/lib/auth";
 
+import { TYPES_PTF_DEFAUT } from "@/lib/ptf-classification";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Validation schema
-const PTF_CATEGORIES = [
-  "Institutions multilatérales",
-  "Bailleurs bilatéraux",
-  "Agences spécialisées",
-  "ONG internationales",
-  "Fondations",
-];
+// Classification des PTF (même liste que l'API : GET /ptf/types)
+const PTF_CATEGORIES = TYPES_PTF_DEFAUT.map((t) => t.nom);
 
 const ptfSchema = z.object({
   name: z.string().min(3, "Le nom doit contenir au moins 3 caractères."),

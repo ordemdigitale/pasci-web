@@ -527,6 +527,10 @@ export interface IOffreProjet {
   image_path?: string;
   image_url?: string;
   date_publication: string;
+  /** Date limite de soumission (null = sans date limite) */
+  date_limite_soumission?: string | null;
+  soumission_ouverte?: boolean;
+  jours_restants?: number | null;
   created_at: string;
   updated_at: string;
   ptf_id?: number | null;

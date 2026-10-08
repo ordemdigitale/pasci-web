@@ -5,6 +5,8 @@ import { ImageWithFallback } from '@/lib/imageWithFallback'
 import { IPTF } from '@/types/api.types';
 import Link from 'next/link';
 import { Loader2, Building2, Search } from 'lucide-react';
+import { useTypesPtf } from '@/lib/ptf-classification';
+import TaskForcesThematiques from '@/components/ptf/TaskForcesThematiques';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -13,6 +15,9 @@ export default function PageAnnuairePTF() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Classification par types (Institutions multilatérales, Agences spécialisées…)
+  const types = useTypesPtf();
+  const [typeChoisi, setTypeChoisi] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,64 +111,101 @@ export default function PageAnnuairePTF() {
         )}
 
         {ptfData.length > 0 && (() => {
-          const filtered = ptfData.filter(ptf => {
-            const q = searchQuery.toLowerCase();
-            return (
+          const q = searchQuery.toLowerCase();
+          const filtered = ptfData.filter(ptf =>
+            (!typeChoisi || (ptf.categorie || 'Autres') === typeChoisi) && (
               ptf.name.toLowerCase().includes(q) ||
               (ptf.description || '').toLowerCase().includes(q) ||
               (ptf.categorie || '').toLowerCase().includes(q)
-            );
-          });
+            )
+          );
+          // Regroupement par type, dans l'ordre de la classification (sans type = « Autres »)
+          const ordre = types.map((t) => t.nom);
+          const groupes = Array.from(new Set([...ordre, ...filtered.map((p) => p.categorie || 'Autres')]))
+            .map((nom) => ({ nom, ptfs: filtered.filter((p) => (p.categorie || 'Autres') === nom) }))
+            .filter((g) => g.ptfs.length > 0);
+          const typesAffiches = types.filter((t) => ptfData.some((p) => (p.categorie || 'Autres') === t.nom));
+
+          const carte = (ptf: typeof ptfData[number]) => (
+            <Link
+              key={ptf.id}
+              href={`/annuaire/annuaire-des-partenaires-techniques-et-financiers/${ptf.slug}`}
+              className="group"
+            >
+              <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden hover:shadow-2xl hover:border-[#2a591d]/30 transition-all duration-300 h-full">
+                <div className="aspect-[4/3] bg-gray-50 flex items-center justify-center p-8 border-b-2 border-gray-200 group-hover:bg-gray-100 transition-colors">
+                  {ptf.thumbnail_url ? (
+                    <ImageWithFallback src={ptf.thumbnail_url} alt={ptf.name} className="w-full h-full object-contain" />
+                  ) : (
+                    <Building2 className="w-16 h-16 text-gray-300" />
+                  )}
+                </div>
+                <div className="p-6 text-center">
+                  {ptf.categorie && (
+                    <span className="inline-block mb-2 px-2 py-0.5 text-xs font-bold bg-[#2a591d]/10 text-[#2a591d] rounded-full">
+                      {ptf.categorie}
+                    </span>
+                  )}
+                  <h3 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-[#2a591d] transition-colors">{ptf.name}</h3>
+                  {ptf.description && (
+                    <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">{ptf.description}</p>
+                  )}
+                </div>
+              </div>
+            </Link>
+          );
+
           return (
             <>
+              {/* Types de PTF */}
+              <div className="flex flex-wrap justify-center gap-2 mb-10">
+                <button
+                  onClick={() => setTypeChoisi('')}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${!typeChoisi ? 'bg-[#2a591d] text-white border-[#2a591d]' : 'bg-white text-gray-700 border-gray-200 hover:border-[#2a591d]/40'}`}
+                >
+                  Tous ({ptfData.length})
+                </button>
+                {typesAffiches.map((t) => {
+                  const nb = ptfData.filter((p) => (p.categorie || 'Autres') === t.nom).length;
+                  return (
+                    <button
+                      key={t.nom}
+                      onClick={() => setTypeChoisi(t.nom)}
+                      title={t.description || undefined}
+                      className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${typeChoisi === t.nom ? 'bg-[#2a591d] text-white border-[#2a591d]' : 'bg-white text-gray-700 border-gray-200 hover:border-[#2a591d]/40'}`}
+                    >
+                      {t.nom} ({nb})
+                    </button>
+                  );
+                })}
+              </div>
+
               {filtered.length === 0 ? (
                 <div className="text-center py-16">
                   <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">Aucun résultat pour &quot;{searchQuery}&quot;</p>
+                  <p className="text-gray-500">Aucun résultat{searchQuery ? <> pour &quot;{searchQuery}&quot;</> : null}</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {filtered.map((ptf) => (
-                    <Link
-                      key={ptf.id}
-                      href={`/annuaire/annuaire-des-partenaires-techniques-et-financiers/${ptf.slug}`}
-                      className="group"
-                    >
-                      <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden hover:shadow-2xl hover:border-[#2a591d]/30 transition-all duration-300">
-                        <div className="aspect-square bg-gray-50 flex items-center justify-center p-8 border-b-2 border-gray-200 group-hover:bg-gray-100 transition-colors">
-                          {ptf.thumbnail_url ? (
-                            <ImageWithFallback
-                              src={ptf.thumbnail_url}
-                              alt={ptf.name}
-                              className="w-full h-full object-contain"
-                            />
-                          ) : (
-                            <Building2 className="w-16 h-16 text-gray-300" />
-                          )}
-                        </div>
-                        <div className="p-6 text-center">
-                          {ptf.categorie && (
-                            <span className="inline-block mb-2 px-2 py-0.5 text-xs font-bold bg-[#2a591d]/10 text-[#2a591d] rounded-full">
-                              {ptf.categorie}
-                            </span>
-                          )}
-                          <h3 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-[#2a591d] transition-colors">
-                            {ptf.name}
-                          </h3>
-                          {ptf.description && (
-                            <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
-                              {ptf.description}
-                            </p>
-                          )}
-                        </div>
+                <div className="space-y-12">
+                  {groupes.map((g) => (
+                    <div key={g.nom}>
+                      <h2 className="text-xl font-bold text-[#2a591d] mb-1">{g.nom}</h2>
+                      {types.find((t) => t.nom === g.nom)?.description && (
+                        <p className="text-sm text-gray-500 mb-5">{types.find((t) => t.nom === g.nom)?.description}</p>
+                      )}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {g.ptfs.map(carte)}
                       </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
               )}
             </>
           );
         })()}
+
+        {/* Task forces thématiques */}
+        <TaskForcesThematiques />
       </div>
 
     </section>

@@ -4,6 +4,7 @@ import { use, useState, useEffect } from "react";
 import { IOffreProjet } from "@/types/api.types";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from "next/link";
+import DateLimiteSoumission from "@/components/projets/DateLimiteSoumission";
 import {
   Building2,
   MapPin,
@@ -132,6 +133,9 @@ export default function PageDetailOffreProjet({
               <span className="bg-gray-900 text-white text-sm font-bold px-3 py-1 rounded-full">
                 {projet.statut}
               </span>
+              {projet.soumission_ouverte === false && (
+                <span className="bg-white text-gray-800 text-sm font-bold px-3 py-1 rounded-full">Clôturée</span>
+              )}
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">
               {projet.nom}
@@ -348,7 +352,10 @@ export default function PageDetailOffreProjet({
                   Partager le projet
                 </button> */}
 
-                {projet.offre_url && (
+                {projet.date_limite_soumission && (
+                  <DateLimiteSoumission grand date={projet.date_limite_soumission} ouverte={projet.soumission_ouverte} joursRestants={projet.jours_restants} />
+                )}
+                {projet.offre_url && projet.soumission_ouverte !== false && (
                   <a
                     href={projet.offre_url}
                     target="_blank"
