@@ -175,7 +175,7 @@ export default function AdminOscPage() {
 
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Gestion des OSC</h1>
       <p className="text-gray-600 mb-6">
-        {total} OSC{total > 1 ? 's' : ''} au total
+        {total} OSC au total
         {totalPages > 1 && ` — page ${page} / ${totalPages}`}
       </p>
 

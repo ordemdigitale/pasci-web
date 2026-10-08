@@ -273,7 +273,7 @@ export default function EditOscTypePage() {
             </p>
           </div> */}
           <div className="bg-white p-4 rounded-lg border border-gray-200">
-            <p className="text-sm text-gray-500 mb-1">OSCs associées</p>
+            <p className="text-sm text-gray-500 mb-1">OSC associées</p>
             <p className="font-medium">
               {oscType.oscs?.length === 0 ? 
               <span>Aucune OSC pour le moment</span>

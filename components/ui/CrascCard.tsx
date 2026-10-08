@@ -30,7 +30,7 @@ export function CrascCard({ crasc, showDetails = true, className = '' }: CrascCa
                             <div className="flex items-center gap-2 text-white/90">
                                 <Users className="w-4 h-4 flex-shrink-0" />
                                 <span className="text-sm font-medium">
-                                    {crasc.osc_count} OSC{crasc.osc_count > 1 ? 's' : ''}
+                                    {crasc.osc_count} OSC
                                 </span>
                             </div>
                         )}
@@ -76,7 +76,7 @@ export function CrascCardCompact({ crasc, className = '' }: CrascCardCompactProp
                     {crasc.osc_count !== undefined && (
                         <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
                             <Users className="w-3 h-3" />
-                            {crasc.osc_count} OSC{crasc.osc_count > 1 ? 's' : ''}
+                            {crasc.osc_count} OSC
                         </p>
                     )}
                 </div>

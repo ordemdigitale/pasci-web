@@ -315,7 +315,7 @@ export default function AnnuaireOSCPage() {
             Annuaire des <span className="text-[#E05017]">OSC</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Découvrir les Organisations de la Société Civile membres du CRASC
+            Découvrir les Organisations de la Société Civile de la PdoC
           </p>
           <div className="w-24 h-1 bg-gradient-to-r from-[#E05017] to-[#2a591d] mx-auto mt-6 rounded-full"></div>
         </div>
@@ -665,7 +665,7 @@ export default function AnnuaireOSCPage() {
                   <span className="text-gray-400">Chargement de l&apos;annuaire…</span>
                 ) : (
                   <>
-                    <span className="font-bold text-[#E05017]">{total}</span> OSC{total > 1 ? 's' : ''} trouvée{total > 1 ? 's' : ''}
+                    <span className="font-bold text-[#E05017]">{total}</span> OSC trouvée{total > 1 ? 's' : ''}
                     {totalPages > 1 && (
                       <span className="text-gray-400"> — page {currentPage} / {totalPages}</span>
                     )}
