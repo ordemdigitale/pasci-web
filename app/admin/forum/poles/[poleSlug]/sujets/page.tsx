@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { fetchWithAuth } from "@/lib/auth";
-import { ArrowLeft, MessageSquare, Pin, Trash2, Eye, Loader2 } from "lucide-react";
+import { ArrowLeft, MessageSquare, Pin, Trash2, Eye, Loader2, FileText, Lock } from "lucide-react";
 
 interface IForumSujet {
   id: number;
@@ -16,6 +16,8 @@ interface IForumSujet {
   is_pinned: boolean;
   views_count: number;
   comments_count: number;
+  est_clos?: boolean;
+  synthese?: string | null;
   created_at: string;
 }
 
@@ -142,7 +144,13 @@ export default function AdminPoleSujetsPage() {
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 mb-1">{sujet.title}</h3>
+                  <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                    {sujet.title}
+                    {sujet.synthese && (
+                      <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-semibold">Synthèse publiée</span>
+                    )}
+                    {sujet.est_clos && <Lock className="w-3.5 h-3.5 text-gray-400" aria-label="Discussion close" />}
+                  </h3>
                   <p className="text-sm text-gray-500 line-clamp-2 mb-2">{sujet.content}</p>
                   <div className="flex items-center gap-4 text-xs text-gray-400">
                     <span>Par <span className="font-medium text-gray-600">{sujet.author_name || "Anonyme"}</span></span>
@@ -174,6 +182,15 @@ export default function AdminPoleSujetsPage() {
                       <Pin className="w-4 h-4" />
                     )}
                   </button>
+
+                  <Link href={`/admin/forum/sujets/${sujet.id}/synthese`}>
+                    <button
+                      className="p-2 text-green-700 hover:bg-green-50 rounded-lg transition-colors"
+                      title="Contributions et synthèse"
+                    >
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </Link>
 
                   <Link
                     href={`/espace-collaboratif/pole-concertation/${poleSlug}/${sujet.slug}`}

@@ -8,6 +8,7 @@ import { IPoleConcertation, IForumSujet, IForumSondage, IPoleMembre } from "@/ty
 import { getToken, fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { libelleRegion } from "@/lib/osc-referentiels";
+import SelecteurMedias from "@/components/forum/SelecteurMedias";
 import {
   FILTRES_VIDES,
   FiltresMembres,
@@ -115,6 +116,7 @@ export default function PagePoleForum() {
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [fichiersSujet, setFichiersSujet] = useState<File[]>([]);
   const [discussionSearch, setDiscussionSearch] = useState("");
   const [filtres, setFiltres] = useState<FiltresMembres>(FILTRES_VIDES);
   const [membresPage, setMembresPage] = useState(1);
@@ -214,13 +216,15 @@ export default function PagePoleForum() {
     setSubmitting(true);
     setError("");
     try {
+      // Multipart : titre, texte + photos, audios, vidéos
+      const corps = new FormData();
+      corps.append("title", title);
+      corps.append("content", content);
+      fichiersSujet.forEach((f) => corps.append("fichiers", f));
       const res = await fetch(API_ENDPOINTS.forum.createSujet(poleSlug), {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title, content }),
+        headers: { Authorization: `Bearer ${token}` },
+        body: corps,
       });
       if (!res.ok) {
         const data = await res.json();
@@ -230,6 +234,7 @@ export default function PagePoleForum() {
       setSujets((prev) => [newSujet, ...prev]);
       setTitle("");
       setContent("");
+      setFichiersSujet([]);
       setShowForm(false);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erreur lors de la création.");
@@ -882,6 +887,7 @@ export default function PagePoleForum() {
               placeholder="Décrivez votre sujet..."
             />
           </div>
+          <SelecteurMedias fichiers={fichiersSujet} onChange={setFichiersSujet} disabled={submitting} />
           <button
             type="submit"
             disabled={submitting}
@@ -925,6 +931,16 @@ export default function PagePoleForum() {
                       <Pin className="w-4 h-4 text-[#E05017] flex-shrink-0" />
                     )}
                     <h3 className="font-semibold text-gray-900 truncate">{sujet.title}</h3>
+                    {sujet.synthese && (
+                      <span className="flex-shrink-0 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-semibold">
+                        Synthèse
+                      </span>
+                    )}
+                    {sujet.est_clos && (
+                      <span className="flex-shrink-0 px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 text-[10px] font-semibold">
+                        Close
+                      </span>
+                    )}
                   </div>
                   <p className="text-sm text-gray-500">
                     Par <span className="font-medium">{sujet.author_name || "Anonyme"}</span>

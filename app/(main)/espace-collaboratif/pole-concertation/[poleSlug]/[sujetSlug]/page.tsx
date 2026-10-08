@@ -6,7 +6,9 @@ import Link from "next/link";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { IForumSujetDetail, IForumCommentaire } from "@/types/api.types";
 import { getToken, getStoredUser } from "@/lib/auth";
-import { ArrowLeft, Eye, MessageSquare, Trash2, Send } from "lucide-react";
+import { ArrowLeft, Eye, MessageSquare, Trash2, Send, Lock, FileText } from "lucide-react";
+import MediasJoints from "@/components/forum/MediasJoints";
+import SelecteurMedias from "@/components/forum/SelecteurMedias";
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("fr-FR", {
@@ -28,6 +30,7 @@ export default function PageSujetDetail() {
   const [sujet, setSujet] = useState<IForumSujetDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState("");
+  const [fichiers, setFichiers] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [token, setToken] = useState<string | null>(null);
@@ -61,17 +64,18 @@ export default function PageSujetDetail() {
       router.push(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
-    if (!comment.trim()) return;
+    if (!comment.trim() && fichiers.length === 0) return;
     setSubmitting(true);
     setError("");
     try {
+      // Multipart : texte + photos, audios, vidéos (le navigateur fixe le Content-Type)
+      const corps = new FormData();
+      corps.append("content", comment);
+      fichiers.forEach((f) => corps.append("fichiers", f));
       const res = await fetch(API_ENDPOINTS.forum.createCommentaire(poleSlug, sujetSlug), {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ content: comment }),
+        headers: { Authorization: `Bearer ${token}` },
+        body: corps,
       });
       if (!res.ok) {
         const data = await res.json();
@@ -88,6 +92,7 @@ export default function PageSujetDetail() {
           : prev
       );
       setComment("");
+      setFichiers([]);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -172,7 +177,24 @@ export default function PageSujetDetail() {
         <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap border-t border-gray-100 pt-4">
           {sujet.content}
         </div>
+        <MediasJoints pieces={sujet.pieces_jointes} />
       </div>
+
+      {/* Synthèse publiée par l'administration */}
+      {sujet.synthese && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6">
+          <h2 className="font-bold text-green-900 mb-2 flex items-center gap-2">
+            <FileText className="w-5 h-5" /> Synthèse de la discussion
+          </h2>
+          <p className="text-sm text-green-950 leading-relaxed whitespace-pre-wrap">{sujet.synthese}</p>
+          {(sujet.synthese_par || sujet.synthese_le) && (
+            <p className="text-xs text-green-800 mt-3">
+              {sujet.synthese_par ? `Rédigée par ${sujet.synthese_par}` : "Rédigée"}
+              {sujet.synthese_le ? ` le ${formatDate(sujet.synthese_le)}` : ""}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Comments */}
       <h2 className="text-base font-bold text-gray-800 mb-4">
@@ -202,16 +224,23 @@ export default function PageSujetDetail() {
                   </button>
                 )}
               </div>
-              <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
-                {c.content}
-              </p>
+              {c.content && (
+                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+                  {c.content}
+                </p>
+              )}
+              <MediasJoints pieces={c.pieces_jointes} />
             </div>
           );
         })}
       </div>
 
       {/* Reply form */}
-      {token ? (
+      {sujet.est_clos ? (
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center text-sm text-gray-600 flex items-center justify-center gap-2">
+          <Lock className="w-4 h-4" /> Cette discussion est close : elle n&apos;accepte plus de réponses.
+        </div>
+      ) : token ? (
         <form
           onSubmit={handleComment}
           className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
@@ -222,14 +251,14 @@ export default function PageSujetDetail() {
             ref={commentRef}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            required
             rows={4}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017] mb-3"
             placeholder="Votre réponse..."
           />
+          <SelecteurMedias fichiers={fichiers} onChange={setFichiers} disabled={submitting} />
           <button
             type="submit"
-            disabled={submitting || !comment.trim()}
+            disabled={submitting || (!comment.trim() && fichiers.length === 0)}
             className="flex items-center gap-2 px-6 py-2 bg-[#E05017] text-white rounded-full text-sm font-semibold hover:bg-[#C54415] disabled:opacity-50 transition-colors"
           >
             <Send className="w-4 h-4" />

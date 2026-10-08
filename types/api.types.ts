@@ -404,6 +404,16 @@ export interface IPoleConcertation {
   created_at: string;
 }
 
+/** Photo, audio ou vidéo jointe à un sujet ou à un message d'un pôle */
+export interface IPieceJointe {
+  id: number;
+  type: "image" | "audio" | "video";
+  url: string;
+  nom?: string | null;
+  mime?: string | null;
+  taille: number;
+}
+
 export interface IForumSujet {
   id: number;
   title: string;
@@ -415,6 +425,10 @@ export interface IForumSujet {
   is_pinned: boolean;
   views_count: number;
   comments_count: number;
+  est_clos?: boolean;
+  synthese?: string | null;
+  synthese_par?: string | null;
+  synthese_le?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -427,10 +441,12 @@ export interface IForumCommentaire {
   author_name?: string;
   created_at: string;
   updated_at: string;
+  pieces_jointes?: IPieceJointe[];
 }
 
 export interface IForumSujetDetail extends IForumSujet {
   commentaires: IForumCommentaire[];
+  pieces_jointes?: IPieceJointe[];
 }
 
 export interface IPoleMembre {
