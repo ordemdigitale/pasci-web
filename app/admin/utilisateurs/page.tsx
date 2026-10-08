@@ -22,6 +22,8 @@ import { userService, UpdateUserAdminData } from "@/lib/services/user.service";
 import { IUser } from "@/types/api.types";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { fetchWithAuth } from "@/lib/auth";
+import { API_BASE_URL } from "@/lib/api-config";
 import AddUserModal from "@/components/admin/AddUserModal";
 import EditUserModal from "@/components/admin/EditUserModal";
 
@@ -64,9 +66,27 @@ export default function UtilisateursPage() {
     }
   };
 
+  // Comptes qui partagent un même email (créés avant que l'unicité ne soit
+  // vérifiée sans tenir compte des majuscules) : à traiter par le superadmin.
+  const [doublons, setDoublons] = useState<IUser[][]>([]);
+  const fetchDoublons = async () => {
+    if (!currentUser?.is_superuser) return;
+    try {
+      const res = await fetchWithAuth(`${API_BASE_URL}/api/v1/users/admin/doublons-email`);
+      setDoublons(res.ok ? await res.json() : []);
+    } catch {
+      setDoublons([]);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    fetchDoublons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?.is_superuser]);
 
   // Reset page on filter change
   useEffect(() => { setCurrentPage(1); }, [searchQuery, selectedStatus, selectedRole]);
@@ -132,6 +152,7 @@ export default function UtilisateursPage() {
       await userService.deleteUser(userId);
       toast.success("Utilisateur supprimé avec succès");
       fetchUsers();
+      fetchDoublons();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erreur lors de la suppression");
     }
@@ -198,6 +219,58 @@ export default function UtilisateursPage() {
             Gérez tous les utilisateurs de la plateforme PdoC
           </p>
         </div>
+
+        {/* Comptes en double (superadmin) */}
+        {doublons.length > 0 && (
+          <div className="mb-8 rounded-xl border border-amber-200 bg-amber-50 p-5">
+            <h2 className="font-bold text-amber-900">
+              Comptes en double ({doublons.length} email{doublons.length > 1 ? "s" : ""})
+            </h2>
+            <p className="text-sm text-amber-800 mt-1 mb-4">
+              Ces comptes partagent la même adresse email (écrite avec des majuscules ou des espaces différents). Ils ont
+              été créés avant la correction : il n&apos;est plus possible d&apos;en créer de nouveaux. Gardez le bon compte
+              (en général celui rattaché à l&apos;OSC ou le plus utilisé) et supprimez les autres.
+            </p>
+            <div className="space-y-3">
+              {doublons.map((groupe) => (
+                <div key={groupe[0].id} className="rounded-lg border border-amber-200 bg-white">
+                  <p className="px-4 py-2 text-sm font-semibold text-gray-800 border-b border-amber-100">
+                    {groupe[0].email.trim().toLowerCase()}
+                  </p>
+                  <ul className="divide-y divide-gray-100">
+                    {groupe.map((compte) => (
+                      <li key={compte.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-sm">
+                        <span className="text-gray-700">
+                          <span className="font-mono">{compte.email}</span>
+                          {" · "}{getUserFullName(compte)}
+                          {" · créé le "}{formatDate(compte.date_joined)}
+                          {compte.osc_id ? " · rattaché à une OSC" : ""}
+                          {compte.is_superuser || compte.is_staff ? " · administrateur" : ""}
+                        </span>
+                        <span className="flex gap-2">
+                          <button
+                            onClick={() => handleViewUser(compte)}
+                            className="px-2 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
+                          >
+                            Voir
+                          </button>
+                          {compte.id !== currentUser?.id && (
+                            <button
+                              onClick={() => handleDeleteUser(compte.id)}
+                              className="px-2 py-1 text-xs font-semibold text-white bg-red-600 rounded hover:bg-red-700"
+                            >
+                              Supprimer
+                            </button>
+                          )}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
