@@ -69,7 +69,7 @@ interface CrascMapSvgProps {
   interactive?: boolean;
   width?: number;
   height?: number;
-  /** CRASC de l'API : alimente le nombre d'adhérents affiché au survol. */
+  /** CRASC de l'API : alimente le nombre d'OSC identifiées affiché au survol. */
   crascs?: CrascZone[];
 }
 
@@ -93,7 +93,7 @@ export function CrascMapSvg({
   const router = useRouter();
 
   // Les zones du SVG sont figées ("nord", "sud"…) : on les rapproche des CRASC
-  // de la base par leur slug, pour afficher le nombre réel d'adhérents.
+  // de la base par leur slug, pour afficher le nombre réel d'OSC identifiées.
   const crascParZone = useMemo(() => {
     const index = new Map<string, CrascZone>();
     crascs.forEach((crasc) => {
@@ -149,7 +149,7 @@ export function CrascMapSvg({
           >
             {/* Repli natif si la souris n'est pas disponible (mobile, lecteur d'écran) */}
             <title>
-              {`${region.name} — ${crascParZone.get(region.id)?.osc_count ?? 0} OSC adhérentes`}
+              {`${region.name} — ${crascParZone.get(region.id)?.osc_count ?? 0} OSC identifiées`}
             </title>
           </path>
           <path
@@ -199,7 +199,7 @@ export function CrascMapSvg({
       </text> */}
     </svg>
 
-      {/* Infobulle de survol : nom du CRASC et nombre d'adhérents */}
+      {/* Infobulle de survol : nom du CRASC et nombre d'OSC identifiées */}
       {interactive && zoneSurvolee && tooltip && (
         <div
           className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-full rounded-lg bg-gray-900/95 px-3 py-2 text-white shadow-xl"
@@ -209,7 +209,7 @@ export function CrascMapSvg({
             {crascSurvole?.name || zoneSurvolee.name}
           </p>
           <p className="whitespace-nowrap text-sm font-extrabold text-[#F9A826]">
-            {(crascSurvole?.osc_count ?? 0).toLocaleString('fr-FR')} OSC adhérente
+            {(crascSurvole?.osc_count ?? 0).toLocaleString('fr-FR')} OSC identifiée
             {(crascSurvole?.osc_count ?? 0) > 1 ? 's' : ''}
           </p>
           {crascSurvole?.regions && crascSurvole.regions.length > 0 && (
