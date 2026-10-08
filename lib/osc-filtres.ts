@@ -93,8 +93,9 @@ export const FORMALISATION_OPTIONS = [
 ];
 
 export const CATEGORIE_OPTIONS = [
-  { value: "organisation_jeune", label: "Organisation de jeune (ODJ)" },
-  { value: "organisation_femme", label: "Organisation de femme (ODF)" },
+  { value: "organisation_jeune", label: "Organisation de jeunes (OdJ)" },
+  { value: "organisation_femme", label: "Organisation de femmes (OdF)" },
+  { value: "organisation_handicap", label: "Organisation de personnes en situation de handicap (OPSH)" },
   { value: "organisation_mixte", label: "Organisation mixte" },
 ];
 

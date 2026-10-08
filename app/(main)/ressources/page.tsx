@@ -20,12 +20,15 @@ import {
   type DocumentationFilters
 } from '@/lib/fetch-documentation'
 import { useTypologieRessources } from '@/lib/fetch-ressources-typologie'
+import { useContenusSite } from '@/lib/contenus-site'
 
 export default function PageRessources() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("all"); // 'all' ou slug d'un type de la typologie
   // Types et catégories gérés dans l'admin (Ressources › Types et catégories)
   const { types, categoriesPour, libelleType } = useTypologieRessources();
+  // Illustration modifiable dans l'admin (Textes et illustrations)
+  const contenu = useContenusSite();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState(1);
@@ -202,7 +205,7 @@ export default function PageRessources() {
         <div className="space-y-12">
           <div className="">
             <ImageWithFallback
-              src="/images/3a510ba6881dd3274d3f509019311d42ace72cf51c823f60c5e5fe2e112ff892.png"
+              src={contenu("ressources_illustration")}
               alt="image"
               className="w-full h-[300px] object-cover rounded-lg"
             />

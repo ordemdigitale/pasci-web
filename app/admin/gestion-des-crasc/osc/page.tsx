@@ -6,6 +6,10 @@ import { ImageWithFallback } from "@/lib/imageWithFallback";
 import { ChevronLeft, ChevronRight, Search, Loader2, Eye, Edit3, EyeOff } from "lucide-react";
 import { getToken } from "@/lib/auth";
 import OscEvaluationBadge from "@/components/osc/OscEvaluationBadge";
+import { GROUPES_TRI_OSC, libelleChampTri, valeurChamp } from "@/lib/osc-tri";
+import { CATEGORIE_OPTIONS, useOscFiltres } from "@/lib/osc-filtres";
+import { useDomainesPrioritaires } from "@/lib/osc-domaines";
+import OscEtiquettes from "@/components/osc/OscEtiquettes";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const PAGE_SIZE = 25;
@@ -18,26 +22,7 @@ const FORMALISATION_OPTIONS = [
   { value: "journal_officiel", label: "Déclaration Journal Officiel de la République de Côte d'Ivoire" },
 ];
 
-const SORT_OPTIONS = [
-  // Le tri par date de dernière mise à jour permet de repérer en un coup d'œil
-  // les fiches qui viennent d'être actualisées (ou celles laissées de côté).
-  { value: "updated_at", label: "Date de dernière mise à jour" },
-  { value: "created_at", label: "Date d'enregistrement" },
-  { value: "score_autoevaluation", label: "Score de notation (/20)" },
-  { value: "name", label: "Nom" },
-  { value: "region_nom", label: "Région" },
-  { value: "departement", label: "Département" },
-  { value: "sous_prefecture", label: "Sous-préfecture" },
-  { value: "categorie", label: "Catégorie d'organisation" },
-  { value: "niveau_regroupement", label: "Niveau de regroupement" },
-  { value: "domaine_prioritaire", label: "1er domaine prioritaire" },
-  { value: "domaine_prioritaire_2", label: "2ème domaine prioritaire" },
-  { value: "domaine_prioritaire_3", label: "3ème domaine prioritaire" },
-  { value: "domaine_prioritaire_4", label: "4ème domaine prioritaire" },
-  { value: "domaine_prioritaire_5", label: "5ème domaine prioritaire" },
-  { value: "type_document_formalisation", label: "Type de document de formalisation" },
-  { value: "document_formalisation", label: "Justificatif de formalisation" },
-];
+// Tri : tous les champs du questionnaire (lib/osc-tri.ts)
 
 const formalisationLabel = (value?: string | null) =>
   FORMALISATION_OPTIONS.find((option) => option.value === value)?.label || "—";
@@ -55,8 +40,10 @@ interface IOsc {
   document_formalisation_url?: string | null;
   score_autoevaluation?: number; couleur_autoevaluation?: string; couleur_autoevaluation_hex?: string;
   is_visible?: boolean;
+  etiquettes?: string[];
   created_at?: string;
   updated_at?: string;
+  [champ: string]: unknown;
 }
 
 /** « 6 oct. 2026 » — vide si la date n'est pas renseignée. */
@@ -79,6 +66,13 @@ export default function AdminOscPage() {
   const [hasDocumentFormalisation, setHasDocumentFormalisation] = useState("all");
   const [sortBy, setSortBy] = useState("updated_at");
   const [sortOrder, setSortOrder] = useState("desc");
+  // Recherche par thématique et étiquettes (OdF, OdJ, OPSH, faîtières)
+  const [domaine, setDomaine] = useState("");
+  const [categorie, setCategorie] = useState("");
+  const [faitiere, setFaitiere] = useState("");
+  const domainesPoles = useDomainesPrioritaires();
+  const { domaines: domainesUtilises } = useOscFiltres();
+  const domaines = Array.from(new Set([...domainesPoles.map((d) => d.value), ...domainesUtilises])).sort((x, y) => x.localeCompare(y, "fr"));
   const [loading, setLoading]     = useState(true);
   const [togglingId, setTogglingId] = useState<number | null>(null);
 
@@ -93,6 +87,9 @@ export default function AdminOscPage() {
       if (hasDocumentFormalisation !== "all") {
         params.set("has_document_formalisation", hasDocumentFormalisation === "with" ? "true" : "false");
       }
+      if (domaine) params.set("domaine_activite", domaine);
+      if (categorie) params.set("categorie", categorie);
+      if (faitiere) params.set("faitiere", faitiere);
       params.set("sort_by", sortBy);
       params.set("sort_order", sortOrder);
       const res  = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?${params}`, {
@@ -107,7 +104,7 @@ export default function AdminOscPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, typeDocumentFormalisation, hasDocumentFormalisation, sortBy, sortOrder]);
+  }, [page, search, typeDocumentFormalisation, hasDocumentFormalisation, sortBy, sortOrder, domaine, categorie, faitiere]);
 
   useEffect(() => { fetchOscs(); }, [fetchOscs]);
 
@@ -128,6 +125,8 @@ export default function AdminOscPage() {
   };
 
   const applySearch = () => { setSearch(searchInput); setPage(1); };
+  // La colonne « Mise à jour » affiche la valeur du champ trié, pour voir l'ordre appliqué
+  const afficherColonneTri = !["updated_at", "name"].includes(sortBy);
   const resetFilters = () => {
     setSearch('');
     setSearchInput('');
@@ -135,6 +134,9 @@ export default function AdminOscPage() {
     setHasDocumentFormalisation("all");
     setSortBy("updated_at");
     setSortOrder("desc");
+    setDomaine("");
+    setCategorie("");
+    setFaitiere("");
     setPage(1);
   };
 
@@ -184,7 +186,7 @@ export default function AdminOscPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Rechercher par nom..."
+            placeholder="Rechercher (nom, thématique, ville, OdF, OPSH, faîtière…)"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && applySearch()}
@@ -197,7 +199,7 @@ export default function AdminOscPage() {
         >
           Rechercher
         </button>
-        {(search || typeDocumentFormalisation !== "all" || hasDocumentFormalisation !== "all" || sortBy !== "updated_at" || sortOrder !== "desc") && (
+        {(search || typeDocumentFormalisation !== "all" || hasDocumentFormalisation !== "all" || sortBy !== "updated_at" || sortOrder !== "desc" || domaine || categorie || faitiere) && (
           <button
             onClick={resetFilters}
             className="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-100 transition-colors"
@@ -205,6 +207,43 @@ export default function AdminOscPage() {
             Effacer
           </button>
         )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <label className="text-xs font-semibold text-gray-600">
+            Thématique (domaine prioritaire)
+            <select
+              value={domaine}
+              onChange={(event) => { setDomaine(event.target.value); setPage(1); }}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
+            >
+              <option value="">Toutes les thématiques</option>
+              {domaines.map((d) => <option key={d} value={d}>{d}</option>)}
+            </select>
+          </label>
+          <label className="text-xs font-semibold text-gray-600">
+            Catégorie d&apos;organisation
+            <select
+              value={categorie}
+              onChange={(event) => { setCategorie(event.target.value); setPage(1); }}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
+            >
+              <option value="">Toutes (OdF, OdJ, OPSH, mixtes)</option>
+              {CATEGORIE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </label>
+          <label className="text-xs font-semibold text-gray-600">
+            Faîtière
+            <select
+              value={faitiere}
+              onChange={(event) => { setFaitiere(event.target.value); setPage(1); }}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
+            >
+              <option value="">Toutes les organisations</option>
+              <option value="true">Faîtières (réseau, fédération, plateforme, confédération)</option>
+              <option value="false">Non faîtières</option>
+            </select>
+          </label>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
@@ -242,8 +281,12 @@ export default function AdminOscPage() {
               onChange={(event) => { setSortBy(event.target.value); setPage(1); }}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
             >
-              {SORT_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+              {GROUPES_TRI_OSC.map(({ groupe, champs }) => (
+                <optgroup key={groupe} label={groupe}>
+                  {champs.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           </label>
@@ -274,7 +317,9 @@ export default function AdminOscPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ville</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Formalisation</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mise à jour</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                {afficherColonneTri ? libelleChampTri(sortBy) : "Mise à jour"}
+              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
             </tr>
           </thead>
@@ -313,6 +358,7 @@ export default function AdminOscPage() {
                         </span>
                       )}
                     </div>
+                    <OscEtiquettes etiquettes={osc.etiquettes} className="mt-1" />
                     <div className="mt-1">
                       <OscEvaluationBadge score={osc.score_autoevaluation} color={osc.couleur_autoevaluation} hex={osc.couleur_autoevaluation_hex} compact />
                     </div>
@@ -359,9 +405,15 @@ export default function AdminOscPage() {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{formatDate(osc.updated_at)}</div>
-                    <div className="text-xs text-gray-400">créée le {formatDate(osc.created_at)}</div>
+                  <td className="px-6 py-4">
+                    {afficherColonneTri ? (
+                      <div className="text-sm text-gray-900 max-w-[200px]">{valeurChamp(osc, sortBy)}</div>
+                    ) : (
+                      <>
+                        <div className="text-sm text-gray-900 whitespace-nowrap">{formatDate(osc.updated_at)}</div>
+                        <div className="text-xs text-gray-400 whitespace-nowrap">créée le {formatDate(osc.created_at)}</div>
+                      </>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center gap-2">

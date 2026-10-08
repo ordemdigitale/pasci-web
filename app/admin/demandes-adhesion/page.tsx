@@ -2,6 +2,10 @@
 
 import { isValidElement, useState, useEffect } from "react";
 import { getToken } from "@/lib/auth";
+import { GROUPES_TRI_DEMANDES, libelleChampTriDemande, valeurChamp } from "@/lib/osc-tri";
+import { CATEGORIE_OPTIONS } from "@/lib/osc-filtres";
+import { useDomainesPrioritaires } from "@/lib/osc-domaines";
+import OscEtiquettes from "@/components/osc/OscEtiquettes";
 import {
   Search,
   Trash2,
@@ -40,6 +44,7 @@ interface OscCredentials {
 
 interface DemandeAdhesion {
   id: number;
+  etiquettes?: string[];
   nom_organisation: string;
   sigle?: string | null;
   type_organisation: string;
@@ -235,6 +240,14 @@ export default function DemandesAdhesionPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatut, setFilterStatut] = useState("en_attente");
+  // Recherche (côté serveur), tri sur tous les champs du questionnaire, thématique et étiquettes
+  const [recherche, setRecherche] = useState("");
+  const [sortBy, setSortBy] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [domaine, setDomaine] = useState("");
+  const [categorie, setCategorie] = useState("");
+  const [faitiere, setFaitiere] = useState("");
+  const domaines = useDomainesPrioritaires();
   const [selected, setSelected] = useState<DemandeAdhesion | null>(null);
   const [noteAdmin, setNoteAdmin] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
@@ -244,9 +257,13 @@ export default function DemandesAdhesionPage() {
 
   const loadDemandes = async () => {
     try {
-      const url = filterStatut
-        ? `${API_BASE_URL}/api/v1/adhesion?statut=${filterStatut}&limit=200`
-        : `${API_BASE_URL}/api/v1/adhesion?limit=200`;
+      const params = new URLSearchParams({ limit: "200", sort_by: sortBy, sort_order: sortOrder });
+      if (filterStatut) params.set("statut", filterStatut);
+      if (recherche) params.set("search", recherche);
+      if (domaine) params.set("domaine", domaine);
+      if (categorie) params.set("categorie", categorie);
+      if (faitiere) params.set("faitiere", faitiere);
+      const url = `${API_BASE_URL}/api/v1/adhesion?${params}`;
       const res = await fetch(url, { headers: { Authorization: `Bearer ${getToken()}` } });
       if (res.ok) setDemandes(await res.json());
     } catch (e) {
@@ -256,15 +273,19 @@ export default function DemandesAdhesionPage() {
     }
   };
 
+  // Recherche envoyée à l'API (insensible aux accents) après une courte pause de saisie
+  useEffect(() => {
+    const t = setTimeout(() => setRecherche(searchQuery.trim()), 350);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
   useEffect(() => {
     loadDemandes();
-  }, [filterStatut]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterStatut, recherche, sortBy, sortOrder, domaine, categorie, faitiere]);
 
-  const filtered = demandes.filter((d) =>
-    d.nom_organisation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    d.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    d.region.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filtered = demandes;
+  const afficherColonneTri = !["created_at", "nom_organisation", "region", "statut"].includes(sortBy);
 
   const openDetail = (demande: DemandeAdhesion) => {
     setSelected(demande);
@@ -401,7 +422,7 @@ export default function DemandesAdhesionPage() {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Rechercher par nom, email, région..."
+            placeholder="Rechercher (nom, email, région, thématique, OdF, OPSH, faîtière…)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-200"
@@ -416,6 +437,37 @@ export default function DemandesAdhesionPage() {
           <option value="en_attente">En attente</option>
           <option value="approuvee">Approuvée</option>
           <option value="rejetee">Rejetée</option>
+        </select>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6 -mt-3">
+        <select value={domaine} onChange={(e) => setDomaine(e.target.value)} aria-label="Thématique"
+          className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+          <option value="">Toutes les thématiques</option>
+          {domaines.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+        </select>
+        <select value={categorie} onChange={(e) => setCategorie(e.target.value)} aria-label="Catégorie d'organisation"
+          className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+          <option value="">Toutes catégories (OdF, OdJ, OPSH…)</option>
+          {CATEGORIE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+        <select value={faitiere} onChange={(e) => setFaitiere(e.target.value)} aria-label="Faîtière"
+          className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+          <option value="">Faîtières et autres</option>
+          <option value="true">Faîtières uniquement</option>
+          <option value="false">Non faîtières</option>
+        </select>
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} aria-label="Trier par"
+          className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+          {GROUPES_TRI_DEMANDES.map(({ groupe, champs }) => (
+            <optgroup key={groupe} label={groupe}>
+              {champs.map((c) => <option key={c.value} value={c.value}>Trier : {c.label}</option>)}
+            </optgroup>
+          ))}
+        </select>
+        <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} aria-label="Ordre"
+          className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+          <option value="asc">Croissant (A → Z, 0 → 9)</option>
+          <option value="desc">Décroissant (Z → A, 9 → 0)</option>
         </select>
       </div>
 
@@ -437,7 +489,9 @@ export default function DemandesAdhesionPage() {
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Région</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Contact</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-600">Statut</th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600">Date</th>
+                  <th className="text-left px-4 py-3 font-semibold text-gray-600">
+                    {afficherColonneTri ? libelleChampTriDemande(sortBy) : "Date"}
+                  </th>
                   <th className="text-right px-4 py-3 font-semibold text-gray-600">Actions</th>
                 </tr>
               </thead>
@@ -447,7 +501,10 @@ export default function DemandesAdhesionPage() {
                     key={demande.id}
                     className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                   >
-                    <td className="px-4 py-3 font-medium text-gray-900">{demande.nom_organisation}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">
+                      {demande.nom_organisation}
+                      <OscEtiquettes etiquettes={demande.etiquettes} className="mt-1" />
+                    </td>
                     <td className="px-4 py-3 text-gray-600">{demande.type_osc || demande.type_organisation}</td>
                     <td className="px-4 py-3 text-gray-600">{demande.region}</td>
                     <td className="px-4 py-3">
@@ -462,8 +519,10 @@ export default function DemandesAdhesionPage() {
                         {STATUT_LABELS[demande.statut]}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-500 text-xs">
-                      {new Date(demande.created_at).toLocaleDateString("fr-FR")}
+                    <td className="px-4 py-3 text-gray-500 text-xs max-w-[200px]">
+                      {afficherColonneTri
+                        ? valeurChamp(demande as unknown as Record<string, unknown>, sortBy)
+                        : new Date(demande.created_at).toLocaleDateString("fr-FR")}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">

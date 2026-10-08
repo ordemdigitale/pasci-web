@@ -760,8 +760,9 @@ export default function AdminAjoutOsc() {
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#2A591D] focus:ring-2 focus:ring-[#2A591D]/20 outline-none transition-all"
               >
                 <option value="">Sélectionner</option>
-                <option value="organisation_jeune">Organisation de jeune (ODJ)</option>
-                <option value="organisation_femme">Organisation de femme</option>
+                <option value="organisation_jeune">Organisation de jeunes (OdJ)</option>
+                <option value="organisation_femme">Organisation de femmes (OdF)</option>
+                <option value="organisation_handicap">Organisation de personnes en situation de handicap (OPSH)</option>
                 <option value="organisation_mixte">Organisation mixte</option>
               </select>
             </div>

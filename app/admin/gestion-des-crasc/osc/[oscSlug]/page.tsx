@@ -10,6 +10,7 @@ import {
   BarChart2, CheckCircle, XCircle, UserPlus, KeyRound, UserX, Eye, EyeOff,
 } from "lucide-react";
 import { getToken } from "@/lib/auth";
+import { categorieLabel } from "@/lib/osc-filtres";
 
 interface IOscDetail {
   id: number; name: string; slug: string;
@@ -35,6 +36,7 @@ interface IOscDetail {
   rapports_annuels?: boolean | null;
   niveau_couverture?: string | null; zone_couverture?: string | null;
   categorie?: string | null;
+  etiquettes?: string[];
   domaine_prioritaire?: string | null; domaine_prioritaire_2?: string | null;
   domaine_prioritaire_3?: string | null; domaine_prioritaire_4?: string | null;
   domaine_prioritaire_5?: string | null;
@@ -270,7 +272,8 @@ export default function OscDetailPage() {
                 {osc.type && <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold flex items-center gap-1"><Tag className="w-3 h-3" />{osc.type.name}</span>}
                 {osc.crasc && <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold flex items-center gap-1"><Building2 className="w-3 h-3" />{osc.crasc.name}</span>}
                 {osc.ville && <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold flex items-center gap-1"><MapPin className="w-3 h-3" />{osc.ville}</span>}
-                {osc.categorie && <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold">{osc.categorie}</span>}
+                {osc.categorie && <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold">{categorieLabel(osc.categorie)}</span>}
+                {osc.etiquettes?.includes("Faîtière") && <span className="px-3 py-1 bg-amber-300/40 rounded-full text-xs font-semibold">Faîtière</span>}
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${osc.is_visible !== false ? "bg-green-400/30 text-white" : "bg-red-400/30 text-white"}`}>
                   {osc.is_visible !== false ? <><Eye className="w-3 h-3" />Publiée</> : <><EyeOff className="w-3 h-3" />Non publiée</>}
                 </span>
@@ -346,7 +349,7 @@ export default function OscDetailPage() {
                 </a>
               ) : null}
             />
-            <InfoRow label="Catégorie" value={osc.categorie} />
+            <InfoRow label="Catégorie" value={osc.categorie ? categorieLabel(osc.categorie) : null} />
             <InfoRow label="Niveau de couverture" value={osc.niveau_couverture} />
             <InfoRow label="Zone de couverture" value={osc.zone_couverture} />
             <InfoRow label="Existence d’un siège" value={<BoolBadge value={osc.existence_siege} />} />

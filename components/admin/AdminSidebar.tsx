@@ -22,6 +22,7 @@ import {
   CreditCard,
   CalendarDays,
   UploadCloud,
+  Image as ImageIcon,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
@@ -188,6 +189,7 @@ export default function AdminSidebar({
     { icon: <Megaphone size={20} />, label: "Messages de contact", href: "/admin/contact", staffOnly: true },
     { icon: <Phone size={20} />, label: "Numéros utiles", href: "/admin/numeros-utiles", staffOnly: true },
     { icon: <ShieldAlert size={20} />, label: "Modération", href: "/admin/moderation", badge: pendingCount, staffOnly: true },
+    { icon: <ImageIcon size={20} />, label: "Textes et illustrations", href: "/admin/textes-illustrations", staffOnly: true },
     {
       icon: <Settings size={20} />,
       label: "Paramètres",

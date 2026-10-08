@@ -633,8 +633,9 @@ export default function ModifierOscPage() {
             </Field>
             <Field label="Catégorie">
               <SelectField name="categorie" placeholder="Sélectionner" options={[
-                { value: "organisation_jeune", label: "Organisation de jeune (ODJ)" },
-                { value: "organisation_femme", label: "Organisation de femme" },
+                { value: "organisation_jeune", label: "Organisation de jeunes (OdJ)" },
+                { value: "organisation_femme", label: "Organisation de femmes (OdF)" },
+                { value: "organisation_handicap", label: "Organisation de personnes en situation de handicap (OPSH)" },
                 { value: "organisation_mixte", label: "Organisation mixte" },
               ]} />
             </Field>

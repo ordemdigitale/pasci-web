@@ -5,6 +5,7 @@ import { Search, MapPin, Users2, Building, Filter, ArrowRight, Loader2, ChevronL
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import Link from 'next/link';
 import OscEvaluationBadge from '@/components/osc/OscEvaluationBadge';
+import OscEtiquettes from '@/components/osc/OscEtiquettes';
 import { useDomainesPrioritaires } from '@/lib/osc-domaines';
 import {
   useOscFiltres,
@@ -41,6 +42,7 @@ interface IOSC {
   region_nom?: string | null;
   sous_prefecture?: string | null;
   categorie?: string | null;
+  etiquettes?: string[];
   ville: string | null;
   email?: string | null;
   phone?: string | null;
@@ -67,6 +69,7 @@ const FILTRES_AVANCES_VIDES = {
   rapports_annuels: '',
   adhesion_crasc_statut: '',
   niveau_regroupement: '',
+  faitiere: '',
   niveau_couverture: '',
   departement: '',
   annee_creation: '',
@@ -574,6 +577,17 @@ export default function AnnuaireOSCPage() {
                       options={enOptions(filtresDisponibles.niveaux_regroupement)}
                     />
                     <ChampDeroulant
+                      label="Organisations faîtières"
+                      icone={Users2}
+                      value={avances.faitiere}
+                      onChange={handleAvanceChange('faitiere')}
+                      placeholder="Indifférent"
+                      options={[
+                        { value: 'true', label: 'Faîtières (réseau, fédération, plateforme, confédération)' },
+                        { value: 'false', label: 'Non faîtières' },
+                      ]}
+                    />
+                    <ChampDeroulant
                       label="9. Catégorie d'organisation"
                       icone={Users2}
                       value={selectedCategorie}
@@ -732,6 +746,7 @@ export default function AnnuaireOSCPage() {
                     <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#E05017] transition-colors">
                       {osc.name}
                     </h3>
+                    <OscEtiquettes etiquettes={osc.etiquettes} className="mb-2" />
                     <p className="text-sm text-gray-600 mb-4 line-clamp-2">
                       {osc.description || "Aucune description disponible"}
                     </p>
