@@ -76,12 +76,12 @@ interface IFaqItem {
 }
 
 const fallbackFaqItems: IFaqItem[] = [
-  { id: 1, question: "Comment puis-je postuler à une offre d'emploi ?", answer: "Pour postuler à une offre d'emploi, veuillez consulter les offres disponibles sur notre site et cliquez sur le bouton Postuler." },
-  { id: 2, question: "Quel est le processus de recrutement chez PASCI ?", answer: "Le processus de recrutement chez PASCI comprend plusieurs étapes : l'analyse de votre profil, un entretien technique, un entretien RH et enfin une proposition d'embauche." },
-  { id: 3, question: "Puis-je envoyer une candidature spontanée ?", answer: "Oui, vous pouvez envoyer une candidature spontanée à travers notre formulaire en ligne ou par email à pdoc@plateforme-osci.org." },
-  { id: 4, question: "Proposez-vous des stages ou des alternances ?", answer: "Oui, PASCI propose des stages et des alternances dans divers domaines techniques et administratifs. Consultez nos offres spécifiques pour plus d'informations." },
-  { id: 5, question: "Comment savoir si ma candidature a été reçue ?", answer: "Vous recevrez un email de confirmation dès que votre candidature aura été reçue. Si vous ne recevez pas cet email dans les 24 heures suivantes, veuillez nous contacter." },
-  { id: 6, question: "Quelles sont les valeurs du projet PASCI ?", answer: "Les valeurs du projet PASCI incluent l'innovation technologique, la collaboration interdisciplinaire et le respect de l'environnement." },
+  { id: 1, question: "Comment mon OSC peut-elle adhérer à la PdoC ?", answer: "Remplissez le formulaire « Rejoindre » en indiquant votre CRASC, votre région et votre domaine prioritaire. Votre demande est examinée par l'équipe PdoC ; dès sa validation, votre OSC apparaît dans l'annuaire et dans son pôle de concertation." },
+  { id: 2, question: "Comment recevoir mes identifiants de connexion ?", answer: "À la validation de votre adhésion, un email contenant votre identifiant (votre adresse email) et votre mot de passe est envoyé à l'adresse indiquée dans le formulaire. Pensez à vérifier vos courriers indésirables." },
+  { id: 3, question: "Comment mettre à jour les informations de mon OSC ?", answer: "Connectez-vous, ouvrez l'espace de votre OSC puis « Modifier ». Les modifications sont vérifiées par un administrateur avant d'être publiées." },
+  { id: 4, question: "Qu'est-ce qu'un pôle de concertation ?", answer: "C'est un espace d'échange entre OSC d'un même domaine (santé, éducation, agriculture…). Votre OSC est inscrite dans le pôle de son premier domaine prioritaire ; elle peut y lancer des discussions et participer aux sondages." },
+  { id: 5, question: "Comment répondre à une offre d'emploi ou de projet ?", answer: "Consultez l'espace collaboratif : chaque offre précise sa date limite et renvoie, via « Plus d'informations », vers les modalités de candidature de l'organisme qui la publie." },
+  { id: 6, question: "J'ai oublié mon mot de passe, que faire ?", answer: "Cliquez sur « Mot de passe oublié » sur la page de connexion : un lien de réinitialisation, valable une heure, vous est envoyé par email. Pour toute autre question : pdoc@plateforme-osci.org." },
 ];
 
 export default function ServicesPage() {

@@ -22,7 +22,6 @@ import {
   Users,
   ArrowRight,
   Rocket,
-  Sparkles,
   Target,
   Loader2
 } from "lucide-react";
@@ -306,53 +305,6 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
           </section>
         </div>
 
-        {/* Similar Offers */}
-        {/* <div className="mt-24">
-          <h3 className="text-xl font-extrabold mb-8 flex items-center gap-3">
-            <Sparkles className="w-6 h-6 text-[#E05017]" />
-            Offres similaires
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            <Link href="/espace-collaboratif/offres-emploi/analyste-donnees">
-              <div className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl transition-all border border-gray-100 cursor-pointer">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="size-12 rounded-lg bg-gray-100 flex items-center justify-center text-[#E05017] group-hover:bg-[#E05017] group-hover:text-white transition-colors">
-                    <Sparkles className="w-6 h-6" />
-                  </div>
-                  <span className="text-[10px] font-bold text-gray-400 uppercase">Aujourd'hui</span>
-                </div>
-                <h4 className="font-bold text-lg mb-1 group-hover:text-[#E05017] transition-colors">
-                  Analyste de Données Impact
-                </h4>
-                <p className="text-sm text-gray-600 mb-4">PASCI • Dakar, Sénégal</p>
-                <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                  <span className="text-xs font-bold text-[#E05017]">CDI • Dakar</span>
-                  <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-[#E05017] transition-colors" />
-                </div>
-              </div>
-            </Link>
-
-            <Link href="/espace-collaboratif/offres-emploi/coordonnateur-rse">
-              <div className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl transition-all border border-gray-100 cursor-pointer">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="size-12 rounded-lg bg-gray-100 flex items-center justify-center text-[#E05017] group-hover:bg-[#E05017] group-hover:text-white transition-colors">
-                    <Heart className="w-6 h-6" />
-                  </div>
-                  <span className="text-[10px] font-bold text-gray-400 uppercase">Hier</span>
-                </div>
-                <h4 className="font-bold text-lg mb-1 group-hover:text-[#E05017] transition-colors">
-                  Coordonnateur RSE Senior
-                </h4>
-                <p className="text-sm text-gray-600 mb-4">PASCI • Abidjan, Côte d'Ivoire</p>
-                <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                  <span className="text-xs font-bold text-[#E05017]">CDI • Abidjan</span>
-                  <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-[#E05017] transition-colors" />
-                </div>
-              </div>
-            </Link>
-          </div>
-        </div> */}
       </main>
     </div>
   );
