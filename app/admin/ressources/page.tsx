@@ -23,6 +23,7 @@ import {
   type IDocumentation,
   type DocumentationFilters 
 } from '@/lib/fetch-documentation';
+import { useTypologieRessources } from "@/lib/fetch-ressources-typologie";
 import { fetchWithAuth } from "@/lib/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -35,6 +36,9 @@ export default function RessourcesPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategorie, setSelectedCategorie] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  // Types et catégories gérés dans l'admin (Ressources › Typologie)
+  const { types, categories: categoriesTypologie, categoriesPour, libelleType } = useTypologieRessources(true);
   const [selectedRessource, setSelectedRessource] = useState<IDocumentation | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -55,6 +59,9 @@ export default function RessourcesPage() {
         if (selectedCategorie) {
           filters.category = selectedCategorie;
         }
+        if (selectedType) {
+          filters.type = selectedType;
+        }
         
         if (searchQuery) {
           filters.search = searchQuery;
@@ -70,7 +77,7 @@ export default function RessourcesPage() {
     };
 
     loadDocuments();
-  }, [selectedCategorie, searchQuery]);
+  }, [selectedCategorie, selectedType, searchQuery]);
 
   // Reset page when filters change
   useEffect(() => { setCurrentPage(1); }, [selectedCategorie, searchQuery]);
@@ -138,7 +145,10 @@ export default function RessourcesPage() {
     return filePath.split("/").pop() || "Document";
   };
 
-  const categories = Array.from(new Set(ressources.map(r => r.category).filter(Boolean))) as string[];
+  // Catégories gérées dans l'admin (celles du type choisi + communes)
+  const toutesCategories = Array.from(new Set(
+    (selectedType ? categoriesPour(selectedType) : categoriesTypologie).map((c) => c.nom),
+  ));
 
   return (
     <div className="p-6">
@@ -149,7 +159,7 @@ export default function RessourcesPage() {
             Gestion des Ressources
           </h1>
           <p className="text-gray-600">
-            Gérez la bibliothèque de documentation et fiches informatives
+            Gérez la bibliothèque : livres, périodiques, ouvrages de référence, documents officiels, fiches et modules PdoC…
           </p>
         </div>
 
@@ -174,7 +184,7 @@ export default function RessourcesPage() {
               <div>
                 <p className="text-sm text-gray-500 mb-1">Catégories</p>
                 <p className="text-3xl font-bold text-blue-600">
-                  {categories.length}
+                  {toutesCategories.length}
                 </p>
               </div>
               <div className="bg-blue-100 p-3 rounded-lg">
@@ -229,6 +239,25 @@ export default function RessourcesPage() {
               </div>
             </div>
 
+            {/* Filter by Type */}
+            <div>
+              <select
+                value={selectedType}
+                onChange={(e) => {
+                  setSelectedType(e.target.value);
+                  setSelectedCategorie("");
+                }}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
+              >
+                <option value="">Tous les types</option>
+                {types.map((t) => (
+                  <option key={t.slug} value={t.slug}>
+                    {t.nom}{t.actif ? "" : " (désactivé)"}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Filter by Categorie */}
             <div>
               <select
@@ -237,7 +266,7 @@ export default function RessourcesPage() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
               >
                 <option value="">Toutes les catégories</option>
-                {categories.map((cat) => (
+                {toutesCategories.map((cat) => (
                   <option key={cat} value={cat}>
                     {cat}
                   </option>
@@ -246,7 +275,14 @@ export default function RessourcesPage() {
             </div>
           </div>
 
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex flex-wrap justify-end gap-3">
+            <Link
+              href="/admin/ressources/typologie"
+              className="flex items-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-bold"
+            >
+              <Folder className="w-5 h-5" />
+              Types et catégories
+            </Link>
             <Link
               href="/admin/ressources/ajouter"
               className="flex items-center gap-2 px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold"
@@ -274,11 +310,16 @@ export default function RessourcesPage() {
                     <div className="w-12 h-12 bg-[#E05017]/10 rounded-lg flex items-center justify-center">
                       <FileText className="w-6 h-6 text-[#E05017]" />
                     </div>
-                    {ressource.category && (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-bold">
-                        {ressource.category}
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-xs bg-orange-100 text-[#E05017] px-3 py-1 rounded-full font-bold">
+                        {libelleType(ressource.type)}
                       </span>
-                    )}
+                      {ressource.category && (
+                        <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-bold">
+                          {ressource.category}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2">

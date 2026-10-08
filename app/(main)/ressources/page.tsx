@@ -19,15 +19,18 @@ import {
   type IDocumentation,
   type DocumentationFilters
 } from '@/lib/fetch-documentation'
+import { useTypologieRessources } from '@/lib/fetch-ressources-typologie'
 
 export default function PageRessources() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedType, setSelectedType] = useState("all"); // 'all', 'documentation', 'fiche'
+  const [selectedType, setSelectedType] = useState("all"); // 'all' ou slug d'un type de la typologie
+  // Types et catégories gérés dans l'admin (Ressources › Types et catégories)
+  const { types, categoriesPour, libelleType } = useTypologieRessources();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState(1);
   const [documents, setDocuments] = useState<IDocumentation[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categoriesUtilisees, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedFiche, setSelectedFiche] = useState<IDocumentation | null>(null);
@@ -86,6 +89,11 @@ export default function PageRessources() {
 
     fetchDocuments();
   }, [currentPage, selectedCategory, searchQuery, selectedType]);
+
+  const categoriesTypologie = categoriesPour(selectedType === "all" ? null : selectedType).map((c) => c.nom);
+  const categories = selectedType === "all"
+    ? Array.from(new Set([...categoriesUtilisees, ...categoriesTypologie]))
+    : categoriesTypologie;
 
   const getCategoryColor = (category: string) => {
     const colors: { [key: string]: string } = {
@@ -154,20 +162,15 @@ export default function PageRessources() {
     setSelectedFiche(null);
   };
 
-  // Separate documents by type
+  // Regroupement par type, dans l'ordre de la typologie (types inconnus à la fin)
   // Si le champ type n'existe pas (ancien serveur), considérer tout comme documentation
-  const documentationItems = documents.filter(doc => !doc.type || doc.type === "documentation");
-  const ficheItems = documents.filter(doc => doc.type === "fiche");
-
-  // Determine what to display based on selectedType
-  let displayItems: IDocumentation[] = [];
-  if (selectedType === "all") {
-    displayItems = documents;
-  } else if (selectedType === "documentation") {
-    displayItems = documentationItems;
-  } else if (selectedType === "fiche") {
-    displayItems = ficheItems;
-  }
+  const typeDe = (doc: IDocumentation) => doc.type || "documentation";
+  const ordreTypes = [...types.map((t) => t.slug), ...documents.map(typeDe)];
+  const slugsAffiches = Array.from(new Set(ordreTypes)).filter((slug) => selectedType === "all" || slug === selectedType);
+  const sections = slugsAffiches
+    .map((slug) => ({ slug, nom: libelleType(slug), items: documents.filter((doc) => typeDe(doc) === slug) }))
+    .filter((sec) => sec.items.length > 0);
+  const displayItems: IDocumentation[] = sections.flatMap((sec) => sec.items);
 
   const totalItems = displayItems.length;
 
@@ -181,14 +184,14 @@ export default function PageRessources() {
         <div className="">
           <h2 className="font-bold text-4xl text-[#2a591d] leading-tight">Ressources</h2>
           <p className="font-bold text-xl max-w-sm mt-6">
-            Documents et Fiches pratiques
+            Livres, périodiques, documents officiels et fiches pratiques
           </p>
           <p className="font-bold text-xl max-w-sm mt-4">Besoin d'un guide ou d&apos;une fiche ? Tout est ici, à portée de clic !</p>
           <p className="text-gray-600 text-md max-w-xl mt-4">
-            Tu trouveras dans cette section <b>plusieurs documents utiles</b> : rapports, études, guides et fiches pratiques.
+            Tu trouveras dans cette section <b>plusieurs documents utiles</b> : livres, périodiques, ouvrages de référence, documents officiels, rapports, guides, fiches et modules PdoC.
           </p>
           <p className="text-gray-600 text-md max-w-xl mt-4">  
-            Tu peux <b>choisir par type</b> &#40;rapport, guide, fiche&#41; pour aller directement à ce qui t&apos;intéresse. Chaque ressource est <b>simple à consulter et à télécharger</b>.
+            Tu peux <b>choisir par type et par catégorie</b> &#40;roman, revue, dictionnaire, loi, guide…&#41; pour aller directement à ce qui t&apos;intéresse. Chaque ressource est <b>simple à consulter et à télécharger</b>.
           </p>
           <p className="text-gray-600 text-md max-w-xl mt-4">  
             Le but est de rendre l&apos;information facile à utiliser pour tout le monde, afin que chacun puisse s&apos;en servir dans ses projets ou activités.
@@ -235,17 +238,19 @@ export default function PageRessources() {
                 value={selectedType}
                 onChange={(e) => {
                   setSelectedType(e.target.value);
+                  setSelectedCategory("");
                   setCurrentPage(1);
                 }}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] focus:border-transparent"
               >
                 <option value="all">Toutes les ressources</option>
-                <option value="documentation">Documentation</option>
-                <option value="fiche">Fiches informatives</option>
+                {types.map((t) => (
+                  <option key={t.slug} value={t.slug}>{t.nom}</option>
+                ))}
               </select>
             </div>
 
-            {selectedType !== "fiche" && (
+            {categories.length > 0 && (
               <div>
                 <label className="block text-sm text-gray-700 mb-2">
                   Catégorie
@@ -283,9 +288,7 @@ export default function PageRessources() {
         {/* Header with Title and View Toggle */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
-            {selectedType === "all" && "Toutes les ressources"}
-            {selectedType === "documentation" && "Documentation"}
-            {selectedType === "fiche" && "Fiches informatives"}
+            {selectedType === "all" ? "Toutes les ressources" : libelleType(selectedType)}
             {totalItems > 0 && ` (${totalItems})`}
           </h2>
           <div className="flex items-center gap-2">
@@ -328,11 +331,10 @@ export default function PageRessources() {
           </div>
         ) : (
           <div>
-            {/* Documentation Section */}
-            {(selectedType === "all" || selectedType === "documentation") && documentationItems.length > 0 && (
-              <div className="mb-12">
+            {sections.map((sec) => (
+              <div key={sec.slug} className="mb-12">
                 {selectedType === "all" && (
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4">Documentation</h3>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-4">{sec.nom}</h3>
                 )}
                 <div
                   className={
@@ -341,7 +343,37 @@ export default function PageRessources() {
                       : "space-y-4"
                   }
                 >
-                  {documentationItems.map((doc) => (
+                  {sec.items.map((doc) => sec.slug === "fiche" ? (
+                    <div
+                      key={`doc-${doc.id}`}
+                      className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-white py-4 px-5 relative min-h-[280px] cursor-pointer"
+                      onClick={() => handleFicheClick(doc)}
+                    >
+                      {/* {viewMode === "grid" && doc.thumbnail_url && (
+                        <div className="mb-4">
+                          <ImageWithFallback
+                            src={doc.thumbnail_url}
+                            alt={doc.title}
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                        </div>
+                      )} */}
+                      <div className="mb-2">
+                        <h3 className="text-lg font-semibold text-gray-900">{doc.title}</h3>
+                        <p className="text-sm text-gray-600 mt-3">{doc.description}</p>
+                      </div>
+                      <div className="mt-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(doc.created_at)}</span>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex items-center gap-2 text-sm text-[#E05017]">
+                        <Eye className="w-4 h-4" />
+                        <span>Lire la fiche</span>
+                      </div>
+                    </div>
+                  ) : (
                     <div
                       key={`doc-${doc.id}`}
                       className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer"
@@ -387,55 +419,7 @@ export default function PageRessources() {
                   ))}
                 </div>
               </div>
-            )}
-
-            {/* Fiches Informatives Section */}
-            {(selectedType === "all" || selectedType === "fiche") && ficheItems.length > 0 && (
-              <div className="mb-12">
-                {selectedType === "all" && (
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4">Fiches informatives</h3>
-                )}
-                <div
-                  className={
-                    viewMode === "grid"
-                      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                      : "space-y-4"
-                  }
-                >
-                  {ficheItems.map((fiche) => (
-                    <div
-                      key={`fiche-${fiche.id}`}
-                      className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow bg-white py-4 px-5 relative min-h-[280px] cursor-pointer"
-                      onClick={() => handleFicheClick(fiche)}
-                    >
-                      {/* {viewMode === "grid" && fiche.thumbnail_url && (
-                        <div className="mb-4">
-                          <ImageWithFallback
-                            src={fiche.thumbnail_url}
-                            alt={fiche.title}
-                            className="w-full h-32 object-cover rounded-lg"
-                          />
-                        </div>
-                      )} */}
-                      <div className="mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">{fiche.title}</h3>
-                        <p className="text-sm text-gray-600 mt-3">{fiche.description}</p>
-                      </div>
-                      <div className="mt-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                          <Calendar className="w-4 h-4" />
-                          <span>{formatDate(fiche.created_at)}</span>
-                        </div>
-                      </div>
-                      <div className="mt-4 flex items-center gap-2 text-sm text-[#E05017]">
-                        <Eye className="w-4 h-4" />
-                        <span>Lire la fiche</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            ))}
           </div>
         )}
         {/* End Content Area */}

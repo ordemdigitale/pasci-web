@@ -23,6 +23,7 @@ import {
   File as FileIcon,
 } from 'lucide-react';
 import { fetchWithAuth } from "@/lib/auth";
+import { useTypologieRessources } from "@/lib/fetch-ressources-typologie";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -30,7 +31,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const documentSchema = z.object({
   title: z.string().min(8, "Le titre doit contenir au moins 8 caractères."),
   description: z.string().optional().nullable(),
-  type: z.enum(["documentation", "fiche"]),
+  type: z.string().min(1, "Le type de ressource est requis"),
   category: z.string().optional().nullable(),
   crasc_id: z.string().optional().nullable(),
   osc_id: z.string().optional().nullable(),
@@ -64,19 +65,10 @@ const documentSchema = z.object({
 
 type DocumentForm = z.infer<typeof documentSchema>;
 
-const categories = [
-  "Rapport",
-  "Guide",
-  "Étude",
-  "Manuel",
-  "PV",
-  "Infographie",
-  "Politique",
-  "Récit",
-  "Plan",
-];
 
 export default function AdminModifierDocument() {
+  // Types et catégories gérés dans l'admin (Ressources › Typologie)
+  const { types, categoriesPour, libelleType } = useTypologieRessources();
   const params = useParams();
   const slug = params?.slug as string;
   const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
@@ -96,6 +88,13 @@ export default function AdminModifierDocument() {
   });
 
   const documentFile = watch("file");
+  const typeChoisi = watch("type");
+  const categorieChoisie = watch("category");
+  // Catégories du type choisi + communes ; la valeur actuelle reste proposée même si elle n'y figure plus
+  const categoriesProposees = Array.from(new Set([
+    ...categoriesPour(typeChoisi).map((c) => c.nom),
+    ...(categorieChoisie ? [categorieChoisie] : []),
+  ]));
 
   // Charger les données du document
   useEffect(() => {
@@ -109,7 +108,7 @@ export default function AdminModifierDocument() {
         // Pré-remplir le formulaire
         setValue("title", doc.title);
         setValue("description", doc.description || "");
-        setValue("type", doc.type as "documentation" | "fiche");
+        setValue("type", doc.type);
         setValue("category", doc.category || "");
         setValue("crasc_id", doc.crasc_id?.toString() || "");
         setValue("osc_id", doc.osc_id?.toString() || "");
@@ -313,26 +312,29 @@ export default function AdminModifierDocument() {
                 name="type"
                 control={control}
                 render={({ field }) => (
-                  <Select.Root onValueChange={field.onChange} value={field.value}>
+                  <Select.Root
+                    onValueChange={(v) => {
+                      field.onChange(v);
+                      if (categorieChoisie && !categoriesPour(v).some((c) => c.nom === categorieChoisie)) setValue("category", "");
+                    }}
+                    value={field.value}
+                  >
                     <Select.Trigger className={`w-full px-4 py-3 border rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between ${errors.type ? "border-red-500" : "border-gray-300"
                       }`}>
-                      <Select.Value placeholder="Sélectionnez le type de ressource" />
+                      <Select.Value placeholder="Sélectionnez le type de ressource">{field.value ? libelleType(field.value) : undefined}</Select.Value>
                       <ChevronDown className="w-4 h-4 text-gray-500" />
                     </Select.Trigger>
                     <Select.Content className="bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-50">
                       <Select.Viewport>
-                        <Select.Item
-                          value="documentation"
-                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
-                        >
-                          <Select.ItemText>Documentation</Select.ItemText>
-                        </Select.Item>
-                        <Select.Item
-                          value="fiche"
-                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
-                        >
-                          <Select.ItemText>Fiche informative</Select.ItemText>
-                        </Select.Item>
+                        {types.map((t) => (
+                          <Select.Item
+                            key={t.slug}
+                            value={t.slug}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
+                          >
+                            <Select.ItemText>{t.nom}</Select.ItemText>
+                          </Select.Item>
+                        ))}
                       </Select.Viewport>
                     </Select.Content>
                   </Select.Root>
@@ -362,7 +364,7 @@ export default function AdminModifierDocument() {
                     </Select.Trigger>
                     <Select.Content className="bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-auto z-50">
                       <Select.Viewport>
-                        {categories.map((cat) => (
+                        {categoriesProposees.map((cat) => (
                           <Select.Item
                             key={cat}
                             value={cat}

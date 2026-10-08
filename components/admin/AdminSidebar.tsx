@@ -162,8 +162,12 @@ export default function AdminSidebar({
     {
       icon: <FileText size={20} />,
       label: "Ressources",
-      href: "/admin/ressources",
+      dropdown: true,
       staffOnly: true,
+      submenus: [
+        { label: "Toutes les ressources", href: "/admin/ressources" },
+        { label: "Types et catégories", href: "/admin/ressources/typologie" },
+      ],
     },
     {
       icon: <ClipboardList size={20} />,
