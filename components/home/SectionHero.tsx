@@ -7,6 +7,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback"
 //import SvgComponent from "../ui/svgComponent";
 import { CrascMapSvg } from "../ui/CrascMapSvg";
+import { fetchAllCrasc } from "@/lib/fetch-crasc";
+import { ICrasc } from "@/types/api.types";
 
 interface HeroSlide {
   /** Absent pour les slides par défaut (pas de page « Voir plus ») */
@@ -62,6 +64,14 @@ export default function SectionHero() {
   const [slides, setSlides] = useState<HeroSlide[]>(FALLBACK_SLIDES);
   const [heroTitle, setHeroTitle] = useState(FALLBACK_TITLE);
   const [heroDesc, setHeroDesc] = useState(FALLBACK_DESC);
+  // CRASC de la base : alimentent le nombre d'OSC identifiées affiché sur la carte
+  const [crascs, setCrascs] = useState<ICrasc[]>([]);
+
+  useEffect(() => {
+    fetchAllCrasc()
+      .then((data) => setCrascs(Array.isArray(data) ? data : []))
+      .catch((error) => console.error("Erreur lors du chargement des CRASC :", error));
+  }, []);
 
   useEffect(() => {
     const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -195,8 +205,14 @@ export default function SectionHero() {
             {/* Clickable map */}
             <CrascMapSvg
               interactive={true}
+              crascs={crascs.map((crasc) => ({
+                id: Number(crasc.id),
+                name: crasc.name,
+                slug: crasc.slug,
+                osc_count: crasc.osc_count,
+                regions: (crasc.regions ?? []).map((region) => ({ id: Number(region.id), name: region.name })),
+              }))}
               onRegionClick={(regionId, href) => {
-                console.log(regionId)
                 router.push(href)
               }}
             />
