@@ -189,7 +189,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                   value={formData.last_name}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2a591d] focus:border-[#2a591d]"
-                  placeholder="PASCI"
+                  placeholder="Ex : Konan"
                 />
               </div>
             </div>
