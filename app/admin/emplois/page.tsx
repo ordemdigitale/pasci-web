@@ -46,7 +46,7 @@ export default function EmploisPage() {
   useEffect(() => {
     const loadJobs = async () => {
       try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/jobs`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/jobs?include_expired=true&limit=500`);
         if (response.ok) {
           const data = await response.json();
           setJobs(data);
@@ -115,15 +115,37 @@ export default function EmploisPage() {
     }
   };
 
+  // Désactiver sort l'offre du site ; réactiver exige une date encore valable,
+  // sinon l'expiration automatique la redésactiverait aussitôt.
   const handleToggleExpired = async (slug: string, currentExpired: boolean) => {
+    let url = `${API_BASE_URL}/api/v1/jobs/${slug}/desactiver`;
+
+    if (currentExpired) {
+      const job = jobs.find((j) => j.slug === slug);
+      const dateActuelle = job?.expiration_date ? new Date(job.expiration_date) : null;
+      const dateDepassee = !dateActuelle || dateActuelle.getTime() <= Date.now();
+      url = `${API_BASE_URL}/api/v1/jobs/${slug}/activer`;
+
+      if (dateDepassee) {
+        const defaut = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+        const saisie = prompt(
+          "La date limite de candidature est dépassée.\nNouvelle date (AAAA-MM-JJ) :",
+          defaut
+        );
+        if (!saisie) return;
+        const nouvelleDate = new Date(`${saisie}T23:59:59`);
+        if (isNaN(nouvelleDate.getTime()) || nouvelleDate.getTime() <= Date.now()) {
+          alert("Date invalide : indiquez une date future au format AAAA-MM-JJ.");
+          return;
+        }
+        url += `?expiration_date=${encodeURIComponent(nouvelleDate.toISOString())}`;
+      }
+    } else if (!confirm("Désactiver cette offre ? Elle sera immédiatement retirée du site.")) {
+      return;
+    }
+
     try {
-      const response = await fetchWithAuth(`${API_BASE_URL}/api/v1/jobs/${slug}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ is_expired: !currentExpired }),
-      });
+      const response = await fetchWithAuth(url, { method: "PATCH" });
 
       if (response.ok) {
         const updatedJob = await response.json();
@@ -132,7 +154,8 @@ export default function EmploisPage() {
           setSelectedJob(updatedJob);
         }
       } else {
-        alert("Erreur lors de la mise à jour du statut");
+        const erreur = await response.json().catch(() => null);
+        alert(erreur?.detail || "Erreur lors de la mise à jour du statut");
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour:", error);
@@ -149,8 +172,12 @@ export default function EmploisPage() {
     });
   };
 
+  const estDateDepassee = (job: IJobs) =>
+    !!job.expiration_date && new Date(job.expiration_date).getTime() <= Date.now();
+
   const getJobStatus = (job: IJobs) => {
-    return job.is_expired ? "Expiré" : "Publié";
+    if (!job.is_expired) return "En ligne";
+    return estDateDepassee(job) ? "Expirée" : "Désactivée";
   };
 
   const getStatutColor = (isExpired: boolean) => {
@@ -212,7 +239,7 @@ export default function EmploisPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Offres Expirées</p>
+                <p className="text-sm text-gray-500 mb-1">Expirées / désactivées</p>
                 <p className="text-3xl font-bold text-red-600">
                   {jobs.filter((j) => j.is_expired).length}
                 </p>
@@ -263,9 +290,8 @@ export default function EmploisPage() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
               >
                 <option value="">Tous les statuts</option>
-                <option value="Publié">Publié</option>
-                <option value="Brouillon">Brouillon</option>
-                <option value="Expiré">Expiré</option>
+                <option value="Publié">En ligne</option>
+                <option value="Expiré">Expirées / désactivées</option>
               </select>
             </div>
           </div>
@@ -350,6 +376,17 @@ export default function EmploisPage() {
                     >
                       <Edit className="w-4 h-4" />
                     </Link>
+                    <button
+                      onClick={() => handleToggleExpired(job.slug, job.is_expired)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        job.is_expired
+                          ? "text-green-600 hover:bg-green-50"
+                          : "text-orange-600 hover:bg-orange-50"
+                      }`}
+                      title={job.is_expired ? "Réactiver et remettre en ligne" : "Désactiver et retirer du site"}
+                    >
+                      {job.is_expired ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+                    </button>
                     <button
                       onClick={() => handleDeleteJob(job.slug)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -572,8 +609,8 @@ export default function EmploisPage() {
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-bold"
                   >
                     {selectedJob.is_expired
-                      ? "Marquer comme active"
-                      : "Marquer comme expirée"}
+                      ? "Réactiver et remettre en ligne"
+                      : "Désactiver et retirer du site"}
                   </button>
                 </div>
               </div>

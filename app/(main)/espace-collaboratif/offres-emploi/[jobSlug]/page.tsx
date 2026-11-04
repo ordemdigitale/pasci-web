@@ -101,9 +101,26 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
     });
   };
 
+  const offreExpiree = !!jobData.is_expired;
+
   return (
     <div className="bg-[#f8f6f6] min-h-screen font-poppins">
       <main className="max-w-[840px] mx-auto px-6 py-12">
+        {offreExpiree && (
+          <div className="mb-6 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <Clock className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="font-bold text-amber-900">Cette offre n'est plus active</p>
+              <p className="text-sm text-amber-800">
+                Les candidatures sont closes. Consultez les offres en cours sur la page{" "}
+                <Link href="/espace-collaboratif/offres-emploi" className="underline font-semibold">
+                  Offres d'emploi
+                </Link>.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Job Header Card */}
         <div className="bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-8 mb-10 overflow-hidden relative">
           <div className="absolute -top-3 left-3 p-4">
@@ -171,7 +188,7 @@ export default function PageDetailOffreEmploi({ params }: { params: Promise<{ jo
 
         {/* Content Sections */}
         <div className="space-y-12">
-          {jobData.offre_url && (
+          {jobData.offre_url && !offreExpiree && (
             <section className="bg-white rounded-xl p-6 border border-[#E05017]/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <p className="text-sm font-bold text-gray-900">Lien pour plus d'informations</p>

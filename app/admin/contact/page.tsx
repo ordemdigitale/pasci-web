@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Trash2, Eye, X, Loader2, Mail } from "lucide-react";
+import { Search, Trash2, Eye, X, Loader2, Mail, Send, Reply, Settings, Check } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -21,6 +21,15 @@ interface ContactMessage {
   motif: string;
   message: string | null;
   statut: "nouveau" | "lu" | "traite";
+  created_at: string;
+}
+
+interface ContactReponse {
+  id: number;
+  contact_id: number;
+  message: string;
+  auteur_nom: string | null;
+  auteur_email: string | null;
   created_at: string;
 }
 
@@ -45,6 +54,17 @@ export default function ContactAdminPage() {
   const [selected, setSelected] = useState<ContactMessage | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  // Réponse directe depuis le backoffice
+  const [reponses, setReponses] = useState<ContactReponse[]>([]);
+  const [reponseTexte, setReponseTexte] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [reponseErreur, setReponseErreur] = useState("");
+  // Boîtes mails qui reçoivent les notifications de nouveaux messages
+  const [showEmailsConfig, setShowEmailsConfig] = useState(false);
+  const [emailsNotif, setEmailsNotif] = useState("");
+  const [savingEmails, setSavingEmails] = useState(false);
+  const [emailsSaved, setEmailsSaved] = useState(false);
+  const [emailsErreur, setEmailsErreur] = useState("");
 
   const load = async () => {
     try {
@@ -62,6 +82,80 @@ export default function ContactAdminPage() {
 
   useEffect(() => { load(); }, [filterStatut]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetchWithAuth(`${API_BASE_URL}/api/v1/contact/emails-notification`);
+        if (res.ok) {
+          const data: { emails: string[] } = await res.json();
+          setEmailsNotif((data.emails || []).join(", "));
+        }
+      } catch {}
+    })();
+  }, []);
+
+  const saveEmailsNotif = async () => {
+    setEmailsErreur("");
+    const emails = emailsNotif.split(",").map((e) => e.trim()).filter(Boolean);
+    if (emails.length === 0) {
+      setEmailsErreur("Indiquez au moins une adresse email.");
+      return;
+    }
+    setSavingEmails(true);
+    try {
+      const res = await fetchWithAuth(`${API_BASE_URL}/api/v1/contact/emails-notification`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emails }),
+      });
+      if (res.ok) {
+        const data: { emails: string[] } = await res.json();
+        setEmailsNotif((data.emails || []).join(", "));
+        setEmailsSaved(true);
+        setTimeout(() => setEmailsSaved(false), 2000);
+      } else {
+        const erreur = await res.json().catch(() => null);
+        setEmailsErreur(erreur?.detail || "Enregistrement impossible.");
+      }
+    } finally {
+      setSavingEmails(false);
+    }
+  };
+
+  const chargerReponses = async (id: number) => {
+    setReponses([]);
+    try {
+      const res = await fetchWithAuth(`${API_BASE_URL}/api/v1/contact/${id}/reponses`);
+      if (res.ok) setReponses(await res.json());
+    } catch {}
+  };
+
+  const envoyerReponse = async () => {
+    if (!selected || !reponseTexte.trim()) return;
+    setReponseErreur("");
+    setIsSending(true);
+    try {
+      const res = await fetchWithAuth(`${API_BASE_URL}/api/v1/contact/${selected.id}/reponses`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: reponseTexte.trim() }),
+      });
+      if (res.ok) {
+        const reponse: ContactReponse = await res.json();
+        setReponses((prev) => [...prev, reponse]);
+        setReponseTexte("");
+        // Répondre marque le message comme traité côté API
+        setMessages((prev) => prev.map((m) => m.id === selected.id ? { ...m, statut: "traite" } : m));
+        setSelected((prev) => prev ? { ...prev, statut: "traite" } : prev);
+      } else {
+        const erreur = await res.json().catch(() => null);
+        setReponseErreur(erreur?.detail || "Envoi impossible.");
+      }
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   const filtered = messages.filter((m) => {
     const matchSearch =
       `${m.nom} ${m.prenoms}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -73,6 +167,9 @@ export default function ContactAdminPage() {
 
   const openDetail = async (m: ContactMessage) => {
     setSelected(m);
+    setReponseTexte("");
+    setReponseErreur("");
+    chargerReponses(m.id);
     // Marquer comme "lu" si encore "nouveau"
     if (m.statut === "nouveau") {
       try {
@@ -132,11 +229,49 @@ export default function ContactAdminPage() {
         <div className="w-10 h-10 bg-[#E05017]/10 rounded-xl flex items-center justify-center flex-shrink-0">
           <Mail className="w-5 h-5 text-[#E05017]" />
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Messages de contact</h1>
           <p className="text-sm text-gray-500">{messages.length} message(s) reçu(s)</p>
         </div>
+        <button
+          onClick={() => setShowEmailsConfig((v) => !v)}
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors"
+          title="Boîtes mails qui reçoivent les nouveaux messages"
+        >
+          <Settings className="w-4 h-4" />
+          <span className="hidden sm:inline">Emails de notification</span>
+        </button>
       </div>
+
+      {/* Destinataires des notifications : sans cette liste, les messages ne
+          partaient vers aucune boîte mail réellement consultée. */}
+      {showEmailsConfig && (
+        <div className="mb-6 bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-sm font-semibold text-gray-900 mb-1">Emails recevant les nouveaux messages</p>
+          <p className="text-xs text-gray-500 mb-3">
+            Plusieurs adresses séparées par des virgules. Chaque nouveau message de contact y est envoyé,
+            avec l'adresse de l'expéditeur en « répondre à ».
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              type="text"
+              value={emailsNotif}
+              onChange={(e) => setEmailsNotif(e.target.value)}
+              placeholder="contact@plateforme-osci.org, direction@plateforme-osci.org"
+              className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
+            />
+            <button
+              onClick={saveEmailsNotif}
+              disabled={savingEmails}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-xl text-sm font-semibold hover:bg-[#c7450f] disabled:opacity-50 transition-colors"
+            >
+              {savingEmails ? <Loader2 className="w-4 h-4 animate-spin" /> : emailsSaved ? <Check className="w-4 h-4" /> : null}
+              {emailsSaved ? "Enregistré" : "Enregistrer"}
+            </button>
+          </div>
+          {emailsErreur && <p className="text-xs text-red-600 mt-2">{emailsErreur}</p>}
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mb-6">
@@ -353,6 +488,47 @@ export default function ContactAdminPage() {
                 )}
                 <div className="col-span-2 text-xs text-gray-400">
                   Reçu le {new Date(selected.created_at).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })}
+                </div>
+              </div>
+
+              {/* Répondre directement à l'usager */}
+              <div className="border-t pt-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Reply className="w-4 h-4 text-[#E05017]" />
+                  <p className="text-sm font-semibold text-gray-900">Répondre à {selected.prenoms}</p>
+                </div>
+
+                {reponses.length > 0 && (
+                  <div className="space-y-2 mb-3">
+                    {reponses.map((r) => (
+                      <div key={r.id} className="bg-green-50 border border-green-100 rounded-lg p-3">
+                        <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">{r.message}</p>
+                        <p className="text-[11px] text-gray-500 mt-2">
+                          {r.auteur_nom || r.auteur_email || "Équipe PdoC"} — {new Date(r.created_at).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <textarea
+                  value={reponseTexte}
+                  onChange={(e) => setReponseTexte(e.target.value)}
+                  rows={4}
+                  placeholder={`Votre réponse sera envoyée à ${selected.email}`}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017] resize-y"
+                />
+                {reponseErreur && <p className="text-xs text-red-600 mt-1">{reponseErreur}</p>}
+                <div className="flex items-center justify-between mt-2 gap-2">
+                  <p className="text-[11px] text-gray-400">L'usager pourra répondre directement à votre adresse.</p>
+                  <button
+                    onClick={envoyerReponse}
+                    disabled={isSending || !reponseTexte.trim()}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white rounded-xl text-sm font-semibold hover:bg-[#c7450f] disabled:opacity-40 transition-colors flex-shrink-0"
+                  >
+                    {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    Envoyer
+                  </button>
                 </div>
               </div>
 
