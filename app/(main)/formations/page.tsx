@@ -9,7 +9,7 @@ import {
   FileText, Download,
 } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
-import { fetchAllFormations, IFormation, MODES_FORMATION, libelleFiche, modeFormation } from '@/lib/fetch-formations';
+import { creneauHoraire, fetchAllFormations, IFormation, MODES_FORMATION, libelleFiche, modeFormation } from '@/lib/fetch-formations';
 
 const FALLBACK_IMAGE = "/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -433,6 +433,12 @@ export default function FormationsPage() {
                               {formatDate(formation.start_date)}
                             </p>
                           )}
+                          {creneauHoraire(formation.start_date, formation.end_date) && (
+                            <p className="text-xs text-gray-400 mb-1 flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5" />
+                              {creneauHoraire(formation.start_date, formation.end_date)}
+                            </p>
+                          )}
                           {formation.registration_deadline && !estTerminee(formation) && (
                             <p className="text-xs text-[#E05017] font-medium mb-3">
                               Inscriptions jusqu&apos;au {formatDate(formation.registration_deadline)}
@@ -610,6 +616,7 @@ export default function FormationsPage() {
                     <div className="flex-1 min-w-0">
                       <h4 className="font-bold text-gray-900 group-hover:text-[#2a591d] transition-colors line-clamp-1">{f.title}</h4>
                       <div className="flex flex-wrap gap-4 mt-1 text-sm text-gray-500">
+                        {creneauHoraire(f.start_date, f.end_date) && <span className="flex items-center gap-1 font-medium text-[#2a591d]"><Clock className="w-3.5 h-3.5" />{creneauHoraire(f.start_date, f.end_date)}</span>}
                         {f.location && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{f.location}</span>}
                         {f.trainer && <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{f.trainer}</span>}
                         {f.registration_deadline && (

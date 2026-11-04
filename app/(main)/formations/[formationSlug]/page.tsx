@@ -32,6 +32,7 @@ import Link from 'next/link';
 import {
   getFormationBySlug, inscrireFormation, verifierCertificat, IFormation,
   MODES_FORMATION, DOCUMENTS_DELIVRES, libelleFiche, modeFormation,
+  creneauHoraire,
 } from '@/lib/fetch-formations';
 import { getStoredUser, getToken } from '@/lib/auth';
 import SupportsFormation from '@/components/formations/SupportsFormation';
@@ -549,6 +550,12 @@ export default function FormationDetailPage() {
                   {formatDate(formation.start_date)}
                   {formation.end_date && formatDate(formation.end_date) !== formatDate(formation.start_date) && ` → ${formatDate(formation.end_date)}`}
                 </span>
+              </div>
+            )}
+            {creneauHoraire(formation.start_date, formation.end_date) && (
+              <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                <Clock className="w-4 h-4 text-[#E05017]" />
+                <span>{creneauHoraire(formation.start_date, formation.end_date)}</span>
               </div>
             )}
             {formation.registration_deadline && (
