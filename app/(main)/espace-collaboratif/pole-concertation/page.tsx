@@ -78,6 +78,7 @@ export default function PagePoleConcertation() {
             <TexteFormate
               className="max-w-xl mt-6"
               texte={contenu("poles_intro")}
+              depliable
               variables={{ nb_poles: loading ? "plusieurs" : poles.length }}
             />
           </div>

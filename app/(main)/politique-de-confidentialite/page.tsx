@@ -6,7 +6,7 @@ export default function PolitiqueConfidentialitePage() {
         <h1 className="text-[#2a591d] font-bold text-3xl pb-4">
           Politique de confidentialité de la Plateforme Digitale de la Société Civile (PdoC)
         </h1>
-        <p className="text-sm text-gray-600">Dernière mise à jour : Janvier 2025</p>
+        <p className="text-sm text-gray-600">Dernière mise à jour : Octobre 2026</p>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
@@ -44,7 +44,7 @@ export default function PolitiqueConfidentialitePage() {
             <li>Créer et gérer votre compte.</li>
             <li>Vous donner accès aux services (formations, accompagnement, informations).</li>
             <li>Vous informer sur nos activités et opportunités.</li>
-            <li>Améliorer le plateforme et votre expérience.</li>
+            <li>Améliorer la plateforme et votre expérience.</li>
             <li>Produire des statistiques anonymes.</li>
             <li>Respecter la loi et nos obligations.</li>
           </ul>
@@ -85,7 +85,7 @@ export default function PolitiqueConfidentialitePage() {
           <h2 className="text-2xl font-bold text-[#2a591d] mb-4">5. Conservation</h2>
           <p className="text-gray-700">
             Vos données sont gardées aussi longtemps que nécessaire. <br />
-            👉 Si votre comptes reste inactif plus de 3 ans, il peut être supprimé après vous avoir prévenu.
+            👉 Si votre compte reste inactif plus de 3 ans, il peut être supprimé après vous avoir prévenu.
           </p>
         </div>
 
@@ -102,7 +102,7 @@ export default function PolitiqueConfidentialitePage() {
             <li>Retirer votre consentement.</li>
           </ul>
           <p className="text-gray-700">
-            📩 Pour exercer vos droits: <a href="mailto:pdoc@plateforme-osc.org" className="text-[#E05017] hover:underline">pdoc@plateforme-osc.org</a>
+            📩 Pour exercer vos droits, écrivez à : <a href="mailto:pdoc@plateforme-osc.org" className="text-[#E05017] hover:underline">pdoc@plateforme-osc.org</a>
           </p>
         </div>
 

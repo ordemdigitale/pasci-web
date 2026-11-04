@@ -184,7 +184,7 @@ export default function PageSujetDetail() {
       {sujet.synthese && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6">
           <h2 className="font-bold text-green-900 mb-2 flex items-center gap-2">
-            <FileText className="w-5 h-5" /> Synthèse de la discussion
+            <FileText className="w-5 h-5" /> Récapitulatif des recommandations
           </h2>
           <p className="text-sm text-green-950 leading-relaxed whitespace-pre-wrap">{sujet.synthese}</p>
           {(sujet.synthese_par || sujet.synthese_le) && (
@@ -198,7 +198,7 @@ export default function PageSujetDetail() {
 
       {/* Comments */}
       <h2 className="text-base font-bold text-gray-800 mb-4">
-        {(sujet.commentaires ?? []).length} réponse{(sujet.commentaires ?? []).length !== 1 ? "s" : ""}
+        {(sujet.commentaires ?? []).length} commentaire{(sujet.commentaires ?? []).length !== 1 ? "s" : ""}
       </h2>
 
       <div className="space-y-4 mb-8">
@@ -238,14 +238,14 @@ export default function PageSujetDetail() {
       {/* Reply form */}
       {sujet.est_clos ? (
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center text-sm text-gray-600 flex items-center justify-center gap-2">
-          <Lock className="w-4 h-4" /> Cette discussion est close : elle n&apos;accepte plus de réponses.
+          <Lock className="w-4 h-4" /> Cette discussion est close : elle n&apos;accepte plus de commentaires.
         </div>
       ) : token ? (
         <form
           onSubmit={handleComment}
           className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
         >
-          <h3 className="font-semibold text-gray-800 mb-3">Votre réponse</h3>
+          <h3 className="font-semibold text-gray-800 mb-3">Votre commentaire</h3>
           {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
           <textarea
             ref={commentRef}
@@ -253,7 +253,7 @@ export default function PageSujetDetail() {
             onChange={(e) => setComment(e.target.value)}
             rows={4}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017] mb-3"
-            placeholder="Votre réponse..."
+            placeholder="Votre commentaire..."
           />
           <SelecteurMedias fichiers={fichiers} onChange={setFichiers} disabled={submitting} />
           <button
@@ -262,7 +262,7 @@ export default function PageSujetDetail() {
             className="flex items-center gap-2 px-6 py-2 bg-[#E05017] text-white rounded-full text-sm font-semibold hover:bg-[#C54415] disabled:opacity-50 transition-colors"
           >
             <Send className="w-4 h-4" />
-            {submitting ? "Envoi..." : "Répondre"}
+            {submitting ? "Envoi..." : "Commenter"}
           </button>
         </form>
       ) : (

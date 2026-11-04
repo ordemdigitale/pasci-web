@@ -88,11 +88,15 @@ export function TexteFormate({
   texte,
   variables = {},
   className = "",
+  depliable = false,
 }: {
   texte: string;
   variables?: Record<string, string | number>;
   className?: string;
+  /** N'affiche que le premier paragraphe, avec « Voir plus » pour dérouler le reste. */
+  depliable?: boolean;
 }) {
+  const [ouvert, setOuvert] = useState(false);
   const blocs: React.ReactNode[] = [];
   let puces: string[] = [];
   let paragraphe: string[] = [];
@@ -125,5 +129,17 @@ export function TexteFormate({
     }
   });
   vider(-1);
-  return <div className={className}>{blocs}</div>;
+  if (!depliable || blocs.length <= 1) return <div className={className}>{blocs}</div>;
+  return (
+    <div className={className}>
+      {ouvert ? blocs : blocs[0]}
+      <button
+        type="button"
+        onClick={() => setOuvert((o) => !o)}
+        className="text-[#E05017] text-sm font-semibold hover:underline"
+      >
+        {ouvert ? "Voir moins" : "Voir plus"}
+      </button>
+    </div>
+  );
 }

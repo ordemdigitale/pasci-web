@@ -9,6 +9,7 @@ import { getToken, fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { libelleRegion } from "@/lib/osc-referentiels";
 import SelecteurMedias from "@/components/forum/SelecteurMedias";
+import { TexteFormate } from "@/lib/contenus-site";
 import {
   FILTRES_VIDES,
   FiltresMembres,
@@ -355,7 +356,7 @@ export default function PagePoleForum() {
         )}
         <h1 className="text-2xl font-bold text-[#2a591d] mb-2">{pole.name}</h1>
         {pole.description && (
-          <p className="text-gray-600 text-sm">{pole.description}</p>
+          <TexteFormate texte={pole.description} className="text-gray-600 text-sm" depliable />
         )}
         <div className="mt-4 grid sm:grid-cols-2 gap-3 text-sm text-gray-600">
           <div className="flex items-center gap-2 rounded-lg bg-white/80 border border-gray-200 px-3 py-2">
@@ -933,7 +934,7 @@ export default function PagePoleForum() {
                     <h3 className="font-semibold text-gray-900 truncate">{sujet.title}</h3>
                     {sujet.synthese && (
                       <span className="flex-shrink-0 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-semibold">
-                        Synthèse
+                        Récapitulatif
                       </span>
                     )}
                     {sujet.est_clos && (
