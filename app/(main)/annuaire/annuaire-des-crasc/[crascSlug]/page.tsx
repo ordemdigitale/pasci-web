@@ -185,6 +185,9 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
     );
   }
 
+  // « Actualités » des statistiques : la rubrique de la page, sinon la liste générale
+  const lienActualites = crascData.news && crascData.news.length > 0 ? "#actualites" : "/actualites";
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white font-poppins">
       <style>{`
@@ -239,7 +242,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
             <div className="grid sm:grid-cols-2 gap-4">
               {/* Régions Card */}
               {crascData.regions && crascData.regions.length > 0 && (
-                <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+                <div id="regions" className="scroll-mt-24 bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                       <MapPin className="w-5 h-5 text-green-600" />
@@ -284,7 +287,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
 
             {/* OSC membres Section */}
             {crascData.oscs !== undefined && (
-              <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+              <div id="osc" className="scroll-mt-24 bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
                 {/* Header avec recherche */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                   <div className="flex items-center gap-3">
@@ -433,7 +436,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
 
             {/* News Section */}
             {crascData.news && crascData.news.length > 0 && (
-              <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+              <div id="actualites" className="scroll-mt-24 bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                     <Calendar className="w-5 h-5 text-orange-600" />
@@ -586,7 +589,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
             )}
 
             {/* ── Agenda Section ── */}
-            <div id="agenda" className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+            <div id="agenda" className="scroll-mt-24 bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${zoneColors.color}20` }}>
                   <CalendarDays className="w-5 h-5" style={{ color: zoneColors.color }} />
@@ -773,40 +776,40 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Quick Stats */}
+            {/* Quick Stats : chaque libellé mène à sa rubrique */}
             <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm sticky top-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">
                 Statistiques
               </h3>
               
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">OSC identifiées</span>
+                <a href="#osc" className="flex items-center justify-between p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors group">
+                  <span className="text-sm font-medium text-gray-700 group-hover:underline">OSC identifiées</span>
                   <span className="text-2xl font-bold text-blue-600">
                     {crascData.osc_count || crascData.oscs?.length || 0}
                   </span>
-                </div>
+                </a>
                 
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Régions et districts</span>
+                <a href="#regions" className="flex items-center justify-between p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors group">
+                  <span className="text-sm font-medium text-gray-700 group-hover:underline">Régions et districts</span>
                   <span className="text-2xl font-bold text-green-600">
                     {crascData.regions?.length || 0}
                   </span>
-                </div>
+                </a>
                 
-                <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Actualités</span>
+                <a href={lienActualites} className="flex items-center justify-between p-3 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors group">
+                  <span className="text-sm font-medium text-gray-700 group-hover:underline">Actualités</span>
                   <span className="text-2xl font-bold text-orange-600">
                     {crascData.news?.length || 0}
                   </span>
-                </div>
+                </a>
 
-                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Événements agenda</span>
+                <a href="#agenda" className="flex items-center justify-between p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors group">
+                  <span className="text-sm font-medium text-gray-700 group-hover:underline">Événements agenda</span>
                   <span className="text-2xl font-bold text-purple-600">
                     {evenements.length}
                   </span>
-                </div>
+                </a>
               </div>
 
               <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">

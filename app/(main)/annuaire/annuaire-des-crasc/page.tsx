@@ -387,8 +387,8 @@ export default function PageAnnuaireCrasc() {
       {/* Statistics Section - Redesigned */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Organizations Count */}
-          <div className="group relative bg-white rounded-xl p-6 border-2 border-[#E05017]/30 hover:border-[#E05017] hover:shadow-xl transition-all duration-300 overflow-hidden">
+          {/* Organizations Count : mène à la liste des OSC identifiées */}
+          <a href="#osc-identifiees" className="group relative block bg-white rounded-xl p-6 border-2 border-[#E05017]/30 hover:border-[#E05017] hover:shadow-xl transition-all duration-300 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-[#E05017] to-[#d04010] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div className="relative z-10">
               <div className="mb-3">
@@ -404,7 +404,7 @@ export default function PageAnnuaireCrasc() {
                 Organisations
               </p>
             </div>
-          </div>
+          </a>
 
           {/* Barème de notation sur 20 points
               (remplace l'ancienne carte « Nos zones CRASC » : la liste des
@@ -467,7 +467,7 @@ export default function PageAnnuaireCrasc() {
       </div>
 
       {/* Section OSC identifiées */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      <div id="osc-identifiees" className="scroll-mt-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-3xl font-extrabold text-gray-900">
             OSC identifiées
