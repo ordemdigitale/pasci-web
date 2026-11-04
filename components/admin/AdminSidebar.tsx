@@ -250,6 +250,8 @@ export default function AdminSidebar({
             }
             return item;
           }),
+        // Recherche (avancée) dans les OSC de son CRASC, en lecture seule
+        { icon: <Users size={20} />, label: "OSC de mon CRASC", href: "/admin/gestion-des-crasc/osc" } as NavItem,
         { icon: <Settings size={20} />, label: "Paramètres", href: "/admin/profile" } as NavItem,
       ]
     : isRedacteur

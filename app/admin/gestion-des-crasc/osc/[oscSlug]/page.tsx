@@ -10,6 +10,7 @@ import {
   BarChart2, CheckCircle, XCircle, UserPlus, KeyRound, UserX, Eye, EyeOff,
 } from "lucide-react";
 import { getToken } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { categorieLabel } from "@/lib/osc-filtres";
 
 interface IOscDetail {
@@ -109,6 +110,9 @@ function Stat({ label, value }: { label: string; value: number | null | undefine
 
 export default function OscDetailPage() {
   const router = useRouter();
+  // Rédacteur CRASC : consultation seulement
+  const { user } = useAuth();
+  const peutModifier = !!(user?.is_staff || user?.is_superuser);
   const params = useParams();
   const oscSlug = params.oscSlug as string;
 
@@ -490,6 +494,7 @@ export default function OscDetailPage() {
           </div>
         )}
 
+        {peutModifier && (<>
         {/* Compte utilisateur OSC */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -613,6 +618,7 @@ export default function OscDetailPage() {
           <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
           <p className="text-yellow-800 text-sm">La suppression d&apos;une OSC est irréversible. Toutes les données associées seront affectées.</p>
         </div>
+        </>)}
       </div>
     </div>
   );

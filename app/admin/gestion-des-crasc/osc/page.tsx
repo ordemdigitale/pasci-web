@@ -5,11 +5,16 @@ import Link from "next/link";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import { ChevronLeft, ChevronRight, Search, Loader2, Eye, Edit3, EyeOff } from "lucide-react";
 import { getToken } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import OscEvaluationBadge from "@/components/osc/OscEvaluationBadge";
 import { GROUPES_TRI_OSC, libelleChampTri, valeurChamp } from "@/lib/osc-tri";
 import { CATEGORIE_OPTIONS, useOscFiltres } from "@/lib/osc-filtres";
 import { useDomainesPrioritaires } from "@/lib/osc-domaines";
 import OscEtiquettes from "@/components/osc/OscEtiquettes";
+import RechercheAvanceeOsc, { ajouterFiltresAvances, FILTRES_AVANCES_VIDES, type CleFiltreAvance, type FiltresAvances } from "@/components/osc/RechercheAvanceeOsc";
+
+// Critères déjà proposés par les filtres de la page : masqués dans la recherche avancée
+const CRITERES_DEJA_FILTRES: CleFiltreAvance[] = ["type_document_formalisation", "has_document_formalisation", "faitiere", "categorie", "domaine_activite"];
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const PAGE_SIZE = 25;
@@ -73,6 +78,10 @@ export default function AdminOscPage() {
   const domainesPoles = useDomainesPrioritaires();
   const { domaines: domainesUtilises } = useOscFiltres();
   const domaines = Array.from(new Set([...domainesPoles.map((d) => d.value), ...domainesUtilises])).sort((x, y) => x.localeCompare(y, "fr"));
+  const [avances, setAvances] = useState<FiltresAvances>(FILTRES_AVANCES_VIDES);
+  // Rédacteur CRASC : recherche et consultation seulement
+  const { user } = useAuth();
+  const peutModifier = !!(user?.is_staff || user?.is_superuser);
   const [loading, setLoading]     = useState(true);
   const [togglingId, setTogglingId] = useState<number | null>(null);
 
@@ -90,6 +99,7 @@ export default function AdminOscPage() {
       if (domaine) params.set("domaine_activite", domaine);
       if (categorie) params.set("categorie", categorie);
       if (faitiere) params.set("faitiere", faitiere);
+      ajouterFiltresAvances(params, avances);
       params.set("sort_by", sortBy);
       params.set("sort_order", sortOrder);
       const res  = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?${params}`, {
@@ -104,7 +114,7 @@ export default function AdminOscPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, typeDocumentFormalisation, hasDocumentFormalisation, sortBy, sortOrder, domaine, categorie, faitiere]);
+  }, [page, search, typeDocumentFormalisation, hasDocumentFormalisation, sortBy, sortOrder, domaine, categorie, faitiere, avances]);
 
   useEffect(() => { fetchOscs(); }, [fetchOscs]);
 
@@ -137,6 +147,7 @@ export default function AdminOscPage() {
     setDomaine("");
     setCategorie("");
     setFaitiere("");
+    setAvances(FILTRES_AVANCES_VIDES);
     setPage(1);
   };
 
@@ -162,15 +173,17 @@ export default function AdminOscPage() {
 
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
-        <Link href="/admin/gestion-des-crasc" className="text-sm text-blue-600 hover:underline">
-          ← Gestion des CRASC
-        </Link>
-        <Link
+        {peutModifier ? (
+          <Link href="/admin/gestion-des-crasc" className="text-sm text-blue-600 hover:underline">
+            ← Gestion des CRASC
+          </Link>
+        ) : <span />}
+        {peutModifier && <Link
           href="/admin/gestion-des-crasc/osc/ajouter-osc"
           className="px-4 py-2 bg-[#2A591D] text-white rounded-lg hover:bg-[#244a17] transition-colors"
         >
           Ajouter une OSC
-        </Link>
+        </Link>}
       </div>
 
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Gestion des OSC</h1>
@@ -199,7 +212,7 @@ export default function AdminOscPage() {
         >
           Rechercher
         </button>
-        {(search || typeDocumentFormalisation !== "all" || hasDocumentFormalisation !== "all" || sortBy !== "updated_at" || sortOrder !== "desc" || domaine || categorie || faitiere) && (
+        {(search || typeDocumentFormalisation !== "all" || hasDocumentFormalisation !== "all" || sortBy !== "updated_at" || sortOrder !== "desc" || domaine || categorie || faitiere || Object.values(avances).some(Boolean)) && (
           <button
             onClick={resetFilters}
             className="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-100 transition-colors"
@@ -302,6 +315,14 @@ export default function AdminOscPage() {
               <option value="desc">Descendant</option>
             </select>
           </label>
+        </div>
+
+        <div className="mt-4">
+          <RechercheAvanceeOsc
+            valeur={avances}
+            onChange={(v) => { setAvances(v); setPage(1); }}
+            champsMasques={CRITERES_DEJA_FILTRES}
+          />
         </div>
       </div>
 
@@ -424,14 +445,14 @@ export default function AdminOscPage() {
                         <Eye className="w-3.5 h-3.5" />
                         Voir
                       </Link>
-                      <Link
+                      {peutModifier && <Link
                         href={`/admin/gestion-des-crasc/osc/${osc.slug}/modifier`}
                         className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                         Modifier
-                      </Link>
-                      <button
+                      </Link>}
+                      {peutModifier && <button
                         onClick={() => handleTogglePublish(osc)}
                         disabled={togglingId === osc.id}
                         title={osc.is_visible !== false ? "Dépublier" : "Publier"}
@@ -445,7 +466,7 @@ export default function AdminOscPage() {
                           ? <><EyeOff className="w-3.5 h-3.5" />Dépublier</>
                           : <><Eye className="w-3.5 h-3.5" />Publier</>
                         }
-                      </button>
+                      </button>}
                     </div>
                   </td>
                 </tr>
@@ -507,9 +528,9 @@ export default function AdminOscPage() {
           <p className="font-semibold mb-2">💡 Actions disponibles :</p>
           <ul className="list-disc list-inside space-y-1 text-xs">
             <li>Cliquez sur Afficher pour voir les détails d&apos;une OSC</li>
-            <li>Cliquez sur Modifier pour mettre à jour une OSC</li>
+            {peutModifier && <li>Cliquez sur Modifier pour mettre à jour une OSC</li>}
             <li>Utilisez la barre de recherche et les filtres pour trier les OSC par formalisation</li>
-            <li>Utilisez Ajouter une OSC pour enregistrer une nouvelle organisation</li>
+            {peutModifier && <li>Utilisez Ajouter une OSC pour enregistrer une nouvelle organisation</li>}
           </ul>
         </div>
       )}

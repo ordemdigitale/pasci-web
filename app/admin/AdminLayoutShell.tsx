@@ -28,6 +28,8 @@ const REDACTEUR_CRASC_ALLOWED_PREFIXES = [
   "/admin/gestion-des-crasc/articles",
   "/admin/gestion-des-crasc/videos",
   "/admin/gestion-des-crasc/agenda",
+  // Liste et recherche avancée des OSC (en lecture : la modification reste aux admins)
+  "/admin/gestion-des-crasc/osc",
   "/admin/profile",
   "/admin/settings",
 ];
@@ -96,7 +98,7 @@ function RedacteurCrascRouteGuard({ children }: { children: React.ReactNode }) {
     if (pathname === "/admin") return;
     const allowed = REDACTEUR_CRASC_ALLOWED_PREFIXES.some((prefix) =>
       pathname.startsWith(prefix)
-    );
+    ) && !(pathname.startsWith("/admin/gestion-des-crasc/osc") && (pathname.endsWith("/modifier") || pathname.endsWith("/ajouter-osc")));
     if (!allowed) router.replace("/admin");
   }, [loading, isRedacteurCrasc, pathname, router]);
 
