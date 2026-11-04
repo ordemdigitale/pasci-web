@@ -82,18 +82,22 @@ export async function fetchAllOscType(): Promise<IOscType[]> {
 export async function fetchAllOsc(
   page = 1,
   size = 20,
-  filters: { search?: string } = {}
+  filters: { search?: string; backOffice?: boolean } = {}
 ): Promise<{ items: IOsc[]; total: number; page: number; size: number; pages: number }> {
   const params = new URLSearchParams({
     page: String(page),
     size: String(size),
   });
   if (filters.search?.trim()) params.set("search", filters.search.trim());
+  // Back-office : toutes les OSC (y compris pas encore mises en ligne) pour les associer à un contenu
+  if (filters.backOffice) params.set("inclure_non_publiees", "true");
+  const token = filters.backOffice ? getToken() : null;
 
   const response = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?${params.toString()}`, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     cache: "no-store"
   });

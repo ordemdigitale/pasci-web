@@ -150,6 +150,13 @@ export default function AdminModerationPage() {
 
   async function handleAction(item: ItemEnAttente, action: "publie" | "rejete") {
     const key = `${item.type}-${item.slug}`;
+    // Actualité rejetée : envoyée par email au rédacteur (point focal communication), avec le motif
+    let motif = "";
+    if (item.type === "actualite" && action === "rejete") {
+      const saisie = window.prompt("Motif du rejet (facultatif). L'article et ce motif seront envoyés par email à son rédacteur :");
+      if (saisie === null) return;
+      motif = saisie.trim();
+    }
     setActionId(key);
     try {
       const urlMap: Record<ItemEnAttente["type"], string> = {
@@ -162,7 +169,13 @@ export default function AdminModerationPage() {
         osc_modification: `${API_BASE}/api/v1/crasc/osc-modification-requests/${item.id}/review?action=${action === "publie" ? "approuvee" : "rejetee"}`,
         nouvelle_osc: `${API_BASE}/api/v1/crasc/osc/${item.slug}/valider?action=${action}`,
       };
-      await fetchWithAuth(urlMap[item.type], { method: "PATCH" });
+      const url = motif ? `${urlMap[item.type]}&motif=${encodeURIComponent(motif)}` : urlMap[item.type];
+      const res = await fetchWithAuth(url, { method: "PATCH" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        window.alert(typeof data.detail === "string" ? data.detail : "L'action n'a pas pu être enregistrée.");
+        return;
+      }
       setItems((prev) => prev.filter((i) => !(i.id === item.id && i.type === item.type)));
     } finally {
       setActionId(null);

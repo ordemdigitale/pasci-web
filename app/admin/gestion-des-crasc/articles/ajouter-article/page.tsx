@@ -74,7 +74,7 @@ export default function AdminAjoutArticle() {
   useEffect(() => {
     let cancelled = false;
     setOscLoading(true);
-    fetchAllOsc(1, 100, { search: oscSearch })
+    fetchAllOsc(1, 100, { search: oscSearch, backOffice: true })
       .then(data => {
         if (!cancelled) setOscs(data.items);
       })
@@ -274,7 +274,7 @@ export default function AdminAjoutArticle() {
                     options={oscs.map((osc) => ({
                       id: osc.id,
                       name: osc.name,
-                      subtitle: [osc.sigle, osc.crasc?.name, osc.type?.name].filter(Boolean).join(" • "),
+                      subtitle: [osc.sigle, osc.crasc?.name, osc.type?.name, osc.statut_publication !== "publie" || osc.is_visible === false ? "pas encore en ligne" : null].filter(Boolean).join(" • "),
                     }))}
                     placeholder="Sélectionnez une OSC"
                     searchPlaceholder="Tapez le début du nom de l'OSC..."

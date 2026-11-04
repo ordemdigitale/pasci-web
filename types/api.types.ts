@@ -53,6 +53,8 @@ export interface IOsc {
   plan_action_document_url?: string | null;
   rapports_annuels_document_url?: string | null;
   adhesion_crasc_document_url?: string | null;
+  is_visible?: boolean;
+  statut_publication?: "en_attente" | "publie" | "rejete";
   created_at?: string;
   updated_at?: string;
 }

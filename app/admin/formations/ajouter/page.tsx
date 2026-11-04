@@ -71,7 +71,7 @@ export default function AdminAjoutFormation() {
   useEffect(() => {
     let annule = false;
     setOscLoading(true);
-    fetchAllOsc(1, 100, { search: oscSearch })
+    fetchAllOsc(1, 100, { search: oscSearch, backOffice: true })
       .then((data) => {
         if (annule) return;
         // Garder l'OSC déjà choisie dans la liste, même hors des résultats
@@ -634,7 +634,7 @@ export default function AdminAjoutFormation() {
                       options={oscs.map((osc) => ({
                         id: osc.id,
                         name: osc.name,
-                        subtitle: [osc.sigle, osc.crasc?.name].filter(Boolean).join(" • "),
+                        subtitle: [osc.sigle, osc.crasc?.name, osc.statut_publication !== "publie" || osc.is_visible === false ? "pas encore en ligne" : null].filter(Boolean).join(" • "),
                       }))}
                       placeholder="Sélectionnez une OSC (optionnel)"
                       searchPlaceholder="Tapez le nom ou le sigle de l'OSC..."

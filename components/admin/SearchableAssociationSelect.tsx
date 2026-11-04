@@ -126,23 +126,16 @@ export default function SearchableAssociationSelect({
           </button>
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all text-gray-500"
-        >
-          {placeholder}
-        </button>
-      )}
-
-      {(open || !value) && (
-        <div className="mt-2">
+        // Saisie directe : on tape le nom dans le champ, la liste se filtre
+        <div>
           <div className="relative">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={query}
               onFocus={() => setOpen(true)}
+              onBlur={() => window.setTimeout(() => setOpen(false), 150)}
+              aria-label={placeholder}
               onChange={(event) => {
                 setQuery(event.target.value);
                 setOpen(true);
