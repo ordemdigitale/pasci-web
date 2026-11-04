@@ -23,6 +23,7 @@ import {
   CalendarDays,
   UploadCloud,
   Image as ImageIcon,
+  Newspaper,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
@@ -209,7 +210,10 @@ export default function AdminSidebar({
         { icon: <Settings size={20} />, label: "Paramètres", href: "/admin/profile" } as NavItem,
       ]
     : isOscUser
-    ? allNavItems.filter((item) => item.href === "/admin" || item.href === "/admin/mon-osc")
+    ? [
+        ...allNavItems.filter((item) => item.href === "/admin" || item.href === "/admin/mon-osc"),
+        { icon: <Newspaper size={20} />, label: "Publier mon actualité", href: "/publier-mon-actualite" } as NavItem,
+      ]
     : isCrascAdmin
     ? [
         ...allNavItems
