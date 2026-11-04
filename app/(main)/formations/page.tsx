@@ -20,6 +20,7 @@ interface IFormationStats {
   total_formations: number;
   total_inscrits: number;
   total_osc_formees: number;
+  total_grand_public_forme?: number;
   par_categorie_acteur: { categorie: string; total: number }[];
 }
 
@@ -520,7 +521,7 @@ export default function FormationsPage() {
               <p className="text-gray-500 text-sm mb-8">Données mises à jour en temps réel</p>
 
               {/* Chiffres clés */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
                 {[
                   {
                     icon: <GraduationCap className="w-8 h-8 text-white" />,
@@ -535,6 +536,13 @@ export default function FormationsPage() {
                     label: 'OSC formées',
                     sublabel: 'Organisations ayant participé',
                     bg: 'from-[#E05017] to-[#c44315]',
+                  },
+                  {
+                    icon: <Users className="w-8 h-8 text-white" />,
+                    value: (stats.total_grand_public_forme ?? 0).toLocaleString('fr-FR'),
+                    label: 'Grand public formé',
+                    sublabel: 'Participants hors organisations',
+                    bg: 'from-[#7c3aed] to-[#6d28d9]',
                   },
                   {
                     icon: <BookOpen className="w-8 h-8 text-white" />,
@@ -560,7 +568,7 @@ export default function FormationsPage() {
                 <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
                   <h4 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
                     <Users className="w-5 h-5 text-[#E05017]" />
-                    OSC formées par catégorie d&apos;acteurs
+                    Publics formés par catégorie d&apos;acteurs
                   </h4>
                   <div className="space-y-4">
                     {(() => {
