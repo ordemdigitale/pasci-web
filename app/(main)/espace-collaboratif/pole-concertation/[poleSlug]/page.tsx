@@ -122,6 +122,7 @@ export default function PagePoleForum() {
   const [filtres, setFiltres] = useState<FiltresMembres>(FILTRES_VIDES);
   const [membresPage, setMembresPage] = useState(1);
   const [regionOuverte, setRegionOuverte] = useState<string | null>(null);
+  const [regionPage, setRegionPage] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [votingId, setVotingId] = useState<number | null>(null);
   const [error, setError] = useState("");
@@ -331,6 +332,9 @@ export default function PagePoleForum() {
   // avec le nombre d'OSC membres entre parenthèses.
   const regionsInfluence = regrouperParRegion(membres);
   const oscsRegionOuverte = regionsInfluence.find((r) => r.nom === regionOuverte)?.oscs ?? [];
+  const nbPagesRegion = Math.max(1, Math.ceil(oscsRegionOuverte.length / MEMBRES_PAR_PAGE));
+  const pageRegion = Math.min(regionPage, nbPagesRegion);
+  const oscsRegionAffichees = oscsRegionOuverte.slice((pageRegion - 1) * MEMBRES_PAR_PAGE, pageRegion * MEMBRES_PAR_PAGE);
   const userCanVoteInPole =
     !!user?.is_superuser ||
     !!user?.is_staff ||
@@ -604,7 +608,10 @@ export default function PagePoleForum() {
                 <button
                   key={region.nom}
                   type="button"
-                  onClick={() => setRegionOuverte(active ? null : region.nom)}
+                  onClick={() => {
+                    setRegionOuverte(active ? null : region.nom);
+                    setRegionPage(1);
+                  }}
                   className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                     active
                       ? "bg-[#2a591d] text-white"
@@ -618,7 +625,7 @@ export default function PagePoleForum() {
           </div>
           {regionOuverte && (
             <ul className="mt-4 grid sm:grid-cols-2 gap-2">
-              {oscsRegionOuverte.map((membre) => (
+              {oscsRegionAffichees.map((membre) => (
                 <li key={membre.id}>
                   <Link
                     href={membre.slug ? `/annuaire/annuaire-des-osc/${membre.slug}` : "#"}
@@ -629,6 +636,29 @@ export default function PagePoleForum() {
                 </li>
               ))}
             </ul>
+          )}
+          {regionOuverte && nbPagesRegion > 1 && (
+            <div className="flex items-center justify-center gap-3 mt-4 text-sm">
+              <button
+                type="button"
+                onClick={() => setRegionPage(pageRegion - 1)}
+                disabled={pageRegion <= 1}
+                className="px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-[#E05017]/50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                ← Précédent
+              </button>
+              <span className="text-gray-500">
+                Page {pageRegion} / {nbPagesRegion}
+              </span>
+              <button
+                type="button"
+                onClick={() => setRegionPage(pageRegion + 1)}
+                disabled={pageRegion >= nbPagesRegion}
+                className="px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-[#E05017]/50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Suivant →
+              </button>
+            </div>
           )}
         </div>
       )}
