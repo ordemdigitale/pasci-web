@@ -270,8 +270,13 @@ export default function FormationDetailPage() {
       } else {
         setInscriptionSuccess(true);
         setAlreadyRegistered(true);
-        // Formation gratuite : le contenu devient accessible tout de suite
-        await Promise.all([chargerModules(), chargerProgression()]);
+        if (currentUser) setShowInscription(false);
+        // Formation gratuite : le contenu (et le lien de la séance) devient accessible tout de suite
+        await Promise.all([
+          chargerModules(),
+          chargerProgression(),
+          getFormationBySlug(formationSlug).then(setFormation).catch(() => {}),
+        ]);
       }
     } catch (err: unknown) {
       setInscriptionError(err instanceof Error ? err.message : "Une erreur est survenue.");
@@ -304,12 +309,15 @@ export default function FormationDetailPage() {
     }
   }
 
-  async function handleInscriptionConnecte() {
+  // Connecté : même formulaire (champs obligatoires), pré-rempli avec le compte
+  function ouvrirInscriptionConnecte() {
     const user = getStoredUser();
     if (!user) return;
-    const nom = user.first_name || user.username || user.email.split("@")[0];
-    const prenoms = user.last_name || "";
-    await inscrire(nom, prenoms, user.email);
+    setInscriptionNom((v) => v || user.first_name || user.username || user.email.split("@")[0]);
+    setInscriptionPrenoms((v) => v || user.last_name || "");
+    setInscriptionEmail(user.email);
+    if (user.osc_id) setInscriptionCategorie((v) => v || "Organisation de la Société Civile OSC");
+    setShowInscription(true);
   }
 
   async function handleInscription(e: React.FormEvent) {
@@ -603,12 +611,11 @@ export default function FormationDetailPage() {
             {canRegister ? (
               currentUser ? (
                 <button
-                  onClick={handleInscriptionConnecte}
-                  disabled={inscribing}
-                  className="w-full flex items-center justify-center gap-2 rounded-lg h-11 bg-[#E05017] text-white text-sm font-bold hover:bg-[#c44315] transition-colors disabled:opacity-60"
+                  onClick={ouvrirInscriptionConnecte}
+                  className="w-full flex items-center justify-center gap-2 rounded-lg h-11 bg-[#E05017] text-white text-sm font-bold hover:bg-[#c44315] transition-colors"
                 >
-                  {inscribing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                  {inscribing ? "Inscription..." : "S'inscrire à cette formation"}
+                  <CheckCircle className="w-4 h-4" />
+                  S&apos;inscrire à cette formation
                 </button>
               ) : (
                 <button
@@ -898,8 +905,8 @@ export default function FormationDetailPage() {
               </div>
             )}
 
-            {/* Inscription form (inline) — uniquement pour les non-connectés */}
-            {showInscription && canRegister && !currentUser && (
+            {/* Inscription form (inline) — tous les champs sont obligatoires */}
+            {showInscription && canRegister && (
               <div className="mb-8 bg-white p-6 rounded-xl border border-[#E05017]/30 shadow-sm">
                 <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-[#E05017]" />
@@ -920,12 +927,12 @@ export default function FormationDetailPage() {
                     {/* Catégorie d'acteurs */}
                     <div className="md:col-span-2">
                       <label className="block text-sm font-semibold text-gray-700 mb-1">
-                        Catégorie d&apos;acteurs {formation?.type === "payante" && <span className="text-red-500">*</span>}
+                        Catégorie d&apos;acteurs <span className="text-red-500">*</span>
                       </label>
                       <select
                         value={inscriptionCategorie}
                         onChange={(e) => setInscriptionCategorie(e.target.value)}
-                        required={formation?.type === "payante"}
+                        required
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017] bg-white"
                       >
                         <option value="">-- Sélectionnez une catégorie --</option>
@@ -971,6 +978,7 @@ export default function FormationDetailPage() {
                       <input
                         type="email"
                         required
+                        readOnly={!!currentUser}
                         value={inscriptionEmail}
                         onChange={(e) => setInscriptionEmail(e.target.value)}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"
@@ -980,11 +988,11 @@ export default function FormationDetailPage() {
                     {/* Contact */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">
-                        Contact {formation?.type === "payante" && <span className="text-red-500">*</span>}
+                        Contact <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="tel"
-                        required={formation?.type === "payante"}
+                        required
                         value={inscriptionPhone}
                         onChange={(e) => setInscriptionPhone(e.target.value)}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017]"

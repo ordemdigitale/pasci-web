@@ -14,6 +14,7 @@ import {
   CreditCard,
   AlertCircle,
   Trash2,
+  Download,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 
@@ -62,6 +63,24 @@ export default function InscriptionsPage() {
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
+  };
+
+  const [exportEnCours, setExportEnCours] = useState(false);
+  const exporterExcel = async () => {
+    setExportEnCours(true);
+    try {
+      const res = await fetchWithAuth(`${API_BASE_URL}/api/v1/formations/${slug}/inscriptions/export`);
+      if (!res.ok) throw new Error();
+      const lien = document.createElement("a");
+      lien.href = URL.createObjectURL(await res.blob());
+      lien.download = `inscrits-${slug}.xlsx`;
+      lien.click();
+      URL.revokeObjectURL(lien.href);
+    } catch {
+      showToast("Impossible d'exporter la liste des inscrits.", "error");
+    } finally {
+      setExportEnCours(false);
+    }
   };
 
   const loadInscriptions = async () => {
@@ -335,7 +354,15 @@ export default function InscriptionsPage() {
               <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>Gestion des inscriptions</h1>
               <p style={{ color: "#6b7280", fontSize: 13, margin: "4px 0 0" }}>Formation : {slug}</p>
             </div>
-            <div style={{ display: "flex", gap: 16 }}>
+            <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+              <button
+                onClick={exporterExcel}
+                disabled={exportEnCours || inscriptions.length === 0}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 8, background: "#2A591D", color: "white", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer", opacity: exportEnCours || inscriptions.length === 0 ? 0.5 : 1 }}
+              >
+                {exportEnCours ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
+                Exporter (Excel)
+              </button>
               <div style={{ textAlign: "center" }}>
                 <div style={{ fontSize: 22, fontWeight: 700, color: "#111827" }}>{inscriptions.length}</div>
                 <div style={{ fontSize: 12, color: "#6b7280" }}>inscrits</div>
