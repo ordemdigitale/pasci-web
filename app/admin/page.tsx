@@ -23,6 +23,7 @@ import {
   UserCircle,
   Target,
   Heart,
+  UserPlus,
 } from 'lucide-react';
 import { ICrasc, IJobs, IOscDetail } from '@/types/api.types';
 import { useAuth } from '@/contexts/AuthContext';
@@ -47,6 +48,104 @@ interface VisiteStats {
   "30_jours": number;
   top_pages: { path: string; visites: number }[];
   par_jour: { date: string; visites: number }[];
+}
+
+/** Compteurs et activités récentes réels (GET /stats/back-office, limités au CRASC du compte). */
+interface BackOfficeStats {
+  compteurs: {
+    actualites_publiees: number;
+    actualites_en_attente: number;
+    adhesions_en_attente: number;
+    adhesions_total: number;
+    offres_emploi_actives: number;
+  };
+  activites: { type: string; titre: string; detail: string; date: string; lien: string }[];
+}
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+function useBackOfficeStats(limite: number) {
+  const [stats, setStats] = useState<BackOfficeStats | null>(null);
+  useEffect(() => {
+    fetchWithAuth(`${API_BASE}/api/v1/stats/back-office?limite=${limite}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => { if (data) setStats(data); })
+      .catch(() => {});
+  }, [limite]);
+  return stats;
+}
+
+function ilYa(date: string) {
+  const minutes = Math.max(0, Math.round((Date.now() - new Date(date).getTime()) / 60000));
+  if (minutes < 1) return "À l'instant";
+  if (minutes < 60) return `Il y a ${minutes} minute${minutes > 1 ? "s" : ""}`;
+  const heures = Math.round(minutes / 60);
+  if (heures < 24) return `Il y a ${heures} heure${heures > 1 ? "s" : ""}`;
+  const jours = Math.round(heures / 24);
+  if (jours < 31) return `Il y a ${jours} jour${jours > 1 ? "s" : ""}`;
+  return `Le ${new Date(date).toLocaleDateString("fr-FR")}`;
+}
+
+const ICONES_ACTIVITE: Record<string, { icone: typeof Building2; fond: string; couleur: string }> = {
+  osc: { icone: Building2, fond: "bg-green-100", couleur: "text-[#2a591d]" },
+  adhesion: { icone: UserPlus, fond: "bg-amber-100", couleur: "text-amber-600" },
+  actualite: { icone: Newspaper, fond: "bg-blue-100", couleur: "text-blue-600" },
+  emploi: { icone: Briefcase, fond: "bg-purple-100", couleur: "text-purple-600" },
+  utilisateur: { icone: Users, fond: "bg-orange-100", couleur: "text-orange-600" },
+  ressource: { icone: FolderOpen, fond: "bg-green-100", couleur: "text-[#2a591d]" },
+  formation: { icone: GraduationCap, fond: "bg-teal-100", couleur: "text-teal-600" },
+};
+
+function ActivitesRecentes({ className = "" }: { className?: string }) {
+  const [toutes, setToutes] = useState(false);
+  const stats = useBackOfficeStats(toutes ? 30 : 8);
+  const activites = stats?.activites ?? [];
+  return (
+    <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+          <Activity className="w-5 h-5 text-[#2a591d]" />
+          Activités récentes
+        </h2>
+        {activites.length >= 8 && (
+          <button type="button" onClick={() => setToutes(!toutes)} className="text-[#2a591d] text-sm font-semibold hover:underline">
+            {toutes ? "Voir moins" : "Voir tout"}
+          </button>
+        )}
+      </div>
+      {!stats ? (
+        <p className="text-sm text-gray-400 text-center py-4">Chargement…</p>
+      ) : activites.length === 0 ? (
+        <p className="text-sm text-gray-400 text-center py-4">Aucune activité pour le moment.</p>
+      ) : (
+        <div className="space-y-4">
+          {activites.map((a, i) => {
+            const style = ICONES_ACTIVITE[a.type] ?? ICONES_ACTIVITE.osc;
+            const Icone = style.icone;
+            return (
+              <Link
+                key={`${a.type}-${a.date}-${i}`}
+                href={a.lien}
+                className={`flex items-start gap-4 pb-4 rounded-lg hover:bg-gray-50 ${i < activites.length - 1 ? "border-b border-gray-100" : ""}`}
+              >
+                <div className={`p-2 rounded-lg ${style.fond}`}>
+                  <Icone className={`w-4 h-4 ${style.couleur}`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-900 font-medium">{a.titre}</p>
+                  <p className="text-gray-600 text-sm truncate">{a.detail}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Calendar className="w-3 h-3 text-gray-400" />
+                    <p className="text-gray-400 text-xs">{ilYa(a.date)}</p>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function OscDashboard() {
@@ -137,8 +236,9 @@ function CrascAdminDashboard() {
   const { user } = useAuth();
   const [crascName, setCrascName] = useState<string | null>(null);
   const [oscCount, setOscCount] = useState<number | null>(null);
-  const [newsCount, setNewsCount] = useState<number | null>(null);
   const [formationsCount, setFormationsCount] = useState<number | null>(null);
+  const backOffice = useBackOfficeStats(8);
+  const compteurs = backOffice?.compteurs;
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -156,12 +256,6 @@ function CrascAdminDashboard() {
           setOscCount(mine.osc_count ?? null);
         }
       })
-      .catch(() => {});
-
-    // Fetch news count for this CRASC
-    fetchWithAuth(`${API_BASE_URL}/api/v1/news?crasc_id=${crascId}&limit=100&statut=toutes`)
-      .then((r) => r.ok ? r.json() : [])
-      .then((data: any[]) => { if (Array.isArray(data)) setNewsCount(data.length); })
       .catch(() => {});
 
     // Fetch formations count for this CRASC
@@ -187,14 +281,24 @@ function CrascAdminDashboard() {
           <p className="text-3xl font-bold text-gray-900">{oscCount ?? "—"}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-          <p className="text-xs text-gray-500 mb-1">Actualités</p>
-          <p className="text-3xl font-bold text-gray-900">{newsCount ?? "—"}</p>
+          <p className="text-xs text-gray-500 mb-1">Actualités publiées</p>
+          <p className="text-3xl font-bold text-gray-900">{compteurs?.actualites_publiees ?? "—"}</p>
+          {!!compteurs?.actualites_en_attente && (
+            <Link href="/admin/moderation" className="text-xs text-amber-600 hover:underline">{compteurs.actualites_en_attente} en attente</Link>
+          )}
         </div>
+        <Link href="/admin/demandes-adhesion" className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:border-amber-300">
+          <p className="text-xs text-gray-500 mb-1">Demandes d&apos;adhésion</p>
+          <p className="text-3xl font-bold text-gray-900">{compteurs?.adhesions_en_attente ?? "—"}</p>
+          <p className="text-xs text-gray-400">en attente sur {compteurs?.adhesions_total ?? "—"}</p>
+        </Link>
         <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
           <p className="text-xs text-gray-500 mb-1">Formations</p>
           <p className="text-3xl font-bold text-gray-900">{formationsCount ?? "—"}</p>
         </div>
       </div>
+
+      <ActivitesRecentes />
 
       {/* Quick links */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
@@ -235,6 +339,13 @@ export default function Dashboard() {
   const isOscUser = !!user?.osc_id && !user?.is_staff && !user?.is_superuser;
   const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
 
+  // Un composant par profil : les hooks ne dépendent plus du compte chargé
+  if (isOscUser) return <OscDashboard />;
+  if (isCrascAdmin) return <CrascAdminDashboard />;
+  return <SuperAdminDashboard />;
+}
+
+function SuperAdminDashboard() {
   const [crascData, setCrascData] = useState<ICrasc[] | null>(null);
   const [jobsData, setJobsData] = useState<IJobs[] | null>(null);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
@@ -243,9 +354,7 @@ export default function Dashboard() {
   const [error, setError] = useState(null);
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
-  if (isOscUser) return <OscDashboard />;
-  if (isCrascAdmin) return <CrascAdminDashboard />;
+  const compteurs = useBackOfficeStats(8)?.compteurs;
 
   // fetch dashboard stats
   useEffect(() => {
@@ -328,7 +437,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Stats CRASC */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-4">
@@ -377,7 +486,7 @@ export default function Dashboard() {
             </div>
           </div>
           <p className="text-gray-600 text-sm mb-1">Offres d'emploi</p>
-          <p className="text-3xl font-bold text-gray-900">{jobsData?.length || 0}</p>
+          <p className="text-3xl font-bold text-gray-900">{dashboardStats?.jobs.total ?? jobsData?.length ?? 0}</p>
           <Link href="/admin/emplois" className="text-[#2a591d] text-xs font-semibold mt-2 inline-block hover:underline">
             Gérer les offres →
           </Link>
@@ -398,6 +507,42 @@ export default function Dashboard() {
           <p className="text-3xl font-bold text-gray-900">{dashboardStats?.users.total.toLocaleString() || 0}</p>
           <Link href="/admin/utilisateurs" className="text-[#2a591d] text-xs font-semibold mt-2 inline-block hover:underline">
             Gérer les utilisateurs →
+          </Link>
+        </div>
+
+        {/* Stats Actualités */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-blue-100 rounded-lg">
+              <Newspaper className="w-6 h-6 text-blue-600" />
+            </div>
+            {!!compteurs?.actualites_en_attente && (
+              <Link href="/admin/moderation" className="flex items-center gap-1 text-amber-600 text-sm font-semibold hover:underline">
+                {compteurs.actualites_en_attente} à valider
+              </Link>
+            )}
+          </div>
+          <p className="text-gray-600 text-sm mb-1">Actualités publiées</p>
+          <p className="text-3xl font-bold text-gray-900">{(compteurs?.actualites_publiees ?? 0).toLocaleString("fr-FR")}</p>
+          <Link href="/admin/actualites" className="text-[#2a591d] text-xs font-semibold mt-2 inline-block hover:underline">
+            Gérer les actualités →
+          </Link>
+        </div>
+
+        {/* Stats Demandes d'adhésion */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-amber-100 rounded-lg">
+              <UserPlus className="w-6 h-6 text-amber-600" />
+            </div>
+            <div className="flex items-center gap-1 text-gray-400 text-sm font-semibold">
+              {(compteurs?.adhesions_total ?? 0).toLocaleString("fr-FR")} au total
+            </div>
+          </div>
+          <p className="text-gray-600 text-sm mb-1">Demandes d&apos;adhésion en attente</p>
+          <p className="text-3xl font-bold text-gray-900">{(compteurs?.adhesions_en_attente ?? 0).toLocaleString("fr-FR")}</p>
+          <Link href="/admin/demandes-adhesion" className="text-[#2a591d] text-xs font-semibold mt-2 inline-block hover:underline">
+            Traiter les demandes →
           </Link>
         </div>
       </div>
@@ -520,89 +665,8 @@ export default function Dashboard() {
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Activités récentes */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-[#2a591d]" />
-              Activités récentes
-            </h2>
-            <button className="text-[#2a591d] text-sm font-semibold hover:underline">
-              Voir tout
-            </button>
-          </div>
-          <div className="space-y-4">
-            <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Building2 className="w-4 h-4 text-[#2a591d]" />
-              </div>
-              <div className="flex-1">
-                <p className="text-gray-900 font-medium">Nouvelle OSC enregistrée</p>
-                <p className="text-gray-600 text-sm">Association pour le Développement Rural a été ajoutée</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <Calendar className="w-3 h-3 text-gray-400" />
-                  <p className="text-gray-400 text-xs">Il y a 2 heures</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Briefcase className="w-4 h-4 text-purple-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-gray-900 font-medium">Offre d'emploi publiée</p>
-                <p className="text-gray-600 text-sm">Coordinateur de projet - Save The Children</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <Calendar className="w-3 h-3 text-gray-400" />
-                  <p className="text-gray-400 text-xs">Il y a 3 heures</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Newspaper className="w-4 h-4 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-gray-900 font-medium">Actualité publiée</p>
-                <p className="text-gray-600 text-sm">Lancement du nouveau programme de formation CRASC 2026</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <Calendar className="w-3 h-3 text-gray-400" />
-                  <p className="text-gray-400 text-xs">Il y a 5 heures</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Users className="w-4 h-4 text-orange-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-gray-900 font-medium">Nouvel utilisateur</p>
-                <p className="text-gray-600 text-sm">Jean-Baptiste KOFFI a créé un compte</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <Calendar className="w-3 h-3 text-gray-400" />
-                  <p className="text-gray-400 text-xs">Il y a 1 jour</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <FolderOpen className="w-4 h-4 text-[#2a591d]" />
-              </div>
-              <div className="flex-1">
-                <p className="text-gray-900 font-medium">Ressource ajoutée</p>
-                <p className="text-gray-600 text-sm">Guide de rédaction de propositions de projets (PDF)</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <Calendar className="w-3 h-3 text-gray-400" />
-                  <p className="text-gray-400 text-xs">Il y a 2 jours</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Activités récentes (réelles) */}
+        <ActivitesRecentes className="lg:col-span-2" />
 
         {/* Quick Actions */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
