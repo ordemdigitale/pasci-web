@@ -4,7 +4,7 @@ export default function ConditionsGeneralesPage() {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 bg-[#f0f9ff] rounded-lg p-8 mb-10">
         <h1 className="text-[#2a591d] font-bold text-3xl pb-4">Conditions Générales d'Utilisation</h1>
-        <p className="text-sm text-gray-600">Dernière mise à jour : Janvier 2025</p>
+        <p className="text-sm text-gray-600">Dernière mise à jour : Octobre 2026</p>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -91,13 +91,13 @@ export default function ConditionsGeneralesPage() {
           <h3 className="text-lg font-semibold text-gray-900 mb-2">4.1 Propriété du contenu</h3>
           <p className="text-gray-700 mb-4">
             Vous conservez tous les droits sur les contenus que vous publiez (textes, images, documents). Toutefois,
-            en publiant du contenu sur la plateforme, vous accordez à PdoC une licence non exclusive pour utiliser,
+            en publiant du contenu sur la plateforme, vous accordez à la PdoC une licence non exclusive pour utiliser,
             reproduire et diffuser ce contenu dans le cadre de ses missions.
           </p>
 
           <h3 className="text-lg font-semibold text-gray-900 mb-2">4.2 Responsabilité du contenu</h3>
           <p className="text-gray-700 mb-4">
-            Vous êtes seul responsable du contenu que vous publiez. PdoC se réserve le droit de supprimer tout
+            Vous êtes seul responsable du contenu que vous publiez. La PdoC se réserve le droit de supprimer tout
             contenu inapproprié sans préavis.
           </p>
         </div>
