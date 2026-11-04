@@ -8,6 +8,7 @@ import Link from "next/link";
 import { ImageWithFallback } from '@/lib/imageWithFallback';
 import { ICrascDetail, INews, IEvenement, ICrascVideo } from "@/types/api.types";
 import { domainesIntervention } from "../page";
+import { correspondRecherche } from "@/lib/recherche";
 import {
   MapPin,
   Users,
@@ -295,7 +296,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                         OSC identifiées <span className="text-gray-400 font-semibold">({crascData.oscs.length})</span>
                       </h2>
                       <p className="text-xs text-gray-500">
-                        {crascData.oscs.filter(o => o.name.toLowerCase().includes(oscSearch.toLowerCase())).length} / {crascData.oscs.length} organisation{crascData.oscs.length > 1 ? 's' : ''}
+                        {crascData.oscs.filter(o => correspondRecherche(oscSearch, o.name, o.sigle)).length} / {crascData.oscs.length} organisation{crascData.oscs.length > 1 ? 's' : ''}
                       </p>
                     </div>
                   </div>
@@ -312,9 +313,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                 </div>
 
                 {(() => {
-                  const filtered = crascData.oscs!.filter(o =>
-                    o.name.toLowerCase().includes(oscSearch.toLowerCase())
-                  );
+                  const filtered = crascData.oscs!.filter(o => correspondRecherche(oscSearch, o.name, o.sigle));
                   const totalPages = Math.ceil(filtered.length / OSC_PER_PAGE);
                   const paginated = filtered.slice((oscPage - 1) * OSC_PER_PAGE, oscPage * OSC_PER_PAGE);
 

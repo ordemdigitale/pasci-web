@@ -10,6 +10,7 @@ import Link from "next/link";
 import DOMPurify from 'dompurify';
 import { CrascMapSvg } from '@/components/ui/CrascMapSvg';
 import { useOscFiltres } from '@/lib/osc-filtres';
+import { correspondRecherche } from '@/lib/recherche';
 import { useRouter } from 'next/navigation';
 
 interface IActivityCard {
@@ -499,9 +500,7 @@ export default function PageAnnuaireCrasc() {
 
         {/* OSC Cards Grid */}
         {(() => {
-          const filtered = oscData.filter(o =>
-            o.name.toLowerCase().includes(oscSearch.toLowerCase())
-          );
+          const filtered = oscData.filter(o => correspondRecherche(oscSearch, o.name, o.sigle));
           const totalPages = Math.ceil(filtered.length / OSC_PER_PAGE);
           const paginated = filtered.slice((oscPage - 1) * OSC_PER_PAGE, oscPage * OSC_PER_PAGE);
 
