@@ -56,6 +56,8 @@ export interface IFormation {
   chronogramme?: string | null;
   /** Épinglée en tête de la page Formations */
   is_pinned?: boolean;
+  /** Formation commune à tous les CRASC */
+  tous_crasc?: boolean;
   crasc?: {
     id: number;
     name: string;

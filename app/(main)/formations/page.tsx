@@ -345,11 +345,19 @@ export default function FormationsPage() {
                             alt={formation.title}
                             className="w-full h-full object-cover"
                           />
-                          {estTerminee(formation) && (
+                          {estTerminee(formation) ? (
                             <span className="absolute top-3 left-3 px-2.5 py-1 bg-gray-800/80 text-white text-xs font-semibold rounded-full">
                               Terminée
                             </span>
-                          )}
+                          ) : formation.is_full ? (
+                            <span className="absolute top-3 left-3 px-2.5 py-1 bg-red-600 text-white text-xs font-semibold rounded-full">
+                              Complet
+                            </span>
+                          ) : formation.max_participants ? (
+                            <span className="absolute top-3 left-3 px-2.5 py-1 bg-green-600 text-white text-xs font-semibold rounded-full">
+                              {Math.max(formation.max_participants - formation.current_participants, 0)} place{formation.max_participants - formation.current_participants > 1 ? "s" : ""} disponible{formation.max_participants - formation.current_participants > 1 ? "s" : ""}
+                            </span>
+                          ) : null}
                         </div>
                         <div className="p-5">
                           {/* Ligne 1 : type + rubrique */}

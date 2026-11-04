@@ -325,9 +325,18 @@ export default function FormationsPage() {
                     >
                       {formation.is_published ? "Publié" : "Brouillon"}
                     </span>
-                    {formation.is_full && (
+                    {formation.is_full ? (
                       <span className="text-xs font-bold px-3 py-1 rounded-full bg-orange-500 text-white">
                         Complet
+                      </span>
+                    ) : formation.max_participants && !formation.is_completed ? (
+                      <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-600 text-white">
+                        {Math.max(formation.max_participants - formation.current_participants, 0)} place{formation.max_participants - formation.current_participants > 1 ? "s" : ""} disponible{formation.max_participants - formation.current_participants > 1 ? "s" : ""}
+                      </span>
+                    ) : null}
+                    {formation.tous_crasc && (
+                      <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#2A591D] text-white">
+                        Tous les CRASC
                       </span>
                     )}
                     {formation.is_completed && (
@@ -509,9 +518,18 @@ export default function FormationsPage() {
                     >
                       {selectedFormation.is_published ? "Publié" : "Brouillon"}
                     </span>
-                    {selectedFormation.is_full && (
+                    {selectedFormation.is_full ? (
                       <span className="text-sm font-bold px-4 py-2 rounded-full bg-orange-500 text-white">
                         Complet
+                      </span>
+                    ) : selectedFormation.max_participants && !selectedFormation.is_completed ? (
+                      <span className="text-sm font-bold px-4 py-2 rounded-full bg-emerald-600 text-white">
+                        {Math.max(selectedFormation.max_participants - selectedFormation.current_participants, 0)} place{selectedFormation.max_participants - selectedFormation.current_participants > 1 ? "s" : ""} disponible{selectedFormation.max_participants - selectedFormation.current_participants > 1 ? "s" : ""}
+                      </span>
+                    ) : null}
+                    {selectedFormation.tous_crasc && (
+                      <span className="text-sm font-bold px-4 py-2 rounded-full bg-[#2A591D] text-white">
+                        Tous les CRASC
                       </span>
                     )}
                     {selectedFormation.is_completed && (

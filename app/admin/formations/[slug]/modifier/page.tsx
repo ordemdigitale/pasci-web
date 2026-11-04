@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
@@ -29,9 +29,12 @@ import {
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
+import SearchableAssociationSelect from "@/components/admin/SearchableAssociationSelect";
 import ChampsFicheFormation, { ajouterFiche, erreurFiche, FICHE_VIDE, ficheDepuis, type FicheFormation } from "@/components/admin/ChampsFicheFormation";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// Valeur du choix « Tous les CRASC » dans la liste des CRASC
+const TOUS_CRASC = "tous";
 
 // Schema de validation
 const formationSchema = z.object({
@@ -64,6 +67,28 @@ export default function AdminModifierFormation() {
   const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
   const [oscs, setOscs] = useState<IOsc[]>([]);
   const [fiche, setFiche] = useState<FicheFormation>(FICHE_VIDE);
+  const [autreCategorie, setAutreCategorie] = useState("");
+  const oscChoisieRef = useRef<string | null>(null);
+  // OSC : recherche côté serveur (la liste complète ne tient pas en une page)
+  const [oscSearch, setOscSearch] = useState("");
+  const [oscLoading, setOscLoading] = useState(false);
+  useEffect(() => {
+    let annule = false;
+    setOscLoading(true);
+    fetchAllOsc(1, 100, { search: oscSearch })
+      .then((data) => {
+        if (annule) return;
+        // Garder l'OSC déjà choisie dans la liste, même hors des résultats
+        setOscs((avant) => {
+          const choisie = avant.find((o) => String(o.id) === oscChoisieRef.current);
+          return choisie && !data.items.some((o) => o.id === choisie.id) ? [choisie, ...data.items] : data.items;
+        });
+      })
+      .catch((error) => console.error("Erreur OSC:", error))
+      .finally(() => { if (!annule) setOscLoading(false); });
+    return () => { annule = true; };
+  }, [oscSearch]);
+
   const { user } = useAuth();
   const peutEpingler = !!(user?.is_staff || user?.is_superuser);
   const [loading, setLoading] = useState(false);
@@ -137,16 +162,25 @@ export default function AdminModifierFormation() {
         setValue("type", (formation.type as "gratuite" | "payante") || "gratuite");
         setValue("price", formation.price || undefined);
         setValue("rubrique_id", formation.rubrique_id?.toString() || "");
-        setValue("crasc_id", formation.crasc_id?.toString() || "");
+        setValue("crasc_id", formation.tous_crasc ? TOUS_CRASC : formation.crasc_id?.toString() || "");
         setValue("osc_id", formation.osc_id?.toString() || "");
-        setValue("categorie", (formation as any).categorie || "");
+        // Catégorie saisie librement : « Autres » + le texte
+        const cat = formation.categorie || "";
+        const connue = !cat || (FORMATION_CATEGORIES as readonly string[]).includes(cat);
+        setValue("categorie", connue ? cat : "Autres");
+        if (!connue) setAutreCategorie(cat);
+        // L'OSC choisie reste proposée même si elle n'est pas dans les résultats de recherche
+        if (formation.osc) {
+          oscChoisieRef.current = String(formation.osc.id);
+          const osc = formation.osc as unknown as IOsc;
+          setOscs((avant) => (avant.some((o) => String(o.id) === String(osc.id)) ? avant : [osc, ...avant]));
+        }
         setFiche(ficheDepuis(formation));
         if (formation.thumbnail_url) setCurrentThumbnailUrl(formation.thumbnail_url);
 
         // Charger CRASC et OSC
-        const [crascData, oscData] = await Promise.all([fetchAllCrasc(), fetchAllOsc()]);
+        const crascData = await fetchAllCrasc();
         setCrascRegions(crascData);
-        setOscs(oscData.items);
       } catch (error) {
         console.error("Erreur lors du chargement:", error);
         setErrorMessage("Erreur lors du chargement de la formation");
@@ -192,9 +226,16 @@ export default function AdminModifierFormation() {
       if (values.type === "payante" && values.price !== null && values.price !== undefined)
         formData.append("price", values.price.toString());
       if (values.rubrique_id) formData.append("rubrique_id", values.rubrique_id);
-      if (values.crasc_id) formData.append("crasc_id", values.crasc_id);
+      // « Tous les CRASC » : formation commune, sans CRASC particulier
+      if (values.crasc_id === TOUS_CRASC) formData.append("tous_crasc", "true");
+      else {
+        if (values.crasc_id) formData.append("crasc_id", values.crasc_id);
+        if (peutEpingler) formData.append("tous_crasc", "false");
+      }
       if (values.osc_id) formData.append("osc_id", values.osc_id);
-      if (values.categorie) formData.append("categorie", values.categorie);
+      // « Autres » : la catégorie saisie (à défaut, « Autres »)
+      const categorie = values.categorie === "Autres" && autreCategorie.trim() ? autreCategorie.trim() : values.categorie;
+      if (categorie) formData.append("categorie", categorie);
       ajouterFiche(formData, fiche, peutEpingler);
       if (thumbnail) formData.append("thumbnail", thumbnail);
 
@@ -431,6 +472,15 @@ export default function AdminModifierFormation() {
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
+              {watch("categorie") === "Autres" && (
+                <input
+                  type="text"
+                  value={autreCategorie}
+                  onChange={(e) => setAutreCategorie(e.target.value)}
+                  className="mt-3 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent"
+                  placeholder="Précisez la catégorie (ex. : Agriculture durable)"
+                />
+              )}
             </div>
 
             {/* Statuts */}
@@ -635,6 +685,14 @@ export default function AdminModifierFormation() {
                       </Select.Trigger>
                       <Select.Content className="bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-auto z-50">
                         <Select.Viewport>
+                          {peutEpingler && (
+                            <Select.Item
+                              value={TOUS_CRASC}
+                              className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors font-semibold text-[#2A591D]"
+                            >
+                              <Select.ItemText>Tous les CRASC (formation commune)</Select.ItemText>
+                            </Select.Item>
+                          )}
                           {crascRegions.map((region) => (
                             <Select.Item
                               key={region.id}
@@ -651,34 +709,26 @@ export default function AdminModifierFormation() {
                 />
               </div>
 
-              {/* OSC */}
+              {/* OSC : recherche dans toutes les OSC (aide à la saisie) */}
               <div>
-                <label htmlFor="osc_id" className="block text-sm font-semibold text-gray-700 mb-2">
-                  OSC associée
-                </label>
                 <Controller
                   name="osc_id"
                   control={control}
                   render={({ field }) => (
-                    <Select.Root onValueChange={field.onChange} value={field.value || undefined}>
-                      <Select.Trigger className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between">
-                        <Select.Value placeholder="Sélectionnez une OSC" />
-                        <ChevronDown className="w-4 h-4 text-gray-500" />
-                      </Select.Trigger>
-                      <Select.Content className="bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-auto z-50">
-                        <Select.Viewport>
-                          {oscs.map((osc) => (
-                            <Select.Item
-                              key={osc.id}
-                              value={osc.id.toString()}
-                              className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
-                            >
-                              <Select.ItemText>{osc.name}</Select.ItemText>
-                            </Select.Item>
-                          ))}
-                        </Select.Viewport>
-                      </Select.Content>
-                    </Select.Root>
+                    <SearchableAssociationSelect
+                      label="OSC associée"
+                      value={field.value || ""}
+                      options={oscs.map((osc) => ({
+                        id: osc.id,
+                        name: osc.name,
+                        subtitle: [osc.sigle, osc.crasc?.name].filter(Boolean).join(" • "),
+                      }))}
+                      placeholder="Sélectionnez une OSC (optionnel)"
+                      searchPlaceholder="Tapez le nom ou le sigle de l'OSC..."
+                      onChange={(v) => { oscChoisieRef.current = v || null; field.onChange(v); }}
+                      onSearchChange={setOscSearch}
+                      loading={oscLoading}
+                    />
                   )}
                 />
               </div>
