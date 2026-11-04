@@ -15,7 +15,7 @@ export default async function AboutPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 bg-[#f0f9ff] rounded-lg pt-8 mb-10">
         <div className="pb-6">
           <h2 className="text-[#2a591d] font-bold text-3xl pb-2">Présentation de la plateforme &#40;PdoC&#41;</h2>
-          <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Une plateforme pour tous</h4>
+          <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Une plateforme pour tous et pour toutes</h4>
           <p className="mb-3">Cette plateforme digitale est née d&apos;un travail collectif. Elle a été construite avec la participation des associations ivoiriennes, de l&apos;État et de partenaires techniques et financiers.</p>
           
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Un projet partagé</h4>
@@ -38,7 +38,7 @@ export default async function AboutPage() {
           <ul className="list-disc ml-12">
             <li>renforcer le vivre ensemble,</li>
             <li>aider à préparer le travail en équipe sans conflit,</li>
-            <li>encourager la participation des femmes et des jeunes.</li>
+            <li>encourager la participation des femmes, des jeunes et des personnes en situation de handicap.</li>
           </ul>
 
         </div>
@@ -52,14 +52,14 @@ export default async function AboutPage() {
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Histoire des CRASC en Côte d'Ivoire</h4>
           <ul className="list-disc ml-12">
             <li>En <b>2010</b>, une étude a montré que les organisations de la société civile &#40;OSC&#41; avaient beaucoup de difficultés.</li>
-            <li>Pour aidé, l&apos;État et l&apos;Union Européenne ont lancé le programme <b>LIANE</b>. Son but : renforcer la démocratie, améliorer la gouvernance et créer un vrai partenariat entre l&apos;État et les OSC.</li>
+            <li>Pour aider, l&apos;État et l&apos;Union Européenne ont lancé le programme <b>LIANE</b> &#40;Leadership et Initiative des Acteurs Non Étatiques&#41;. Son but : renforcer la démocratie, améliorer la gouvernance et créer un vrai partenariat entre l&apos;État et les OSC.</li>
             <li>En <b>2015</b>, grâce au projet LIANE I, les premiers <b>Centres Régionaux d&apos;Appui à la Société Civile &#40;CRASC&#41;</b> ont été créés.</li>
           </ul>
 
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Pourquoi les CRASC ?</h4>
           <ul className="list-disc ml-12">
             <li>Les OSC sont nombreuses et réparties partout dans le pays.</li>
-            <li>Pour mieux les accompagner, on a créé <b>5 CRASC</b> : Centre, Est, Nord, Ouest et Sud.</li>
+            <li>Pour mieux les accompagner, <b>5 CRASC</b> ont été créés : Centre, Est, Nord, Ouest et Sud.</li>
             <li>Chaque CRASC sert de relais pour donner conseils, formations et appuis aux associations de sa région.</li>
           </ul>
 
@@ -75,7 +75,7 @@ export default async function AboutPage() {
 
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Mission des CRASC</h4>
           <p className="mb-2">Les CRASC ont pour mission principale d&apos;<b>aider les organisations de la société civile &#40;OSC&#41;</b> de leur région à mieux fonctionner.</p>
-          <p>Ils aident les organisations à avoir leurs papiers, à bien s&apos;organiser et leur donnent des méthodes efficaces pour bien travailler.</p>
+          <p>Ils aident les organisations à avoir leurs papiers &#40;leurs documents de formalisation&#41;, à bien s&apos;organiser et leur donnent des méthodes efficaces pour bien travailler.</p>
 
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Objectifs des CRASC</h4>
           <ul className="list-disc ml-12">
@@ -94,7 +94,7 @@ export default async function AboutPage() {
           </ul>
 
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Organisation des CRASC</h4>
-          <p>Les CRASC sont structurés autour de 5 organes :</p>
+          <p>Les CRASC sont structurés autour des organes suivants :</p>
           <ul className="list-disc ml-12">
             <li>Assemblée Générale</li>
             <li>Conseil d&apos;Administration</li>
@@ -102,6 +102,7 @@ export default async function AboutPage() {
             <li>Délégations régionales</li>
             <li>Commissariat aux comptes</li>
             <li>Le conseil des sages</li>
+            <li>Les Taskforces</li>
           </ul>
 
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Les zones couvertes par les CRASC</h4>
@@ -118,7 +119,7 @@ export default async function AboutPage() {
           <p className="mb-2">Bafing &#40;Touba&#41;, Cavally &#40;Guiglo&#41;, Guémon &#40;Duékoué&#41;, Haut-Sassandra &#40;Daloa&#41;, Tonkpi &#40;Man&#41;</p>
 
           <p><b>CRASC Sud</b> : 9 régions + 1 district</p>
-          <p className="mb-2">Agnéby-Tiassa &#40;Agboville&#41;, Gbôklè &#40;Sassandra&#41;, Gôh &#40;Gagnoa&#41;, Mé &#40;Adzopé&#41;, San Pedro, Grands-Ponts &#40;Dabou&#41;, Loh-Djiboua &#40;Divo&#41;, Nawa &#40;Soubré&#41;, Sud-Comoé &#40;Aboisso&#41;, District autonome d'Abidjan</p>
+          <p className="mb-2">Agnéby-Tiassa &#40;Agboville&#41;, Gbôklè &#40;Sassandra&#41;, Gôh &#40;Gagnoa&#41;, Mé &#40;Adzopé&#41;, San Pedro &#40;San Pedro&#41;, Grands-Ponts &#40;Dabou&#41;, Loh-Djiboua &#40;Divo&#41;, Nawa &#40;Soubré&#41;, Sud-Comoé &#40;Aboisso&#41;, District autonome d'Abidjan</p>
 
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Réalisations des CRASC</h4>
           <p className="font-bold text-lg pt-4 pb-2">1. Renforcement des capacités de 5 409 OSC</p>
@@ -131,7 +132,7 @@ export default async function AboutPage() {
 
           <p className="font-bold text-lg pt-4 pb-2">2. Appui à la gouvernance et à la participation citoyenne</p>
           <ul className="list-disc ml-12">
-            <li>Réalisation d&apos;<b>enquêtes de satisfaction citoyenne</b> sur les services publics &#40;éducation inclusion financière&#41;</li>
+            <li>Réalisation d&apos;<b>enquêtes de satisfaction citoyenne</b> sur les services publics &#40;éducation à l&apos;inclusion financière&#41;</li>
             <li>30 Organisations de <b>cafés citoyens</b> et panels de dialogue avec les autorités et les candidats aux élections.</li>
             <li>Contribution à la <b>définition des politiques de développement local</b>.</li>
             <li>Élaboration d&apos;une <b>feuille de route pour les CRASC</b>.</li>
@@ -152,7 +153,7 @@ export default async function AboutPage() {
 
           <h4 className="font-bold text-lg pt-4 pb-2 text-[#2F5496]">Rôle principal de la DGAT</h4>
           <ul className="list-disc ml-12">
-            <li><b>Vulgarisation et formation</b> : La DGAT organise des ateliers pour expliquer l'ordonnance n° 2024-368 aux OSC et aux CRASC (Centres Régionaux d'Appui à la Société Civile).</li>
+            <li><b>Vulgarisation et formation</b> : La DGAT organise des ateliers pour expliquer la loi n° 2025-386 du 11 juin 2025 portant ratification de l&apos;ordonnance n° 2024-368 du 12 juin 2024 relative à l&apos;organisation de la société civile en Côte d&apos;Ivoire aux OSC et aux CRASC (Centres Régionaux d'Appui à la Société Civile).</li>
             <li><b>Accompagnement juridique et administratif</b> : Elle aide les OSC à comprendre les nouvelles obligations (déclaration, comptabilité, transparence, gouvernance).</li>
             <li><b>Mise en conformité</b> : La DGAT guide les OSC pour qu'elles adaptent leurs statuts, leurs procédures et leur fonctionnement aux nouvelles règles.</li>
             <li><b>Renforcement de la gouvernance</b> : Elle insiste sur la professionnalisation des OSC en matière de gestion financière, comptable et des ressources humaines.</li>
@@ -174,7 +175,7 @@ export default async function AboutPage() {
             <li><b>Structuration durable</b> : Les OSC sont encouragées à se regrouper en réseaux et plateformes pour plus de force collective.</li>
           </ul>
           <p className="my-4">En clair, la DGAT est le <b>bras opérationnel du ministère de l'Intérieur</b> pour appliquer l'ordonnance sur les OSC. Elle ne se contente pas de contrôler, mais elle <b>forme, accompagne et professionnalise</b> les organisations afin qu’elles deviennent des acteurs crédibles du développement et de la cohésion sociale en Côte d’Ivoire.</p>
-          <p className="text-[#2a591d] mb-4 font-bold">Les 10 articles Clés illustratifs de l'ordonnance n° 2024-368 sur les OSC, pour comprendre le rôle de la DGAT et son rapport avec les OSC.</p>
+          <p className="text-[#2a591d] mb-4 font-bold">Les 10 articles clés illustratifs de la loi n° 2025-386 du 11 juin 2025 portant ratification de l&apos;ordonnance n° 2024-368 du 12 juin 2024 relative à l&apos;organisation de la société civile en Côte d&apos;Ivoire,, pour comprendre le rôle de la DGAT et son rapport avec les OSC.</p>
           <ul className="list-disc ml-12">
             <li><b>Article 5</b> : « Les associations et organisations cultuelles doivent être déclarées auprès de la préfecture ou sous-préfecture. Les fondations doivent obtenir une autorisation préalable. ». Cela veut dire que pour exister légalement, une OSC doit faire une démarche officielle.</li>
             <li><b>Article 15</b> : « Les OSC régulièrement déclarées peuvent recevoir des dons, posséder des biens nécessaires à leurs activités et ouvrir un compte bancaire. ». Une OSC reconnue a donc le droit de gérer de l’argent et des biens pour ses actions.</li>
