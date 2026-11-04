@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
+import { ZONES_PROJET, couvreLaZone } from "@/lib/zones-projet";
 import {
   CircleCheckBig,
   Handshake,
-  DollarSign,
+  Coins,
   Search,
   MapPin,
   Clock,
@@ -31,14 +32,7 @@ const domaines = [
   "Développement communautaire"
 ];
 
-const zones = [
-  "Abidjan",
-  "Bouaké",
-  "Yamoussoukro",
-  "Korhogo",
-  "San-Pédro",
-  "Daloa"
-];
+const zones = ZONES_PROJET;
 
 export default function PageOffreProjet() {
   const [projets, setProjets] = useState<IOffreProjet[]>([]);
@@ -76,7 +70,7 @@ export default function PageOffreProjet() {
     const matchSearch = projet.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
                        projet.osc.toLowerCase().includes(searchQuery.toLowerCase());
     const matchDomaine = !selectedDomaine || projet.domaine === selectedDomaine;
-    const matchZone = !selectedZone || projet.zone === selectedZone;
+    const matchZone = !selectedZone || couvreLaZone(projet.zone, selectedZone);
 
     const ouverte = projet.soumission_ouverte !== false;
     const matchSoumission = soumission === "toutes" || (soumission === "ouvertes" ? ouverte : !ouverte);
@@ -260,7 +254,7 @@ export default function PageOffreProjet() {
                         <span>{projet.durée}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-[#E05017]" />
+                        <Coins className="w-4 h-4 text-[#E05017]" />
                         <span className="font-semibold">{projet.budget}</span>
                       </div>
                     </div>

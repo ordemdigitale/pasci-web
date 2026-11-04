@@ -9,7 +9,7 @@ import {
   Building2,
   MapPin,
   Clock,
-  DollarSign,
+  Coins,
   Target,
   Users,
   CheckCircle,
@@ -166,7 +166,7 @@ export default function PageDetailOffreProjet({
           </div>
 
           <div className="bg-white rounded-xl p-5 border border-gray-200 text-center">
-            <DollarSign className="w-8 h-8 text-[#E05017] mx-auto mb-2" />
+            <Coins className="w-8 h-8 text-[#E05017] mx-auto mb-2" />
             <p className="text-xs text-gray-500 mb-1">Budget</p>
             <p className="font-bold text-sm">{projet.budget}</p>
           </div>

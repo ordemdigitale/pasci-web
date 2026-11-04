@@ -40,6 +40,7 @@ interface DashboardStats {
 interface VisiteStats {
   total: number;
   visiteurs_uniques: number;
+  pages_vues?: number;
   aujourd_hui: number;
   hier: number;
   "7_jours": number;
@@ -421,9 +422,9 @@ export default function Dashboard() {
             <p className="text-2xl font-bold text-gray-900">{(visiteStats?.["30_jours"] ?? 0).toLocaleString("fr-FR")}</p>
           </div>
           <div className="bg-[#2a591d]/5 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-1">Total visites</p>
+            <p className="text-xs text-gray-500 mb-1">Total connexions</p>
             <p className="text-2xl font-bold text-[#2a591d]">{(visiteStats?.total ?? 0).toLocaleString("fr-FR")}</p>
-            <p className="text-xs text-gray-400 mt-1">{(visiteStats?.visiteurs_uniques ?? 0).toLocaleString("fr-FR")} visiteurs uniques</p>
+            <p className="text-xs text-gray-400 mt-1">{(visiteStats?.pages_vues ?? 0).toLocaleString("fr-FR")} pages vues</p>
           </div>
         </div>
 

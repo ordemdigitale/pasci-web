@@ -40,6 +40,10 @@ export const TYPES_PTF_DEFAUT: TypePtf[] = [
   "ONG internationales",
   "Fondations",
   "Secteur privé",
+  "Associations",
+  "Ministères",
+  "Collectivités territoriales",
+  "Pays",
   "Autres",
 ].map((nom) => ({ nom, nb_ptf: 0 }));
 

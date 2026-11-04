@@ -4,6 +4,8 @@ import { fetchWithAuth } from "@/lib/auth";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
+import SelecteurZones from "@/components/admin/SelecteurZones";
+import { messageErreurApi } from "@/lib/erreurs-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { ArrowLeft, Plus, Trash2, Upload, X, Loader2 } from "lucide-react";
@@ -18,7 +20,7 @@ const projetSchema = z.object({
   nom: z.string().min(5, "Le nom doit contenir au moins 5 caractères."),
   osc: z.string().min(2, "L'OSC porteuse est requise."),
   domaine: z.string().min(1, "Le domaine est requis."),
-  zone: z.string().min(2, "La zone est requise."),
+  zone: z.string().min(2, "Choisissez au moins une zone."),
   durée: z.string().min(1, "La durée est requise."),
   budget: z.string().min(1, "Le budget est requis."),
   offre_url: z.string().url("Lien de l'offre invalide").or(z.literal("")).optional(),
@@ -42,18 +44,6 @@ const domaines = [
   "Développement communautaire",
 ];
 
-const zones = [
-  "Abidjan",
-  "Bouaké",
-  "Yamoussoukro",
-  "Korhogo",
-  "San-Pédro",
-  "Daloa",
-  "Région du Nord",
-  "Région du Sud",
-  "Région de l'Ouest",
-  "Région du Centre",
-];
 
 export default function EditProjetPage() {
   const router = useRouter();
@@ -260,7 +250,7 @@ export default function EditProjetPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || "Erreur lors de la mise à jour du projet");
+        throw new Error(messageErreurApi(errorData.detail) || "Erreur lors de la mise à jour du projet");
       }
 
       router.push("/admin/projets");
@@ -387,19 +377,12 @@ export default function EditProjetPage() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Zone *
+                    Zones d&apos;exécution * <span className="text-gray-400 font-normal">(plusieurs choix possibles)</span>
                   </label>
-                  <select
-                    {...register("zone")}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
-                  >
-                    <option value="">Sélectionnez une zone</option>
-                    {zones.map((zone) => (
-                      <option key={zone} value={zone}>
-                        {zone}
-                      </option>
-                    ))}
-                  </select>
+                  <SelecteurZones
+                    valeur={watch("zone") || ""}
+                    onChange={(z) => setValue("zone", z, { shouldValidate: true })}
+                  />
                   {errors.zone && (
                     <p className="text-red-600 text-sm mt-1">{errors.zone.message}</p>
                   )}

@@ -8,7 +8,7 @@ import {
   Target,
   Building2,
   MapPin,
-  DollarSign,
+  Coins,
   Clock,
   Search,
   Plus,
@@ -192,7 +192,7 @@ export default function ProjetsPage() {
                 </p>
               </div>
               <div className="bg-purple-100 p-3 rounded-lg">
-                <DollarSign className="w-6 h-6 text-purple-600" />
+                <Coins className="w-6 h-6 text-purple-600" />
               </div>
             </div>
           </div>
@@ -489,7 +489,7 @@ export default function ProjetsPage() {
                   </div>
 
                   <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                    <DollarSign className="w-5 h-5 text-[#E05017] mt-0.5" />
+                    <Coins className="w-5 h-5 text-[#E05017] mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-gray-700">
                         Budget

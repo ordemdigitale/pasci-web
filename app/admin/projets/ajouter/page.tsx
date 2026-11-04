@@ -4,6 +4,8 @@ import { fetchWithAuth } from "@/lib/auth";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import SelecteurZones from "@/components/admin/SelecteurZones";
+import { messageErreurApi } from "@/lib/erreurs-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { ArrowLeft, Plus, Trash2, Upload, X } from "lucide-react";
@@ -17,9 +19,11 @@ const projetSchema = z.object({
   nom: z.string().min(5, "Le nom doit contenir au moins 5 caractères."),
   osc: z.string().min(2, "L'OSC porteuse est requise."),
   domaine: z.string().min(1, "Le domaine est requis."),
-  zone: z.string().optional(),
-  durée: z.string().optional(),
-  budget: z.string().optional(),
+  // Obligatoires côté API : laissés vides, l'API répondait par une liste
+  // d'erreurs affichée « [object Object],[object Object] »
+  zone: z.string().min(2, "Choisissez au moins une zone."),
+  durée: z.string().min(1, "La durée est requise."),
+  budget: z.string().min(1, "Le budget est requis."),
   offre_url: z.string().url("Lien de l'offre invalide").or(z.literal("")).optional(),
   objectif: z.string().optional(),
   description: z.string().optional(),
@@ -41,11 +45,6 @@ const domaines = [
   "Développement communautaire",
 ];
 
-const zones = [
-  "Sous-régional",
-  "National",
-  "International",
-];
 
 export default function AddProjetPage() {
   const router = useRouter();
@@ -180,7 +179,7 @@ export default function AddProjetPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || "Erreur lors de la création du projet");
+        throw new Error(messageErreurApi(errorData.detail) || "Erreur lors de la création du projet");
       }
 
       router.push("/admin/projets");
@@ -297,26 +296,20 @@ export default function AddProjetPage() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Zone
+                    Zones d&apos;exécution <span className="text-gray-400 font-normal">(plusieurs choix possibles)</span>
                   </label>
-                  <select
-                    {...register("zone")}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
-                  >
-                    <option value="">Sélectionnez une zone</option>
-                    {zones.map((zone) => (
-                      <option key={zone} value={zone}>
-                        {zone}
-                      </option>
-                    ))}
-                  </select>
+                  <SelecteurZones
+                    valeur={watch("zone") || ""}
+                    onChange={(z) => setValue("zone", z, { shouldValidate: true })}
+                  />
+                  {errors.zone && <p className="text-red-600 text-sm mt-1">{errors.zone.message}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Durée
+                    Durée *
                   </label>
                   <input
                     {...register("durée")}
@@ -324,11 +317,12 @@ export default function AddProjetPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
                     placeholder="Ex: 24 mois"
                   />
+                  {errors.durée && <p className="text-red-600 text-sm mt-1">{errors.durée.message}</p>}
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Budget
+                    Budget *
                   </label>
                   <input
                     {...register("budget")}
@@ -336,6 +330,7 @@ export default function AddProjetPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
                     placeholder="Ex: 250 millions FCFA"
                   />
+                  {errors.budget && <p className="text-red-600 text-sm mt-1">{errors.budget.message}</p>}
                 </div>
               </div>
 
