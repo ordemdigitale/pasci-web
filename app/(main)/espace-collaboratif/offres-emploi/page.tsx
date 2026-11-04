@@ -223,6 +223,19 @@ export default function PageOffreEmploi() {
               </div>
             ))}
           </div>
+
+          {/* Les offres expirées sont retirées du site : la page doit rester
+              lisible quand aucune offre n'est en cours. */}
+          {jobs.length === 0 && (
+            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+              <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-lg font-bold text-gray-700 mb-1">Aucune offre en cours</p>
+              <p className="text-sm text-gray-500">
+                Les offres dont la date limite de candidature est passée ne sont plus affichées.
+                Revenez prochainement pour consulter les nouvelles opportunités.
+              </p>
+            </div>
+          )}
         </div>
 
       </div>
