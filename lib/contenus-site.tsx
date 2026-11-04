@@ -52,6 +52,7 @@ Les pôles de concertation sont des espaces où les organisations de la sociét�
 - La charte peut évoluer selon les besoins des OSC.`,
   poles_illustration: "/images/b81daf7f-c015-4a68-942f-ce602fdf5542.jpg",
   ressources_illustration: "/images/3a510ba6881dd3274d3f509019311d42ace72cf51c823f60c5e5fe2e112ff892.png",
+  services_illustration: "/images/page-service/aa9d2f8c-6d73-497b-ba42-99c54f91cc24.jpg",
 };
 
 /** Valeurs de configuration du site, complétées par les valeurs par défaut. */

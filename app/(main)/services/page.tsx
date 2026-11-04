@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ImageWithFallback } from '@/lib/imageWithFallback'
+import { useContenusSite } from '@/lib/contenus-site'
 import {
   Users,
   FileText,
@@ -28,19 +29,19 @@ const services: IService[] = [
   {
     id: 1,
     icon: <Speech size={24} color="#E05017" />,
-    name: "Conseil",
+    name: "Conseils",
     //content: "Des conseils stratégiques pour des décisions éclairées et une croissance durable."
   },
   {
     id: 2,
     icon: <Users size={24} color="#E05017" />,
-    name: "Accompagnement",
+    name: "Accompagnements",
     //content: "Un soutien personnalisé à chaque étape de la mise en œuvre de vos projets."
   },
   {
     id: 3,
     icon: <FileText size={24} color="#E05017" />,
-    name: "Soutien Administratif",
+    name: "Soutiens administratifs",
     //content: "Formalisation et mise en conformité pour une structure solide et transparente."
   },
   {
@@ -52,19 +53,19 @@ const services: IService[] = [
   {
     id: 5,
     icon: <GraduationCap size={24} color="#E05017" />,
-    name: "Formation",
+    name: "Formations",
     //content: "un processus d'apprentissage structuré qui permet à un individu ou à un groupe d'acquérir des connaissances."
   },
   {
     id: 6,
     icon: <CalendarCheck size={24} color="#E05017" />,
-    name: "Suivi-évaluation",
+    name: "Suivi-évaluations",
     //content: "Mise en place d’outils et d’indicateurs de performance pour mesurer l’avancement et l’impact des actions menées."
   },
   {
     id: 7,
     icon: <Info size={24} color="#E05017" />,
-    name: "Information",
+    name: "Informations",
     //content: "Nous vous donnons des informations sur les opportunités de financements, de formation et de réseautage."
   },
 ];
@@ -88,6 +89,7 @@ export default function ServicesPage() {
   const [openFaqs, setOpenFaqs] = useState<number[]>([]);
   const [faqSearch, setFaqSearch] = useState("");
   const [faqItems, setFaqItems] = useState<IFaqItem[]>(fallbackFaqItems);
+  const contenu = useContenusSite();
 
   useEffect(() => {
     async function loadFaq() {
@@ -133,8 +135,8 @@ export default function ServicesPage() {
         <div className="space-y-12">
           <div className="">
             <ImageWithFallback
-              src="/images/page-service/aa9d2f8c-6d73-497b-ba42-99c54f91cc24.jpg"
-              alt="image"
+              src={contenu("services_illustration")}
+              alt="Services du CRASC"
               className="w-full h-[300px] object-cover rounded-lg"
             />
           </div>
@@ -166,60 +168,60 @@ export default function ServicesPage() {
       
       {/* Conseil */}
       <div className="py-8">
-        <p className="font-bold text-4xl text-center pb-4">Conseil</p>
+        <p className="font-bold text-4xl text-center pb-4">Conseils</p>
         <div className="max-w-5xl mx-auto bg-[#f0f9ff] p-6 sm:px-6 lg:px-8 border border-gray-200 rounded-lg space-y-6">
           <p>
-            Nous venons vous expliquer comment déposer vos demandes de financement et quelles sont les conditions pour être accepté. On insiste aussi sur les erreurs à éviter pour mettre toutes les chances de votre côté.
+            Nous venons vous expliquer comment déposer vos demandes de financement et les conditions pour être accepté.
           </p>
         </div>
       </div>
 
       {/* Accompagnement */}
       <div className="py-8">
-        <p className="font-bold text-4xl text-center pb-4">Accompagnement</p>
+        <p className="font-bold text-4xl text-center pb-4">Accompagnements</p>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg py-8 space-y-6">
           <p>
-            Au CRASC, on ne se limite pas aux conseils. On reste à vos côtés pour mettre en pratique vos idées. Cela peut être du coaching, des formations pour vos équipes, du mentorat pour vos responsables, ou même la prise en charge de certaines tâches importantes. Le but : vous aider à devenir autonomes.
+            Le but du CRASC est de vous aider à devenir autonomes. Nous restons à vos côtés pour mettre en pratique vos idées. Cela peut être du coaching, des formations pour vos équipes, du mentorat pour vos responsables, ou même la prise en charge de certaines tâches importantes.
           </p>
         </div>
       </div>
       
       {/* Soutien Administratif */}
       <div className="py-8">
-        <p className="font-bold text-4xl text-center pb-4">Soutien Administratif</p>
+        <p className="font-bold text-4xl text-center pb-4">Soutiens administratifs</p>
         <div className="max-w-5xl mx-auto bg-[#f0f9ff] p-6 sm:px-6 lg:px-8 border border-gray-200 rounded-lg space-y-6">
           <p>
-            On vous aide à rédiger vos statuts, vos règlements et à respecter les règles légales. L&apos;objectif est que votre organisation fonctionne correctement et en toute sécurité.
+            Nous vous aidons à rédiger vos statuts, vos règlements et à respecter les règles légales. L&apos;objectif est que votre organisation fonctionne correctement et en toute sécurité.
           </p>
         </div>
       </div>
 
       {/* Formation */}
       <div className="py-8">
-        <p className="font-bold text-4xl text-center pb-4">Formation</p>
+        <p className="font-bold text-4xl text-center pb-4">Formations</p>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg py-8 space-y-6">
           <p>
-            Nos formations ne servent pas seulement à apprendre des notions. Elles développent aussi l'esprit critique, l'autonomie et la capacité à appliquer ce qu'on a appris dans la vraie vie. On encourage aussi le partage d&pos;expériences entre participants.
+            Nos formations servent à développer l&apos;esprit critique, l&apos;autonomie et la capacité à appliquer ce qu&apos;on a appris sur le terrain. Nous encourageons aussi le partage d&apos;expériences entre participants.
           </p>
         </div>
       </div>
       
       {/* Suivi-évaluation */}
       <div className="py-8">
-        <p className="font-bold text-4xl text-center pb-4">Suivi-Évaluation</p>
+        <p className="font-bold text-4xl text-center pb-4">Suivi-évaluations</p>
         <div className="max-w-5xl mx-auto bg-[#f0f9ff] p-6 sm:px-6 lg:px-8 border border-gray-200 rounded-lg space-y-6">
           <p>
-            Ce n&apos;est pas juste mesurer des résultats. C&apos;est un outil pour prendre de bonnes décisions, ajuster vos actions en cours de route et améliorer l&apos;impact de vos projets. Cela garantit aussi plus de transparence et de responsabilité.
+            Le suivi-évaluation est un outil pour prendre de bonnes décisions, ajuster vos actions en cours de route et améliorer l&apos;impact de vos projets. Il garantit aussi plus de transparence et de responsabilité.
           </p>
         </div>
       </div>
 
       {/* Information */}
       <div className="py-8">
-        <p className="font-bold text-4xl text-center pb-4">Information</p>
+        <p className="font-bold text-4xl text-center pb-4">Informations</p>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border border-gray-200 rounded-lg py-8 space-y-6">
           <p>
-            Nous partageons avec vous les opportunités de financement, de formation et de réseautage. En diffusant ces infos, nous vous aidons à saisir les bonnes occasions et à renforcer vos actions sur le terrain.
+            Nous partageons avec vous les opportunités de financement, de formation et de réseautage. En diffusant ces informations, nous vous aidons à saisir les opportunités et à renforcer vos actions sur le terrain.
           </p>
         </div>
       </div>

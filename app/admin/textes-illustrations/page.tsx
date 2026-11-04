@@ -24,6 +24,7 @@ const TEXTES = [
 const IMAGES = [
   { cle: "poles_illustration", titre: "Illustration de la page Pôles de concertation" },
   { cle: "ressources_illustration", titre: "Illustration de la page Ressources" },
+  { cle: "services_illustration", titre: "Illustration de la page Services" },
 ];
 
 export default function TextesIllustrationsPage() {
