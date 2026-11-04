@@ -229,7 +229,7 @@ export default function ServicesPage() {
       {/* FAQ */}
       <div className="py-8">
         <div className="flex justify-center items-center mb-8">
-          <h2 className="text-gray-900 font-bold text-3xl">Foire Aux Questions</h2>
+          <h2 className="text-gray-900 font-bold text-3xl">Foire Aux Questions (FAQ)</h2>
         </div>
         <div className="relative max-w-3xl mx-auto mb-10 px-4">
           <Search className="absolute left-7 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
