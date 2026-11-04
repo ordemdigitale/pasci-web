@@ -2,6 +2,7 @@
 
 const CHAMPS: Record<string, string> = {
   nom: "Nom", osc: "OSC porteuse", domaine: "Domaine", zone: "Zone", durée: "Durée", budget: "Budget",
+  duree_heures: "Durée (heures)", max_participants: "Places", price: "Prix",
 };
 
 /**

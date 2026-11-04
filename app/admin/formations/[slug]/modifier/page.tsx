@@ -28,6 +28,7 @@ import {
   ListOrdered,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
+import { messageErreurApi } from "@/lib/erreurs-api";
 import { useAuth } from "@/contexts/AuthContext";
 import SearchableAssociationSelect from "@/components/admin/SearchableAssociationSelect";
 import ChampsFicheFormation, { ajouterFiche, erreurFiche, FICHE_VIDE, ficheDepuis, type FicheFormation } from "@/components/admin/ChampsFicheFormation";
@@ -253,7 +254,7 @@ export default function AdminModifierFormation() {
         console.error("Error response:", errorData);
         const errorMessage =
           errorData.detail?.errors?.[0]?.message ||
-          errorData.detail ||
+          messageErreurApi(errorData.detail) ||
           `Erreur ${response.status}: ${response.statusText}`;
         throw new Error(errorMessage);
       }
