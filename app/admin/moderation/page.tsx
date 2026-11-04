@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { fetchWithAuth } from "@/lib/auth";
 import { CheckCircle, XCircle, Loader2, Newspaper, Briefcase, BookOpen, FolderOpen, AlertCircle, Eye, Building2, FileText } from "lucide-react";
 import Link from "next/link";
+import { lecteurVideo } from "@/lib/medias-accueil";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -14,14 +15,15 @@ interface ItemEnAttente {
   nom?: string;
   created_at: string;
   type: "actualite" | "emploi" | "formation" | "projet" | "video" | "documentation" | "osc_modification" | "nouvelle_osc";
+  url?: string; // vidéo CRASC : lien YouTube, Vimeo…
   changes?: Record<string, unknown>;
 }
 
 const TYPE_CONFIG = {
   actualite:  { label: "Actualité",       icon: Newspaper,  color: "text-blue-600",   bg: "bg-blue-50",  border: "border-blue-200", adminPath: "/admin/gestion-des-actualites", pathSuffix: "/modifier" },
-  emploi:     { label: "Offre d'emploi",  icon: Briefcase,  color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200", adminPath: "/admin/emplois", pathSuffix: "" },
-  formation:  { label: "Formation",       icon: BookOpen,   color: "text-green-600",  bg: "bg-green-50",  border: "border-green-200", adminPath: "/admin/formations", pathSuffix: "" },
-  projet:     { label: "Offre de projet", icon: FolderOpen, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", adminPath: "/admin/projets", pathSuffix: "" },
+  emploi:     { label: "Offre d'emploi",  icon: Briefcase,  color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200", adminPath: "/admin/emplois", pathSuffix: "/modifier" },
+  formation:  { label: "Formation",       icon: BookOpen,   color: "text-green-600",  bg: "bg-green-50",  border: "border-green-200", adminPath: "/admin/formations", pathSuffix: "/modifier" },
+  projet:     { label: "Offre de projet", icon: FolderOpen, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", adminPath: "/admin/projets", pathSuffix: "/modifier" },
   video:      { label: "Vidéo CRASC",     icon: CheckCircle, color: "text-teal-600",  bg: "bg-teal-50",  border: "border-teal-200",  adminPath: "/admin/gestion-des-crasc/videos", pathSuffix: "" },
   documentation: { label: "Ressource", icon: FileText, color: "text-indigo-600", bg: "bg-indigo-50", border: "border-indigo-200", adminPath: "/admin/ressources", pathSuffix: "/modifier" },
   osc_modification: { label: "Modification OSC", icon: Building2, color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", adminPath: "/admin/gestion-des-crasc/osc", pathSuffix: "" },
@@ -61,10 +63,35 @@ function fieldLabel(field: string) {
   return FIELD_LABELS[field] || field.replaceAll("_", " ");
 }
 
+function ApercuVideo({ url }: { url: string }) {
+  const lecteur = lecteurVideo(url);
+  return (
+    <div className="basis-full">
+      {lecteur?.type === "iframe" ? (
+        <div className="aspect-video w-full max-w-2xl overflow-hidden rounded-lg bg-black">
+          <iframe
+            src={lecteur.src}
+            className="h-full w-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="Aperçu de la vidéo"
+          />
+        </div>
+      ) : lecteur?.type === "fichier" ? (
+        <video src={lecteur.src} controls className="w-full max-w-2xl rounded-lg bg-black" />
+      ) : null}
+      <a href={url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block break-all text-xs text-blue-600 hover:underline">
+        {url}
+      </a>
+    </div>
+  );
+}
+
 export default function AdminModerationPage() {
   const [items, setItems] = useState<ItemEnAttente[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState<string | null>(null);
+  const [videoOuverte, setVideoOuverte] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -90,6 +117,7 @@ export default function AdminModerationPage() {
           created_at: d.created_at as string,
           type,
           changes: d.changes as Record<string, unknown> | undefined,
+          url: d.url as string | undefined,
         }));
       };
 
@@ -180,7 +208,7 @@ export default function AdminModerationPage() {
               return (
                 <div
                   key={key}
-                  className={`flex items-center gap-4 bg-white border ${cfg.border} rounded-xl px-5 py-4 shadow-sm`}
+                  className={`flex flex-wrap items-center gap-4 bg-white border ${cfg.border} rounded-xl px-5 py-4 shadow-sm`}
                 >
                   {/* Icône type */}
                   <div className={`${cfg.bg} rounded-lg p-2 flex-shrink-0`}>
@@ -211,7 +239,18 @@ export default function AdminModerationPage() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    {item.slug && (
+                    {item.type === "video" ? (
+                      <button
+                        type="button"
+                        onClick={() => setVideoOuverte(videoOuverte === key ? null : key)}
+                        disabled={!item.url}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 border border-gray-200 text-sm font-semibold rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                        title="Visionner la vidéo"
+                      >
+                        <Eye className="w-4 h-4" />
+                        {videoOuverte === key ? "Masquer" : "Voir"}
+                      </button>
+                    ) : item.slug && (
                       <Link
                         href={`${cfg.adminPath}/${item.slug}${cfg.pathSuffix}`}
                         target="_blank"
@@ -239,6 +278,11 @@ export default function AdminModerationPage() {
                       Rejeter
                     </button>
                   </div>
+
+                  {/* Vidéo CRASC : visionnage sur place (pas de page de détail) */}
+                  {item.type === "video" && videoOuverte === key && item.url && (
+                    <ApercuVideo url={item.url} />
+                  )}
                 </div>
               );
             })}
