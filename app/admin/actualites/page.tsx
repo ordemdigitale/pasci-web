@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -22,7 +22,7 @@ import {
 import newsService, { INews, NewsAdminListe } from "@/lib/services/news.service";
 import { toast } from "sonner";
 
-const PAR_PAGE = 10;
+const PAR_PAGE = 20;
 
 const ETATS: Record<string, { libelle: string; classe: string }> = {
   en_attente: { libelle: "En attente de validation", classe: "bg-amber-100 text-amber-700" },
@@ -74,6 +74,13 @@ export default function ActualitesPage() {
     if (liste && liste.items.length === 0 && page > 1) setPage((p) => p - 1);
   }, [liste, page]);
 
+  // Changement de page : revenir en haut de la liste (les boutons sont en bas)
+  const haut = useRef<HTMLDivElement>(null);
+  const changerPage = (nouvelle: number) => {
+    setPage(nouvelle);
+    haut.current?.scrollIntoView({ block: "start" });
+  };
+
   const actualites = liste?.items ?? [];
   const compteurs = liste?.compteurs;
 
@@ -113,7 +120,7 @@ export default function ActualitesPage() {
 
   return (
     <div className="p-6">
-      <div className="max-w-7xl mx-auto">
+      <div ref={haut} className="max-w-7xl mx-auto scroll-mt-6">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
@@ -361,7 +368,7 @@ export default function ActualitesPage() {
               <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => setPage(page - 1)}
+                  onClick={() => changerPage(page - 1)}
                   disabled={page <= 1}
                   className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
@@ -370,7 +377,7 @@ export default function ActualitesPage() {
                 <span className="text-gray-600">Page {liste.page} / {liste.pages}</span>
                 <button
                   type="button"
-                  onClick={() => setPage(page + 1)}
+                  onClick={() => changerPage(page + 1)}
                   disabled={page >= liste.pages}
                   className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
