@@ -5,7 +5,8 @@ import Link from 'next/link';
 import {
   Search, Loader2, Calendar, MapPin, Users,
   Clock, ChevronRight, ChevronLeft, Mail, Phone, Send, Lightbulb, CheckCircle,
-  AlertCircle, BookOpen, UserCheck, GraduationCap, Building2, BarChart3, Pin
+  AlertCircle, BookOpen, UserCheck, GraduationCap, Building2, BarChart3, Pin,
+  FileText, Download,
 } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
 import { fetchAllFormations, IFormation, MODES_FORMATION, libelleFiche, modeFormation } from '@/lib/fetch-formations';
@@ -20,6 +21,14 @@ interface IFormationStats {
   total_inscrits: number;
   total_osc_formees: number;
   par_categorie_acteur: { categorie: string; total: number }[];
+}
+
+// Catalogue PDF déposé dans Admin › Formations › Catalogue
+interface ICatalogue {
+  id: number;
+  titre: string;
+  description?: string | null;
+  fichier_url: string;
 }
 
 interface SuggestionForm {
@@ -56,6 +65,7 @@ export default function FormationsPage() {
   const [defaultImage, setDefaultImage] = useState(FALLBACK_IMAGE);
 
   const [stats, setStats] = useState<IFormationStats | null>(null);
+  const [catalogues, setCatalogues] = useState<ICatalogue[]>([]);
 
   // Suggestion modal
   const [suggestion, setSuggestion] = useState<SuggestionForm>({ nom: '', prenoms: '', email: '', contact: '', message: '' });
@@ -81,6 +91,13 @@ export default function FormationsPage() {
     fetch(`${API_BASE}/api/v1/config`)
       .then((r) => r.ok ? r.json() : {})
       .then((cfg: Record<string, string>) => { if (cfg.formation_default_image) setDefaultImage(cfg.formation_default_image); })
+      .catch(() => {});
+
+    // Catalogue : affiché dès qu'il est actif dans l'admin, que les formations
+    // soient à venir ou expirées (il avait disparu lors d'une refonte de la page)
+    fetch(`${API_BASE}/api/v1/formations/catalogue?active_only=true`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => setCatalogues(Array.isArray(data) ? data : []))
       .catch(() => {});
 
     fetch(`${API_BASE}/api/v1/stats/formations`)
@@ -185,6 +202,36 @@ export default function FormationsPage() {
             />
           </div>
         </div>
+
+        {/* Catalogue de formations (PDF) */}
+        {catalogues.length > 0 && (
+          <div className="mb-10">
+            <h3 className="text-gray-800 text-2xl font-bold mb-6 flex items-center gap-3">
+              <FileText className="w-7 h-7 text-[#E05017]" />
+              Catalogue de Formations
+            </h3>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {catalogues.map((cat) => (
+                <a
+                  key={cat.id}
+                  href={cat.fichier_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-4 bg-white border-2 border-gray-200 hover:border-[#E05017] rounded-xl p-5 shadow-sm hover:shadow-md transition-all"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-red-50 group-hover:bg-[#E05017]/10 flex items-center justify-center flex-shrink-0 transition-colors">
+                    <FileText className="w-6 h-6 text-red-500 group-hover:text-[#E05017]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-gray-900 line-clamp-1 group-hover:text-[#E05017] transition-colors">{cat.titre}</p>
+                    {cat.description && <p className="text-sm text-gray-500 line-clamp-1 mt-0.5">{cat.description}</p>}
+                  </div>
+                  <Download className="w-5 h-5 text-gray-400 group-hover:text-[#E05017] flex-shrink-0 transition-colors" />
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Search Bar — pleine largeur */}
         <div className="relative mb-6">
