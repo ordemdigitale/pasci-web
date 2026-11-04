@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { X, Loader2, User, Mail, Shield, CheckCircle, XCircle, Building2 } from "lucide-react";
 import { userService, UpdateUserAdminData } from "@/lib/services/user.service";
-import { IUser, ICrasc } from "@/types/api.types";
+import { IUser, ICrasc, IPoleConcertation } from "@/types/api.types";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchAllCrasc } from "@/lib/fetch-crasc";
+import { API_ENDPOINTS } from "@/lib/api-config";
 
 interface EditUserModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
   const { user: currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [crascs, setCrascs] = useState<ICrasc[]>([]);
+  const [poles, setPoles] = useState<IPoleConcertation[]>([]);
   const [formData, setFormData] = useState<UpdateUserAdminData>({
     email: user.email,
     username: user.username || "",
@@ -30,6 +32,8 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
     is_staff: user.is_staff,
     is_superuser: user.is_superuser,
     is_redacteur: user.is_redacteur ?? false,
+    is_expert: user.is_expert ?? false,
+    expert_pole_ids: user.expert_pole_ids ?? [],
     crasc_id: user.crasc_id ?? null,
   });
 
@@ -45,6 +49,8 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
       is_staff: user.is_staff,
       is_superuser: user.is_superuser,
       is_redacteur: user.is_redacteur ?? false,
+      is_expert: user.is_expert ?? false,
+      expert_pole_ids: user.expert_pole_ids ?? [],
       crasc_id: user.crasc_id ?? null,
     });
   }, [user]);
@@ -52,6 +58,10 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
   useEffect(() => {
     if (isOpen) {
       fetchAllCrasc().then(setCrascs).catch(() => {});
+      fetch(API_ENDPOINTS.forum.poles)
+        .then((r) => (r.ok ? r.json() : []))
+        .then((data) => setPoles(Array.isArray(data) ? data : []))
+        .catch(() => {});
     }
   }, [isOpen]);
 
@@ -61,6 +71,10 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
     // Validation
     if (!formData.email) {
       toast.error("L'email est requis");
+      return;
+    }
+    if (formData.is_expert && !formData.expert_pole_ids?.length) {
+      toast.error("Choisissez au moins un pôle pour l'expert");
       return;
     }
 
@@ -341,6 +355,50 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                         </p>
                       </div>
                     </label>
+
+                    <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={formData.is_expert ?? false}
+                        onChange={() => handleCheckboxChange("is_expert")}
+                        className="w-5 h-5 text-[#2a591d] rounded focus:ring-[#2a591d]"
+                      />
+                      <div>
+                        <p className="font-semibold text-gray-900">Expert des pôles</p>
+                        <p className="text-sm text-gray-600">
+                          Anime les discussions de ses pôles : lance des sujets, les épingle et les clôt, modère les messages et rédige le récapitulatif
+                        </p>
+                      </div>
+                    </label>
+
+                    {formData.is_expert && (
+                      <div className="ml-2 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <p className="text-sm font-semibold text-gray-700 mb-2">
+                          Pôles animés <span className="text-red-500">*</span>
+                        </p>
+                        <div className="grid sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto">
+                          {poles.map((p) => (
+                            <label key={p.id} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={formData.expert_pole_ids?.includes(p.id) ?? false}
+                                onChange={() =>
+                                  setFormData((prev) => {
+                                    const ids = prev.expert_pole_ids ?? [];
+                                    return {
+                                      ...prev,
+                                      expert_pole_ids: ids.includes(p.id) ? ids.filter((i) => i !== p.id) : [...ids, p.id],
+                                    };
+                                  })
+                                }
+                                className="w-4 h-4 text-[#2a591d] rounded focus:ring-[#2a591d]"
+                              />
+                              {p.name}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
               </div>

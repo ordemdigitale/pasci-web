@@ -53,7 +53,8 @@ export default function AdminSidebar({
   const [oscAPublierCount, setOscAPublierCount] = useState(0);
   const pathname = usePathname();
   const { user } = useAuth();
-  const isOscUser = !!user?.osc_id && !user?.is_staff && !user?.is_superuser;
+  const isExpert = !!user?.is_expert && !user?.is_staff && !user?.is_superuser && !user?.is_redacteur;
+  const isOscUser = !!user?.osc_id && !user?.is_staff && !user?.is_superuser && !isExpert;
   const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
   const isRedacteurCrasc = !!user?.is_redacteur && !!user?.crasc_id && !user?.is_staff && !user?.is_superuser;
   const isRedacteur = !!user?.is_redacteur && !user?.crasc_id && !user?.is_staff && !user?.is_superuser;
@@ -201,7 +202,13 @@ export default function AdminSidebar({
     },
   ];
 
-  const navItems = isOscUser
+  const navItems = isExpert
+    ? [
+        ...allNavItems.filter((item) => !!user?.osc_id && (item.href === "/admin" || item.href === "/admin/mon-osc")),
+        { icon: <MessageSquare size={20} />, label: "Mes pôles", href: "/admin/forum/poles" } as NavItem,
+        { icon: <Settings size={20} />, label: "Paramètres", href: "/admin/profile" } as NavItem,
+      ]
+    : isOscUser
     ? allNavItems.filter((item) => item.href === "/admin" || item.href === "/admin/mon-osc")
     : isCrascAdmin
     ? [

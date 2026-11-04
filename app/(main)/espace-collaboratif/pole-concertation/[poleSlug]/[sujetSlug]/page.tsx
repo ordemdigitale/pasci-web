@@ -150,6 +150,9 @@ export default function PageSujetDetail() {
     );
   }
 
+  const idsExperts = new Set((sujet.experts ?? []).map((e) => e.id));
+  const estExpert = (id?: string | null) => !!id && idsExperts.has(id);
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 font-poppins">
       {/* Breadcrumb */}
@@ -164,7 +167,10 @@ export default function PageSujetDetail() {
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 shadow-sm">
         <h1 className="text-xl font-bold text-gray-900 mb-3">{sujet.title}</h1>
         <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
-          <span className="font-medium text-gray-600">{sujet.author_name || "Anonyme"}</span>
+          <span className="font-medium text-gray-600">
+            {sujet.author_name || "Anonyme"}
+            {estExpert(sujet.author_id) && <span className="ml-2 px-2 py-0.5 rounded-full bg-teal-100 text-teal-700 text-[10px] font-semibold align-middle">Expert</span>}
+          </span>
           <span>·</span>
           <span>{formatDate(sujet.created_at)}</span>
           <span className="flex items-center gap-1">
@@ -204,13 +210,14 @@ export default function PageSujetDetail() {
       <div className="space-y-4 mb-8">
         {(sujet.commentaires ?? []).map((c) => {
           const isOwner = currentUser && c.author_id === currentUser.id;
-          const isStaff = currentUser && (currentUser.is_staff || currentUser.is_superuser);
+          const isStaff = currentUser && (currentUser.is_staff || currentUser.is_superuser || estExpert(currentUser.id));
           return (
             <div key={c.id} className="bg-gray-50 border border-gray-100 rounded-xl p-5">
               <div className="flex items-start justify-between gap-4 mb-3">
                 <div>
                   <span className="font-semibold text-sm text-gray-800">
                     {c.author_name || "Anonyme"}
+                    {estExpert(c.author_id) && <span className="ml-2 px-2 py-0.5 rounded-full bg-teal-100 text-teal-700 text-[10px] font-semibold align-middle">Expert</span>}
                   </span>
                   <span className="text-gray-400 text-xs ml-2">{formatDate(c.created_at)}</span>
                 </div>

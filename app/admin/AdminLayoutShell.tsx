@@ -32,12 +32,44 @@ const REDACTEUR_CRASC_ALLOWED_PREFIXES = [
   "/admin/settings",
 ];
 
+// Routes autorisées pour les experts des pôles (l'ajout, la modification et
+// les sondages d'un pôle restent réservés au staff)
+const EXPERT_ALLOWED_PREFIXES = ["/admin/forum/poles", "/admin/forum/sujets", "/admin/profile"];
+const EXPERT_BLOCKED = /^\/admin\/forum\/poles\/(ajouter|[^/]+\/(modifier|sondages))/;
+
+/** Expert des pôles (sans autre rôle d'administration). */
+function estExpertSeul(user: ReturnType<typeof useAuth>["user"]) {
+  return !!user?.is_expert && !user?.is_staff && !user?.is_superuser && !user?.is_redacteur;
+}
+
+function ExpertRouteGuard({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const isExpert = estExpertSeul(user);
+
+  useEffect(() => {
+    if (loading || !isExpert) return;
+    if (pathname === "/admin") {
+      // Sans OSC, le tableau de bord n'a rien à montrer : direction ses pôles
+      if (!user?.osc_id) router.replace("/admin/forum/poles");
+      return;
+    }
+    if (user?.osc_id && pathname.startsWith("/admin/mon-osc")) return;
+    const allowed = EXPERT_ALLOWED_PREFIXES.some((prefix) => pathname.startsWith(prefix)) && !EXPERT_BLOCKED.test(pathname);
+    if (!allowed) router.replace("/admin/forum/poles");
+  }, [loading, isExpert, user?.osc_id, pathname, router]);
+
+  return <>{children}</>;
+}
+
 function OscRouteGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
 
-  const isOscUser = !!user?.osc_id && !user?.is_staff && !user?.is_superuser;
+  const isOscUser = !!user?.osc_id && !user?.is_staff && !user?.is_superuser && !user?.is_expert;
 
   useEffect(() => {
     if (loading || !isOscUser) return;
@@ -111,6 +143,7 @@ export default function AdminLayoutShell({
           <OscRouteGuard>
             <RedacteurCrascRouteGuard>
             <CrascAdminRouteGuard>
+            <ExpertRouteGuard>
             <div className="flex h-screen overflow-hidden bg-cyan-50/50 font-poppins">
               <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
@@ -129,6 +162,7 @@ export default function AdminLayoutShell({
                 <AdminFooter />
               </div>
             </div>
+            </ExpertRouteGuard>
             </CrascAdminRouteGuard>
             </RedacteurCrascRouteGuard>
           </OscRouteGuard>

@@ -33,6 +33,7 @@ function getUserRole(u: IUser): string {
   if (u.is_superuser) return "superuser";
   if (u.is_staff) return "admin_crasc";
   if (u.is_redacteur) return "redacteur";
+  if (u.is_expert) return "expert";
   if (u.osc_id) return "osc";
   return "utilisateur";
 }
@@ -92,12 +93,21 @@ export default function UtilisateursPage() {
   useEffect(() => { setCurrentPage(1); }, [searchQuery, selectedStatus, selectedRole]);
 
   const handleRoleChange = async (targetUser: IUser, newRole: string) => {
+    // Un expert doit avoir ses pôles : on les choisit dans la fiche avant d'enregistrer
+    if (newRole === "expert") {
+      setSelectedUser({ ...targetUser, is_superuser: false, is_staff: false, is_redacteur: false, is_expert: true });
+      setIsEditModalOpen(true);
+      toast.info("Cochez les pôles que cet expert animera, puis enregistrez.");
+      return;
+    }
     setUpdatingRoleId(targetUser.id);
     try {
       const update: UpdateUserAdminData = {
         is_superuser: false,
         is_staff: false,
         is_redacteur: false,
+        is_expert: false,
+        expert_pole_ids: [],
       };
       if (newRole === "superuser") { update.is_superuser = true; update.is_staff = true; }
       else if (newRole === "admin_crasc") { update.is_staff = true; }
@@ -370,6 +380,7 @@ export default function UtilisateursPage() {
                 <option value="superuser">Superuser</option>
                 <option value="admin_crasc">Admin CRASC</option>
                 <option value="redacteur">Rédacteur</option>
+                <option value="expert">Expert des pôles</option>
                 <option value="osc">Utilisateur OSC</option>
                 <option value="utilisateur">Utilisateur</option>
               </select>
@@ -442,6 +453,8 @@ export default function UtilisateursPage() {
                                 ? "bg-blue-50 text-blue-700 border-blue-200"
                                 : getUserRole(user) === "redacteur"
                                 ? "bg-orange-50 text-orange-700 border-orange-200"
+                                : getUserRole(user) === "expert"
+                                ? "bg-teal-50 text-teal-700 border-teal-200"
                                 : getUserRole(user) === "osc"
                                 ? "bg-green-50 text-green-700 border-green-200"
                                 : "bg-gray-50 text-gray-700 border-gray-200"
@@ -450,6 +463,7 @@ export default function UtilisateursPage() {
                             <option value="superuser">Superuser</option>
                             <option value="admin_crasc">Admin CRASC</option>
                             <option value="redacteur">Rédacteur</option>
+                            <option value="expert">Expert des pôles</option>
                             <option value="utilisateur">Utilisateur</option>
                           </select>
                           {updatingRoleId === user.id && (
@@ -473,7 +487,12 @@ export default function UtilisateursPage() {
                               Rédacteur
                             </span>
                           )}
-                          {!user.is_staff && !user.is_superuser && !user.is_redacteur && (
+                          {user.is_expert && !user.is_staff && !user.is_superuser && !user.is_redacteur && (
+                            <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-teal-100 text-teal-700">
+                              Expert des pôles
+                            </span>
+                          )}
+                          {!user.is_staff && !user.is_superuser && !user.is_redacteur && !user.is_expert && (
                             <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
                               {user.osc_id ? "Utilisateur OSC" : "Utilisateur"}
                             </span>
@@ -642,6 +661,8 @@ export default function UtilisateursPage() {
                       ? "Admin CRASC"
                       : selectedUser.is_redacteur
                       ? "Rédacteur"
+                      : selectedUser.is_expert
+                      ? "Expert des pôles"
                       : "Utilisateur"}
                   </p>
                 </div>

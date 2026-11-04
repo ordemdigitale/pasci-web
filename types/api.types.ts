@@ -341,6 +341,9 @@ export interface IUser {
   is_staff: boolean;
   is_superuser: boolean;
   is_redacteur: boolean;
+  /** Expert : anime les discussions des pôles listés */
+  is_expert?: boolean;
+  expert_pole_ids?: number[];
   crasc_id?: number | null;
   osc_id?: number | null;
   avatar?: string;
@@ -396,6 +399,8 @@ export interface IPoleConcertation {
   regions_influence?: string;
   // Régions des membres avec leur nombre d'OSC, de la plus représentée à la moins représentée
   regions_effectifs?: { nom: string; nb: number }[];
+  /** Experts qui animent le pôle */
+  experts?: { id: string; nom: string }[];
   realisations?: string;
   projets_en_cours?: string;
   agenda?: string;
@@ -447,6 +452,7 @@ export interface IForumCommentaire {
 export interface IForumSujetDetail extends IForumSujet {
   commentaires: IForumCommentaire[];
   pieces_jointes?: IPieceJointe[];
+  experts?: { id: string; nom: string }[];
 }
 
 export interface IPoleMembre {

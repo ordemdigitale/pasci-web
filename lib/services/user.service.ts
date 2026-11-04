@@ -27,6 +27,8 @@ export interface UpdateUserAdminData extends UpdateUserData {
   is_staff?: boolean;
   is_superuser?: boolean;
   is_redacteur?: boolean;
+  is_expert?: boolean;
+  expert_pole_ids?: number[];
   crasc_id?: number | null;
 }
 

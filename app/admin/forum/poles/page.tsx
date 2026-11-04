@@ -50,6 +50,9 @@ interface IPoleConcertation {
 export default function AdminForumPolesPage() {
   const { user } = useAuth();
   const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
+  // L'expert ne voit que les pôles qu'il anime, sans les actions de gestion
+  const isExpert = !!user?.is_expert && !user?.is_staff && !user?.is_superuser;
+  const peutGerer = !isCrascAdmin && !isExpert;
   const [poles, setPoles] = useState<IPoleConcertation[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -69,7 +72,8 @@ export default function AdminForumPolesPage() {
 
   useEffect(() => {
     fetchPoles();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExpert]);
 
   async function handleFusion() {
     if (!fusionSource || !fusionCible) return;
@@ -129,10 +133,11 @@ export default function AdminForumPolesPage() {
     setLoading(true);
     try {
       // Fetch all poles including inactive (admin view)
-      const res = await fetchWithAuth(API_ENDPOINTS.forum.poles + "?limit=100&include_inactive=true");
+      const res = await fetchWithAuth(API_ENDPOINTS.forum.poles + (isExpert ? "?limit=100" : "?limit=100&include_inactive=true"));
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setPoles(Array.isArray(data) ? data : []);
+      const liste: IPoleConcertation[] = Array.isArray(data) ? data : [];
+      setPoles(isExpert ? liste.filter((p) => user?.expert_pole_ids?.includes(p.id)) : liste);
     } catch (err) {
       console.error(err);
     } finally {
@@ -195,9 +200,11 @@ export default function AdminForumPolesPage() {
             <h1 className="text-3xl font-extrabold text-gray-900 mb-1">
               Pôles de concertation
             </h1>
-            <p className="text-gray-600">Gérez les pôles du forum collaboratif</p>
+            <p className="text-gray-600">
+              {isExpert ? "Animez les discussions des pôles qui vous sont confiés" : "Gérez les pôles du forum collaboratif"}
+            </p>
           </div>
-          {!isCrascAdmin && (
+          {peutGerer && (
             <Link href="/admin/forum/poles/ajouter">
               <button className="flex items-center gap-2 px-5 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold">
                 <Plus className="w-5 h-5" />
@@ -419,7 +426,7 @@ export default function AdminForumPolesPage() {
                       <Pin className="w-4 h-4" />
                     </button>
                   </Link>
-                  {!isCrascAdmin && (
+                  {peutGerer && (
                     <>
                       <Link href={`/admin/forum/poles/${pole.slug}/sondages`}>
                         <button

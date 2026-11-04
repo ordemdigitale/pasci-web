@@ -358,6 +358,13 @@ export default function PagePoleForum() {
         {pole.description && (
           <TexteFormate texte={pole.description} className="text-gray-600 text-sm" depliable />
         )}
+        {(pole.experts ?? []).length > 0 && (
+          <p className="mt-2 text-sm text-gray-600">
+            Animé par{" "}
+            <span className="font-semibold text-teal-700">{(pole.experts ?? []).map((e) => e.nom).join(", ")}</span>
+            <span className="ml-2 px-2 py-0.5 rounded-full bg-teal-100 text-teal-700 text-[10px] font-semibold align-middle">Expert</span>
+          </p>
+        )}
         <div className="mt-4 grid sm:grid-cols-2 gap-3 text-sm text-gray-600">
           <div className="flex items-center gap-2 rounded-lg bg-white/80 border border-gray-200 px-3 py-2">
             <Users className="w-4 h-4 text-[#E05017]" />
