@@ -5,10 +5,10 @@ import Link from 'next/link';
 import {
   Search, Loader2, Calendar, MapPin, Users,
   Clock, ChevronRight, ChevronLeft, Mail, Phone, Send, Lightbulb, CheckCircle,
-  AlertCircle, BookOpen, UserCheck, GraduationCap, Building2, BarChart3
+  AlertCircle, BookOpen, UserCheck, GraduationCap, Building2, BarChart3, Pin
 } from 'lucide-react';
 import { ImageWithFallback } from "@/lib/imageWithFallback";
-import { fetchAllFormations, IFormation } from '@/lib/fetch-formations';
+import { fetchAllFormations, IFormation, MODES_FORMATION, libelleFiche, modeFormation } from '@/lib/fetch-formations';
 
 const FALLBACK_IMAGE = "/images/page-formation/0cd2210f-3c2d-4036-9e65-e993265c441c.jpg";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -46,7 +46,7 @@ function isUpcoming(dateStr: string | null | undefined) {
 export default function FormationsPage() {
   const [activeCategorie, setActiveCategorie] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<'all' | 'gratuite' | 'payante'>('all');
-  const [filterMode, setFilterMode] = useState<'all' | 'en_ligne' | 'presentiel'>('all');
+  const [filterMode, setFilterMode] = useState<'all' | 'en_ligne' | 'presentiel' | 'hybride'>('all');
   const [filterStatut, setFilterStatut] = useState<'all' | 'actif' | 'termine'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -98,8 +98,7 @@ export default function FormationsPage() {
       (formation.description && formation.description.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesCategorie = activeCategorie === null || formation.categorie === activeCategorie;
     const matchesType = filterType === 'all' || formation.type === filterType;
-    const isEnLigne = !formation.location || formation.location.toLowerCase().includes('ligne') || formation.location.toLowerCase().includes('online') || formation.location.toLowerCase().includes('distance');
-    const matchesMode = filterMode === 'all' || (filterMode === 'en_ligne' ? isEnLigne : !isEnLigne);
+    const matchesMode = filterMode === 'all' || modeFormation(formation) === filterMode;
     const matchesStatut = filterStatut === 'all' || (filterStatut === 'actif' ? !estTerminee(formation) : estTerminee(formation));
     return matchesSearch && matchesCategorie && matchesType && matchesMode && matchesStatut;
   });
@@ -110,9 +109,12 @@ export default function FormationsPage() {
   // Reset page when filters change
   const setCategorie = (cat: string | null) => { setActiveCategorie(cat); setCurrentPage(1); };
   const setType = (v: 'all' | 'gratuite' | 'payante') => { setFilterType(v); setCurrentPage(1); };
-  const setMode = (v: 'all' | 'en_ligne' | 'presentiel') => { setFilterMode(v); setCurrentPage(1); };
+  const setMode = (v: 'all' | 'en_ligne' | 'presentiel' | 'hybride') => { setFilterMode(v); setCurrentPage(1); };
   const setStatut = (v: 'all' | 'actif' | 'termine') => { setFilterStatut(v); setCurrentPage(1); };
   const resetFilters = () => { setFilterType('all'); setFilterMode('all'); setFilterStatut('all'); setCurrentPage(1); };
+
+  // Épinglées par l'admin (3 au plus), hors terminées : mises en avant en tête de page
+  const formationsEpinglees = formations.filter(f => f.is_pinned && !estTerminee(f));
 
   const upcomingFormations = formations
     .filter(f => isUpcoming(f.start_date) && !estTerminee(f))
@@ -247,6 +249,30 @@ export default function FormationsPage() {
 
             {/* Formations Grid */}
             <div className="mb-8">
+              {formationsEpinglees.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-gray-800 text-xl font-bold mb-3 flex items-center gap-2">
+                    <Pin className="w-5 h-5 text-[#E05017]" /> À ne pas manquer
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {formationsEpinglees.map((f) => (
+                      <Link
+                        key={f.id}
+                        href={`/formations/${f.slug}`}
+                        className="clignote block rounded-lg border-2 border-[#E05017] bg-orange-50 p-4 hover:bg-orange-100 transition-colors"
+                      >
+                        <p className="font-semibold text-gray-900 line-clamp-2">{f.title}</p>
+                        <p className="text-xs text-gray-600 mt-1">
+                          {f.registration_deadline
+                            ? `Inscriptions jusqu'au ${formatDate(f.registration_deadline)}`
+                            : f.start_date ? `Début le ${formatDate(f.start_date)}` : null}
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <h3 className="text-gray-800 text-3xl font-bold my-6">Programmes de Formations</h3>
 
               {/* Filtres */}
@@ -262,7 +288,7 @@ export default function FormationsPage() {
                 </div>
                 {/* Mode */}
                 <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
-                  {([['all', 'Tous modes'], ['en_ligne', 'En ligne'], ['presentiel', 'Présentiel']] as const).map(([val, label]) => (
+                  {([['all', 'Tous modes'], ['en_ligne', 'En ligne'], ['presentiel', 'Présentiel'], ['hybride', 'Hybride']] as const).map(([val, label]) => (
                     <button key={val} onClick={() => setMode(val)}
                       className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${filterMode === val ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}>
                       {label}
@@ -335,20 +361,29 @@ export default function FormationsPage() {
                             ) : (
                               <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">Gratuite</span>
                             )}
-                            {formation.rubrique && (
-                              <span className="px-2 py-0.5 text-white text-xs font-semibold rounded-full" style={{ backgroundColor: formation.rubrique.color || '#E05017' }}>
-                                {formation.rubrique.name}
+                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                              {libelleFiche(MODES_FORMATION, modeFormation(formation))}
+                            </span>
+                            {formation.duree_heures != null && (
+                              <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full flex items-center gap-1">
+                                <Clock className="w-3 h-3" /> {formation.duree_heures.toLocaleString('fr-FR')} h
                               </span>
                             )}
                           </div>
                           <h4 className="text-gray-800 text-xl font-semibold mb-3">{formation.title}</h4>
                           <p className="text-gray-600 text-sm mb-4 line-clamp-3">{formation.description || "Aucune description disponible."}</p>
                           {formation.start_date && (
-                            <p className="text-xs text-gray-400 mb-3 flex items-center gap-1">
+                            <p className="text-xs text-gray-400 mb-1 flex items-center gap-1">
                               <Calendar className="w-3.5 h-3.5" />
                               {formatDate(formation.start_date)}
                             </p>
                           )}
+                          {formation.registration_deadline && !estTerminee(formation) && (
+                            <p className="text-xs text-[#E05017] font-medium mb-3">
+                              Inscriptions jusqu&apos;au {formatDate(formation.registration_deadline)}
+                            </p>
+                          )}
+                          {!(formation.registration_deadline && !estTerminee(formation)) && <div className="mb-2" />}
                           <Link href={`/formations/${formation.slug}`}>
                             <button className="px-4 py-2 text-white rounded-full text-sm hover:bg-[#c44315] transition-colors" style={{ backgroundColor: '#E05107' }}>
                               Voir plus

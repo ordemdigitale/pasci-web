@@ -23,9 +23,16 @@ import {
   Smartphone,
   Clock,
   AlertCircle,
+  Award,
+  Monitor,
+  Video,
+  ListOrdered,
 } from 'lucide-react';
 import Link from 'next/link';
-import { getFormationBySlug, inscrireFormation, verifierCertificat, IFormation } from '@/lib/fetch-formations';
+import {
+  getFormationBySlug, inscrireFormation, verifierCertificat, IFormation,
+  MODES_FORMATION, DOCUMENTS_DELIVRES, libelleFiche, modeFormation,
+} from '@/lib/fetch-formations';
 import { getStoredUser, getToken } from '@/lib/auth';
 import SupportsFormation from '@/components/formations/SupportsFormation';
 import EvaluationFinale from '@/components/formations/EvaluationFinale';
@@ -387,6 +394,9 @@ export default function FormationDetailPage() {
   }
 
   const terminee = formation.est_terminee ?? formation.is_completed;
+  const placesRestantes = formation.max_participants
+    ? Math.max(formation.max_participants - formation.current_participants, 0)
+    : null;
   const canRegister = !alreadyRegistered && !terminee && !formation.is_full &&
     (formation.inscriptions_ouvertes ??
       (!formation.registration_deadline || new Date(formation.registration_deadline) > new Date()));
@@ -394,9 +404,21 @@ export default function FormationDetailPage() {
   const paiementAFaire = alreadyRegistered && !acces && (paymentStatus === "pending" || paymentStatus === "failed");
   const paiementEnVerification = alreadyRegistered && !acces && paymentStatus === "soumis";
 
-  const programme = modules.length === 0 ? (
-    <p className="text-xs text-gray-400 px-3">Aucun contenu disponible.</p>
+  const etapesChronogramme = (formation.chronogramme || "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const chronogramme = etapesChronogramme.length === 0 ? (
+    <p className="text-xs text-gray-400 px-3">Le chronogramme sera bientôt publié.</p>
   ) : (
+    <ol className="flex flex-col gap-2 px-3">
+      {etapesChronogramme.map((etape, i) => (
+        <li key={i} className="flex gap-2 text-sm text-gray-700">
+          <span className="flex-shrink-0 w-5 h-5 rounded-full bg-orange-100 text-[#E05017] text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+          <span>{etape}</span>
+        </li>
+      ))}
+    </ol>
+  );
+
+  const programme = modules.length === 0 ? null : (
     <div className="flex flex-col gap-6">
       {modules.map((module) => (
         <div key={module.id}>
@@ -491,19 +513,19 @@ export default function FormationDetailPage() {
                   Gratuite
                 </span>
               )}
-              {formation.rubrique && (
-                <span
-                  className="px-2 py-1 text-white text-xs font-bold rounded-full"
-                  style={{ backgroundColor: formation.rubrique.color || '#E05017' }}
-                >
-                  {formation.rubrique.name}
-                </span>
-              )}
+              <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                {libelleFiche(MODES_FORMATION, modeFormation(formation))}
+              </span>
               {terminee && (
                 <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-full">Terminée</span>
               )}
               {formation.is_full && !terminee && (
                 <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-full">Complet</span>
+              )}
+              {!formation.is_full && !terminee && placesRestantes !== null && (
+                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                  {placesRestantes} place{placesRestantes > 1 ? "s" : ""} disponible{placesRestantes > 1 ? "s" : ""}
+                </span>
               )}
             </div>
             {(formation as any).categorie && (
@@ -515,7 +537,32 @@ export default function FormationDetailPage() {
             {formation.start_date && (
               <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
                 <Calendar className="w-4 h-4 text-[#E05017]" />
-                <span>{formatDate(formation.start_date)}</span>
+                <span>
+                  {formatDate(formation.start_date)}
+                  {formation.end_date && formatDate(formation.end_date) !== formatDate(formation.start_date) && ` → ${formatDate(formation.end_date)}`}
+                </span>
+              </div>
+            )}
+            {formation.registration_deadline && (
+              <div className="flex items-center gap-2 text-sm text-[#E05017] font-medium mb-1">
+                <Clock className="w-4 h-4" />
+                <span>Inscriptions jusqu&apos;au {formatDate(formation.registration_deadline)}</span>
+              </div>
+            )}
+            {formation.duree_heures != null && (
+              <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                <Monitor className="w-4 h-4 text-[#E05017]" />
+                <span>Durée : {formation.duree_heures.toLocaleString("fr-FR")} heure{formation.duree_heures > 1 ? "s" : ""}</span>
+              </div>
+            )}
+            {formation.document_delivre && (
+              <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                <Award className="w-4 h-4 text-[#E05017]" />
+                <span>
+                  {formation.document_delivre === "neant"
+                    ? "Aucun document délivré"
+                    : `${libelleFiche(DOCUMENTS_DELIVRES, formation.document_delivre)} ${formation.document_delivre === "attestation" ? "délivrée" : "délivré"} à l'issue de la formation`}
+                </span>
               </div>
             )}
             {formation.location && (
@@ -532,12 +579,18 @@ export default function FormationDetailPage() {
             )}
           </div>
 
-          {/* Modules */}
+          {/* Chronogramme et modules */}
           <div className="flex-1 overflow-y-auto p-4">
             <h2 className="text-xs font-bold uppercase tracking-wider mb-4 px-3 text-gray-600">
-              Programme
+              Chronogramme de la formation
             </h2>
-            {programme}
+            {chronogramme}
+            {programme && (
+              <>
+                <h2 className="text-xs font-bold uppercase tracking-wider mt-6 mb-4 px-3 text-gray-600">Contenu en ligne</h2>
+                {programme}
+              </>
+            )}
           </div>
 
           {/* Barre de progression */}
@@ -959,10 +1012,16 @@ export default function FormationDetailPage() {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
               {/* Left Column */}
               <div className="xl:col-span-2 space-y-8">
-                {/* Programme sur petit écran (la barre latérale n'y est pas affichée) */}
+                {/* Chronogramme sur petit écran (la barre latérale n'y est pas affichée) */}
                 <div className="lg:hidden bg-white p-4 rounded-xl border border-gray-200">
-                  <h2 className="text-xs font-bold uppercase tracking-wider mb-4 px-3 text-gray-600">Programme</h2>
-                  {programme}
+                  <h2 className="text-xs font-bold uppercase tracking-wider mb-4 px-3 text-gray-600">Chronogramme de la formation</h2>
+                  {chronogramme}
+                  {programme && (
+                    <>
+                      <h2 className="text-xs font-bold uppercase tracking-wider mt-6 mb-4 px-3 text-gray-600">Contenu en ligne</h2>
+                      {programme}
+                    </>
+                  )}
                   {progressionBloc && <div className="mt-4 px-3">{progressionBloc}</div>}
                 </div>
 
@@ -988,6 +1047,34 @@ export default function FormationDetailPage() {
                     <p>{formation.description || "Aucune description disponible."}</p>
                   </div>
                 </div>
+
+                {formation.competences_requises && (
+                  <div className="bg-white p-6 rounded-xl border border-gray-200">
+                    <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                      <ListOrdered className="w-5 h-5 text-[#E05017]" />
+                      Compétences requises
+                    </h2>
+                    <p className="text-gray-600 text-base leading-relaxed whitespace-pre-line">{formation.competences_requises}</p>
+                  </div>
+                )}
+
+                {/* Lien de la séance : renvoyé par l'API aux seuls inscrits */}
+                {formation.lien_visio && (
+                  <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
+                    <h2 className="text-lg font-bold mb-2 flex items-center gap-2 text-blue-900">
+                      <Video className="w-5 h-5" />
+                      Séance en ligne
+                    </h2>
+                    <a
+                      href={formation.lien_visio}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-1 px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700"
+                    >
+                      Rejoindre la séance
+                    </a>
+                  </div>
+                )}
               </div>
 
               {/* Right Column */}
