@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -19,41 +19,43 @@ import {
   MessageSquare,
   Share2,
 } from "lucide-react";
-import newsService, { INews } from "@/lib/services/news.service";
+import newsService, { INews, NewsAdminListe } from "@/lib/services/news.service";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
+
+const PAR_PAGE = 10;
+
+const ETATS: Record<string, { libelle: string; classe: string }> = {
+  en_attente: { libelle: "En attente de validation", classe: "bg-amber-100 text-amber-700" },
+  rejete: { libelle: "Rejetée", classe: "bg-red-100 text-red-700" },
+};
 
 export default function ActualitesPage() {
-  const { user } = useAuth();
-  const isCrascAdmin = !!user?.is_staff && !user?.is_superuser && !!user?.crasc_id;
-  const isRedacteurCrasc = !!user?.is_redacteur && !!user?.crasc_id && !user?.is_staff && !user?.is_superuser;
-  const restrictToCrasc = (isCrascAdmin || isRedacteurCrasc) && !!user?.crasc_id;
-
-  const [actualites, setActualites] = useState<INews[]>([]);
-  const [filteredActualites, setFilteredActualites] = useState<INews[]>([]);
+  // Liste paginée par l'API : toutes les actualités (y compris en attente,
+  // rejetées et archivées), limitées au CRASC du compte côté API
+  const [liste, setListe] = useState<NewsAdminListe | null>(null);
+  const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [recherche, setRecherche] = useState("");
+  const [statut, setStatut] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedActualite, setSelectedActualite] = useState<INews | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch articles from API
+  // Recherche envoyée à l'API après une courte pause de frappe
   useEffect(() => {
-    fetchArticles();
-  }, [restrictToCrasc, user?.crasc_id]);
+    const t = window.setTimeout(() => {
+      setRecherche(searchQuery);
+      setPage(1);
+    }, 300);
+    return () => window.clearTimeout(t);
+  }, [searchQuery]);
 
-  const fetchArticles = async () => {
+  const fetchArticles = useCallback(async () => {
     setLoading(true);
     setError(null);
-
     try {
-      const data = await newsService.getAll({
-        limit: 100,
-        statut: "toutes", // y compris les archivées
-        ...(restrictToCrasc ? { crasc_id: user!.crasc_id! } : {}),
-      });
-      setActualites(data);
-      setFilteredActualites(data);
+      setListe(await newsService.listeAdmin({ page, size: PAR_PAGE, search: recherche, statut_publication: statut }));
     } catch (err: any) {
       console.error("Erreur lors du chargement des actualités:", err);
       setError(err.message || "Impossible de charger les actualités");
@@ -61,23 +63,19 @@ export default function ActualitesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, recherche, statut]);
 
-  // Filter articles based on search query
   useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredActualites(actualites);
-    } else {
-      const query = searchQuery.toLowerCase();
-      const filtered = actualites.filter(article =>
-        article.title.toLowerCase().includes(query) ||
-        (article.content || '').toLowerCase().includes(query) ||
-        article.crasc?.name.toLowerCase().includes(query) ||
-        article.osc?.name.toLowerCase().includes(query)
-      );
-      setFilteredActualites(filtered);
-    }
-  }, [searchQuery, actualites]);
+    fetchArticles();
+  }, [fetchArticles]);
+
+  // Dernière actualité d'une page supprimée : revenir à la page précédente
+  useEffect(() => {
+    if (liste && liste.items.length === 0 && page > 1) setPage((p) => p - 1);
+  }, [liste, page]);
+
+  const actualites = liste?.items ?? [];
+  const compteurs = liste?.compteurs;
 
   const handleViewActualite = (actu: INews) => {
     setSelectedActualite(actu);
@@ -133,8 +131,11 @@ export default function ActualitesPage() {
               <div>
                 <p className="text-sm text-gray-500 mb-1">Total Actualités</p>
                 <p className="text-3xl font-bold text-gray-900">
-                  {actualites.length}
+                  {compteurs?.total ?? "—"}
                 </p>
+                {!!compteurs?.en_attente && (
+                  <p className="text-xs text-amber-600 mt-1">dont {compteurs.en_attente} en attente</p>
+                )}
               </div>
               <div className="bg-[#E05017]/10 p-3 rounded-lg">
                 <Newspaper className="w-6 h-6 text-[#E05017]" />
@@ -147,7 +148,7 @@ export default function ActualitesPage() {
               <div>
                 <p className="text-sm text-gray-500 mb-1">Par CRASC</p>
                 <p className="text-3xl font-bold text-green-600">
-                  {actualites.filter(a => a.crasc_id).length}
+                  {compteurs?.crasc ?? "—"}
                 </p>
               </div>
               <div className="bg-green-100 p-3 rounded-lg">
@@ -161,7 +162,7 @@ export default function ActualitesPage() {
               <div>
                 <p className="text-sm text-gray-500 mb-1">Par OSC</p>
                 <p className="text-3xl font-bold text-blue-600">
-                  {actualites.filter(a => a.osc_id).length}
+                  {compteurs?.osc ?? "—"}
                 </p>
               </div>
               <div className="bg-blue-100 p-3 rounded-lg">
@@ -175,12 +176,7 @@ export default function ActualitesPage() {
               <div>
                 <p className="text-sm text-gray-500 mb-1">Ce mois</p>
                 <p className="text-3xl font-bold text-purple-600">
-                  {actualites.filter(a => {
-                    const date = new Date(a.created_at);
-                    const now = new Date();
-                    return date.getMonth() === now.getMonth() &&
-                      date.getFullYear() === now.getFullYear();
-                  }).length}
+                  {compteurs?.ce_mois ?? "—"}
                 </p>
               </div>
               <div className="bg-purple-100 p-3 rounded-lg">
@@ -209,9 +205,9 @@ export default function ActualitesPage() {
 
         {/* Filters & Actions */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
-            <div>
+            <div className="md:col-span-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
@@ -223,6 +219,20 @@ export default function ActualitesPage() {
                 />
               </div>
             </div>
+
+            <select
+              value={statut}
+              onChange={(e) => {
+                setStatut(e.target.value);
+                setPage(1);
+              }}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017] bg-white"
+            >
+              <option value="">Tous les états</option>
+              <option value="publie">Publiées</option>
+              <option value="en_attente">En attente de validation</option>
+              <option value="rejete">Rejetées</option>
+            </select>
 
             <div className="flex justify-end">
               <Link
@@ -247,7 +257,7 @@ export default function ActualitesPage() {
         {/* Actualites List */}
         {!loading && (
           <div className="space-y-4">
-            {filteredActualites.map((actu) => (
+            {actualites.map((actu) => (
               <div
                 key={actu.id}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all overflow-hidden"
@@ -287,6 +297,11 @@ export default function ActualitesPage() {
                           {actu.title}
                           {actu.est_archivee && (
                             <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 text-xs font-semibold align-middle">Archivée</span>
+                          )}
+                          {ETATS[actu.statut_publication] && (
+                            <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold align-middle ${ETATS[actu.statut_publication].classe}`}>
+                              {ETATS[actu.statut_publication].libelle}
+                            </span>
                           )}
                         </h3>
                         <p className="text-gray-600 text-sm line-clamp-2 mb-3">
@@ -336,16 +351,46 @@ export default function ActualitesPage() {
           </div>
         )}
 
-        {!loading && filteredActualites.length === 0 && (
+        {/* Pagination */}
+        {!loading && liste && liste.total > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6 text-sm">
+            <p className="text-gray-500">
+              {(liste.page - 1) * liste.size + 1}–{Math.min(liste.page * liste.size, liste.total)} sur {liste.total} actualité{liste.total > 1 ? "s" : ""}
+            </p>
+            {liste.pages > 1 && (
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPage(page - 1)}
+                  disabled={page <= 1}
+                  className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  ← Précédent
+                </button>
+                <span className="text-gray-600">Page {liste.page} / {liste.pages}</span>
+                <button
+                  type="button"
+                  onClick={() => setPage(page + 1)}
+                  disabled={page >= liste.pages}
+                  className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Suivant →
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {!loading && actualites.length === 0 && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <Newspaper className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 text-lg font-semibold">
               Aucune actualité trouvée
             </p>
             <p className="text-gray-400 text-sm mt-1">
-              {searchQuery ? "Essayez de modifier vos critères de recherche" : "Commencez par créer votre première actualité"}
+              {searchQuery || statut ? "Essayez de modifier vos critères de recherche" : "Commencez par créer votre première actualité"}
             </p>
-            {!searchQuery && (
+            {!searchQuery && !statut && (
               <Link
                 href="/admin/gestion-des-crasc/articles/ajouter-article"
                 className="inline-flex items-center gap-2 mt-4 px-6 py-3 bg-[#E05017] text-white rounded-lg hover:bg-[#c44315] transition-colors font-bold"

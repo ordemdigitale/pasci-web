@@ -137,7 +137,7 @@ export default function AdminAjoutArticle() {
       setPreviewImage(null);
 
       setTimeout(() => {
-        router.push("/admin/gestion-des-actualites");
+        router.push("/admin/actualites");
       }, 2000);
     } catch (error: any) {
       setErrorMessage(error.message || "Une erreur est survenue.");
@@ -161,7 +161,7 @@ export default function AdminAjoutArticle() {
             </div>
           </div>
           <Link
-            href="/admin/gestion-des-actualites"
+            href="/admin/actualites"
             className="inline-flex items-center gap-2 text-sm text-white/90 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />

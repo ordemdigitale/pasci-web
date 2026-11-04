@@ -4,6 +4,7 @@
 import React, { use, useState, useEffect } from "react";
 import { getCrascBySlug, fetchEvenements, fetchCrascVideos } from "@/lib/fetch-crasc";
 import { fetchAllNews } from "@/lib/fetch-news";
+import newsService from "@/lib/services/news.service";
 import Link from "next/link";
 import { ImageWithFallback } from '@/lib/imageWithFallback';
 import { ICrascDetail, INews, IEvenement, ICrascVideo } from "@/types/api.types";
@@ -67,6 +68,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
   const crascSlug = resolvedParams.crascSlug;
   const zoneColors = CRASC_ZONE_COLORS[crascSlug] || DEFAULT_ZONE_COLORS;
   const [crascData, setCrascData] = useState<ICrascDetail | null>(null);
+  const [nbActualites, setNbActualites] = useState<number | null>(null);
   const [evenements, setEvenements] = useState<IEvenement[]>([]);
   const [videos, setVideos] = useState<ICrascVideo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,13 +127,16 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
           setCrascData(data);
 
           if (data.id) {
-            const [newsData, evtData, videoData] = await Promise.all([
+            const [newsData, evtData, videoData, totalNews] = await Promise.all([
               fetchAllNews({ crasc_id: parseInt(data.id) }),
               fetchEvenements(parseInt(data.id), false),
               fetchCrascVideos(parseInt(data.id)),
+              // Compteur : toutes les actualités du CRASC, pas seulement les 20 de la liste
+              newsService.compte({ crasc_id: parseInt(data.id) }).catch(() => null),
             ]);
             if (isCurrent) {
               setCrascData(prev => prev ? { ...prev, news: newsData } : prev);
+              setNbActualites(totalNews);
               setEvenements(evtData);
               setVideos(videoData);
             }
@@ -800,7 +805,7 @@ export default function CrascRegionPage({ params }: { params: Promise<{ crascSlu
                 <a href={lienActualites} className="flex items-center justify-between p-3 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors group">
                   <span className="text-sm font-medium text-gray-700 group-hover:underline">Actualités</span>
                   <span className="text-2xl font-bold text-orange-600">
-                    {crascData.news?.length || 0}
+                    {nbActualites ?? crascData.news?.length ?? 0}
                   </span>
                 </a>
 

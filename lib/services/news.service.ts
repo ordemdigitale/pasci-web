@@ -44,6 +44,17 @@ export interface NewsFilters {
   statut?: "actives" | "archives" | "toutes";
 }
 
+/** Liste paginée du back-office (toutes les actualités, avec leur état de validation). */
+export interface NewsAdminListe {
+  items: (INews & { statut_publication: "publie" | "en_attente" | "rejete" })[];
+  total: number;
+  page: number;
+  size: number;
+  pages: number;
+  /** Sur toutes les actualités visibles par le compte, pas seulement la page */
+  compteurs: { total: number; crasc: number; osc: number; ce_mois: number; en_attente: number };
+}
+
 export interface CreateNewsData {
   title: string;
   content: string;
@@ -237,6 +248,25 @@ export const newsService = {
   /**
    * Delete news article (requires authentication)
    */
+  async listeAdmin(filtres: { page: number; size: number; search?: string; statut_publication?: string }): Promise<NewsAdminListe> {
+    const params = new URLSearchParams({ page: String(filtres.page), size: String(filtres.size) });
+    if (filtres.search?.trim()) params.set("search", filtres.search.trim());
+    if (filtres.statut_publication) params.set("statut_publication", filtres.statut_publication);
+    const response = await fetchWithAuth(`${API_URL}/news/admin/liste?${params.toString()}`);
+    if (!response.ok) throw new Error("Impossible de charger les actualités");
+    return response.json();
+  },
+
+  /** Nombre d'actualités en ligne (sans la limite de 20 de la liste). */
+  async compte(filtres: { crasc_id?: number; osc_id?: number } = {}): Promise<number> {
+    const params = new URLSearchParams();
+    if (filtres.crasc_id) params.set("crasc_id", String(filtres.crasc_id));
+    if (filtres.osc_id) params.set("osc_id", String(filtres.osc_id));
+    const response = await fetch(`${API_URL}/news/compte?${params.toString()}`);
+    if (!response.ok) throw new Error("Impossible de compter les actualités");
+    return (await response.json()).total;
+  },
+
   async delete(slug: string): Promise<void> {
     const response = await fetchWithAuth(`${API_URL}/news/${slug}`, {
       method: "DELETE",
