@@ -159,7 +159,7 @@ function CrascAdminDashboard() {
       .catch(() => {});
 
     // Fetch news count for this CRASC
-    fetchWithAuth(`${API_BASE_URL}/api/v1/news?crasc_id=${crascId}&limit=100`)
+    fetchWithAuth(`${API_BASE_URL}/api/v1/news?crasc_id=${crascId}&limit=100&statut=toutes`)
       .then((r) => r.ok ? r.json() : [])
       .then((data: any[]) => { if (Array.isArray(data)) setNewsCount(data.length); })
       .catch(() => {});

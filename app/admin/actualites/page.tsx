@@ -49,6 +49,7 @@ export default function ActualitesPage() {
     try {
       const data = await newsService.getAll({
         limit: 100,
+        statut: "toutes", // y compris les archivées
         ...(restrictToCrasc ? { crasc_id: user!.crasc_id! } : {}),
       });
       setActualites(data);
@@ -284,6 +285,9 @@ export default function ActualitesPage() {
                         </div>
                         <h3 className="font-bold text-xl text-gray-900 mb-2">
                           {actu.title}
+                          {actu.est_archivee && (
+                            <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 text-xs font-semibold align-middle">Archivée</span>
+                          )}
                         </h3>
                         <p className="text-gray-600 text-sm line-clamp-2 mb-3">
                           {truncateContent(actu.content, 150)}

@@ -8,10 +8,11 @@ import { ImageWithFallback } from "@/lib/imageWithFallback";
 import {
   MapPin, Mail, Phone, Globe, Users2, Building, Calendar,
   Loader2, UserCircle, Briefcase, Target, Star, ChevronRight,
-  Hash, Flag, BarChart3,
+  Hash, Flag, BarChart3, Newspaper, Archive,
 } from 'lucide-react';
 import Link from 'next/link';
 import OscEvaluationBadge from '@/components/osc/OscEvaluationBadge';
+import newsService, { INews } from '@/lib/services/news.service';
 
 function fmt(n?: number | null) {
   if (n == null) return null;
@@ -54,6 +55,16 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
   const oscSlug = resolvedParams.oscSlug;
   const [oscData, setOscData] = useState<IOscDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  // Actualités de l'OSC : en cours, et archivées (date de désactivation passée)
+  const [actualites, setActualites] = useState<INews[]>([]);
+  const [archives, setArchives] = useState<INews[]>([]);
+
+  useEffect(() => {
+    if (!oscData?.id) return;
+    const oscId = Number(oscData.id);
+    newsService.getAll({ osc_id: oscId, limit: 20 }).then(setActualites).catch(() => setActualites([]));
+    newsService.getAll({ osc_id: oscId, limit: 50, statut: "archives" }).then(setArchives).catch(() => setArchives([]));
+  }, [oscData?.id]);
 
   useEffect(() => {
     if (!oscSlug) return;
@@ -343,6 +354,47 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
                 )}
                 {oscData.type_financement && (
                   <p className="text-sm text-gray-600 mt-2">{oscData.type_financement}</p>
+                )}
+              </div>
+            )}
+
+            {/* Actualités de l'OSC, puis les archives (désactivées automatiquement) */}
+            {(actualites.length > 0 || archives.length > 0) && (
+              <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Newspaper className="w-5 h-5 text-[#E05017]" />
+                  <h2 className="text-lg font-bold text-gray-900">Actualités de l&apos;OSC</h2>
+                </div>
+                {actualites.length > 0 ? (
+                  <ul className="space-y-2 mb-4">
+                    {actualites.map((n) => (
+                      <li key={n.id}>
+                        <Link href={`/actualites/${n.slug}`} className="text-sm text-gray-800 hover:text-[#E05017] font-medium">
+                          {n.title}
+                        </Link>
+                        <span className="text-xs text-gray-400 ml-2">{new Date(n.created_at).toLocaleDateString("fr-FR")}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-500 mb-4">Aucune actualité en cours.</p>
+                )}
+                {archives.length > 0 && (
+                  <details className="border-t border-gray-100 pt-3">
+                    <summary className="cursor-pointer text-sm font-semibold text-gray-600 flex items-center gap-2">
+                      <Archive className="w-4 h-4" /> Archives ({archives.length})
+                    </summary>
+                    <ul className="space-y-2 mt-3">
+                      {archives.map((n) => (
+                        <li key={n.id}>
+                          <Link href={`/actualites/${n.slug}`} className="text-sm text-gray-600 hover:text-[#E05017]">
+                            {n.title}
+                          </Link>
+                          <span className="text-xs text-gray-400 ml-2">{new Date(n.created_at).toLocaleDateString("fr-FR")}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
                 )}
               </div>
             )}

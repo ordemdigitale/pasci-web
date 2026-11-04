@@ -52,6 +52,12 @@ export default function AdminAjoutArticle() {
   const [loading, setLoading] = useState(false);
   const [oscLoading, setOscLoading] = useState(false);
   const [oscSearch, setOscSearch] = useState("");
+  // Désactivation automatique proposée à 3 mois (modifiable, ou vide pour jamais)
+  const [dateExpiration, setDateExpiration] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 3);
+    return d.toISOString().slice(0, 10);
+  });
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -123,6 +129,7 @@ export default function AdminAjoutArticle() {
         thumbnail: values.thumbnail,
         crasc_id: values.crasc_id ? parseInt(values.crasc_id) : undefined,
         osc_id: values.osc_id ? parseInt(values.osc_id) : undefined,
+        date_expiration: dateExpiration,
       });
 
       setSuccessMessage("✅ Actualité publiée avec succès!");
@@ -278,6 +285,24 @@ export default function AdminAjoutArticle() {
                 )}
               />
             </div>
+          </div>
+
+          {/* Section: Désactivation automatique */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <label htmlFor="date_expiration" className="block text-sm font-semibold text-gray-700 mb-2">
+              Date de désactivation automatique
+            </label>
+            <input
+              id="date_expiration"
+              type="date"
+              value={dateExpiration}
+              onChange={(e) => setDateExpiration(e.target.value)}
+              className="w-full md:w-64 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent"
+            />
+            <p className="text-xs text-gray-500 mt-2">
+              Après cette date, l&apos;actualité quitte les listes du site et passe dans les archives du profil de l&apos;OSC.
+              Laissez vide pour qu&apos;elle reste toujours en ligne.
+            </p>
           </div>
 
           {/* Section: Image de couverture */}

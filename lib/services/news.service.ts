@@ -13,6 +13,9 @@ export interface INews {
   thumbnail_url: string;
   osc_id?: number | null;
   crasc_id?: number | null;
+  /** AAAA-MM-JJ : après cette date, l'actualité passe dans les archives de l'OSC */
+  date_expiration?: string | null;
+  est_archivee?: boolean;
   created_at: string;
   updated_at: string;
   tags?: string[];
@@ -37,6 +40,8 @@ export interface NewsFilters {
   search?: string;
   sort_by?: "created_at" | "title";
   sort_order?: "asc" | "desc";
+  /** actives (défaut de l'API) | archives | toutes (admin) */
+  statut?: "actives" | "archives" | "toutes";
 }
 
 export interface CreateNewsData {
@@ -45,6 +50,8 @@ export interface CreateNewsData {
   thumbnail?: File;
   crasc_id?: number;
   osc_id?: number;
+  /** AAAA-MM-JJ, vide = jamais désactivée */
+  date_expiration?: string;
 }
 
 export interface UpdateNewsData {
@@ -53,6 +60,8 @@ export interface UpdateNewsData {
   thumbnail?: File;
   crasc_id?: number;
   osc_id?: number;
+  /** AAAA-MM-JJ, vide = n'expire plus */
+  date_expiration?: string;
 }
 
 /**
@@ -73,6 +82,7 @@ export const newsService = {
     if (filters.search) params.append("search", filters.search);
     if (filters.sort_by) params.append("sort_by", filters.sort_by);
     if (filters.sort_order) params.append("sort_order", filters.sort_order);
+    if (filters.statut) params.append("statut", filters.statut);
 
     const url = `${API_URL}/news?${params.toString()}`;
 
@@ -169,6 +179,7 @@ export const newsService = {
     // Always send crasc_id and osc_id (even if empty) to match backend expectations
     formData.append("crasc_id", data.crasc_id !== undefined ? data.crasc_id.toString() : "");
     formData.append("osc_id", data.osc_id !== undefined ? data.osc_id.toString() : "");
+    if (data.date_expiration !== undefined) formData.append("date_expiration", data.date_expiration);
 
     const response = await fetchWithAuth(`${API_URL}/news`, {
       method: "POST",
@@ -206,6 +217,7 @@ export const newsService = {
     // Always send crasc_id and osc_id (even if empty) to match backend expectations
     formData.append("crasc_id", data.crasc_id !== undefined ? data.crasc_id.toString() : "");
     formData.append("osc_id", data.osc_id !== undefined ? data.osc_id.toString() : "");
+    if (data.date_expiration !== undefined) formData.append("date_expiration", data.date_expiration);
 
     const response = await fetchWithAuth(`${API_URL}/news/${slug}`, {
       method: "PATCH",

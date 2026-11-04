@@ -26,7 +26,8 @@ export default function GestionActualitesPage() {
     setError(null);
 
     try {
-      const data = await newsService.getAll({ limit: 100 });
+      // Toutes, y compris les actualités archivées (date de désactivation passée)
+      const data = await newsService.getAll({ limit: 100, statut: "toutes" });
       setArticles(data);
       setFilteredArticles(data);
     } catch (err: any) {
@@ -225,7 +226,7 @@ export default function GestionActualitesPage() {
                       <tr key={article.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4">
                           <div>
-                            <p className="font-semibold text-gray-900 mb-1">{article.title}</p>
+                            <p className="font-semibold text-gray-900 mb-1">{article.title} {article.est_archivee && <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 text-[10px] font-semibold align-middle">Archivée</span>}</p>
                             <p className="text-sm text-gray-500 line-clamp-2">
                               {truncateContent(article.content, 120)}
                             </p>
