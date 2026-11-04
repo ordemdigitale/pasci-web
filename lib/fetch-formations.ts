@@ -45,6 +45,17 @@ export interface IFormation {
   crasc_id: number | null;
   osc_id: number | null;
   categorie: string | null;
+  /** en_ligne | presentiel | hybride */
+  mode?: string | null;
+  duree_heures?: number | null;
+  /** attestation | certificat | diplome | neant */
+  document_delivre?: string | null;
+  competences_requises?: string | null;
+  /** Lien Zoom/Teams : renvoyé aux inscrits et au staff seulement */
+  lien_visio?: string | null;
+  chronogramme?: string | null;
+  /** Épinglée en tête de la page Formations */
+  is_pinned?: boolean;
   crasc?: {
     id: number;
     name: string;
@@ -240,6 +251,34 @@ export async function registerToFormation(
   }
 
   return response.json();
+}
+
+export const MODES_FORMATION = [
+  { valeur: "en_ligne", libelle: "En ligne" },
+  { valeur: "presentiel", libelle: "Présentiel" },
+  { valeur: "hybride", libelle: "Hybride" },
+] as const;
+
+export const DOCUMENTS_DELIVRES = [
+  { valeur: "attestation", libelle: "Attestation" },
+  { valeur: "certificat", libelle: "Certificat" },
+  { valeur: "diplome", libelle: "Diplôme" },
+  { valeur: "neant", libelle: "Néant" },
+] as const;
+
+/** Libellé d'un mode ou d'un document délivré (« Hybride », « Certificat »…). */
+export function libelleFiche(liste: readonly { valeur: string; libelle: string }[], valeur?: string | null) {
+  return liste.find((x) => x.valeur === valeur)?.libelle ?? null;
+}
+
+/**
+ * Mode d'une formation : le champ « mode » s'il est renseigné, sinon déduit
+ * du lieu comme avant (pas de lieu ou « en ligne » / « distance » → en ligne).
+ */
+export function modeFormation(f: Pick<IFormation, "mode" | "location">): string {
+  if (f.mode) return f.mode;
+  const lieu = (f.location || "").toLowerCase();
+  return !lieu || lieu.includes("ligne") || lieu.includes("online") || lieu.includes("distance") ? "en_ligne" : "presentiel";
 }
 
 export const FORMATION_CATEGORIES = [

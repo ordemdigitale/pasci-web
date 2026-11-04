@@ -9,7 +9,7 @@ import * as z from "zod";
 import * as Select from "@radix-ui/react-select";
 import { ICrasc, IOsc } from "@/types/api.types";
 import { fetchAllCrasc, fetchAllOsc } from "@/lib/fetch-crasc";
-import { getFormationBySlug, fetchAllRubriques, IFormationRubrique, FORMATION_CATEGORIES } from "@/lib/fetch-formations";
+import { getFormationBySlug, FORMATION_CATEGORIES } from "@/lib/fetch-formations";
 import {
   ArrowLeft,
   BookOpen,
@@ -25,8 +25,11 @@ import {
   DollarSign,
   ImageIcon,
   X,
+  ListOrdered,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
+import ChampsFicheFormation, { ajouterFiche, erreurFiche, FICHE_VIDE, ficheDepuis, type FicheFormation } from "@/components/admin/ChampsFicheFormation";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -60,7 +63,9 @@ export default function AdminModifierFormation() {
   const slug = params.slug as string;
   const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
   const [oscs, setOscs] = useState<IOsc[]>([]);
-  const [rubriques, setRubriques] = useState<IFormationRubrique[]>([]);
+  const [fiche, setFiche] = useState<FicheFormation>(FICHE_VIDE);
+  const { user } = useAuth();
+  const peutEpingler = !!(user?.is_staff || user?.is_superuser);
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -135,17 +140,13 @@ export default function AdminModifierFormation() {
         setValue("crasc_id", formation.crasc_id?.toString() || "");
         setValue("osc_id", formation.osc_id?.toString() || "");
         setValue("categorie", (formation as any).categorie || "");
+        setFiche(ficheDepuis(formation));
         if (formation.thumbnail_url) setCurrentThumbnailUrl(formation.thumbnail_url);
 
-        // Charger CRASC, OSC et rubriques
-        const [crascData, oscData, rubriquesData] = await Promise.all([
-          fetchAllCrasc(),
-          fetchAllOsc(),
-          fetchAllRubriques(),
-        ]);
+        // Charger CRASC et OSC
+        const [crascData, oscData] = await Promise.all([fetchAllCrasc(), fetchAllOsc()]);
         setCrascRegions(crascData);
         setOscs(oscData.items);
-        setRubriques(rubriquesData.filter((r) => r.is_active));
       } catch (error) {
         console.error("Erreur lors du chargement:", error);
         setErrorMessage("Erreur lors du chargement de la formation");
@@ -160,6 +161,11 @@ export default function AdminModifierFormation() {
   // Soumission du formulaire
   const onSubmit = async (values: FormationForm) => {
     console.log("Form submitted with values:", values);
+    const erreur = erreurFiche(fiche);
+    if (erreur) {
+      setErrorMessage(erreur);
+      return;
+    }
     setLoading(true);
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -189,6 +195,7 @@ export default function AdminModifierFormation() {
       if (values.crasc_id) formData.append("crasc_id", values.crasc_id);
       if (values.osc_id) formData.append("osc_id", values.osc_id);
       if (values.categorie) formData.append("categorie", values.categorie);
+      ajouterFiche(formData, fiche, peutEpingler);
       if (thumbnail) formData.append("thumbnail", thumbnail);
 
       console.log("Sending PATCH request to:", `${API_BASE_URL}/api/v1/formations/${slug}`);
@@ -397,7 +404,7 @@ export default function AdminModifierFormation() {
                   <input
                     id="price"
                     type="number"
-                    {...register("price", { valueAsNumber: true })}
+                    {...register("price", { setValueAs: (v) => (v === "" || v === null ? null : Number(v)) })}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent ${
                       errors.price ? "border-red-500" : "border-gray-300"
                     }`}
@@ -411,35 +418,6 @@ export default function AdminModifierFormation() {
               )}
             </div>
 
-            {/* Rubrique */}
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Rubrique / Catégorie</label>
-              <Controller
-                name="rubrique_id"
-                control={control}
-                render={({ field }) => (
-                  <Select.Root onValueChange={field.onChange} value={field.value || undefined}>
-                    <Select.Trigger className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between">
-                      <Select.Value placeholder="Sélectionnez une rubrique (optionnel)" />
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    </Select.Trigger>
-                    <Select.Content className="bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-auto z-50">
-                      <Select.Viewport>
-                        {rubriques.map((r) => (
-                          <Select.Item
-                            key={r.id}
-                            value={r.id.toString()}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
-                          >
-                            <Select.ItemText>{r.name}</Select.ItemText>
-                          </Select.Item>
-                        ))}
-                      </Select.Viewport>
-                    </Select.Content>
-                  </Select.Root>
-                )}
-              />
-            </div>
 
             {/* Catégorie thématique */}
             <div className="mb-6">
@@ -546,7 +524,7 @@ export default function AdminModifierFormation() {
                 <input
                   id="current_participants"
                   type="number"
-                  {...register("current_participants", { valueAsNumber: true })}
+                  {...register("current_participants", { setValueAs: (v) => (v === "" || v === null ? null : Number(v)) })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent"
                   min="0"
                 />
@@ -563,13 +541,22 @@ export default function AdminModifierFormation() {
                 <input
                   id="max_participants"
                   type="number"
-                  {...register("max_participants", { valueAsNumber: true })}
+                  {...register("max_participants", { setValueAs: (v) => (v === "" || v === null ? null : Number(v)) })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent"
                   placeholder="Ex: 30"
                   min="1"
                 />
               </div>
             </div>
+          </div>
+
+          {/* Section: Déroulé de la formation */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+              <ListOrdered className="w-5 h-5 text-[#2A591D]" />
+              <h2 className="text-xl font-bold text-gray-900">Déroulé de la formation</h2>
+            </div>
+            <ChampsFicheFormation valeur={fiche} onChange={setFiche} peutEpingler={peutEpingler} />
           </div>
 
           {/* Section: Liens */}

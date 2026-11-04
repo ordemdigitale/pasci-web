@@ -9,7 +9,7 @@ import * as z from "zod";
 import * as Select from "@radix-ui/react-select";
 import { ICrasc, IOsc } from "@/types/api.types";
 import { fetchAllCrasc, fetchAllOsc } from "@/lib/fetch-crasc";
-import { fetchAllRubriques, IFormationRubrique, FORMATION_CATEGORIES } from "@/lib/fetch-formations";
+import { FORMATION_CATEGORIES } from "@/lib/fetch-formations";
 import {
   ArrowLeft,
   BookOpen,
@@ -25,8 +25,11 @@ import {
   DollarSign,
   ImageIcon,
   X,
+  ListOrdered,
 } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
+import ChampsFicheFormation, { ajouterFiche, erreurFiche, FICHE_VIDE, ficheDepuis, type FicheFormation } from "@/components/admin/ChampsFicheFormation";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -56,7 +59,9 @@ type FormationForm = z.infer<typeof formationSchema>;
 export default function AdminAjoutFormation() {
   const [crascRegions, setCrascRegions] = useState<ICrasc[]>([]);
   const [oscs, setOscs] = useState<IOsc[]>([]);
-  const [rubriques, setRubriques] = useState<IFormationRubrique[]>([]);
+  const [fiche, setFiche] = useState<FicheFormation>(FICHE_VIDE);
+  const { user } = useAuth();
+  const peutEpingler = !!(user?.is_staff || user?.is_superuser);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -76,7 +81,7 @@ export default function AdminAjoutFormation() {
     setThumbnailPreview(null);
   };
 
-  // Récupérer les CRASC, OSC et rubriques
+  // Récupérer les CRASC et OSC
   useEffect(() => {
     fetchAllCrasc()
       .then((data) => setCrascRegions(data))
@@ -85,10 +90,6 @@ export default function AdminAjoutFormation() {
     fetchAllOsc()
       .then((data) => setOscs(data.items))
       .catch((error) => console.error("Erreur OSC:", error));
-
-    fetchAllRubriques()
-      .then((data) => setRubriques(data.filter((r) => r.is_active)))
-      .catch((error) => console.error("Erreur rubriques:", error));
   }, []);
 
   const {
@@ -126,6 +127,11 @@ export default function AdminAjoutFormation() {
   // Soumission du formulaire
   const onSubmit = async (values: FormationForm) => {
     console.log("Form submitted with values:", values);
+    const erreur = erreurFiche(fiche);
+    if (erreur) {
+      setErrorMessage(erreur);
+      return;
+    }
     setLoading(true);
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -152,6 +158,7 @@ export default function AdminAjoutFormation() {
       if (values.crasc_id) formData.append("crasc_id", values.crasc_id);
       if (values.osc_id) formData.append("osc_id", values.osc_id);
       if (values.categorie) formData.append("categorie", values.categorie);
+      ajouterFiche(formData, fiche, peutEpingler);
       if (thumbnail) formData.append("thumbnail", thumbnail);
 
       console.log("Sending request to:", `${API_BASE_URL}/api/v1/formations`);
@@ -353,7 +360,7 @@ export default function AdminAjoutFormation() {
                   <input
                     id="price"
                     type="number"
-                    {...register("price", { valueAsNumber: true })}
+                    {...register("price", { setValueAs: (v) => (v === "" || v === null ? null : Number(v)) })}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent ${
                       errors.price ? "border-red-500" : "border-gray-300"
                     }`}
@@ -367,35 +374,6 @@ export default function AdminAjoutFormation() {
               )}
             </div>
 
-            {/* Rubrique */}
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Rubrique / Catégorie</label>
-              <Controller
-                name="rubrique_id"
-                control={control}
-                render={({ field }) => (
-                  <Select.Root onValueChange={field.onChange} value={field.value || undefined}>
-                    <Select.Trigger className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-[#2A591D] focus:border-transparent transition-all flex items-center justify-between">
-                      <Select.Value placeholder="Sélectionnez une rubrique (optionnel)" />
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    </Select.Trigger>
-                    <Select.Content className="bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-auto z-50">
-                      <Select.Viewport>
-                        {rubriques.map((r) => (
-                          <Select.Item
-                            key={r.id}
-                            value={r.id.toString()}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
-                          >
-                            <Select.ItemText>{r.name}</Select.ItemText>
-                          </Select.Item>
-                        ))}
-                      </Select.Viewport>
-                    </Select.Content>
-                  </Select.Root>
-                )}
-              />
-            </div>
 
             {/* Catégorie thématique */}
             <div className="mb-6">
@@ -488,13 +466,22 @@ export default function AdminAjoutFormation() {
                 <input
                   id="max_participants"
                   type="number"
-                  {...register("max_participants", { valueAsNumber: true })}
+                  {...register("max_participants", { setValueAs: (v) => (v === "" || v === null ? null : Number(v)) })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2A591D] focus:border-transparent"
                   placeholder="Ex: 30"
                   min="1"
                 />
               </div>
             </div>
+          </div>
+
+          {/* Section: Déroulé de la formation */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+              <ListOrdered className="w-5 h-5 text-[#2A591D]" />
+              <h2 className="text-xl font-bold text-gray-900">Déroulé de la formation</h2>
+            </div>
+            <ChampsFicheFormation valeur={fiche} onChange={setFiche} peutEpingler={peutEpingler} />
           </div>
 
           {/* Section: Liens */}
