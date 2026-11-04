@@ -94,7 +94,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/rejoindre" className="text-gray-300 hover:text-white text-sm transition-colors">
-                  Demande d&apos;adhésion
+                  Adhérer au CRASC
                 </Link>
               </li>
               <li>
