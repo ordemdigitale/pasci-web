@@ -47,7 +47,7 @@ const services: IService[] = [
   {
     id: 4,
     icon: <PenLine size={24} color="#E05017" />,
-    name: "Rédaction",
+    name: "Rédactions",
     //content: "Rédaction de documents professionnels : statuts, règlements, projets, manuels."
   },
   {
