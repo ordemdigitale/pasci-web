@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "À Propos — PdoC, Plateforme Digitale de la Société Civile Ivoirienne",
-  description: "Découvrez la PdoC (Plateforme Digitale de la Société Civile Ivoirienne) et les CRASC. Notre mission : renforcer les capacités des organisations de la société civile en Côte d'Ivoire.",
+  title: "À Propos — PdoC, Plateforme Digitale de la Société Civile",
+  description: "Découvrez la PdoC (Plateforme Digitale de la Société Civile) et les CRASC. Notre mission : renforcer les capacités des organisations de la société civile en Côte d'Ivoire.",
   keywords: [
     "PASCI", "Programme Appui Société Civile Ivoirienne", "PdoC", "CRASC",
     "histoire société civile Côte d'Ivoire", "mission PASCI", "gouvernance OSC",

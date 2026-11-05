@@ -122,7 +122,7 @@ export default function CertificatPage() {
               </div>
             </div>
             <p style={{ color: "#888", fontSize: 11, fontFamily: "Arial, sans-serif", letterSpacing: "0.15em", textTransform: "uppercase", margin: "4px 0 32px" }}>
-              Plateforme Digitale de la Société Civile Ivoirienne
+              Plateforme Digitale de la Société Civile
             </p>
 
             {/* Titre */}

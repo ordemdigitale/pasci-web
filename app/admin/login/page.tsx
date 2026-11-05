@@ -180,7 +180,7 @@ export default function AdminLoginPage() {
 
         {/* Copyright */}
         <p className="text-center text-xs text-gray-500">
-          © {new Date().getFullYear()} PdoC - Plateforme Digitale de la Société Civile Ivoirienne
+          © {new Date().getFullYear()} PdoC - Plateforme Digitale de la Société Civile
         </p>
       </div>
     </div>

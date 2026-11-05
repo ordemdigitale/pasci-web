@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     "plateforme digitale OSC", "société civile Abidjan", "ONG Côte d'Ivoire",
     "développement communautaire", "formalisation OSC", "renforcement capacités",
   ],
-  authors: [{ name: "PdoC — Plateforme Digitale de la Société Civile Ivoirienne" }],
+  authors: [{ name: "PdoC — Plateforme Digitale de la Société Civile" }],
   creator: "PdoC",
   publisher: "PdoC",
   metadataBase: new URL("https://plateforme-osci.org"),

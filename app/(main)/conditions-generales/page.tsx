@@ -13,7 +13,7 @@ export default function ConditionsGeneralesPage() {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Introduction</h2>
           <p className="text-gray-700 mb-3">
-            Bienvenue sur la plateforme PdoC (Plateforme Digitale de la Société Civile Ivoirienne). Les présentes
+            Bienvenue sur la plateforme PdoC (Plateforme Digitale de la Société Civile). Les présentes
             Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation de notre plateforme digitale.
           </p>
           <p className="text-gray-700">
