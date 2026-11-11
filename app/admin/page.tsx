@@ -570,6 +570,10 @@ function SuperAdminDashboard() {
             <p className="text-xs text-gray-500 mb-1">Total connexions</p>
             <p className="text-2xl font-bold text-[#2a591d]">{(visiteStats?.total ?? 0).toLocaleString("fr-FR")}</p>
             <p className="text-xs text-gray-400 mt-1">{(visiteStats?.pages_vues ?? 0).toLocaleString("fr-FR")} pages vues</p>
+            {/* Les connexions ne sont mesurées que depuis la mise en place de
+                l'identifiant de session : sans ce repère, le chiffre paraît
+                anormalement bas face aux pages vues cumulées depuis l'ouverture. */}
+            <p className="text-[10px] text-gray-400 mt-1 leading-tight">Connexions comptées depuis le 5 nov. 2026</p>
           </div>
         </div>
 

@@ -11,7 +11,11 @@ export default function VisiteCounter() {
   useEffect(() => {
     fetch(`${API_BASE}/api/v1/visites/stats`)
       .then((r) => r.ok ? r.json() : null)
-      .then((d) => { if (d?.total != null) setTotal(d.total); })
+      // Compteur public : nombre de visites de pages, mesuré de la même façon
+      // depuis l'ouverture du site. « total » est passé aux connexions, une
+      // mesure qui n'existe que depuis le 5 novembre 2026 : l'afficher ici
+      // faisait chuter le compteur public d'un facteur dix.
+      .then((d) => { const n = d?.pages_vues ?? d?.total; if (n != null) setTotal(n); })
       .catch(() => {});
   }, []);
 

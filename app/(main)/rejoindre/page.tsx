@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/form';
 import { toast } from 'sonner';
 import { fetchAllCrasc, ICrasc } from '@/lib/fetch-crasc';
+import { messageErreurApi } from '@/lib/erreurs-api';
 import {
   FORMALISATION_FILE_ACCEPT,
   FORMALISATION_FILE_MAX_SIZE,
@@ -362,13 +363,20 @@ export default function PageRejoindre() {
         body: formData,
       });
       if (!res.ok) {
-        throw new Error('Erreur lors de la soumission');
+        // Sans ce détail, un champ refusé par l'API (valeur trop longue par
+        // exemple) n'affichait qu'un « une erreur est survenue » inexploitable.
+        const corps = await res.json().catch(() => null);
+        throw new Error(messageErreurApi(corps?.detail) || 'Erreur lors de la soumission');
       }
       toast.success('Demande soumise avec succès ! Nous vous contacterons prochainement.');
       form.reset();
       setFileInputKey((key) => key + 1);
     } catch (error) {
-      toast.error('Une erreur est survenue. Veuillez réessayer.');
+      toast.error(
+        error instanceof Error && error.message
+          ? error.message
+          : 'Une erreur est survenue. Veuillez réessayer.'
+      );
       console.error('Submission error:', error);
     } finally {
       setIsSubmitting(false);
