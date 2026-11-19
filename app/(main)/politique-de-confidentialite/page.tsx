@@ -102,7 +102,29 @@ export default function PolitiqueConfidentialitePage() {
             <li>Retirer votre consentement.</li>
           </ul>
           <p className="text-gray-700">
-            📩 Pour exercer vos droits, écrivez à : <a href="mailto:pdoc@plateforme-osc.org" className="text-[#E05017] hover:underline">pdoc@plateforme-osc.org</a>
+            📩 Pour exercer vos droits, écrivez à : <a href="mailto:pdoc@plateforme-osci.org" className="text-[#E05017] hover:underline">pdoc@plateforme-osci.org</a>
+          </p>
+        </div>
+
+        {/* Suppression du compte (lien demandé par Google Play) */}
+        <div id="suppression-du-compte" className="scroll-mt-24 bg-white border border-gray-200 rounded-lg p-6">
+          <h2 className="text-2xl font-bold text-[#2a591d] mb-4">Supprimer votre compte</h2>
+          <p className="text-gray-700 mb-3">
+            Cette démarche vaut pour le site et pour l&apos;application mobile PdoC, qui utilisent le même compte.
+          </p>
+          <ol className="list-decimal ml-6 space-y-2 text-gray-700 mb-4">
+            <li>
+              Écrivez à <a href="mailto:pdoc@plateforme-osci.org?subject=Suppression%20de%20mon%20compte" className="text-[#E05017] hover:underline">pdoc@plateforme-osci.org</a>{" "}
+              depuis l&apos;adresse e-mail de votre compte, avec pour objet « Suppression de mon compte ».
+            </li>
+            <li>Nous vous confirmons la suppression par e-mail, dans un délai de 30 jours au plus.</li>
+          </ol>
+          <p className="text-gray-700 mb-2">
+            <strong>Données supprimées :</strong> votre compte (nom, e-mail, téléphone, mot de passe) et votre profil.
+          </p>
+          <p className="text-gray-700">
+            <strong>Données conservées :</strong> la fiche de votre OSC et les contenus publiés en son nom (actualités,
+            messages dans les pôles), qui appartiennent à l&apos;organisation et non à votre compte personnel.
           </p>
         </div>
 

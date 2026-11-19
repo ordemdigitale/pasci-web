@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ImageWithFallback } from '@/lib/imageWithFallback';
 import { User, Mail, Phone, Building, MapPin, Lock, Camera, Save } from 'lucide-react';
@@ -377,11 +378,14 @@ export default function ProfilePage() {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <h3 className="text-lg font-semibold text-red-600 mb-4">Zone Dangereuse</h3>
               <p className="text-gray-600 mb-4">
-                La suppression de votre compte est irréversible. Toutes vos données seront définitivement supprimées.
+                La suppression de votre compte est irréversible. Elle se demande par e-mail : la marche à suivre et les données concernées sont détaillées ici.
               </p>
-              <button className="px-4 py-2 border-2 border-red-600 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors font-semibold">
+              <Link
+                href="/politique-de-confidentialite#suppression-du-compte"
+                className="inline-block px-4 py-2 border-2 border-red-600 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors font-semibold"
+              >
                 Supprimer mon compte
-              </button>
+              </Link>
             </div>
           </div>
         )}
