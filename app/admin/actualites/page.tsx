@@ -24,6 +24,16 @@ import { toast } from "sonner";
 
 const PAR_PAGE = 20;
 
+// Libellés des motifs de rejet (codes renvoyés par GET /news/motifs-rejet)
+const LIBELLES_MOTIFS_REJET: Record<string, string> = {
+  consentement: "Absence de fiche de consentement",
+  politique: "Article à caractère politique",
+  donnees_sensibles: "Données sensibles",
+  donnees_incoherentes: "Données incohérentes",
+  source_verification: "Absence de source de vérification",
+  autre: "Autre",
+};
+
 const ETATS: Record<string, { libelle: string; classe: string }> = {
   en_attente: { libelle: "En attente de validation", classe: "bg-amber-100 text-amber-700" },
   rejete: { libelle: "Rejetée", classe: "bg-red-100 text-red-700" },
@@ -314,6 +324,29 @@ export default function ActualitesPage() {
                         <p className="text-gray-600 text-sm line-clamp-2 mb-3">
                           {truncateContent(actu.content, 150)}
                         </p>
+
+                        {/* Article rejeté : les motifs cochés par le point focal,
+                            pour que le rédacteur sache quoi corriger. */}
+                        {actu.statut_publication === "rejete" && (actu.motifs_rejet || actu.motif_rejet_detail) && (
+                          <div className="mb-3 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                            <p className="text-xs font-bold text-red-700 uppercase tracking-wide mb-1">
+                              Motifs du rejet
+                            </p>
+                            <ul className="text-sm text-red-900 list-disc pl-5 space-y-0.5">
+                              {(actu.motifs_rejet || "")
+                                .split(",")
+                                .map((code) => code.trim())
+                                .filter(Boolean)
+                                .map((code) => (
+                                  <li key={code}>
+                                    {LIBELLES_MOTIFS_REJET[code] || code}
+                                    {code === "autre" && actu.motif_rejet_detail ? ` : ${actu.motif_rejet_detail}` : ""}
+                                  </li>
+                                ))}
+                              {!actu.motifs_rejet && actu.motif_rejet_detail && <li>{actu.motif_rejet_detail}</li>}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     </div>
 

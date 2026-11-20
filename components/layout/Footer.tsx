@@ -34,6 +34,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/actualites" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Actualités
+                </Link>
+              </li>
+              <li>
                 <Link href="/annuaire/annuaire-des-crasc" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Annuaire des OSC
                 </Link>

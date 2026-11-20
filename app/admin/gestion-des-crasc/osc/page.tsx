@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ImageWithFallback } from "@/lib/imageWithFallback";
-import { ChevronLeft, ChevronRight, Search, Loader2, Eye, Edit3, EyeOff } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Loader2, Eye, Edit3, EyeOff, Download } from "lucide-react";
 import { getToken } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import OscEvaluationBadge from "@/components/osc/OscEvaluationBadge";
@@ -79,29 +79,67 @@ export default function AdminOscPage() {
   const { domaines: domainesUtilises } = useOscFiltres();
   const domaines = Array.from(new Set([...domainesPoles.map((d) => d.value), ...domainesUtilises])).sort((x, y) => x.localeCompare(y, "fr"));
   const [avances, setAvances] = useState<FiltresAvances>(FILTRES_AVANCES_VIDES);
+  // Pôle de concertation : critère demandé pour trier avant d'exporter
+  const [poleId, setPoleId] = useState("");
+  const [poles, setPoles] = useState<{ id: number; name: string }[]>([]);
+  const [exportEnCours, setExportEnCours] = useState(false);
   // Rédacteur CRASC : recherche et consultation seulement
   const { user } = useAuth();
   const peutModifier = !!(user?.is_staff || user?.is_superuser);
   const [loading, setLoading]     = useState(true);
   const [togglingId, setTogglingId] = useState<number | null>(null);
 
+  // Critères courants, repris à l'identique par l'export Excel
+  const parametresFiltres = useCallback(() => {
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (typeDocumentFormalisation !== "all") {
+      params.set("type_document_formalisation", typeDocumentFormalisation);
+    }
+    if (hasDocumentFormalisation !== "all") {
+      params.set("has_document_formalisation", hasDocumentFormalisation === "with" ? "true" : "false");
+    }
+    if (domaine) params.set("domaine_activite", domaine);
+    if (categorie) params.set("categorie", categorie);
+    if (faitiere) params.set("faitiere", faitiere);
+    if (poleId) params.set("pole_id", poleId);
+    ajouterFiltresAvances(params, avances);
+    params.set("sort_by", sortBy);
+    params.set("sort_order", sortOrder);
+    return params;
+  }, [search, typeDocumentFormalisation, hasDocumentFormalisation, domaine, categorie, faitiere, poleId, avances, sortBy, sortOrder]);
+
+  const exporterExcel = async () => {
+    setExportEnCours(true);
+    try {
+      const params = parametresFiltres();
+      const res = await fetch(`${API_BASE_URL}/api/v1/crasc/osc/export?${params}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (!res.ok) {
+        alert("L'export n'a pas pu être généré.");
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const lien = document.createElement("a");
+      lien.href = url;
+      lien.download = `annuaire-osc-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(lien);
+      lien.click();
+      lien.remove();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExportEnCours(false);
+    }
+  };
+
   const fetchOscs = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ page: String(page), size: String(PAGE_SIZE) });
-      if (search) params.set('search', search);
-      if (typeDocumentFormalisation !== "all") {
-        params.set("type_document_formalisation", typeDocumentFormalisation);
-      }
-      if (hasDocumentFormalisation !== "all") {
-        params.set("has_document_formalisation", hasDocumentFormalisation === "with" ? "true" : "false");
-      }
-      if (domaine) params.set("domaine_activite", domaine);
-      if (categorie) params.set("categorie", categorie);
-      if (faitiere) params.set("faitiere", faitiere);
-      ajouterFiltresAvances(params, avances);
-      params.set("sort_by", sortBy);
-      params.set("sort_order", sortOrder);
+      const params = parametresFiltres();
+      params.set("page", String(page));
+      params.set("size", String(PAGE_SIZE));
       const res  = await fetch(`${API_BASE_URL}/api/v1/crasc/osc?${params}`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
@@ -114,9 +152,20 @@ export default function AdminOscPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, typeDocumentFormalisation, hasDocumentFormalisation, sortBy, sortOrder, domaine, categorie, faitiere, avances]);
+  }, [page, parametresFiltres]);
 
   useEffect(() => { fetchOscs(); }, [fetchOscs]);
+
+  // Pôles de concertation, pour le filtre et l'export
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/v1/forum/poles`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
+        const liste = Array.isArray(data) ? data : data?.items ?? [];
+        setPoles(liste.map((p: { id: number; name: string }) => ({ id: p.id, name: p.name })));
+      })
+      .catch(() => {});
+  }, []);
 
   const handleTogglePublish = async (osc: IOsc) => {
     setTogglingId(osc.id);
@@ -147,6 +196,7 @@ export default function AdminOscPage() {
     setDomaine("");
     setCategorie("");
     setFaitiere("");
+    setPoleId("");
     setAvances(FILTRES_AVANCES_VIDES);
     setPage(1);
   };
@@ -212,7 +262,7 @@ export default function AdminOscPage() {
         >
           Rechercher
         </button>
-        {(search || typeDocumentFormalisation !== "all" || hasDocumentFormalisation !== "all" || sortBy !== "updated_at" || sortOrder !== "desc" || domaine || categorie || faitiere || Object.values(avances).some(Boolean)) && (
+        {(search || typeDocumentFormalisation !== "all" || hasDocumentFormalisation !== "all" || sortBy !== "updated_at" || sortOrder !== "desc" || domaine || categorie || faitiere || poleId || Object.values(avances).some(Boolean)) && (
           <button
             onClick={resetFilters}
             className="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-100 transition-colors"
@@ -220,9 +270,19 @@ export default function AdminOscPage() {
             Effacer
           </button>
         )}
+        {/* L'export reprend exactement les filtres et le tri affichés */}
+        <button
+          onClick={exporterExcel}
+          disabled={exportEnCours}
+          title="Exporter la sélection courante au format Excel"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#E05017] text-white text-sm font-semibold rounded-lg hover:bg-[#c7450f] disabled:opacity-50 transition-colors lg:ml-auto"
+        >
+          {exportEnCours ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+          Exporter en Excel
+        </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <label className="text-xs font-semibold text-gray-600">
             Thématique (domaine prioritaire)
             <select
@@ -243,6 +303,17 @@ export default function AdminOscPage() {
             >
               <option value="">Toutes (OdF, OdJ, OPSH, mixtes)</option>
               {CATEGORIE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </label>
+          <label className="text-xs font-semibold text-gray-600">
+            Pôle de concertation
+            <select
+              value={poleId}
+              onChange={(event) => { setPoleId(event.target.value); setPage(1); }}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A591D]"
+            >
+              <option value="">Tous les pôles</option>
+              {poles.map((p) => <option key={p.id} value={String(p.id)}>{p.name}</option>)}
             </select>
           </label>
           <label className="text-xs font-semibold text-gray-600">

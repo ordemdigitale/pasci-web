@@ -17,6 +17,7 @@ export const REGIONS_OPTIONS = [
   "Bélier",
   "Bounkani",
   "Cavally",
+  "Ferkessédougou",
   "Folon",
   "Gbêkê",
   "Gbôklé",

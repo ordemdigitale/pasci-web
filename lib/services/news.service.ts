@@ -16,6 +16,10 @@ export interface INews {
   /** AAAA-MM-JJ : après cette date, l'actualité passe dans les archives de l'OSC */
   date_expiration?: string | null;
   est_archivee?: boolean;
+  statut_publication?: string;
+  /** Codes des motifs cochés lors d'un rejet, séparés par des virgules */
+  motifs_rejet?: string | null;
+  motif_rejet_detail?: string | null;
   created_at: string;
   updated_at: string;
   tags?: string[];

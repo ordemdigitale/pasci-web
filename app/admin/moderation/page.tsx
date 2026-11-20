@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { fetchWithAuth } from "@/lib/auth";
-import { CheckCircle, XCircle, Loader2, Newspaper, Briefcase, BookOpen, FolderOpen, AlertCircle, Eye, Building2, FileText } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Newspaper, Briefcase, BookOpen, FolderOpen, AlertCircle, Eye, Building2, FileText, X } from "lucide-react";
 import Link from "next/link";
 import { lecteurVideo } from "@/lib/medias-accueil";
 
@@ -87,10 +87,20 @@ function ApercuVideo({ url }: { url: string }) {
   );
 }
 
+interface MotifRejet {
+  code: string;
+  libelle: string;
+}
+
 export default function AdminModerationPage() {
   const [items, setItems] = useState<ItemEnAttente[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState<string | null>(null);
+  // Rejet d'un article : motifs cochés par le point focal
+  const [motifsRejet, setMotifsRejet] = useState<MotifRejet[]>([]);
+  const [itemARejeter, setItemARejeter] = useState<ItemEnAttente | null>(null);
+  const [motifsCoches, setMotifsCoches] = useState<string[]>([]);
+  const [precisionRejet, setPrecisionRejet] = useState("");
   const [videoOuverte, setVideoOuverte] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -148,14 +158,33 @@ export default function AdminModerationPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  async function handleAction(item: ItemEnAttente, action: "publie" | "rejete") {
+  // Motifs de rejet d'un article, cochés par le point focal (référentiel API)
+  useEffect(() => {
+    fetchWithAuth(`${API_BASE}/api/v1/news/motifs-rejet`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: MotifRejet[]) => Array.isArray(data) && setMotifsRejet(data))
+      .catch(() => {});
+  }, []);
+
+  function basculerMotif(code: string) {
+    setMotifsCoches((prev) =>
+      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
+    );
+  }
+
+  async function handleAction(
+    item: ItemEnAttente,
+    action: "publie" | "rejete",
+    motifs: string[] = [],
+    precision = ""
+  ) {
     const key = `${item.type}-${item.slug}`;
-    // Actualité rejetée : envoyée par email au rédacteur (point focal communication), avec le motif
-    let motif = "";
-    if (item.type === "actualite" && action === "rejete") {
-      const saisie = window.prompt("Motif du rejet (facultatif). L'article et ce motif seront envoyés par email à son rédacteur :");
-      if (saisie === null) return;
-      motif = saisie.trim();
+    // Une actualité rejetée part par email au rédacteur avec les motifs cochés
+    if (item.type === "actualite" && action === "rejete" && motifs.length === 0 && !precision.trim()) {
+      setItemARejeter(item);
+      setMotifsCoches([]);
+      setPrecisionRejet("");
+      return;
     }
     setActionId(key);
     try {
@@ -169,7 +198,9 @@ export default function AdminModerationPage() {
         osc_modification: `${API_BASE}/api/v1/crasc/osc-modification-requests/${item.id}/review?action=${action === "publie" ? "approuvee" : "rejetee"}`,
         nouvelle_osc: `${API_BASE}/api/v1/crasc/osc/${item.slug}/valider?action=${action}`,
       };
-      const url = motif ? `${urlMap[item.type]}&motif=${encodeURIComponent(motif)}` : urlMap[item.type];
+      let url = urlMap[item.type];
+      if (motifs.length > 0) url += `&motifs=${encodeURIComponent(motifs.join(","))}`;
+      if (precision.trim()) url += `&motif=${encodeURIComponent(precision.trim())}`;
       const res = await fetchWithAuth(url, { method: "PATCH" });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -177,6 +208,7 @@ export default function AdminModerationPage() {
         return;
       }
       setItems((prev) => prev.filter((i) => !(i.id === item.id && i.type === item.type)));
+      setItemARejeter(null);
     } finally {
       setActionId(null);
     }
@@ -302,6 +334,76 @@ export default function AdminModerationPage() {
           </div>
         )}
       </div>
+
+      {/* Rejet d'un article : le point focal coche les motifs, transmis au rédacteur */}
+      {itemARejeter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between p-5 border-b border-gray-100">
+              <div>
+                <h2 className="font-bold text-gray-900">Motifs du rejet</h2>
+                <p className="text-sm text-gray-500 line-clamp-1">{itemARejeter.title}</p>
+              </div>
+              <button onClick={() => setItemARejeter(null)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-2">
+              <p className="text-xs text-gray-500 mb-2">
+                Cochez un ou plusieurs motifs. L&apos;article et les motifs seront envoyés par email à son rédacteur.
+              </p>
+              {motifsRejet.map((motif) => (
+                <label
+                  key={motif.code}
+                  className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                    motifsCoches.includes(motif.code) ? "border-[#E05017] bg-[#E05017]/5" : "border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={motifsCoches.includes(motif.code)}
+                    onChange={() => basculerMotif(motif.code)}
+                    className="mt-0.5 accent-[#E05017]"
+                  />
+                  <span className="text-sm text-gray-900">{motif.libelle}</span>
+                </label>
+              ))}
+
+              {motifsCoches.includes("autre") && (
+                <textarea
+                  value={precisionRejet}
+                  onChange={(e) => setPrecisionRejet(e.target.value)}
+                  rows={3}
+                  placeholder="Précisez le motif…"
+                  className="w-full mt-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#E05017] resize-y"
+                />
+              )}
+            </div>
+
+            <div className="flex justify-end gap-2 p-5 border-t border-gray-100">
+              <button
+                onClick={() => setItemARejeter(null)}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => handleAction(itemARejeter, "rejete", motifsCoches, precisionRejet)}
+                disabled={
+                  motifsCoches.length === 0 ||
+                  (motifsCoches.includes("autre") && !precisionRejet.trim()) ||
+                  actionId !== null
+                }
+                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-xl hover:bg-red-700 disabled:opacity-40 transition-colors"
+              >
+                {actionId ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                Rejeter l&apos;article
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
