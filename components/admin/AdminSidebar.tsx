@@ -165,6 +165,9 @@ export default function AdminSidebar({
       staffOnly: true,
       submenus: [
         { label: "Pôles de concertation", href: "/admin/forum/poles" },
+        // Task forces de l'espace collaboratif : groupes d'OSC (à ne pas
+        // confondre avec les task forces de PTF de l'annuaire des partenaires)
+        { label: "Task forces (OSC)", href: "/admin/espace-collaboratif/task-forces" },
       ],
     },
     {

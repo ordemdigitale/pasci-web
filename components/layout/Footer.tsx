@@ -54,6 +54,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/espace-collaboratif/task-forces" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Task forces
+                </Link>
+              </li>
+              <li>
                 <Link href="/contact" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Contact
                 </Link>

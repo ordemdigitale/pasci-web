@@ -19,6 +19,7 @@ interface CriteresDisponibles {
   regions: OptionCritere[];
   poles: OptionCritere[];
   task_forces: OptionCritere[];
+  categories_ptf: OptionCritere[];
 }
 
 interface Destinataire {
@@ -48,6 +49,7 @@ interface MessageEnvoye {
 
 const CRITERES_VIDES: CriteresDisponibles = {
   crasc: [], types_osc: [], categories: [], regions: [], poles: [], task_forces: [],
+  categories_ptf: [],
 };
 
 export default function MessagesGroupesPage() {
@@ -58,7 +60,9 @@ export default function MessagesGroupesPage() {
   const [regions, setRegions] = useState<string[]>([]);
   const [poleIds, setPoleIds] = useState<string[]>([]);
   const [taskForceIds, setTaskForceIds] = useState<string[]>([]);
+  const [categoriesPtf, setCategoriesPtf] = useState<string[]>([]);
   const [toutesLesOsc, setToutesLesOsc] = useState(false);
+  const [tousLesPtf, setTousLesPtf] = useState(false);
 
   const [objet, setObjet] = useState("");
   const [message, setMessage] = useState("");
@@ -93,12 +97,14 @@ export default function MessagesGroupesPage() {
     regions,
     pole_ids: poleIds.map(Number),
     task_force_ids: taskForceIds.map(Number),
+    ptf_categories: categoriesPtf,
     toutes_les_osc: toutesLesOsc,
-  }), [crascIds, typeIds, categories, regions, poleIds, taskForceIds, toutesLesOsc]);
+    tous_les_ptf: tousLesPtf,
+  }), [crascIds, typeIds, categories, regions, poleIds, taskForceIds, categoriesPtf, toutesLesOsc, tousLesPtf]);
 
   const auMoinsUnCritere =
-    toutesLesOsc || crascIds.length > 0 || typeIds.length > 0 || categories.length > 0 ||
-    regions.length > 0 || poleIds.length > 0 || taskForceIds.length > 0;
+    toutesLesOsc || tousLesPtf || crascIds.length > 0 || typeIds.length > 0 || categories.length > 0 ||
+    regions.length > 0 || poleIds.length > 0 || taskForceIds.length > 0 || categoriesPtf.length > 0;
 
   // L'aperçu se recalcule dès qu'un critère change : on sait qui sera touché
   useEffect(() => {
@@ -232,12 +238,33 @@ export default function MessagesGroupesPage() {
             <GroupeCases titre="Catégorie d'OSC" options={criteres.categories} selection={categories} setSelection={setCategories} desactive={toutesLesOsc} />
             <GroupeCases titre="Région" options={criteres.regions} selection={regions} setSelection={setRegions} desactive={toutesLesOsc} />
             <GroupeCases titre="Pôle de concertation" options={criteres.poles} selection={poleIds} setSelection={setPoleIds} desactive={toutesLesOsc} />
-            <GroupeCases titre="Task force (PTF)" options={criteres.task_forces} selection={taskForceIds} setSelection={setTaskForceIds} />
+            <GroupeCases titre="Task force" options={criteres.task_forces} selection={taskForceIds} setSelection={setTaskForceIds} desactive={toutesLesOsc} />
+          </div>
+
+          {/* Les PTF ne sont pas des OSC : sélection indépendante, qui s'ajoute */}
+          <div className="mt-5 pt-5 border-t border-gray-100">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3 p-3 rounded-xl border border-gray-200 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={tousLesPtf}
+                onChange={(e) => setTousLesPtf(e.target.checked)}
+                className="accent-[#2A591D]"
+              />
+              Tous les partenaires techniques et financiers
+            </label>
+            <GroupeCases
+              titre="Partenaires techniques et financiers (par catégorie)"
+              options={criteres.categories_ptf}
+              selection={categoriesPtf}
+              setSelection={setCategoriesPtf}
+              desactive={tousLesPtf}
+            />
           </div>
 
           <p className="text-xs text-gray-500 mt-4 bg-gray-50 border border-gray-100 rounded-lg p-3">
             Les critères OSC se combinent : cocher « CRASC Nord » et « Organisation de femmes »
-            vise les organisations de femmes du CRASC Nord. Les task forces ajoutent les PTF membres.
+            vise les organisations de femmes du CRASC Nord. Les task forces sont des groupes d&apos;OSC
+            de l&apos;espace collaboratif. La sélection de PTF est indépendante et s&apos;ajoute au résultat.
           </p>
         </div>
 
