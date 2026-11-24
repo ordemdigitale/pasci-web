@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Users, Plus, Edit3, Trash2, Loader2, Save, X, Crown, Search } from "lucide-react";
+import Link from "next/link";
+import { Users, Plus, Edit3, Trash2, Loader2, Save, X, Crown, Search, FolderOpen } from "lucide-react";
 import { fetchWithAuth } from "@/lib/auth";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -20,14 +21,70 @@ interface TaskForce {
   nom: string;
   slug?: string | null;
   thematique?: string | null;
+  zone?: string | null;
   description?: string | null;
   pole_id?: number | null;
   pole_nom?: string | null;
   ordre: number;
   actif: boolean;
   nb_membres: number;
+  nb_personnes: number;
+  nb_documents: number;
   membres: Membre[];
 }
+
+/** Personne siégeant dans la task force, au nom d'une OSC. */
+interface Personne {
+  id: number;
+  task_force_id: number;
+  osc_id?: number | null;
+  osc_nom?: string | null;
+  titre?: string | null;
+  nom: string;
+  fonction?: string | null;
+  contact?: string | null;
+  email?: string | null;
+  zone_crasc?: string | null;
+  groupes_thematiques?: string | null;
+  role?: string | null;
+  est_coordonnateur: boolean;
+}
+
+interface DocumentTf {
+  id: number;
+  task_force_id?: number | null;
+  task_force_nom?: string | null;
+  categorie: string;
+  sous_categorie?: string | null;
+  titre: string;
+  description?: string | null;
+  fichier_url?: string | null;
+  fichier_nom?: string | null;
+  taille_octets?: number | null;
+  auteur_nom?: string | null;
+  created_at: string;
+}
+
+interface CategorieDoc {
+  categorie: string;
+  sous_categories: string[];
+  nb_documents: number;
+}
+
+const ZONES = ["Nord", "Sud", "Est", "Ouest", "Centre"];
+
+const PERSONNE_VIDE = {
+  osc_id: null as number | null,
+  osc_nom: "",
+  titre: "",
+  nom: "",
+  fonction: "",
+  contact: "",
+  email: "",
+  groupes_thematiques: "",
+  role: "",
+  est_coordonnateur: false,
+};
 
 interface OscMini {
   id: number;
@@ -44,6 +101,7 @@ interface Brouillon {
   id?: number;
   nom: string;
   thematique: string;
+  zone: string;
   description: string;
   pole_id: string;
   ordre: number;
@@ -54,7 +112,7 @@ interface Brouillon {
 
 const VIDE: Brouillon = {
   nom: "", thematique: "", description: "", pole_id: "", ordre: 0,
-  actif: true, osc_ids: [], chef_de_file_id: null,
+  actif: true, osc_ids: [], chef_de_file_id: null, zone: "",
 };
 
 export default function TaskForcesOscPage() {
@@ -123,6 +181,7 @@ export default function TaskForcesOscPage() {
       id: tf.id,
       nom: tf.nom,
       thematique: tf.thematique || "",
+      zone: tf.zone || "",
       description: tf.description || "",
       pole_id: tf.pole_id ? String(tf.pole_id) : "",
       ordre: tf.ordre,
@@ -160,6 +219,7 @@ export default function TaskForcesOscPage() {
       const corps = {
         nom: brouillon.nom.trim(),
         thematique: brouillon.thematique.trim() || null,
+        zone: brouillon.zone || null,
         description: brouillon.description.trim() || null,
         pole_id: brouillon.pole_id ? Number(brouillon.pole_id) : null,
         ordre: brouillon.ordre,
@@ -233,7 +293,8 @@ export default function TaskForcesOscPage() {
                 <div className="min-w-0">
                   <h2 className="font-bold text-gray-900">{tf.nom}</h2>
                   <p className="text-xs text-gray-500">
-                    {tf.thematique || "Sans thématique"}
+                    {tf.zone ? `Zone ${tf.zone}` : "Sans zone"}
+                    {tf.thematique ? ` · ${tf.thematique}` : ""}
                     {tf.pole_nom ? ` · pôle ${tf.pole_nom}` : ""}
                   </p>
                 </div>
@@ -254,8 +315,19 @@ export default function TaskForcesOscPage() {
 
               {tf.description && <p className="text-sm text-gray-600 mb-3 line-clamp-2">{tf.description}</p>}
 
+              <div className="flex items-center gap-3 mb-2">
+                <Link href={`/admin/espace-collaboratif/task-forces/${tf.id}`}
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#2A591D] hover:underline">
+                  <Users className="w-4 h-4" /> {tf.nb_personnes} membre(s)
+                </Link>
+                <Link href={`/admin/espace-collaboratif/task-forces/${tf.id}#documents`}
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#E05017] hover:underline">
+                  <FolderOpen className="w-4 h-4" /> {tf.nb_documents} document(s)
+                </Link>
+              </div>
+
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">
-                {tf.nb_membres} OSC membre(s)
+                {tf.nb_membres} OSC rattachée(s)
               </p>
               <div className="flex flex-wrap gap-1">
                 {tf.membres.slice(0, 6).map((m) => (
@@ -303,6 +375,15 @@ export default function TaskForcesOscPage() {
                     onChange={(e) => setBrouillon({ ...brouillon, thematique: e.target.value })}
                     placeholder="Gouvernance, genre, climat…"
                     className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-[#2A591D]" />
+                </label>
+                <label className="text-xs font-semibold text-gray-600">
+                  Zone
+                  <select value={brouillon.zone}
+                    onChange={(e) => setBrouillon({ ...brouillon, zone: e.target.value })}
+                    className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-[#2A591D]">
+                    <option value="">Aucune (hors découpage régional)</option>
+                    {ZONES.map((z) => <option key={z} value={z}>{z}</option>)}
+                  </select>
                 </label>
                 <label className="text-xs font-semibold text-gray-600">
                   Pôle de rattachement

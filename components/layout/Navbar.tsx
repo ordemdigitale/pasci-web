@@ -37,6 +37,10 @@ const NavLinks = [
     submenu2: {
       title: 'Offres d\'emploi',
       href: "/espace-collaboratif/offres-emploi",
+    },
+    submenu3: {
+      title: 'Taskforce',
+      href: "/espace-collaboratif/task-forces",
     }
   };
 
@@ -112,6 +116,11 @@ export default function Navbar() {
                         <DropdownMenuSub>
                           <Link href={espaceCollabSubmenu.submenu2.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
                             <span>{espaceCollabSubmenu.submenu2.title}</span>
+                          </Link>
+                        </DropdownMenuSub>
+                        <DropdownMenuSub>
+                          <Link href={espaceCollabSubmenu.submenu3.href} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm'>
+                            <span>{espaceCollabSubmenu.submenu3.title}</span>
                           </Link>
                         </DropdownMenuSub>
                       </DropdownMenuContent>
@@ -247,6 +256,9 @@ export default function Navbar() {
                           </Link>
                           <Link href={espaceCollabSubmenu.submenu2.href} className="block text-sm text-gray-700">
                             {espaceCollabSubmenu.submenu2.title}
+                          </Link>
+                          <Link href={espaceCollabSubmenu.submenu3.href} className="block text-sm text-gray-700">
+                            {espaceCollabSubmenu.submenu3.title}
                           </Link>
                         </div>
                       )}
