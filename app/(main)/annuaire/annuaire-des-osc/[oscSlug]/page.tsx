@@ -444,10 +444,11 @@ export default function OSCDetailPage({ params }: { params: Promise<{ oscSlug: s
                   </div>
                 )}
 
+                {/* Contacts de l'organisation uniquement : le contact personnel
+                    du/de la président(e) reste réservé au back-office. */}
                 {([
                   { label: "Téléphone", valeur: oscData.phone },
                   { label: "Contact de l'OSC", valeur: oscData.contact_osc },
-                  { label: "Contact du/de la président(e)", valeur: oscData.contact_president },
                   { label: "Contact 1", valeur: oscData.contact_1 },
                   { label: "Contact 2", valeur: oscData.contact_2 },
                 ] as const).map(({ label, valeur }) => valeur ? (

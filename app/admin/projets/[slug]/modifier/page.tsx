@@ -3,6 +3,7 @@ import { fetchWithAuth } from "@/lib/auth";
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useDomainesPrioritaires, avecValeurActuelle } from "@/lib/osc-domaines";
 import { useForm } from "react-hook-form";
 import SelecteurZones from "@/components/admin/SelecteurZones";
 import { messageErreurApi } from "@/lib/erreurs-api";
@@ -34,19 +35,13 @@ const projetSchema = z.object({
 
 type ProjetFormData = z.infer<typeof projetSchema>;
 
-const domaines = [
-  "Environnement",
-  "Éducation",
-  "Santé",
-  "Culture & Économie",
-  "Agriculture",
-  "Eau & Assainissement",
-  "Développement communautaire",
-];
 
 
 export default function EditProjetPage() {
   const router = useRouter();
+  // Mêmes domaines qu'à la création d'une OSC (pôles de concertation)
+  const domainesOptions = useDomainesPrioritaires();
+
   const params = useParams();
   const slug = params.slug as string;
 
@@ -364,9 +359,9 @@ export default function EditProjetPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E05017] focus:border-[#E05017]"
                   >
                     <option value="">Sélectionnez un domaine</option>
-                    {domaines.map((domaine) => (
-                      <option key={domaine} value={domaine}>
-                        {domaine}
+                    {avecValeurActuelle(domainesOptions, watch("domaine")).map((domaine) => (
+                      <option key={domaine.value} value={domaine.value}>
+                        {domaine.label}
                       </option>
                     ))}
                   </select>

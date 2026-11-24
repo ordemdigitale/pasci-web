@@ -18,23 +18,17 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { IOffreProjet } from '@/types/api.types';
+import { useDomainesPrioritaires } from '@/lib/osc-domaines';
 import DateLimiteSoumission from '@/components/projets/DateLimiteSoumission';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
-/* Categories data */
-const domaines = [
-  "Environnement",
-  "Éducation",
-  "Santé",
-  "Culture & Économie",
-  "Agriculture",
-  "Développement communautaire"
-];
 
 const zones = ZONES_PROJET;
 
 export default function PageOffreProjet() {
+  // Mêmes domaines qu'à l'enregistrement d'un projet et d'une OSC
+  const domaines = useDomainesPrioritaires();
   const [projets, setProjets] = useState<IOffreProjet[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
